@@ -4,13 +4,6 @@ use opengles::gl2;
 use std::io;
 use std::path;
 
-/// Clears background with a color.
-#[inline(always)]
-pub fn clear_background(r: f32, g: f32, b: f32, a: f32) {
-    gl2::clear_color(r, g, b, a);
-    gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT);
-}
-
 /// Compiles a vertex shader from file and fails if not succeeding.
 pub fn compile_shader_file(
     shader_type: gl2::GLenum, 

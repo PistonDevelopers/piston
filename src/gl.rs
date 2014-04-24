@@ -79,6 +79,13 @@ impl Gl {
 }
 
 impl BackEnd for Gl {
+    fn supports_clear_rgba(&self) -> bool { true }
+
+    fn clear_rgba(&mut self, r: f32, g: f32, b: f32, a: f32) {
+        gl::clear_color(r, g, b, a);
+        gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+    }
+
     fn supports_tri_list_xy_rgba_f32(&self) -> bool { true }
 
     fn tri_list_xy_rgba_f32(&mut self, vertices: &[f32], colors: &[f32]) {
