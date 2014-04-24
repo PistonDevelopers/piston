@@ -28,6 +28,13 @@ pub fn compile_shader_file(
     })
 }
 
+/// Splits lines into byte slices.
+pub fn with_shader_source<T>(source: &str, f: |&[&[u8]]| -> T) -> T {
+    let lines: Vec<&[u8]> = source.split('\n')
+                .map(|line| line.as_bytes()).collect();
+    f(lines.as_slice())
+}
+
 /// Reads a shader file and creates data required to compile.
 pub fn with_shader_file<T>(file: &str, f: |io::IoResult<&[&[u8]]>| -> T) -> T {
     let path = path::Path::new(file);

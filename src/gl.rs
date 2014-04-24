@@ -1,8 +1,30 @@
 //! OpenGL back-end for Rust-Graphics.
 
 use gl = opengles::gl2;
-use shader_utils::{compile_shader_file};
+use shader_utils::{with_shader_source, compile_shader};
 use BackEnd = graphics::BackEnd;
+
+static VERTEX_SHADER_TRI_LIST_XY_RGBA: &'static str = "
+attribute vec4 a_v4Position;
+attribute vec4 a_v4FillColor;
+ 
+varying vec4 v_v4FillColor;
+ 
+void main()
+{
+    v_v4FillColor = a_v4FillColor;
+    gl_Position = a_v4Position;
+}
+";
+
+static FRAGMENT_SHADER_TRI_LIST_XY_RGBA: &'static str = "
+varying vec4 v_v4FillColor;
+ 
+void main()
+{
+        gl_FragColor = v_v4FillColor;
+}
+";
 
 /// OpenGL back-end for Rust-Graphics.
 pub struct Gl {
@@ -19,12 +41,14 @@ pub struct Gl {
 impl Gl {
     /// Creates a new Gl.
     pub fn new() -> Gl {
-        let vertex_shader = compile_shader_file(
-            gl::VERTEX_SHADER,
-            "triangle.vert");
-        let fragment_shader = compile_shader_file(
-            gl::FRAGMENT_SHADER,
-            "triangle.frag");
+        let vertex_shader = with_shader_source(
+            VERTEX_SHADER_TRI_LIST_XY_RGBA, |src| {
+                compile_shader(gl::VERTEX_SHADER, src)
+            }).unwrap();
+        let fragment_shader = with_shader_source(
+            FRAGMENT_SHADER_TRI_LIST_XY_RGBA, |src| {
+                compile_shader(gl::FRAGMENT_SHADER, src)
+            }).unwrap();
         let program = gl::create_program();
         gl::attach_shader(program, vertex_shader);
         gl::attach_shader(program, fragment_shader);
