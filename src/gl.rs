@@ -86,13 +86,13 @@ impl BackEnd for Gl {
         gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
     }
 
-    fn alpha_blend(&mut self, on: bool) {
-        if on {
-            gl::enable(gl::BLEND);
-            gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-        } else {
-            gl::disable(gl::BLEND);
-        }
+    fn enable_alpha_blend(&mut self) {
+        gl::enable(gl::BLEND);
+        gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+    }
+
+    fn disable_alpha_blend(&mut self) {
+        gl::disable(gl::BLEND);
     }
 
     fn supports_tri_list_xy_rgba_f32(&self) -> bool { true }
