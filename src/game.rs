@@ -3,6 +3,8 @@
 use glfw;
 use glfw::Context;
 use gl = opengles::gl2;
+use graphics;
+use Gl = gl::Gl;
 
 use game_window::GameWindow;
 
@@ -41,7 +43,7 @@ pub trait Game {
     fn get_settings<'a>(&'a self) -> &'a Settings;
     
     /// Render graphics.
-    fn render(&self); 
+    fn render(&self, context: &graphics::Context, gl: &mut Gl); 
     
     /// Update the physical state of the game.
     fn update(&mut self);
@@ -49,21 +51,12 @@ pub trait Game {
     /// Perform tasks for loading before showing anything.
     fn load(&mut self);
 
-    /// Clears the background with color from settings.
-    #[inline(always)]
-    fn clear_background(&self) {
-        let rgb  = self.get_settings().background_color;
-        gl::clear_color(rgb[0], rgb[1], rgb[2], rgb[3]);
-        gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-    }
-
     /// Sets up viewport.
     #[inline(always)]
     fn viewport(&self) {
         let game_window = self.get_game_window();
         let (w, h) = game_window.window.get_size();
         gl::viewport(0, 0, w as gl::GLint, h as gl::GLint); 
-        self.clear_background();
     }
 
     /// Whether the window should be closed.
@@ -98,11 +91,18 @@ pub trait Game {
 
     /// Executes a game loop.
     fn run(&mut self) {
+        use graphics::{Clear, AddColor};
+        use gl::Gl;
+
         self.load();
+        let mut gl = Gl::new();
+        let context = graphics::Context::new();
+        let bg = self.get_settings().background_color;
+        let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
         while !self.should_close() {
             self.viewport();
-            self.clear_background();
-            self.render();
+            bg.clear(&mut gl);
+            self.render(&context, &mut gl);
             self.swap_buffers();
             self.update();
             self.handle_events();
