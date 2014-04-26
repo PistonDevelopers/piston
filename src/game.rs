@@ -36,9 +36,6 @@ impl Settings {
 
 /// Implement default behavior for a game.
 pub trait Game {
-    /// Get the game window.
-    fn get_game_window<'a>(&'a self) -> &'a GameWindow;
-    
     /// Read settings.
     fn get_settings<'a>(&'a self) -> &'a Settings;
     
@@ -51,38 +48,47 @@ pub trait Game {
     /// Perform tasks for loading before showing anything.
     fn load(&mut self);
 
+    /// User pressed a key.
+    fn key_press(&mut self, _key: glfw::Key) {}
+
+    /// User released a key.
+    fn key_release(&mut self, _key: glfw::Key) {}
+
     /// Sets up viewport.
     #[inline(always)]
-    fn viewport(&self) {
-        let game_window = self.get_game_window();
+    fn viewport(&self, game_window: &GameWindow) {
         let (w, h) = game_window.window.get_size();
         gl::viewport(0, 0, w as gl::GLint, h as gl::GLint); 
     }
 
     /// Whether the window should be closed.
-    fn should_close(&self) -> bool {
-        self.get_game_window().window.should_close()
+    fn should_close(&self, game_window: &GameWindow) -> bool {
+        game_window.window.should_close()
     }
 
     /// Swaps the front buffer with the back buffer.
     /// This shows the next frame.
-    fn swap_buffers(&self) {
-        self.get_game_window().window.swap_buffers()
+    fn swap_buffers(&self, game_window: &GameWindow) {
+        game_window.window.swap_buffers()
     }
 
     /// Handles events with default settings..
-    fn handle_events(&self) {
-        let game_window = self.get_game_window();
-        let glfw = &game_window.glfw;
-        let settings = self.get_settings();
-        glfw.poll_events();
+    fn handle_events(&mut self, game_window: &GameWindow) {
+        let exit_on_esc = self.get_settings().exit_on_esc;
+        game_window.glfw.poll_events();
         for (_, event) in 
         glfw::flush_messages(&game_window.events) {
             match event {
                 // Close with Esc.
                 glfw::KeyEvent(glfw::KeyEscape, _, glfw::Press, _)
-                if settings.exit_on_esc  => {
+                if exit_on_esc  => {
                     game_window.window.set_should_close(true)
+                },
+                glfw::KeyEvent(key, _, glfw::Press, _) => {
+                    self.key_press(key)
+                },
+                glfw::KeyEvent(key, _, glfw::Release, _) => {
+                    self.key_release(key)
                 },
                 _ => {},
             }
@@ -90,7 +96,7 @@ pub trait Game {
     }
 
     /// Executes a game loop.
-    fn run(&mut self) {
+    fn run(&mut self, game_window: &GameWindow) {
         use graphics::{Clear, AddColor};
         use gl::Gl;
 
@@ -99,13 +105,13 @@ pub trait Game {
         let context = graphics::Context::new();
         let bg = self.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
-        while !self.should_close() {
-            self.viewport();
+        while !self.should_close(game_window) {
+            self.viewport(game_window);
             bg.clear(&mut gl);
             self.render(&context, &mut gl);
-            self.swap_buffers();
+            self.swap_buffers(game_window);
             self.update();
-            self.handle_events();
+            self.handle_events(game_window);
         }
     }
 }
