@@ -1,5 +1,6 @@
 //! Game loop.
 
+use time;
 use glfw;
 use glfw::Context;
 use gl = opengles::gl2;
@@ -43,7 +44,7 @@ pub trait Game {
     fn render(&self, context: &graphics::Context, gl: &mut Gl); 
     
     /// Update the physical state of the game.
-    fn update(&mut self);
+    fn update(&mut self, dt: f64);
     
     /// Perform tasks for loading before showing anything.
     fn load(&mut self);
@@ -105,12 +106,22 @@ pub trait Game {
         let context = graphics::Context::new();
         let bg = self.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
+        let updates_per_second: u64 = 100;
+        let dt: f64 = 1.0 / updates_per_second as f64;
+        let update_time_in_ns: u64 = 1_000_000_000 / updates_per_second;
+        let mut last_update = time::precise_time_ns();
         while !self.should_close(game_window) {
             self.viewport(game_window);
             bg.clear(&mut gl);
             self.render(&context, &mut gl);
             self.swap_buffers(game_window);
-            self.update();
+            // Perform updates by fixed time step until it catches up.
+            loop {
+                self.update(dt);
+                last_update += update_time_in_ns;
+                let now = time::precise_time_ns();
+                if now <= last_update { break; }
+            }
             self.handle_events(game_window);
         }
     }

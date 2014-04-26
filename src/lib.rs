@@ -3,6 +3,7 @@
 
 //! A user friendly graphics engine.
 
+extern crate time;
 extern crate graphics;
 extern crate opengles;
 extern crate glfw;
