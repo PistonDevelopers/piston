@@ -23,7 +23,7 @@ There are currently many breaking changes in Rust, so please help the maintainer
 In the Terminal window, navigate to the project folder and type:
 
 ```
-make lib
+make rlib
 ```
 
 This gives you a new '.rlib' file in the '/target/cpu-vendor-os/lib/' folder to put in your project.
