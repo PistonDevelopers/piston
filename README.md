@@ -15,7 +15,8 @@ Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
 If you are starting a new project, [Rust-Empty](https://github.com/bvssvni/rust-empty) will automate the setup of directories for you.
 
 When you have set up your project, you can build Piston.  
-One way to simplify working with multiple projects on the same machine is to symlink the '.rlib' directly into the next project with the command `ln -s <from> <to>`.
+Piston can either be compiled as a static or dynamic library (or both).  
+One way to simplify working with multiple projects on the same machine is to symlink the '.rlib' directly into the next project with the command `ln -s <from> <to>`.  
 
 ## How to build Piston
 
