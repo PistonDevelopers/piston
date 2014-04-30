@@ -10,6 +10,13 @@ Built on top of
 
 Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
 
+## Start new project with Piston
+
+If you are starting a new project, [Rust-Empty](https://github.com/bvssvni/rust-empty) will automate the setup of directories for you.
+
+When you have set up your project, you can build Piston.  
+One way to simplify working with multiple projects on the same machine is to symlink the '.rlib' directly into the next project with the command `ln -s <from> <to>`.
+
 ## How to build Piston
 
 Build the folliwing projects and put the '.rlib' files to '/target/cpu-vendor-os/lib/':
@@ -23,12 +30,14 @@ There are currently many breaking changes in Rust, so please help the maintainer
 In the Terminal window, navigate to the project folder and type:
 
 ```
-make rlib
+make
 ```
 
 This gives you a new '.rlib' file in the '/target/cpu-vendor-os/lib/' folder to put in your project.
 
-If you are starting a new project, [Rust-Empty](https://github.com/bvssvni/rust-empty) will automate the setup of directories for you.
+## Compiling dynamic library
+
+The default make command can be modified by setting `DEFAULT = make dylib` in the `Makefile`. 
 
 ## Goals
 
