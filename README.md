@@ -26,6 +26,10 @@ In the Terminal window, navigate to the project folder and type:
 make lib
 ```
 
+This gives you a new '.rlib' file in the '/target/cpu-vendor-os/lib/' folder to put in your project.
+
+If you are starting a new project, [Rust-Empty](https://github.com/bvssvni/rust-empty) will automate the setup of directories for you.
+
 ## Goals
 
 * Test the design and performance of Rust-Graphics
