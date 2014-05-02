@@ -10,12 +10,13 @@ extern crate glfw;
 
 pub use Game = game::Game;
 pub use GameWindow = game_window::GameWindow;
-pub use GameSettings = game::GameSettings;
+pub use GameSettings = game_settings::GameSettings;
 pub use Gl = gl::Gl;
 
 pub mod shader_utils;
 
 mod game;
+mod game_settings;
 mod game_window;
 mod gl;
 
