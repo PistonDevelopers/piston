@@ -96,9 +96,9 @@ impl BackEnd for Gl {
         gl::disable(gl::BLEND);
     }
 
-    fn supports_tri_list_xy_rgba_f32(&self) -> bool { true }
+    fn supports_tri_list_xy_f32_rgba_f32(&self) -> bool { true }
 
-    fn tri_list_xy_rgba_f32(&mut self, vertices: &[f32], colors: &[f32]) {
+    fn tri_list_xy_f32_rgba_f32(&mut self, vertices: &[f32], colors: &[f32]) {
         let size_vertices: i32 = 2;
         gl::bind_buffer(gl::ARRAY_BUFFER, self.position_id);
         gl::buffer_data(gl::ARRAY_BUFFER, vertices.as_slice(), gl::DYNAMIC_DRAW);
