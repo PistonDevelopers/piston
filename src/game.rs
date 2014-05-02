@@ -11,27 +11,38 @@ use Gl = gl::Gl;
 use GameWindowSettings = game_window_settings::GameWindowSettings;
 use GameWindow = game_window::GameWindow;
 
-/// Implement default behavior for a game.
+/// Implemented by game applications.
 pub trait Game {
-    /// Read game settings.
+    /// Read game window settings.
     fn get_game_window_settings<'a>(&'a self) -> &'a GameWindowSettings;
     
     /// Render graphics.
+    /// 
+    /// `context` is a Rust-Graphics context.  
+    /// `gl` is the Piston OpenGL back-end for Rust-Graphics.  
     fn render(&self, context: &Context, gl: &mut Gl); 
     
     /// Update the physical state of the game.
+    ///
+    /// `dt` is the delta time from last update in seconds.
     fn update(&mut self, dt: f64);
     
     /// Perform tasks for loading before showing anything.
     fn load(&mut self);
 
     /// User pressed a key.
+    ///
+    /// This can be overridden to handle key pressed events.
     fn key_press(&mut self, _key: glfw::Key) {}
 
     /// User released a key.
+    ///
+    /// This can be overridden to handle key released events.
     fn key_release(&mut self, _key: glfw::Key) {}
 
     /// Sets up viewport.
+    ///
+    /// A viewport is the region of the window where graphics is rendered.  
     #[inline(always)]
     fn viewport(&self, game_window: &GameWindow) {
         let (w, h) = game_window.window.get_size();
@@ -39,19 +50,28 @@ pub trait Game {
     }
 
     /// Whether the window should be closed.
+    ///
+    /// When this is `true` the application shuts down.  
+    /// This can be overridden to emulate a user closing the window.  
+    /// One can also override this method to prevent window from closing.  
     fn should_close(&self, game_window: &GameWindow) -> bool {
         game_window.window.should_close()
     }
 
-    /// Swaps the front buffer with the back buffer.
-    /// This shows the next frame.
+    /// Swaps the front buffer with the back buffer.  
+    /// 
+    /// When called, This shows the next frame.  
+    /// The graphics is rendered to the back buffer.  
+    /// The front buffer is displayed on the screen.  
     fn swap_buffers(&self, game_window: &GameWindow) {
         use glfw::Context;
 
         game_window.window.swap_buffers()
     }
 
-    /// Handles events with default settings..
+    /// Handles events using current game window settings.
+    ///
+    /// This can be overriden to do custom event handling.  
     fn handle_events(&mut self, game_window: &GameWindow) {
         let exit_on_esc = self.get_game_window_settings().exit_on_esc;
         game_window.glfw.poll_events();
@@ -75,6 +95,8 @@ pub trait Game {
     }
 
     /// Executes a game loop.
+    /// 
+    /// The loop continues until `should_close` returns true.  
     fn run(&mut self, game_window: &GameWindow) {
         use graphics::{Clear, AddColor};
         use gl::Gl;

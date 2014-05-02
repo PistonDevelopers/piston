@@ -40,7 +40,7 @@ pub struct Gl {
 
 
 impl Gl {
-    /// Creates a new Gl.
+    /// Creates a new OpenGl back-end.
     pub fn new() -> Gl {
         let vertex_shader = with_shader_source(
             VERTEX_SHADER_TRI_LIST_XY_RGBA, |src| {

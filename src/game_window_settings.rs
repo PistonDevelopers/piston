@@ -1,5 +1,5 @@
 
-/// Basic settings for window behavior.
+/// Settings for window behavior.
 pub struct GameWindowSettings {
     /// If true, exit when pressing Esc.
     pub exit_on_esc: bool,
