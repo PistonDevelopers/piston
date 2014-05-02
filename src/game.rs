@@ -10,25 +10,25 @@ use Gl = gl::Gl;
 use game_window::GameWindow;
 
 /// Basic settings for window behavior.
-pub struct Settings {
+pub struct GameSettings {
     /// If true, exit when pressing Esc.
     pub exit_on_esc: bool,
     /// The color to use as background.
     pub background_color: [f32, ..4],
 }
 
-impl Settings {
+impl GameSettings {
     /// Gets default settings.
-    pub fn default() -> Settings {
-        Settings {
+    pub fn default() -> GameSettings {
+        GameSettings {
             exit_on_esc: true,
             background_color: [0.0, 0.0, 0.0, 1.0],
         }
     }
 
     /// Creates a new Settings.
-    pub fn new(exit_on_esc: bool, background_color: [f32, ..4]) -> Settings {
-        Settings {
+    pub fn new(exit_on_esc: bool, background_color: [f32, ..4]) -> GameSettings {
+        GameSettings {
             exit_on_esc: exit_on_esc,
             background_color: background_color,
         }
@@ -38,7 +38,7 @@ impl Settings {
 /// Implement default behavior for a game.
 pub trait Game {
     /// Read settings.
-    fn get_settings<'a>(&'a self) -> &'a Settings;
+    fn get_settings<'a>(&'a self) -> &'a GameSettings;
     
     /// Render graphics.
     fn render(&self, context: &graphics::Context, gl: &mut Gl); 
