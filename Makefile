@@ -61,7 +61,7 @@ all:
 
 help:
 	clear \
-	&& echo "--- rust-empty (0.2 012)" \
+	&& echo "--- rust-empty (0.3 002)" \
 	&& echo "make run               - Runs executable" \
 	&& echo "make exe               - Builds main executable" \
 	&& echo "make lib               - Both static and dynamic library" \
@@ -78,6 +78,8 @@ help:
 	&& echo "make examples          - Builds examples" \
 	&& echo "make cargo-lite-exe    - Setup executable package" \
 	&& echo "make cargo-lite-lib    - Setup library package" \
+	&& echo "make cargo-exe         - EXPERIMENTAL: Setup executable package" \
+	&& echo "make cargo-lib         - EXPERIMENTAL: Setup library package" \
 	&& echo "make rust-ci-lib       - Setup Travis CI Rust library" \
 	&& echo "make rust-ci-exe       - Setup Travis CI Rust executable" \
 	&& echo "make rusti             - Setup 'rusti.sh' for interactive Rust" \
@@ -87,11 +89,14 @@ help:
 	&& echo "make clean             - Deletes binaries and documentation." \
 	&& echo "make clear-project     - WARNING: Deletes project files except 'Makefile'" \
 	&& echo "make clear-git         - WARNING: Deletes Git setup" \
+	&& echo "make symlink-info      - Symlinked libraries dependency info"
 
 .PHONY: \
 		bench \
 		bench-internal \
 		bench-external \
+		cargo-lib \
+		cargo-exe \
 		cargo-lite-lib \
 		cargo-lite-exe \
 		clean \
@@ -104,6 +109,7 @@ help:
 		rusti \
 		rust-ci-lib \
 		rust-ci-exe \
+		symlink-info \
 		test \
 		test-internal \
 		test-external
@@ -140,8 +146,40 @@ cargo-lite-lib: src/lib.rs
 	( \
 		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"src/lib.rs\"\ncrate_type = \"library\"\nrustc_args = []\n" > cargo-lite.conf \
 		&& clear \
-		&& echo "--- Created 'cargo-lite-conf' for library" \
+		&& echo "--- Created 'cargo-lite.conf' for library" \
 		&& cat cargo-lite.conf \
+	)
+
+cargo-exe: src/main.rs
+	( \
+		test -e Cargo.toml \
+		&& clear \
+		&& echo "--- The file 'Cargo.toml' already exists" \
+	) \
+	|| \
+	( \
+		name=$${PWD##/*/} ; \
+		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
+		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[bin]]\n\nname = \"$$name\"\npath = \"bin/main.rs\"\n" > Cargo.toml \
+		&& clear \
+		&& echo "--- Created 'Cargo.toml' for executable" \
+		&& cat Cargo.toml \
+	)
+
+cargo-lib: src/main.rs
+	( \
+		test -e Cargo.toml \
+		&& clear \
+		&& echo "--- The file 'Cargo.toml' already exists" \
+	) \
+	|| \
+	( \
+		name=$${PWD##/*/} ; \
+		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
+		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"bin/lib.rs\"\n" > Cargo.toml \
+		&& clear \
+		&& echo "--- Created 'Cargo.toml' for executable" \
+		&& cat Cargo.toml \
 	)
 
 rust-ci-lib: src/lib.rs
@@ -323,6 +361,7 @@ clean:
 	&& echo "--- Deleted binaries and documentation"
 
 clear-project:
+	rm -f ".symlink-info"
 	rm -f "cargo-lite.conf"
 	rm -f ".travis.yml"
 	rm -f "rusti.sh"
@@ -363,4 +402,26 @@ loc:
 	clear \
 	&& echo "--- Counting lines of .rs files in 'src' (LOC):" \
 	&& find src/ -type f -name "*.rs" -exec cat {} \; | wc -l
+
+# Finds the original locations of symlinked libraries and
+# prints the commit hash with remote branches containing that commit.
+symlink-info:
+	current=$$(pwd) ; \
+	for symlib in $$(find target/*/lib/ -type l) ; do \
+		cd $$current ; \
+		echo $$symlib ; \
+		original_file=$$(readlink $$symlib) ; \
+		original_dir=$$(dirname $$original_file) ; \
+		cd $$original_dir ; \
+		commit=$$(git rev-parse HEAD) ; \
+		echo $$commit ; \
+		git config --get remote.origin.url ; \
+		git branch -r --contains $$commit ; \
+		echo "" ; \
+	done \
+	> .symlink-info \
+	&& cd $$current \
+	&& clear \
+	&& echo "--- Created '.symlink-info'" \
+	&& cat .symlink-info
 
