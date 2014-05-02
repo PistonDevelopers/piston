@@ -16,15 +16,15 @@ pub trait Game {
     /// 
     /// `context` is a Rust-Graphics context.  
     /// `gl` is the Piston OpenGL back-end for Rust-Graphics.  
-    fn render(&self, context: &Context, gl: &mut Gl); 
+    fn render(&self, _context: &Context, _gl: &mut Gl) {} 
     
     /// Update the physical state of the game.
     ///
     /// `dt` is the delta time from last update in seconds.
-    fn update(&mut self, dt: f64);
+    fn update(&mut self, _dt: f64) {}
     
     /// Perform tasks for loading before showing anything.
-    fn load(&mut self);
+    fn load(&mut self) {}
 
     /// User pressed a key.
     ///
