@@ -3,6 +3,9 @@
 // External crates.
 use glfw;
 
+// Local crate.
+use game_window_settings::GameWindowSettings;
+
 /// Contains stuff for game window.
 pub struct GameWindow {
     /// The window.
@@ -11,6 +14,8 @@ pub struct GameWindow {
     pub events: Receiver<(f64, glfw::WindowEvent)>,
     /// GLFW context.
     pub glfw: glfw::Glfw,
+    /// Game window settings;
+    pub settings: GameWindowSettings,
 }
 
 impl GameWindow {
@@ -19,7 +24,8 @@ impl GameWindow {
     pub fn window(
         title: &str,
         width: u32,
-        height: u32
+        height: u32,
+        settings: GameWindowSettings
     ) -> GameWindow {
         use glfw::Context;	    
 
@@ -35,6 +41,7 @@ impl GameWindow {
             window: window,
             events: events,
             glfw: glfw,
+            settings: settings,
         }
     }
 
@@ -42,7 +49,8 @@ impl GameWindow {
     /// Sets screen resolution to the physical size of the monitor.
     #[allow(dead_code)]
     pub fn fullscreen(
-        title: &str
+        title: &str,
+        settings: GameWindowSettings
     ) -> GameWindow { 
 	    // Create GLFW window.
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -61,6 +69,7 @@ impl GameWindow {
                 window: window,
                 events: events,
                 glfw: glfw,
+                settings: settings,
             }
         })
     }

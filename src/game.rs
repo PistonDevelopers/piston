@@ -8,14 +8,10 @@ use graphics::*;
 
 // Local crate.
 use Gl = gl::Gl;
-use GameWindowSettings = game_window_settings::GameWindowSettings;
 use GameWindow = game_window::GameWindow;
 
 /// Implemented by game applications.
 pub trait Game {
-    /// Read game window settings.
-    fn get_game_window_settings<'a>(&'a self) -> &'a GameWindowSettings;
-    
     /// Render graphics.
     /// 
     /// `context` is a Rust-Graphics context.  
@@ -73,7 +69,7 @@ pub trait Game {
     ///
     /// This can be overriden to do custom event handling.  
     fn handle_events(&mut self, game_window: &GameWindow) {
-        let exit_on_esc = self.get_game_window_settings().exit_on_esc;
+        let exit_on_esc = game_window.settings.exit_on_esc;
         game_window.glfw.poll_events();
         for (_, event) in 
         glfw::flush_messages(&game_window.events) {
@@ -104,7 +100,7 @@ pub trait Game {
         self.load();
         let mut gl = Gl::new();
         let context = Context::new();
-        let bg = self.get_game_window_settings().background_color;
+        let bg = game_window.settings.background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
         let updates_per_second: u64 = 100;
         let dt: f64 = 1.0 / updates_per_second as f64;
