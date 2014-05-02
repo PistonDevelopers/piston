@@ -37,8 +37,8 @@ impl GameSettings {
 
 /// Implement default behavior for a game.
 pub trait Game {
-    /// Read settings.
-    fn get_settings<'a>(&'a self) -> &'a GameSettings;
+    /// Read game settings.
+    fn get_game_settings<'a>(&'a self) -> &'a GameSettings;
     
     /// Render graphics.
     fn render(&self, context: &graphics::Context, gl: &mut Gl); 
@@ -75,7 +75,7 @@ pub trait Game {
 
     /// Handles events with default settings..
     fn handle_events(&mut self, game_window: &GameWindow) {
-        let exit_on_esc = self.get_settings().exit_on_esc;
+        let exit_on_esc = self.get_game_settings().exit_on_esc;
         game_window.glfw.poll_events();
         for (_, event) in 
         glfw::flush_messages(&game_window.events) {
@@ -104,7 +104,7 @@ pub trait Game {
         self.load();
         let mut gl = Gl::new();
         let context = graphics::Context::new();
-        let bg = self.get_settings().background_color;
+        let bg = self.get_game_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
         let updates_per_second: u64 = 100;
         let dt: f64 = 1.0 / updates_per_second as f64;
