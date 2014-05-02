@@ -1,5 +1,6 @@
 #![crate_id = "piston"]
 #![deny(missing_doc)]
+#![feature(globs)]
 
 //! A user friendly graphics engine.
 

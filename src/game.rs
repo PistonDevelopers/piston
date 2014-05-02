@@ -2,9 +2,8 @@
 
 use time;
 use glfw;
-use glfw::Context;
 use gl = opengles::gl2;
-use graphics;
+use graphics::*;
 use Gl = gl::Gl;
 use GameSettings = game_settings::GameSettings;
 use GameWindow = game_window::GameWindow;
@@ -15,7 +14,7 @@ pub trait Game {
     fn get_game_settings<'a>(&'a self) -> &'a GameSettings;
     
     /// Render graphics.
-    fn render(&self, context: &graphics::Context, gl: &mut Gl); 
+    fn render(&self, context: &Context, gl: &mut Gl); 
     
     /// Update the physical state of the game.
     fn update(&mut self, dt: f64);
@@ -44,6 +43,8 @@ pub trait Game {
     /// Swaps the front buffer with the back buffer.
     /// This shows the next frame.
     fn swap_buffers(&self, game_window: &GameWindow) {
+        use glfw::Context;
+
         game_window.window.swap_buffers()
     }
 
@@ -77,7 +78,7 @@ pub trait Game {
 
         self.load();
         let mut gl = Gl::new();
-        let context = graphics::Context::new();
+        let context = Context::new();
         let bg = self.get_game_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
         let updates_per_second: u64 = 100;
