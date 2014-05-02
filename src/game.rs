@@ -1,9 +1,12 @@
 //! Game loop.
 
+// External crates.
 use time;
 use glfw;
 use gl = opengles::gl2;
 use graphics::*;
+
+// Local crate.
 use Gl = gl::Gl;
 use GameSettings = game_settings::GameSettings;
 use GameWindow = game_window::GameWindow;

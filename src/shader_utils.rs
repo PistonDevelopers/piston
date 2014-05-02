@@ -1,5 +1,6 @@
 //! Helper functions for dealing with shaders.
 
+// External crates.
 use opengles::gl2;
 use std::io;
 use std::path;

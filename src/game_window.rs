@@ -1,7 +1,7 @@
-//! Creating of window.
+//! Create window.
 
+// External crates.
 use glfw;
-use glfw::Context;
 
 /// Contains stuff for game window.
 pub struct GameWindow {
@@ -21,7 +21,9 @@ impl GameWindow {
         width: u32,
         height: u32
     ) -> GameWindow {
-	    // Create GLFW window.
+        use glfw::Context;	    
+
+        // Create GLFW window.
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
         let (window, events) = glfw.create_window(
             width, height, title, glfw::Windowed)
@@ -45,6 +47,8 @@ impl GameWindow {
 	    // Create GLFW window.
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
         glfw.with_primary_monitor(|m| {
+            use glfw::Context;            
+
             let m = m.unwrap();
             let (width, height) = m.get_physical_size();
             let (window, events) = glfw.create_window(
