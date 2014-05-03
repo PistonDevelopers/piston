@@ -11,7 +11,7 @@ https://github.com/bvssvni/rust-graphics.git
   origin/master
 
 target/x86_64-apple-darwin/lib//libopengles-73387c6a-0.1.rlib
-dc980ff084d61359423b229553ca78caba0bd7af
+d2384a67e8a8d6738a23e25d26c088b432aba992
 https://github.com/bvssvni/rust-opengles.git
-  origin/rustup_20140422
+  origin/rustup_20140503_rebase
 
