@@ -109,7 +109,14 @@ pub trait Game {
         while !self.should_close(game_window) {
             self.viewport(game_window);
             bg.clear(&mut gl);
-            self.render(&context, &mut gl);
+            let (w, h) = game_window.window.get_size();
+            if w != 0 && h != 0 {
+                self.render(&context
+                .trans_local(-1.0, 1.0)
+                .scale_local(2.0 / w as f64, -2.0 / h as f64)
+                .store_view()
+                .reset(), &mut gl);
+            }
             self.swap_buffers(game_window);
             // Perform updates by fixed time step until it catches up.
             loop {
