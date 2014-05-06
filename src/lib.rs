@@ -12,6 +12,7 @@ extern crate graphics;
 extern crate opengles;
 extern crate glfw;
 extern crate log;
+extern crate collections;
 
 pub use Game = game::Game;
 pub use GameWindow = game_window::GameWindow;
