@@ -9,6 +9,9 @@ pub struct GameWindowSettings {
 
 impl GameWindowSettings {
     /// Gets default settings.
+    ///
+    /// This exits the window when pressing `Esc`.  
+    /// The background color is set to black.  
     pub fn default() -> GameWindowSettings {
         GameWindowSettings {
             exit_on_esc: true,
