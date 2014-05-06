@@ -17,6 +17,7 @@ pub use Game = game::Game;
 pub use GameWindow = game_window::GameWindow;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use Gl = gl::Gl;
+pub use GlData = gl::GlData;
 pub use AssetStore = asset_store::AssetStore;
 
 pub mod shader_utils;

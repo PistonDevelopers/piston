@@ -8,7 +8,9 @@ use graphics::*;
 
 // Local crate.
 use Gl = gl::Gl;
+use GlData = gl::GlData;
 use GameWindow = game_window::GameWindow;
+use AssetStore = asset_store::AssetStore;
 
 /// Implemented by game applications.
 pub trait Game {
@@ -21,20 +23,28 @@ pub trait Game {
     /// Update the physical state of the game.
     ///
     /// `dt` is the delta time from last update in seconds.
-    fn update(&mut self, _dt: f64) {}
+    fn update(&mut self, _dt: f64, _asset_store: &mut AssetStore) {}
     
     /// Perform tasks for loading before showing anything.
-    fn load(&mut self) {}
+    fn load(&mut self, _asset_store: &mut AssetStore) {}
 
     /// User pressed a key.
     ///
     /// This can be overridden to handle key pressed events.
-    fn key_press(&mut self, _key: glfw::Key) {}
+    fn key_press(
+        &mut self, 
+        _key: glfw::Key, 
+        _asset_store: &mut AssetStore
+    ) {}
 
     /// User released a key.
     ///
     /// This can be overridden to handle key released events.
-    fn key_release(&mut self, _key: glfw::Key) {}
+    fn key_release(
+        &mut self, 
+        _key: glfw::Key, 
+        _asset_store: &mut AssetStore
+    ) {}
 
     /// Sets up viewport.
     ///
@@ -68,7 +78,12 @@ pub trait Game {
     /// Handles events using current game window settings.
     ///
     /// This can be overriden to do custom event handling.  
-    fn handle_events(&mut self, game_window: &GameWindow) {
+    fn handle_events(
+        &mut self, 
+        game_window: &GameWindow,
+        asset_store: &mut AssetStore
+    ) {
+        
         let exit_on_esc = game_window.settings.exit_on_esc;
         game_window.glfw.poll_events();
         for (_, event) in 
@@ -80,10 +95,10 @@ pub trait Game {
                     game_window.window.set_should_close(true)
                 },
                 glfw::KeyEvent(key, _, glfw::Press, _) => {
-                    self.key_press(key)
+                    self.key_press(key, asset_store)
                 },
                 glfw::KeyEvent(key, _, glfw::Release, _) => {
-                    self.key_release(key)
+                    self.key_release(key, asset_store)
                 },
                 _ => {},
             }
@@ -93,12 +108,16 @@ pub trait Game {
     /// Executes a game loop.
     /// 
     /// The loop continues until `should_close` returns true.  
-    fn run(&mut self, game_window: &GameWindow) {
+    fn run(
+        &mut self, 
+        game_window: &GameWindow, 
+        asset_store: &mut AssetStore
+    ) {
         use graphics::{Clear, AddColor};
         use gl::Gl;
 
-        self.load();
-        let mut gl = Gl::new();
+        self.load(asset_store);
+        let gl_data = GlData::new();
         let context = Context::new();
         let bg = game_window.settings.background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
@@ -108,9 +127,10 @@ pub trait Game {
         let mut last_update = time::precise_time_ns();
         while !self.should_close(game_window) {
             self.viewport(game_window);
-            bg.clear(&mut gl);
             let (w, h) = game_window.window.get_size();
             if w != 0 && h != 0 {
+                let mut gl = Gl::new(&gl_data, asset_store);
+                bg.clear(&mut gl);
                 self.render(&context
                 .trans_local(-1.0, 1.0)
                 .scale_local(2.0 / w as f64, -2.0 / h as f64)
@@ -120,12 +140,12 @@ pub trait Game {
             self.swap_buffers(game_window);
             // Perform updates by fixed time step until it catches up.
             loop {
-                self.update(dt);
+                self.update(dt, asset_store);
                 last_update += update_time_in_ns;
                 let now = time::precise_time_ns();
                 if now <= last_update { break; }
             }
-            self.handle_events(game_window);
+            self.handle_events(game_window, asset_store);
         }
     }
 }
