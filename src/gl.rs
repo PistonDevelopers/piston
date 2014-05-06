@@ -30,6 +30,36 @@ void main()
 }
 ";
 
+static VERTEX_SHADER_TRI_LIST_XY_RGBA_UV: &'static str = "
+attribute vec4 a_v4Position;
+attribute vec4 a_v4FillColor;
+attribute vec2 a_v2TexCoord;
+
+uniform sampler2D s_texture;
+
+varying vec2 v_v2TexCoord;
+varying vec4 v_v4FillColor;
+
+void main()
+{
+        v_v2TexCoord = a_v2TexCoord;
+        v_v4FillColor = a_v4FillColor;
+        gl_Position = a_v4Position;
+}
+";
+
+static FRAGMENT_SHADER_TRI_LIST_XY_RGBA_UV: &'static str = "
+uniform sampler2D s_texture;
+
+varying vec2 v_v2TexCoord;
+varying vec4 v_v4FillColor;
+
+void main()
+{
+        gl_FragColor = texture2D(s_texture, v_v2TexCoord) * v_v4FillColor;
+}
+";
+
 /// OpenGL back-end for Rust-Graphics.
 pub struct Gl<'a> {
     gl_data: &'a GlData,
@@ -49,21 +79,16 @@ impl<'a> Gl<'a> {
     }
 }
 
-/// Contains OpenGL data.
-pub struct GlData {
+struct TriListXYRGBA {
     vertex_shader: gl::GLuint,
     fragment_shader: gl::GLuint,
     program: gl::GLuint,
     a_v4Position: gl::GLuint,
     a_v4FillColor: gl::GLuint,
-    position_id: gl::GLuint,
-    fill_color_id: gl::GLuint,
 }
 
-
-impl<'a> GlData {
-    /// Creates a new OpenGl back-end.
-    pub fn new() -> GlData {
+impl TriListXYRGBA {
+    fn new() -> TriListXYRGBA {
         let vertex_shader = with_shader_source(
             VERTEX_SHADER_TRI_LIST_XY_RGBA, |src| {
                 compile_shader(gl::VERTEX_SHADER, src)
@@ -77,26 +102,93 @@ impl<'a> GlData {
         gl::attach_shader(program, fragment_shader);
         gl::link_program(program);
         gl::use_program(program);
-        let a_v4Position = 
-            gl::get_attrib_location(program, "a_v4Position") as gl::GLuint;
+        let a_v4Position = gl::get_attrib_location(
+            program, "a_v4Position") as gl::GLuint;
         gl::enable_vertex_attrib_array(a_v4Position);
-        let a_v4FillColor = 
-            gl::get_attrib_location(program, "a_v4FillColor") as gl::GLuint;
+        let a_v4FillColor = gl::get_attrib_location(
+            program, "a_v4FillColor") as gl::GLuint;
         gl::enable_vertex_attrib_array(a_v4FillColor);
-
-        // Load the vertices and color buffers.
-        let buffers = gl::gen_buffers(2);
-        let position_id = *buffers.get(0);
-        let fill_color_id = *buffers.get(1);
-
-        GlData {
+        TriListXYRGBA {
             vertex_shader: vertex_shader,
             fragment_shader: fragment_shader,
             program: program,
             a_v4Position: a_v4Position,
             a_v4FillColor: a_v4FillColor,
+        }
+    }
+}
+
+struct TriListXYRGBAUV {
+    vertex_shader: gl::GLuint,
+    fragment_shader: gl::GLuint,
+    program: gl::GLuint,
+    a_v4Position: gl::GLuint,
+    a_v4FillColor: gl::GLuint,
+    a_v2TexCoord: gl::GLuint,
+}
+
+impl TriListXYRGBAUV {
+    fn new() -> TriListXYRGBAUV {
+        let vertex_shader = with_shader_source(
+            VERTEX_SHADER_TRI_LIST_XY_RGBA_UV, |src| {
+                compile_shader(gl::VERTEX_SHADER, src)
+            }).unwrap();
+        let fragment_shader = with_shader_source(
+            FRAGMENT_SHADER_TRI_LIST_XY_RGBA_UV, |src| {
+                compile_shader(gl::FRAGMENT_SHADER, src)
+            }).unwrap();
+        let program = gl::create_program();
+        gl::attach_shader(program, vertex_shader);
+        gl::attach_shader(program, fragment_shader);
+        gl::link_program(program);
+        gl::use_program(program);
+        let a_v4Position = gl::get_attrib_location(
+            program, "a_v4Position") as gl::GLuint;
+        gl::enable_vertex_attrib_array(a_v4Position);
+        let a_v4FillColor = gl::get_attrib_location(
+            program, "a_v4FillColor") as gl::GLuint;
+        gl::enable_vertex_attrib_array(a_v4FillColor);
+        let a_v2TexCoord = gl::get_attrib_location(
+            program, "a_v2TexCoord") as gl::GLuint;
+        TriListXYRGBAUV {
+            vertex_shader: vertex_shader,
+            fragment_shader: fragment_shader,
+            program: program,
+            a_v4Position: a_v4Position,
+            a_v4FillColor: a_v4FillColor,
+            a_v2TexCoord: a_v2TexCoord,
+        }
+    }
+}
+
+/// Contains OpenGL data.
+pub struct GlData {
+    tri_list_xy_rgba: TriListXYRGBA,
+    tri_list_xy_rgba_uv: TriListXYRGBAUV,
+    // id of buffer for xy positions.
+    position_id: gl::GLuint,
+    // id of buffer for rgba colors.
+    fill_color_id: gl::GLuint,
+    // id of buffer for uv texture coords.
+    tex_coord_id: gl::GLuint,
+}
+
+
+impl<'a> GlData {
+    /// Creates a new OpenGl back-end.
+    pub fn new() -> GlData {
+        // Load the vertices, color and texture coord buffers.
+        let buffers = gl::gen_buffers(3);
+        let position_id = *buffers.get(0);
+        let fill_color_id = *buffers.get(1);
+        let tex_coord_id = *buffers.get(2);
+
+        GlData {
+            tri_list_xy_rgba: TriListXYRGBA::new(),
+            tri_list_xy_rgba_uv: TriListXYRGBAUV::new(),
             position_id: position_id,
             fill_color_id: fill_color_id,
+            tex_coord_id: tex_coord_id,
         }
     }
 }
@@ -125,21 +217,22 @@ impl<'a> BackEnd for Gl<'a> {
         vertices: &[f32], 
         colors: &[f32]
     ) {
-        let data = self.gl_data;
+        let data = &self.gl_data;
+        let shader = &data.tri_list_xy_rgba;
         let size_vertices: i32 = 2;
         gl::bind_buffer(
             gl::ARRAY_BUFFER, data.position_id);
         gl::buffer_data(
             gl::ARRAY_BUFFER, vertices.as_slice(), gl::DYNAMIC_DRAW);
         gl::vertex_attrib_pointer_f32(
-            data.a_v4Position, size_vertices, true, 0, 0);
+            shader.a_v4Position, size_vertices, true, 0, 0);
 
         gl::bind_buffer(
             gl::ARRAY_BUFFER, data.fill_color_id);
         gl::buffer_data(
             gl::ARRAY_BUFFER, colors.as_slice(), gl::DYNAMIC_DRAW);
         gl::vertex_attrib_pointer_f32(
-            data.a_v4FillColor, 4, false, 0, 0);
+            shader.a_v4FillColor, 4, false, 0, 0);
 
         // gl::enable(gl::DEPTH_TEST);
         gl::cull_face(gl::FRONT_AND_BACK);
