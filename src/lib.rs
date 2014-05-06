@@ -1,6 +1,9 @@
 #![crate_id = "piston"]
 #![deny(missing_doc)]
+#![deny(dead_code)]
 #![feature(globs)]
+#![feature(macro_rules)]
+#![feature(phase)]
 
 //! A user friendly graphics engine.
 
@@ -8,6 +11,7 @@ extern crate time;
 extern crate graphics;
 extern crate opengles;
 extern crate glfw;
+extern crate log;
 
 pub use Game = game::Game;
 pub use GameWindow = game_window::GameWindow;
@@ -20,4 +24,8 @@ mod game;
 mod game_window;
 mod game_window_settings;
 mod gl;
+
+// Temporary copied code from other projects.
+mod png;
+#[path = "png/inflate.rs"] mod inflate;
 
