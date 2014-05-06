@@ -240,5 +240,44 @@ impl<'a> BackEnd for Gl<'a> {
         let items: i32 = vertices.len() as i32 / size_vertices;
         gl::draw_arrays(gl::TRIANGLES, 0, items);
     }
+
+    fn supports_tri_list_xy_f32_rgba_f32_uv_f32(&self) -> bool { true }
+
+    fn tri_list_xy_f32_rgba_f32_uv_f32(
+        &mut self, 
+        vertices: &[f32], 
+        colors: &[f32],
+        texture_coords: &[f32]
+    ) {
+        let data = &self.gl_data;
+        let shader = &data.tri_list_xy_rgba_uv;
+        let size_vertices: i32 = 2;
+        gl::bind_buffer(
+            gl::ARRAY_BUFFER, data.position_id);
+        gl::buffer_data(
+            gl::ARRAY_BUFFER, vertices.as_slice(), gl::DYNAMIC_DRAW);
+        gl::vertex_attrib_pointer_f32(
+            shader.a_v4Position, size_vertices, true, 0, 0);
+
+        gl::bind_buffer(
+            gl::ARRAY_BUFFER, data.fill_color_id);
+        gl::buffer_data(
+            gl::ARRAY_BUFFER, colors.as_slice(), gl::DYNAMIC_DRAW);
+        gl::vertex_attrib_pointer_f32(
+            shader.a_v4FillColor, 4, false, 0, 0);
+
+        gl::bind_buffer(
+            gl::ARRAY_BUFFER, data.tex_coord_id);
+        gl::buffer_data(
+            gl::ARRAY_BUFFER, texture_coords.as_slice(), gl::DYNAMIC_DRAW);
+        gl::vertex_attrib_pointer_f32(
+            shader.a_v2TexCoord, 2, false, 0, 0);
+
+        // gl::enable(gl::DEPTH_TEST);
+        gl::cull_face(gl::FRONT_AND_BACK);
+
+        let items: i32 = vertices.len() as i32 / size_vertices;
+        gl::draw_arrays(gl::TRIANGLES, 0, items);
+    }
 }
 
