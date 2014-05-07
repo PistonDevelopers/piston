@@ -117,7 +117,7 @@ pub trait Game {
         use gl::Gl;
 
         self.load(asset_store);
-        let gl_data = GlData::new();
+        let mut gl_data = GlData::new();
         let context = Context::new();
         let bg = game_window.settings.background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
@@ -129,7 +129,7 @@ pub trait Game {
             self.viewport(game_window);
             let (w, h) = game_window.window.get_size();
             if w != 0 && h != 0 {
-                let mut gl = Gl::new(&gl_data, asset_store);
+                let mut gl = Gl::new(&mut gl_data, asset_store);
                 bg.clear(&mut gl);
                 self.render(&context
                 .trans_local(-1.0, 1.0)

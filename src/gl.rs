@@ -62,14 +62,14 @@ void main()
 
 /// OpenGL back-end for Rust-Graphics.
 pub struct Gl<'a> {
-    gl_data: &'a GlData,
+    gl_data: &'a mut GlData,
     asset_store: &'a AssetStore,
 }
 
 impl<'a> Gl<'a> {
     /// Creates a new OpenGl back-end.
     pub fn new(
-        gl_data: &'a GlData, 
+        gl_data: &'a mut GlData, 
         asset_store: &'a AssetStore
     ) -> Gl<'a> {
         Gl {
@@ -171,6 +171,8 @@ pub struct GlData {
     fill_color_id: gl::GLuint,
     // id of buffer for uv texture coords.
     tex_coord_id: gl::GLuint,
+    // Keeps track of the current shader program.
+    current_program: Option<gl::GLuint>,
 }
 
 
@@ -189,7 +191,21 @@ impl<'a> GlData {
             position_id: position_id,
             fill_color_id: fill_color_id,
             tex_coord_id: tex_coord_id,
+            current_program: None,
         }
+    }
+
+    /// Sets the current program only if the program is not in use.
+    pub fn use_program(&mut self, program: gl::GLuint) {
+        match self.current_program {
+            None => {},
+            Some(current_program) => {
+                if program == current_program { return; }
+            },
+        }
+        
+        gl::use_program(program);
+        self.current_program = Some(program);
     }
 }
 
@@ -217,6 +233,11 @@ impl<'a> BackEnd for Gl<'a> {
         vertices: &[f32], 
         colors: &[f32]
     ) {
+        {
+            // Set shader program.
+            let shader_program = self.gl_data.tri_list_xy_rgba.program;
+            self.gl_data.use_program(shader_program);
+        }
         let data = &self.gl_data;
         let shader = &data.tri_list_xy_rgba;
         let size_vertices: i32 = 2;
@@ -249,6 +270,11 @@ impl<'a> BackEnd for Gl<'a> {
         colors: &[f32],
         texture_coords: &[f32]
     ) {
+        {
+            // Set shader program.
+            let shader_program = self.gl_data.tri_list_xy_rgba_uv.program;
+            self.gl_data.use_program(shader_program);
+        }
         let data = &self.gl_data;
         let shader = &data.tri_list_xy_rgba_uv;
         let size_vertices: i32 = 2;
