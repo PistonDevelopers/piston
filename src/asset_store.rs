@@ -48,6 +48,11 @@ impl AssetStore {
         }
     }
 
+    /// Gets OpenGL texture from texture id.
+    pub fn get_texture(&self, texture_id: uint) -> gl::GLuint {
+        self.textures.get(texture_id).id
+    }
+
     /// Loads image by relative file name to the asset root.
     pub fn load_image(&mut self, file: &str) -> Image {
         let folder = self.assets_folder.as_ref().unwrap();

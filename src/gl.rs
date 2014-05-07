@@ -226,6 +226,18 @@ impl<'a> BackEnd for Gl<'a> {
         gl::disable(gl::BLEND);
     }
 
+    fn supports_single_texture(&self) -> bool { true }
+
+    fn enable_single_texture(&mut self, texture_id: uint) {
+        let texture = self.asset_store.get_texture(texture_id);
+        gl::bind_texture(gl::TEXTURE_2D, texture);
+    }
+
+    fn disable_single_texture(&mut self) {}
+
+    // Assume all textures has alpha channel for now.
+    fn has_texture_alpha(&self, _texture_id: uint) -> bool { true }
+
     fn supports_tri_list_xy_f32_rgba_f32(&self) -> bool { true }
 
     fn tri_list_xy_f32_rgba_f32(
