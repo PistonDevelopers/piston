@@ -55,6 +55,19 @@ impl AssetStore {
 
     /// Loads image by relative file name to the asset root.
     pub fn load_image(&mut self, file: &str) -> Image {
+        match self.texture_files.find_equiv(&file) {
+            None => {},
+            Some(&texture_id) => {
+                let texture = self.textures.get(texture_id);
+                return Image {
+                    texture_id: texture_id,
+                    texture_width: texture.width,
+                    texture_height: texture.height,
+                    source_rect: [0, 0, texture.width, texture.height],
+                }
+            },
+        };
+
         let folder = self.assets_folder.as_ref().unwrap();
         let path = Path::new(format!("{}/{}", folder, file));
         let img = match png::load_png(&path) {
