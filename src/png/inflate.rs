@@ -207,7 +207,7 @@ struct CodeLengthReader {
 impl CodeLengthReader {
     fn new(clens: ~[u8, ..19], num_lit: u16, num_dist: u8) -> CodeLengthReader {
         // Fill in the 7-bit patterns that match each code.
-        let mut patterns = ~([0xffu8, ..128]);
+        let mut patterns = box() ([0xffu8, ..128]);
         with_codes!(clens, 7 => u8, |i: u8, code: u8, bits| {
             let base = BIT_REV_U8[(code << (8 - bits)) as uint];
             for rest in range(0u8, 1 << (7 - bits)) {
@@ -282,7 +282,7 @@ impl DynHuffman16 {
     fn new(clens: &[u8]) -> DynHuffman16 {
         // Fill in the 8-bit patterns that match each code.
         // Longer patterns go into the trie.
-        let mut patterns = ~([0xffffu16, ..256]);
+        let mut patterns = box() ([0xffffu16, ..256]);
         let mut rest = Vec::new();
         with_codes!(clens, 15 => u16, |i: u16, code: u16, bits: u8| {
             let entry = i | (bits as u16 << 12);
@@ -318,9 +318,9 @@ impl DynHuffman16 {
                 } else {
                     let child = &mut trie_entry.children[(high & 0xf) as uint];
                     if child.is_none() {
-                        *child = Some(~([0xffff, ..16]));
+                        *child = Some(box() ([0xffff, ..16]));
                     }
-                    let ~ref mut child = *child.as_mut().unwrap();
+                    let box ref mut child = *child.as_mut().unwrap();
                     let high_top = high >> 4;
                     for rest in range(0u8, 1 << (16 - bits)) {
                         child[(high_top | (rest << (bits - 12))) as uint] = entry;
@@ -732,7 +732,7 @@ impl InflateStream {
                     BlockDynHlit => ok!(BlockDynHdist(take!(5) + 1)),
                     BlockDynHdist(hlit) => ok!(BlockDynHclen(hlit, take!(5) + 1)),
                     BlockDynHclen(hlit, hdist) => {
-                        ok!(BlockDynClenCodeLengths(hlit, hdist, take!(4) + 4, 0, ~([0, ..19])))
+                        ok!(BlockDynClenCodeLengths(hlit, hdist, take!(4) + 4, 0, box() ([0, ..19])))
                     }
                     BlockDynClenCodeLengths(hlit, hdist, hclen, i, mut clens) => {
                         let v = match stream.take(3) {

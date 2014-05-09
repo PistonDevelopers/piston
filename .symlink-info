@@ -1,5 +1,5 @@
 target/x86_64-apple-darwin/lib//libglfw-38369174-0.1.rlib
-f306cae7139852171075b42c83862f6aa759fb72
+ddcdcccbc80ca4973fc9584421c070dccbde96fe
 https://github.com/bvssvni/glfw-rs.git
   upstream/HEAD -> upstream/master
   upstream/master

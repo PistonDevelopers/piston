@@ -262,7 +262,7 @@ struct PartialImage {
     interlace: u8,
     palette: Option<Vec<u8>>,
     transparent_color: Option<[u16, ..3]>,
-    idat_inflate_stream: Option<~InflateStream>,
+    idat_inflate_stream: Option<Box<InflateStream>>,
     x_byte_pos: uint,
     y_byte_pos: uint,
     scanline_bytes: uint,
@@ -922,7 +922,7 @@ impl Decoder {
                         } else {
                             let stream = &mut self.image.as_mut().unwrap().idat_inflate_stream;
                             if stream.is_none() {
-                                *stream = Some(~InflateStream::from_zlib());
+                                *stream = Some(box InflateStream::from_zlib());
                             }
                             ok!(IdatInflate(size))
                         }
@@ -1037,7 +1037,7 @@ pub trait DecoderRef {
     fn update<'a>(&'a mut self, data: &[u8]) -> ImageState<'a>;
 }
 
-impl DecoderRef for Option<~Decoder> {
+impl DecoderRef for Option<Box<Decoder>> {
     fn update<'a>(&'a mut self, data: &[u8]) -> ImageState<'a> {
         match self.take() {
             Some(mut decoder) => {
@@ -1078,7 +1078,7 @@ pub fn load_png(path: &Path) -> Result<Image, ~str> {
 
 #[allow(dead_code)]
 pub fn load_png_from_memory(image: &[u8]) -> Result<Image, ~str> {
-    let mut decoder = Some(~Decoder::new());
+    let mut decoder = Some(box Decoder::new());
     match decoder.update(image) {
         Partial(_) => Err("incomplete PNG file".to_owned()),
         Complete(image) => Ok(image),
@@ -1119,7 +1119,7 @@ mod test {
             };
 
             let mut buf = Vec::from_elem(chunk_size, 0u8);
-            let mut decoder = Some(~Decoder::new());
+            let mut decoder = Some(box Decoder::new());
             loop {
                 match reader.read(buf.mut_slice(0, chunk_size)) {
                     Ok(count) => match decoder.update(buf.slice_to(count)) {
