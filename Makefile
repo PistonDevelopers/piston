@@ -61,7 +61,7 @@ all:
 
 help:
 	clear \
-	&& echo "--- rust-empty (0.3 002)" \
+	&& echo "--- rust-empty (0.3 004)" \
 	&& echo "make run               - Runs executable" \
 	&& echo "make exe               - Builds main executable" \
 	&& echo "make lib               - Both static and dynamic library" \
@@ -115,12 +115,32 @@ help:
 		test-external
 
 nightly-install:
-	cd ~ \
-    && curl -s http://www.rust-lang.org/rustup.sh | sudo sh
+	clear \
+	&& cd ~ \
+	&& curl -s http://www.rust-lang.org/rustup.sh > rustup.sh \
+	&& ( \
+		echo "Rust install-script stored as '~/rustup.sh'" ; \
+		read -p "Do you want to install? [y/n]:" -n 1 -r ; \
+		echo "" ; \
+		if [[ $$REPLY =~ ^[Yy]$$ ]] ; \
+		then \
+			cat rustup.sh | sudo sh ; \
+		fi \
+	)
 
 nightly-uninstall:
-	cd ~ \
-    && curl -s http://www.rust-lang.org/rustup.sh | sudo sh -s -- --uninstall
+	clear \
+	&& cd ~ \
+	&& curl -s http://www.rust-lang.org/rustup.sh > rustup.sh \
+	&& ( \
+		echo "Rust install-script stored as '~/rustup.sh'" ; \
+		read -p "Do you want to uninstall? [y/n]:" -n 1 -r ; \
+		echo "" ; \
+		if [[ $$REPLY =~ ^[Yy]$$ ]] ; \
+		then \
+			cat rustup.sh | sudo sh -s -- --uninstall ; \
+		fi \
+	)
 
 cargo-lite-exe: src/main.rs
 	( \
@@ -407,7 +427,7 @@ loc:
 # prints the commit hash with remote branches containing that commit.
 symlink-info:
 	current=$$(pwd) ; \
-	for symlib in $$(find target/*/lib/ -type l) ; do \
+	for symlib in $$(find target/*/lib -type l) ; do \
 		cd $$current ; \
 		echo $$symlib ; \
 		original_file=$$(readlink $$symlib) ; \
