@@ -5,12 +5,13 @@ A user friendly game engine written in Rust
 
 Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
 
-### Daily Docs
+[Piston online docs](http://bvssvni.github.io/docs/piston/piston/)  
 
-[Piston (this project)](http://bvssvni.github.io/docs/piston/piston/)  
-[Rust-Graphics](http://bvssvni.github.io/docs/rust-graphics/graphics/)  
-[glfw-rs](http://bvssvni.github.io/docs/glfw-rs/glfw/)  
-[rust-opengles](http://bvssvni.github.io/docs/rust-opengles/opengles/)
+| Dependency | Online Docs |
+|---------|------|------------|
+| [rust-graphics](https://github.com/bvssvni/rust-graphics) | [rust-graphics docs](http://bvssvni.github.io/docs/rust-graphics/graphics/) |
+| [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://bvssvni.github.io/docs/glfw-rs/glfw/) |
+| [rust-opengles](https://github.com/mozilla-servo/rust-opengles) | [rust-opengles docs](http://bvssvni.github.io/docs/rust-opengles/opengles/) |
 
 ## Start new project with Piston
 
@@ -22,13 +23,7 @@ One way to simplify working with multiple projects on the same machine is to sym
 
 ## How to build Piston
 
-Build the folliwing projects and put the '.rlib' files to '/target/cpu-vendor-os/lib/':
-
-* [GLFW-RS](https://github.com/bjz/glfw-rs)
-* [Rust-Graphics](https://github.com/bvssvni/rust-graphics)
-* [Rust-OpenGLES](https://github.com/mozilla-servo/rust-opengles)
-
-There are currently many breaking changes in Rust, so please help the maintainers to keep them up with master!  
+Build the dependencies and put the '.rlib' files to '/target/cpu-vendor-os/lib/'.
 
 In the Terminal window, navigate to the project folder and type:
 
