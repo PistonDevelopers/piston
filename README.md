@@ -7,6 +7,8 @@ Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
 
 [Piston online docs](http://bvssvni.github.io/docs/piston/piston/)  
 
+[How to contribute](https://github.com/bvssvni/piston/issues/70)
+
 | Dependency | Online Docs |
 |---------|------|------------|
 | [rust-graphics](https://github.com/bvssvni/rust-graphics) | [rust-graphics docs](http://bvssvni.github.io/docs/rust-graphics/graphics/) |
