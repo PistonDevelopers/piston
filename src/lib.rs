@@ -10,7 +10,7 @@
 extern crate time;
 extern crate graphics;
 extern crate opengles;
-extern crate glfw;
+//extern crate glfw;
 extern crate sdl2;
 extern crate log;
 extern crate collections;

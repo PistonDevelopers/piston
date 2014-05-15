@@ -74,8 +74,6 @@ pub trait Game<W: GameWindow> {
     /// The graphics is rendered to the back buffer.
     /// The front buffer is displayed on the screen.
     fn swap_buffers(&self, game_window: &W) {
-        use glfw::Context;
-
         game_window.swap_buffers()
     }
 
