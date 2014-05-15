@@ -64,28 +64,26 @@ impl GameWindow for GameWindowSDL2 {
                 if self.settings.exit_on_esc && key == sdl2::keycode::EscapeKey {
                     self.should_close = true;
                 } else {
-                    let keycode = match key {
-                        sdl2::keycode::UpKey => keycode::UpKey,
-                        sdl2::keycode::DownKey => keycode::DownKey,
-                        sdl2::keycode::LeftKey => keycode::LeftKey,
-                        sdl2::keycode::RightKey => keycode::RightKey,
-                        _ => keycode::UnknownKey,
-                    };
-                    return event::KeyPressEvent(keycode);
+                    return event::KeyPressEvent(sdl2_keycode_to_keycode(key));
                 }
             },
             sdl2::event::KeyUpEvent(_, _, key, _, _) => {
-                let keycode = match key {
-                    sdl2::keycode::UpKey => keycode::UpKey,
-                    sdl2::keycode::DownKey => keycode::DownKey,
-                    sdl2::keycode::LeftKey => keycode::LeftKey,
-                    sdl2::keycode::RightKey => keycode::RightKey,
-                    _ => keycode::UnknownKey,
-                };
-                return event::KeyReleaseEvent(keycode);
+                return event::KeyReleaseEvent(sdl2_keycode_to_keycode(key));
             },
             _ => {},
         }
         event::NoEvent
+    }
+}
+
+fn sdl2_keycode_to_keycode(keycode: sdl2::keycode::KeyCode) -> keycode::KeyCode {
+    match keycode {
+        sdl2::keycode::UpKey => keycode::UpKey,
+        sdl2::keycode::DownKey => keycode::DownKey,
+        sdl2::keycode::LeftKey => keycode::LeftKey,
+        sdl2::keycode::RightKey => keycode::RightKey,
+        sdl2::keycode::ReturnKey => keycode::EnterKey,
+        sdl2::keycode::SpaceKey => keycode::SpaceKey,
+        _ => keycode::UnknownKey,
     }
 }

@@ -13,6 +13,8 @@ pub mod keycode {
         RightKey,
         UpKey,
         DownKey,
+        EnterKey,
+        SpaceKey,
     }
 }
 
