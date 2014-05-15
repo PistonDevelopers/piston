@@ -1,3 +1,5 @@
+//! A widow implemented by SDL2 back-end.
+
 use sdl2;
 
 use game_window::{
@@ -7,6 +9,7 @@ use game_window::{
 };
 use game_window_settings::GameWindowSettings;
 
+/// A widow implemented by SDL2 back-end.
 pub struct GameWindowSDL2 {
     window: sdl2::video::Window,
     context: sdl2::video::GLContext,

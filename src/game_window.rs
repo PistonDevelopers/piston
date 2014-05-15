@@ -1,29 +1,46 @@
+//! A trait for window operations.
+
 use game_window_settings::GameWindowSettings;
 use self::event::{
     Event,
     NoEvent,
 };
 
-pub mod game_window_sdl2;
-
 pub mod keycode {
+//! Represent a physics key.
+
+    /// Represent a physics key.
+    #[deriving(Eq)]
     pub enum KeyCode {
+        /// Key that not supported currently.
         UnknownKey,
+        /// Left arrow key.
         LeftKey,
+        /// Right arrow key.
         RightKey,
+        /// Up arrow key.
         UpKey,
+        /// Down arrow key.
         DownKey,
+        /// Return
         EnterKey,
+        /// Space bar
         SpaceKey,
     }
 }
 
 pub mod event {
+//! MISSING DOC
+
     use super::keycode::KeyCode;
 
+    /// A Event
     pub enum Event {
+        /// No event occur
         NoEvent,
+        /// A key was released.
         KeyReleaseEvent(KeyCode),
+        /// A key was pressed.
         KeyPressEvent(KeyCode),
     }
 }
