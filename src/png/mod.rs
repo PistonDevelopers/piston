@@ -20,7 +20,7 @@ extern crate log;
 #[cfg(test)]
 extern crate extra;
 
-use std::cast;
+use std::mem;
 use std::cmp::min;
 use std::io;
 use std::io::File;
@@ -484,9 +484,9 @@ impl PartialImage {
             macro_rules! filter (($x:expr, $pixel_bytes:expr) => ({
                 // HACK(eddyb) this requires the filter to not deref invalid references.
                 let (a, b, c): (&u8, &u8, &u8) = unsafe {(
-                    cast::transmute(pixels.unsafe_ref(i - dx * $pixel_bytes)),
-                    cast::transmute(pixels.unsafe_ref(i - dy * self.scanline_bytes)),
-                    cast::transmute(pixels.unsafe_ref(i - dx * $pixel_bytes - dy * self.scanline_bytes))
+                    mem::transmute(pixels.unsafe_ref(i - dx * $pixel_bytes)),
+                    mem::transmute(pixels.unsafe_ref(i - dy * self.scanline_bytes)),
+                    mem::transmute(pixels.unsafe_ref(i - dx * $pixel_bytes - dy * self.scanline_bytes))
                 )};
                 f.apply($x, a, b, c)
             }))
