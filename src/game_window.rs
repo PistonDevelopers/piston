@@ -1,77 +1,43 @@
-//! Create window.
-
-// External crates.
-use glfw;
-
-// Local crate.
 use game_window_settings::GameWindowSettings;
+use self::event::{
+    Event,
+    NoEvent,
+};
 
-/// Contains stuff for game window.
-pub struct GameWindow {
-    /// The window.
-    pub window: glfw::Window,
-    /// Receives events from window.
-    pub events: Receiver<(f64, glfw::WindowEvent)>,
-    /// GLFW context.
-    pub glfw: glfw::Glfw,
-    /// Game window settings;
-    pub settings: GameWindowSettings,
+pub mod keycode {
+    pub enum KeyCode {
+        UnknownKey,
+        LeftKey,
+        RightKey,
+        UpKey,
+        DownKey,
+    }
 }
 
-impl GameWindow {
+pub mod event {
+    use super::keycode::KeyCode;
+
+    pub enum Event {
+        NoEvent,
+        KeyUpEvent(KeyCode),
+        KeyDownEvent(KeyCode),
+    }
+}
+
+/// Implemented by window back-end.
+pub trait GameWindow {
     /// Creates a window.
-    #[allow(dead_code)]
-    pub fn window(
-        title: &str,
-        width: u32,
-        height: u32,
-        settings: GameWindowSettings
-    ) -> GameWindow {
-        use glfw::Context;	    
+    fn new(settings: GameWindowSettings) -> Self;
+    /// Get the window's settings.
+    fn get_settings<'a>(&'a self) -> &'a GameWindowSettings;
 
-        // Create GLFW window.
-        let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-        let (window, events) = glfw.create_window(
-            width, height, title, glfw::Windowed)
-                .expect("Failed to create GLFW window.");
-        window.set_key_polling(true);
-        window.make_current();
-
-        GameWindow {
-            window: window,
-            events: events,
-            glfw: glfw,
-            settings: settings,
-        }
-    }
-
-    /// Opens up in fullscreen on default monitor.
-    /// Sets screen resolution to the physical size of the monitor.
-    #[allow(dead_code)]
-    pub fn fullscreen(
-        title: &str,
-        settings: GameWindowSettings
-    ) -> GameWindow { 
-	    // Create GLFW window.
-        let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-        glfw.with_primary_monitor(|m| {
-            use glfw::Context;            
-
-            let m = m.unwrap();
-            let (width, height) = m.get_physical_size();
-            let (window, events) = glfw.create_window(
-                width as u32, height as u32, title, 
-                glfw::FullScreen(m)).expect("Failed to create GLFW window.");
-            window.set_key_polling(true);
-            window.make_current();
-        
-            GameWindow {
-                window: window,
-                events: events,
-                glfw: glfw,
-                settings: settings,
-            }
-        })
-    }
+    /// Returns ture if the window should close.
+    fn should_close(&self) -> bool { true }
+    /// Get the window's size
+    fn get_size(&self) -> (int, int) { (0, 0) }
+    /// If window support double buffers, called this to tell implementation
+    /// swap buffers.
+    fn swap_buffers(&self) {}
+    /// Poll a event from window's event queue.
+    fn poll_event(&self) -> Event { NoEvent }
 }
-
