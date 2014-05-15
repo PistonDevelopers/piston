@@ -25,8 +25,8 @@ impl GameWindow for GameWindowSDL2 {
             settings.title,
             sdl2::video::PosCentered,
             sdl2::video::PosCentered,
-            self.settings.size[0],
-            self.settings.size[1],
+            settings.size[0],
+            settings.size[1],
             sdl2::video::OpenGL
         ).unwrap();
 
@@ -41,7 +41,7 @@ impl GameWindow for GameWindowSDL2 {
         }
     }
 
-    fn<'a> get_settings(&'a self) -> &'a GameWindowSettings {
+    fn get_settings<'a>(&'a self) -> &'a GameWindowSettings {
         &self.settings
     }
 
@@ -57,7 +57,7 @@ impl GameWindow for GameWindowSDL2 {
         self.window.gl_swap_window();
     }
 
-    fn poll_event(&mut self) -> Event {
+    fn poll_event(&mut self) -> event::Event {
         match sdl2::event::poll_event() {
             sdl2::event::QuitEvent(_) => { self.should_close = true; },
             sdl2::event::KeyDownEvent(_, _, key, _, _) => {
@@ -71,7 +71,7 @@ impl GameWindow for GameWindowSDL2 {
                         sdl2::keycode::RightKey => keycode::RightKey,
                         _ => keycode::UnknownKey,
                     };
-                    return event::KeyDownEvent(keycode);
+                    return event::KeyPressEvent(keycode);
                 }
             },
             sdl2::event::KeyUpEvent(_, _, key, _, _) => {
@@ -82,9 +82,10 @@ impl GameWindow for GameWindowSDL2 {
                     sdl2::keycode::RightKey => keycode::RightKey,
                     _ => keycode::UnknownKey,
                 };
-                return event::KeyUpEvent(keycode);
-            }
+                return event::KeyReleaseEvent(keycode);
+            },
+            _ => {},
         }
-        NoEvent
+        event::NoEvent
     }
 }

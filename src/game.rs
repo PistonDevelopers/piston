@@ -84,7 +84,7 @@ pub trait Game<W: GameWindow> {
     /// This can be overriden to do custom event handling.
     fn handle_events(
         &mut self,
-        game_window: &W,
+        game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
         /*let exit_on_esc = game_window.settings.exit_on_esc;
@@ -108,10 +108,10 @@ pub trait Game<W: GameWindow> {
         }*/
         loop {
             match game_window.poll_event() {
-                event::KeyDownEvent(keycode) => {
+                event::KeyPressEvent(keycode) => {
                     self.key_press(keycode, asset_store)
                 },
-                event::KeyUpEvent(keycode) => {
+                event::KeyReleaseEvent(keycode) => {
                     self.key_release(keycode, asset_store)
                 },
                 event::NoEvent => {
@@ -126,7 +126,7 @@ pub trait Game<W: GameWindow> {
     /// The loop continues until `should_close` returns true.
     fn run(
         &mut self,
-        game_window: &W,
+        game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
         use graphics::{Clear, AddColor};

@@ -4,6 +4,8 @@ use self::event::{
     NoEvent,
 };
 
+pub mod game_window_sdl2;
+
 pub mod keycode {
     pub enum KeyCode {
         UnknownKey,
@@ -19,8 +21,8 @@ pub mod event {
 
     pub enum Event {
         NoEvent,
-        KeyUpEvent(KeyCode),
-        KeyDownEvent(KeyCode),
+        KeyReleaseEvent(KeyCode),
+        KeyPressEvent(KeyCode),
     }
 }
 
@@ -39,5 +41,5 @@ pub trait GameWindow {
     /// swap buffers.
     fn swap_buffers(&self) {}
     /// Poll a event from window's event queue.
-    fn poll_event(&self) -> Event { NoEvent }
+    fn poll_event(&mut self) -> Event { NoEvent }
 }

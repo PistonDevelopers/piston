@@ -4,7 +4,7 @@ pub struct GameWindowSettings {
     /// Title of the window.
     pub title: ~str,
     /// The size of the window
-    pub size: [f32, ..2],
+    pub size: [int, ..2],
     /// If true, the window is fullscreen.
     pub fullscreen: bool,
     /// If true, exit when pressing Esc.
@@ -21,7 +21,7 @@ impl GameWindowSettings {
     pub fn default() -> GameWindowSettings {
         GameWindowSettings {
             title: "Piston".to_owned(),
-            size: [640.0, 480.0],
+            size: [640, 480],
             fullscreen: false,
             exit_on_esc: true,
             background_color: [0.0, 0.0, 0.0, 1.0],
@@ -31,7 +31,7 @@ impl GameWindowSettings {
     /// Creates a new Settings.
     pub fn new(
         title: ~str,
-        size: [f32, ..2],
+        size: [int, ..2],
         fullscreen: bool,
         exit_on_esc: bool,
         background_color: [f32, ..4]
