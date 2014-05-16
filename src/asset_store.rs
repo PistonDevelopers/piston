@@ -18,8 +18,8 @@ pub struct Texture {
 
 /// A place to store sounds, textures, animations etc.
 ///
-/// The idea is to have one object which the app can use  
-/// to load assets for the game with a simple interface.  
+/// The idea is to have one object which the app can use
+/// to load assets for the game with a simple interface.
 pub struct AssetStore {
     // The folder to load assets from.
     assets_folder: Option<~str>,
@@ -30,7 +30,7 @@ pub struct AssetStore {
 }
 
 impl AssetStore {
-    /// Creates a new `AssetStore` from an assets folder.  
+    /// Creates a new `AssetStore` from an assets folder.
     pub fn from_folder(assets_folder: &str) -> AssetStore {
         AssetStore {
             assets_folder: Some(assets_folder.to_owned()),
@@ -63,7 +63,7 @@ impl AssetStore {
                     texture_id: texture_id,
                     texture_width: texture.width,
                     texture_height: texture.height,
-                    source_rect: [0, 0, texture.width, texture.height],
+                    source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
                 }
             },
         };
@@ -74,7 +74,7 @@ impl AssetStore {
             Ok(img) => img,
             Err(msg) => fail!("Could not load '{}': {}", file, msg),
         };
-       
+
         match img.color_type {
             png::RGBA8 => {},
             t => fail!("Unsupported color type {:?} in png", t),
@@ -109,7 +109,7 @@ impl AssetStore {
             texture_id: texture_id,
             texture_width: texture.width,
             texture_height: texture.height,
-            source_rect: [0, 0, texture.width, texture.height], 
+            source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
         }
 
         // gl::RGBA
@@ -119,7 +119,7 @@ impl AssetStore {
         //  target: GLenum, // gl::TEXTURE_2D
         //  pname: GLenum,  // gl::TEXTURE_MIN_FILTER, gl::TEXTURE_MAG_FILTER
         //  param: GLint,   // gl::LINEAR
-        //  ) 
+        //  )
         // gl::tex_image_2d(
         //  target: GLenum,             // gl::TEXTURE_2D
         //  level: GLint,               // 0
@@ -131,7 +131,7 @@ impl AssetStore {
         //  ty: GLenum,                 // gl::UNSIGNED_BYTE
         //  opt_data: Option<&[u8]>     // Some(img.pixels.as_slice())
         // )
-        
+
     }
 }
 
