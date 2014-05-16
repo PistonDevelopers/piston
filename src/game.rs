@@ -15,7 +15,7 @@ use event;
 use mouse;
 
 /// Implemented by game applications.
-pub trait Game<W: GameWindow> {
+pub trait Game {
     /// Render graphics.
     ///
     /// `context` is a Rust-Graphics context.
@@ -82,7 +82,7 @@ pub trait Game<W: GameWindow> {
     ///
     /// A viewport is the region of the window where graphics is rendered.
     #[inline(always)]
-    fn viewport(&self, game_window: &W) {
+    fn viewport<W: GameWindow>(&self, game_window: &W) {
         let (w, h) = game_window.get_size();
         gl::viewport(0, 0, w as gl::GLint, h as gl::GLint);
     }
@@ -92,7 +92,7 @@ pub trait Game<W: GameWindow> {
     /// When this is `true` the application shuts down.
     /// This can be overridden to emulate a user closing the window.
     /// One can also override this method to prevent window from closing.
-    fn should_close(&self, game_window: &W) -> bool {
+    fn should_close<W: GameWindow>(&self, game_window: &W) -> bool {
         game_window.should_close()
     }
 
@@ -101,14 +101,14 @@ pub trait Game<W: GameWindow> {
     /// When called, This shows the next frame.
     /// The graphics is rendered to the back buffer.
     /// The front buffer is displayed on the screen.
-    fn swap_buffers(&self, game_window: &W) {
+    fn swap_buffers<W: GameWindow>(&self, game_window: &W) {
         game_window.swap_buffers()
     }
 
     /// Handles events using current game window settings.
     ///
     /// This can be overriden to do custom event handling.
-    fn handle_events(
+    fn handle_events<W: GameWindow>(
         &mut self,
         game_window: &mut W,
         asset_store: &mut AssetStore
@@ -145,7 +145,7 @@ pub trait Game<W: GameWindow> {
     /// Executes a game loop.
     ///
     /// The loop continues until `should_close` returns true.
-    fn run(
+    fn run<W: GameWindow>(
         &mut self,
         game_window: &mut W,
         asset_store: &mut AssetStore
