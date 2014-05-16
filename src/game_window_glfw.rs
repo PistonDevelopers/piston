@@ -5,9 +5,9 @@ use collections::ringbuf::RingBuf;
 // External crates.
 use glfw;
 // Local crate.
+use event;
 use keyboard;
 use game_window::{
-    event,
     GameWindow,
 };
 use game_window_settings::GameWindowSettings;
@@ -41,10 +41,10 @@ impl GameWindowGLFW {
                     self.should_close = true;
                 },
                 glfw::KeyEvent(key, _, glfw::Press, _) => {
-                    self.event_queue.push_back(event::KeyPressEvent(glfw_keycode_to_keycode(key)));
+                    self.event_queue.push_back(event::KeyPressed(glfw_keycode_to_keycode(key)));
                 },
                 glfw::KeyEvent(key, _, glfw::Release, _) => {
-                    self.event_queue.push_back(event::KeyReleaseEvent(glfw_keycode_to_keycode(key)));
+                    self.event_queue.push_back(event::KeyReleased(glfw_keycode_to_keycode(key)));
                 },
                 _ => {},
             }

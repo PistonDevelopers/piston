@@ -6,8 +6,8 @@ use sdl2;
 // Local crate.
 use game_window::{
     GameWindow,
-    event,
 };
+use event;
 use game_window_settings::GameWindowSettings;
 use keyboard;
 
@@ -65,11 +65,11 @@ impl GameWindow for GameWindowSDL2 {
                 if self.settings.exit_on_esc && key == sdl2::keycode::EscapeKey {
                     self.should_close = true;
                 } else {
-                    return event::KeyPressEvent(sdl2_keycode_to_keycode(key));
+                    return event::KeyPressed(sdl2_keycode_to_keycode(key));
                 }
             },
             sdl2::event::KeyUpEvent(_, _, key, _, _) => {
-                return event::KeyReleaseEvent(sdl2_keycode_to_keycode(key));
+                return event::KeyReleased(sdl2_keycode_to_keycode(key));
             },
             _ => {},
         }

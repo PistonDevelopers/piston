@@ -1,22 +1,7 @@
 //! A trait for window operations.
 
+use event;
 use game_window_settings::GameWindowSettings;
-
-pub mod event {
-//! MISSING DOC
-
-    use keyboard;
-
-    /// A Event
-    pub enum Event {
-        /// No event occur
-        NoEvent,
-        /// A key was released.
-        KeyReleaseEvent(keyboard::Key),
-        /// A key was pressed.
-        KeyPressEvent(keyboard::Key),
-    }
-}
 
 /// Implemented by window back-end.
 pub trait GameWindow {

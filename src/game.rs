@@ -11,10 +11,7 @@ use GlData = gl::GlData;
 use GameWindow = game_window::GameWindow;
 use AssetStore = asset_store::AssetStore;
 use keyboard;
-
-use game_window::{
-    event,
-};
+use event;
 
 /// Implemented by game applications.
 pub trait Game<W: GameWindow> {
@@ -106,10 +103,10 @@ pub trait Game<W: GameWindow> {
         }*/
         loop {
             match game_window.poll_event() {
-                event::KeyPressEvent(keycode) => {
+                event::KeyPressed(keycode) => {
                     self.key_press(keycode, asset_store)
                 },
-                event::KeyReleaseEvent(keycode) => {
+                event::KeyReleased(keycode) => {
                     self.key_release(keycode, asset_store)
                 },
                 event::NoEvent => {
