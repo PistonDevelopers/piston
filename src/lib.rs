@@ -28,6 +28,7 @@ pub mod shader_utils;
 pub mod game_window;
 pub mod keyboard;
 pub mod event;
+pub mod mouse;
 
 mod game;
 mod game_window_sdl2;
