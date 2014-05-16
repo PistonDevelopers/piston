@@ -12,6 +12,7 @@ Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
 | Dependency | Online Docs |
 |---------|------|------------|
 | [rust-graphics](https://github.com/bvssvni/rust-graphics) | [rust-graphics docs](http://bvssvni.github.io/docs/rust-graphics/graphics/) |
+| [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://bvssvni.github.io/docs/rust-sdl2/sdl2/) |
 | [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://bvssvni.github.io/docs/glfw-rs/glfw/) |
 | [rust-opengles](https://github.com/mozilla-servo/rust-opengles) | [rust-opengles docs](http://bvssvni.github.io/docs/rust-opengles/opengles/) |
 
