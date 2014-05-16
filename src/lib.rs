@@ -14,6 +14,7 @@ extern crate log;
 extern crate collections;
 extern crate glfw;
 extern crate sdl2;
+extern crate png;
 
 pub use Game = game::Game;
 pub use GameWindow = game_window::GameWindow;
@@ -36,8 +37,4 @@ mod game_window_glfw;
 mod game_window_settings;
 mod gl;
 mod asset_store;
-
-// Temporary copied code from other projects.
-mod png;
-#[path = "png/inflate.rs"] mod inflate;
 
