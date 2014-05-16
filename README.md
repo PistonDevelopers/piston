@@ -42,8 +42,11 @@ The default make command can be modified by setting `DEFAULT = make dylib` in th
 
 ## Goals
 
+2D will be first priority, but we encourage people to experiment with 3D as well.  
+
 * Test the design and performance of Rust-Graphics
 * Experiment with Rust-ish game design and collect feedback
-* Actor/events AI modelling
+* Experiment with actor/events AI modelling
+* Experiment with multiplayer architectures
 * Make more people use Rust for game development
 * Multi-platform game development
