@@ -63,7 +63,7 @@ impl AssetStore {
                     texture_id: texture_id,
                     texture_width: texture.width,
                     texture_height: texture.height,
-                    source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
+                    source_rect: [0, 0, texture.width, texture.height],
                 }
             },
         };
@@ -109,29 +109,8 @@ impl AssetStore {
             texture_id: texture_id,
             texture_width: texture.width,
             texture_height: texture.height,
-            source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
+            source_rect: [0, 0, texture.width, texture.height],
         }
-
-        // gl::RGBA
-        // gl::gen_textures(n: GLsizei) -> Vec<GLuint>
-        // gl::delete_textures(textures: &[GLuint])
-        // gl::tex_parameter_i(
-        //  target: GLenum, // gl::TEXTURE_2D
-        //  pname: GLenum,  // gl::TEXTURE_MIN_FILTER, gl::TEXTURE_MAG_FILTER
-        //  param: GLint,   // gl::LINEAR
-        //  )
-        // gl::tex_image_2d(
-        //  target: GLenum,             // gl::TEXTURE_2D
-        //  level: GLint,               // 0
-        //  internal_format: GLint,     // gl::RGBA
-        //  width: GLsizei,             // img.width
-        //  height: GLsizei,            // img.height
-        //  border: GLint,              // 0
-        //  format: GLenum,             // gl::RGBA
-        //  ty: GLenum,                 // gl::UNSIGNED_BYTE
-        //  opt_data: Option<&[u8]>     // Some(img.pixels.as_slice())
-        // )
-
     }
 }
 
