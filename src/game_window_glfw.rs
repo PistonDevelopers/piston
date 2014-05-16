@@ -1,77 +1,114 @@
 //! Create window.
 
+use collections::deque::Deque;
+use collections::ringbuf::RingBuf;
 // External crates.
 use glfw;
-
 // Local crate.
+use game_window::{
+    event,
+    keycode,
+    GameWindow,
+};
 use game_window_settings::GameWindowSettings;
 
 /// Contains stuff for game window.
-pub struct GameWindow {
+pub struct GameWindowGLFW {
     /// The window.
-    pub window: glfw::Window,
+    window: glfw::Window,
     /// Receives events from window.
-    pub events: Receiver<(f64, glfw::WindowEvent)>,
+    events: Receiver<(f64, glfw::WindowEvent)>,
     /// GLFW context.
-    pub glfw: glfw::Glfw,
+    glfw: glfw::Glfw,
     /// Game window settings;
-    pub settings: GameWindowSettings,
+    settings: GameWindowSettings,
+
+    should_close: bool,
+    event_queue: RingBuf<event::Event>,
 }
 
-impl GameWindow {
-    /// Creates a window.
-    #[allow(dead_code)]
-    pub fn window(
-        title: &str,
-        width: u32,
-        height: u32,
-        settings: GameWindowSettings
-    ) -> GameWindow {
+impl GameWindowGLFW {
+    fn flush_messages(&mut self) {
+        self.glfw.poll_events();
+        for (_, event) in glfw::flush_messages(&self.events) {
+            match event {
+                glfw::KeyEvent(glfw::KeyEscape, _, glfw::Press, _)
+                if self.settings.exit_on_esc => {
+                    self.should_close = true;
+                },
+                glfw::KeyEvent(key, _, glfw::Press, _) => {
+                    self.event_queue.push_back(event::KeyPressEvent(glfw_keycode_to_keycode(key)));
+                },
+                glfw::KeyEvent(key, _, glfw::Release, _) => {
+                    self.event_queue.push_back(event::KeyReleaseEvent(glfw_keycode_to_keycode(key)));
+                },
+                _ => {},
+            }
+        }
+    }
+}
+
+impl GameWindow for GameWindowGLFW {
+    fn new(settings: GameWindowSettings) -> GameWindowGLFW {
         use glfw::Context;
 
         // Create GLFW window.
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
         let (window, events) = glfw.create_window(
-            width, height, title, glfw::Windowed)
-                .expect("Failed to create GLFW window.");
+            settings.size[0],
+            settings.size[1],
+            settings.title, glfw::Windowed
+        ).expect("Failed to create GLFW window.");
         window.set_key_polling(true);
         window.make_current();
 
-        GameWindow {
+        GameWindowGLFW {
             window: window,
             events: events,
             glfw: glfw,
             settings: settings,
+
+            should_close: false,
+            event_queue: RingBuf::<event::Event>::new(),
         }
     }
 
-    /// Opens up in fullscreen on default monitor.
-    /// Sets screen resolution to the physical size of the monitor.
-    #[allow(dead_code)]
-    pub fn fullscreen(
-        title: &str,
-        settings: GameWindowSettings
-    ) -> GameWindow {
-        // Create GLFW window.
-        let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-        glfw.with_primary_monitor(|m| {
-            use glfw::Context;
+    fn get_settings<'a>(&'a self) -> &'a GameWindowSettings {
+        &self.settings
+    }
 
-            let m = m.unwrap();
-            let (width, height) = m.get_physical_size();
-            let (window, events) = glfw.create_window(
-                width as u32, height as u32, title,
-                glfw::FullScreen(m)).expect("Failed to create GLFW window.");
-            window.set_key_polling(true);
-            window.make_current();
+    fn should_close(&self) -> bool {
+        self.should_close
+    }
 
-            GameWindow {
-                window: window,
-                events: events,
-                glfw: glfw,
-                settings: settings,
+    fn swap_buffers(&self) {
+        use glfw::Context;
+
+        self.window.swap_buffers();
+    }
+
+    fn poll_event(&mut self) -> event::Event {
+        if self.event_queue.len() != 0 {
+            self.event_queue.pop_front().unwrap()
+        } else {
+            self.flush_messages();
+            if self.event_queue.len() != 0 {
+                self.poll_event()
+            } else {
+                event::NoEvent
             }
-        })
+        }
     }
 }
 
+fn glfw_keycode_to_keycode(keycode: glfw::Key) -> keycode::KeyCode {
+    match keycode {
+        glfw::KeySpace => keycode::SpaceKey,
+        glfw::KeyEnter => keycode::EnterKey,
+        glfw::KeyUp => keycode::UpKey,
+        glfw::KeyDown => keycode::DownKey,
+        glfw::KeyLeft => keycode::LeftKey,
+        glfw::KeyRight => keycode::RightKey,
+        _ => keycode::UnknownKey,
+    }
+}

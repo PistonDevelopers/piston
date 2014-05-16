@@ -1,10 +1,6 @@
 //! A trait for window operations.
 
 use game_window_settings::GameWindowSettings;
-use self::event::{
-    Event,
-    NoEvent,
-};
 
 pub mod keycode {
 //! Represent a physics key.
@@ -54,11 +50,15 @@ pub trait GameWindow {
 
     /// Returns ture if the window should close.
     fn should_close(&self) -> bool { true }
+
     /// Get the window's size
-    fn get_size(&self) -> (int, int) { (0, 0) }
+    fn get_size(&self) -> (u32, u32) {
+        (self.get_settings().size[0], self.get_settings().size[1])
+    }
+
     /// If window support double buffers, called this to tell implementation
     /// swap buffers.
     fn swap_buffers(&self) {}
     /// Poll a event from window's event queue.
-    fn poll_event(&mut self) -> Event { NoEvent }
+    fn poll_event(&mut self) -> event::Event { event::NoEvent }
 }

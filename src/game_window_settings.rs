@@ -4,7 +4,7 @@ pub struct GameWindowSettings {
     /// Title of the window.
     pub title: ~str,
     /// The size of the window
-    pub size: [int, ..2],
+    pub size: [u32, ..2],
     /// If true, the window is fullscreen.
     pub fullscreen: bool,
     /// If true, exit when pressing Esc.
@@ -31,7 +31,7 @@ impl GameWindowSettings {
     /// Creates a new Settings.
     pub fn new(
         title: ~str,
-        size: [int, ..2],
+        size: [u32, ..2],
         fullscreen: bool,
         exit_on_esc: bool,
         background_color: [f32, ..4]

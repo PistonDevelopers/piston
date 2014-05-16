@@ -1,4 +1,4 @@
-//! A widow implemented by SDL2 back-end.
+//! A window implemented by SDL2 back-end.
 
 use sdl2;
 
@@ -28,8 +28,8 @@ impl GameWindow for GameWindowSDL2 {
             settings.title,
             sdl2::video::PosCentered,
             sdl2::video::PosCentered,
-            settings.size[0],
-            settings.size[1],
+            settings.size[0] as int,
+            settings.size[1] as int,
             sdl2::video::OpenGL
         ).unwrap();
 
@@ -50,10 +50,6 @@ impl GameWindow for GameWindowSDL2 {
 
     fn should_close(&self) -> bool {
         self.should_close
-    }
-
-    fn get_size(&self) -> (int, int) {
-        (self.settings.size[0], self.settings.size[1])
     }
 
     fn swap_buffers(&self) {
