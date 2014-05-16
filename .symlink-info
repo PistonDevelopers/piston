@@ -17,7 +17,9 @@ https://github.com/bvssvni/rust-opengles.git
   origin/rustup_20140516
 
 target/x86_64-apple-darwin/lib/libsdl2-79c1f430-0.0.1.rlib
-234c006e716a90e813c5d7f84dfd92b134dc858e
+f5f7c022dac2b5b1ac51bd8fa76f123edb7aa06a
 https://github.com/bvssvni/rust-sdl2
-  origin/rustup_20140516
+  origin/master
+  upstream/HEAD -> upstream/master
+  upstream/master
 
