@@ -2,42 +2,19 @@
 
 use game_window_settings::GameWindowSettings;
 
-pub mod keycode {
-//! Represent a physics key.
-
-    /// Represent a physics key.
-    #[deriving(Eq)]
-    pub enum KeyCode {
-        /// Key that not supported currently.
-        UnknownKey,
-        /// Left arrow key.
-        LeftKey,
-        /// Right arrow key.
-        RightKey,
-        /// Up arrow key.
-        UpKey,
-        /// Down arrow key.
-        DownKey,
-        /// Return
-        EnterKey,
-        /// Space bar
-        SpaceKey,
-    }
-}
-
 pub mod event {
 //! MISSING DOC
 
-    use super::keycode::KeyCode;
+    use keyboard;
 
     /// A Event
     pub enum Event {
         /// No event occur
         NoEvent,
         /// A key was released.
-        KeyReleaseEvent(KeyCode),
+        KeyReleaseEvent(keyboard::Key),
         /// A key was pressed.
-        KeyPressEvent(KeyCode),
+        KeyPressEvent(keyboard::Key),
     }
 }
 

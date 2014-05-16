@@ -1,13 +1,15 @@
 //! A window implemented by SDL2 back-end.
 
+// External crates.
 use sdl2;
 
+// Local crate.
 use game_window::{
     GameWindow,
     event,
-    keycode,
 };
 use game_window_settings::GameWindowSettings;
+use keyboard;
 
 /// A widow implemented by SDL2 back-end.
 pub struct GameWindowSDL2 {
@@ -75,14 +77,15 @@ impl GameWindow for GameWindowSDL2 {
     }
 }
 
-fn sdl2_keycode_to_keycode(keycode: sdl2::keycode::KeyCode) -> keycode::KeyCode {
+fn sdl2_keycode_to_keycode(keycode: sdl2::keycode::KeyCode) -> keyboard::Key {
     match keycode {
-        sdl2::keycode::UpKey => keycode::UpKey,
-        sdl2::keycode::DownKey => keycode::DownKey,
-        sdl2::keycode::LeftKey => keycode::LeftKey,
-        sdl2::keycode::RightKey => keycode::RightKey,
-        sdl2::keycode::ReturnKey => keycode::EnterKey,
-        sdl2::keycode::SpaceKey => keycode::SpaceKey,
-        _ => keycode::UnknownKey,
+        sdl2::keycode::UpKey => keyboard::Up,
+        sdl2::keycode::DownKey => keyboard::Down,
+        sdl2::keycode::LeftKey => keyboard::Left,
+        sdl2::keycode::RightKey => keyboard::Right,
+        sdl2::keycode::ReturnKey => keyboard::Enter,
+        sdl2::keycode::SpaceKey => keyboard::Space,
+        _ => keyboard::Unknown,
     }
 }
+

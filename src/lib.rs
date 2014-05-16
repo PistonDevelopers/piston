@@ -26,6 +26,7 @@ pub use AssetStore = asset_store::AssetStore;
 
 pub mod shader_utils;
 pub mod game_window;
+pub mod keyboard;
 
 mod game;
 mod game_window_sdl2;

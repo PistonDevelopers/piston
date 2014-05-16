@@ -10,9 +10,9 @@ use Gl = gl::Gl;
 use GlData = gl::GlData;
 use GameWindow = game_window::GameWindow;
 use AssetStore = asset_store::AssetStore;
+use keyboard;
 
 use game_window::{
-    keycode,
     event,
 };
 
@@ -37,7 +37,7 @@ pub trait Game<W: GameWindow> {
     /// This can be overridden to handle key pressed events.
     fn key_press(
         &mut self,
-        _key: keycode::KeyCode,
+        _key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {}
 
@@ -46,7 +46,7 @@ pub trait Game<W: GameWindow> {
     /// This can be overridden to handle key released events.
     fn key_release(
         &mut self,
-        _key: keycode::KeyCode,
+        _key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {}
 

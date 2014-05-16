@@ -5,9 +5,9 @@ use collections::ringbuf::RingBuf;
 // External crates.
 use glfw;
 // Local crate.
+use keyboard;
 use game_window::{
     event,
-    keycode,
     GameWindow,
 };
 use game_window_settings::GameWindowSettings;
@@ -102,14 +102,15 @@ impl GameWindow for GameWindowGLFW {
     }
 }
 
-fn glfw_keycode_to_keycode(keycode: glfw::Key) -> keycode::KeyCode {
+fn glfw_keycode_to_keycode(keycode: glfw::Key) -> keyboard::Key {
     match keycode {
-        glfw::KeySpace => keycode::SpaceKey,
-        glfw::KeyEnter => keycode::EnterKey,
-        glfw::KeyUp => keycode::UpKey,
-        glfw::KeyDown => keycode::DownKey,
-        glfw::KeyLeft => keycode::LeftKey,
-        glfw::KeyRight => keycode::RightKey,
-        _ => keycode::UnknownKey,
+        glfw::KeySpace => keyboard::Space,
+        glfw::KeyEnter => keyboard::Enter,
+        glfw::KeyUp => keyboard::Up,
+        glfw::KeyDown => keyboard::Down,
+        glfw::KeyLeft => keyboard::Left,
+        glfw::KeyRight => keyboard::Right,
+        _ => keyboard::Unknown,
     }
 }
+
