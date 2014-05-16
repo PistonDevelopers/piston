@@ -10,6 +10,7 @@ use game_window::{
 use event;
 use game_window_settings::GameWindowSettings;
 use keyboard;
+use mouse;
 
 /// A widow implemented by SDL2 back-end.
 pub struct GameWindowSDL2 {
@@ -65,11 +66,24 @@ impl GameWindow for GameWindowSDL2 {
                 if self.settings.exit_on_esc && key == sdl2::keycode::EscapeKey {
                     self.should_close = true;
                 } else {
-                    return event::KeyPressed(sdl2_keycode_to_keycode(key));
+                    return event::KeyPressed(sdl2_map_key(key));
                 }
             },
             sdl2::event::KeyUpEvent(_, _, key, _, _) => {
-                return event::KeyReleased(sdl2_keycode_to_keycode(key));
+                return event::KeyReleased(sdl2_map_key(key));
+            },
+            sdl2::event::MouseButtonDownEvent(_, _, _, button, _, _) => {
+                return event::MouseButtonPressed(sdl2_map_mouse(button));
+            },
+            sdl2::event::MouseButtonUpEvent(_, _, _, button, _, _) => {
+                return event::MouseButtonReleased(sdl2_map_mouse(button));
+            },
+            sdl2::event::MouseMotionEvent(_, _, _, _, x, y, dx, dy) => {
+                return event::MouseMoved(
+                    x as f64, 
+                    y as f64, 
+                    Some((dx as f64, dy as f64))
+                );
             },
             _ => {},
         }
@@ -77,7 +91,7 @@ impl GameWindow for GameWindowSDL2 {
     }
 }
 
-fn sdl2_keycode_to_keycode(keycode: sdl2::keycode::KeyCode) -> keyboard::Key {
+fn sdl2_map_key(keycode: sdl2::keycode::KeyCode) -> keyboard::Key {
     match keycode {
         sdl2::keycode::UpKey => keyboard::Up,
         sdl2::keycode::DownKey => keyboard::Down,
@@ -86,6 +100,17 @@ fn sdl2_keycode_to_keycode(keycode: sdl2::keycode::KeyCode) -> keyboard::Key {
         sdl2::keycode::ReturnKey => keyboard::Enter,
         sdl2::keycode::SpaceKey => keyboard::Space,
         _ => keyboard::Unknown,
+    }
+}
+
+fn sdl2_map_mouse(button: sdl2::mouse::Mouse) -> mouse::Button {
+    match button {
+        sdl2::mouse::LeftMouse => mouse::Left,
+        sdl2::mouse::RightMouse => mouse::Right,
+        sdl2::mouse::MiddleMouse => mouse::Middle,
+        sdl2::mouse::X1Mouse => mouse::X1,
+        sdl2::mouse::X2Mouse => mouse::X2,
+        sdl2::mouse::UnknownMouse(_) => mouse::Unknown,
     }
 }
 

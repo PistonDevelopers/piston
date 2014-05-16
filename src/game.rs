@@ -12,6 +12,7 @@ use GameWindow = game_window::GameWindow;
 use AssetStore = asset_store::AssetStore;
 use keyboard;
 use event;
+use mouse;
 
 /// Implemented by game applications.
 pub trait Game<W: GameWindow> {
@@ -44,6 +45,36 @@ pub trait Game<W: GameWindow> {
     fn key_release(
         &mut self,
         _key: keyboard::Key,
+        _asset_store: &mut AssetStore
+    ) {}
+
+    /// Pressed a mouse button.
+    fn mouse_press(
+        &mut self,
+        _button: mouse::Button,
+        _asset_store: &mut AssetStore
+    ) {}
+
+    /// Released a mouse button.
+    fn mouse_release(
+        &mut self,
+        _button: mouse::Button,
+        _asset_store: &mut AssetStore
+    ) {}
+
+    /// Moved mouse cursor.
+    fn mouse_move(
+        &mut self,
+        _x: f64,
+        _y: f64,
+        _asset_store: &mut AssetStore
+    ) {}
+
+    /// Moved mouse relative, not bounded by cursor.
+    fn mouse_relative_move(
+        &mut self,
+        _dx: f64,
+        _dy: f64,
         _asset_store: &mut AssetStore
     ) {}
 
@@ -82,25 +113,6 @@ pub trait Game<W: GameWindow> {
         game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
-        /*let exit_on_esc = game_window.settings.exit_on_esc;
-        game_window.glfw.poll_events();
-        for (_, event) in
-        glfw::flush_messages(&game_window.events) {
-            match event {
-                // Close with Esc.
-                glfw::KeyEvent(glfw::KeyEscape, _, glfw::Press, _)
-                if exit_on_esc  => {
-                    game_window.set_should_close(true)
-                },
-                glfw::KeyEvent(key, _, glfw::Press, _) => {
-                    self.key_press(key, asset_store)
-                },
-                glfw::KeyEvent(key, _, glfw::Release, _) => {
-                    self.key_release(key, asset_store)
-                },
-                _ => {},
-            }
-        }*/
         loop {
             match game_window.poll_event() {
                 event::KeyPressed(keycode) => {
@@ -108,6 +120,20 @@ pub trait Game<W: GameWindow> {
                 },
                 event::KeyReleased(keycode) => {
                     self.key_release(keycode, asset_store)
+                },
+                event::MouseButtonPressed(mouse_button) => {
+                    self.mouse_press(mouse_button, asset_store)
+                },
+                event::MouseButtonReleased(mouse_button) => {
+                    self.mouse_release(mouse_button, asset_store)
+                },
+                event::MouseMoved(x, y, relative_move) => {
+                    self.mouse_move(x, y, asset_store);
+                    match relative_move {
+                        Some((dx, dy)) => 
+                            self.mouse_relative_move(dx, dy, asset_store),
+                        None => {},
+                    }
                 },
                 event::NoEvent => {
                     break

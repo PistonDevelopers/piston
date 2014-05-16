@@ -2,6 +2,7 @@
 //! Event data.
 
 use keyboard;
+use mouse;
 
 /// Contains the information associated with an event.
 pub enum Event {
@@ -11,6 +12,16 @@ pub enum Event {
     KeyReleased(keyboard::Key),
     /// A key was pressed.
     KeyPressed(keyboard::Key),
+    /// A mouse button was pressed.
+    MouseButtonPressed(mouse::Button),
+    /// A mouse button was released.
+    MouseButtonReleased(mouse::Button),
+    /// The mouse moved.
+    /// 
+    /// (x, y, Some((dx, dy)))  
+    /// The second part is relative motion which is not bounded.  
+    /// Relative motion might not be supported by all window back-ends.  
+    MouseMoved(f64, f64, Option<(f64, f64)>),
 }
 
 

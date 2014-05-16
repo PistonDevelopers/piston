@@ -4,7 +4,7 @@
 /// Represent a mouse button.
 #[deriving(Eq)]
 pub enum Button {
-    /// Button that not supported currently.
+    /// Unknown mouse button.
     Unknown,
     /// Left mouse button.
     Left,
@@ -12,5 +12,15 @@ pub enum Button {
     Right,
     /// Middle mouse button.
     Middle,
+    /// Extra mouse button number 1.
+    X1,
+    /// Extra mouse button number 2.
+    X2,
+    /// Mouse button number 6.
+    Button6,
+    /// Mouse button number 7.
+    Button7,
+    /// Mouse button number 8.
+    Button8,
 }
 
