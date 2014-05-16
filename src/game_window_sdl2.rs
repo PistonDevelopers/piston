@@ -80,8 +80,8 @@ impl GameWindow for GameWindowSDL2 {
             },
             sdl2::event::MouseMotionEvent(_, _, _, _, x, y, dx, dy) => {
                 return event::MouseMoved(
-                    x as f64, 
-                    y as f64, 
+                    x as f64,
+                    y as f64,
                     Some((dx as f64, dy as f64))
                 );
             },

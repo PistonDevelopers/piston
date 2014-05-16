@@ -80,6 +80,10 @@ impl GameWindow for GameWindowGLFW {
             settings.title, glfw::Windowed
         ).expect("Failed to create GLFW window.");
         window.set_key_polling(true);
+        window.set_mouse_button_polling(true);
+        window.set_cursor_pos_polling(true);
+        // or polling all event
+        //window.set_all_polling(true);
         window.make_current();
 
         GameWindowGLFW {

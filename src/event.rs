@@ -17,11 +17,10 @@ pub enum Event {
     /// A mouse button was released.
     MouseButtonReleased(mouse::Button),
     /// The mouse moved.
-    /// 
-    /// (x, y, Some((dx, dy)))  
-    /// The second part is relative motion which is not bounded.  
-    /// Relative motion might not be supported by all window back-ends.  
+    ///
+    /// (x, y, Some((dx, dy)))
+    /// The second part is relative motion which is not bounded.
+    /// Relative motion might not be supported by all window back-ends.
     MouseMoved(f64, f64, Option<(f64, f64)>),
 }
-
 
