@@ -29,6 +29,10 @@ pub struct GameWindowGLFW {
 
 impl GameWindowGLFW {
     fn flush_messages(&mut self) {
+        if self.event_queue.len() != 0 {
+            return;
+        }
+
         self.glfw.poll_events();
         for (_, event) in glfw::flush_messages(&self.events) {
             match event {
@@ -88,15 +92,12 @@ impl GameWindow for GameWindowGLFW {
     }
 
     fn poll_event(&mut self) -> event::Event {
+        self.flush_messages();
+
         if self.event_queue.len() != 0 {
             self.event_queue.pop_front().unwrap()
         } else {
-            self.flush_messages();
-            if self.event_queue.len() != 0 {
-                self.poll_event()
-            } else {
-                event::NoEvent
-            }
+            event::NoEvent
         }
     }
 }
