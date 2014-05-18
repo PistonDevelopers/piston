@@ -1,13 +1,14 @@
 //! Game loop.
 
 // External crates.
+use gl;
+use gl::types::*;
 use time;
-use gl = opengles::gl2;
 use graphics::*;
 
 // Local crate.
-use Gl = gl::Gl;
-use GlData = gl::GlData;
+use Gl = gl_back_end::Gl;
+use GlData = gl_back_end::GlData;
 use GameWindow = game_window::GameWindow;
 use AssetStore = asset_store::AssetStore;
 use keyboard;
@@ -84,7 +85,7 @@ pub trait Game {
     #[inline(always)]
     fn viewport<W: GameWindow>(&self, game_window: &W) {
         let (w, h) = game_window.get_size();
-        gl::viewport(0, 0, w as gl::GLint, h as gl::GLint);
+        gl::Viewport(0, 0, w as GLint, h as GLint);
     }
 
     /// Whether the window should be closed.
@@ -151,7 +152,6 @@ pub trait Game {
         asset_store: &mut AssetStore
     ) {
         use graphics::{Clear, AddColor};
-        use gl::Gl;
 
         self.load(asset_store);
         let mut gl_data = GlData::new();

@@ -3,15 +3,17 @@
 
 // Extern crates.
 use graphics::*;
-use gl = opengles::gl2;
 use HashMap = collections::HashMap;
+use gl;
+use gl::types::*;
+use libc::c_void;
 
 // Local crate.
 use png;
 
 /// Represents a texture in Piston.
 pub struct Texture {
-    id: gl::GLuint,
+    id: GLuint,
     width: u32,
     height: u32,
 }
@@ -49,7 +51,7 @@ impl AssetStore {
     }
 
     /// Gets OpenGL texture from texture id.
-    pub fn get_texture(&self, texture_id: uint) -> gl::GLuint {
+    pub fn get_texture(&self, texture_id: uint) -> GLuint {
         self.textures.get(texture_id).id
     }
 
@@ -63,7 +65,7 @@ impl AssetStore {
                     texture_id: texture_id,
                     texture_width: texture.width,
                     texture_height: texture.height,
-                    source_rect: [0, 0, texture.width, texture.height],
+                    source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
                 }
             },
         };
@@ -80,22 +82,24 @@ impl AssetStore {
             t => fail!("Unsupported color type {:?} in png", t),
         };
 
-        let id: gl::GLuint = *gl::gen_textures(1).get(0);
-        gl::bind_texture(gl::TEXTURE_2D, id);
-        gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
-        gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
-        gl::tex_image_2d(
-            gl::TEXTURE_2D,
-            0,
-            gl::RGBA as i32,
-            img.width as i32,
-            img.height as i32,
-            0,
-            gl::RGBA,
-            gl::UNSIGNED_BYTE,
-            Some(img.pixels.as_slice())
-        );
-
+        let mut id: GLuint = 0;
+        unsafe {
+            gl::GenTextures(1, &mut id);
+            gl::BindTexture(gl::TEXTURE_2D, id);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+            gl::TexImage2D(
+                gl::TEXTURE_2D,
+                0,
+                gl::RGBA as i32,
+                img.width as i32,
+                img.height as i32,
+                0,
+                gl::RGBA,
+                gl::UNSIGNED_BYTE,
+                img.pixels.as_ptr() as *c_void
+            );
+        }
         let texture = Texture {
             id: id,
             width: img.width,
@@ -109,7 +113,7 @@ impl AssetStore {
             texture_id: texture_id,
             texture_width: texture.width,
             texture_height: texture.height,
-            source_rect: [0, 0, texture.width, texture.height],
+            source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
         }
     }
 }

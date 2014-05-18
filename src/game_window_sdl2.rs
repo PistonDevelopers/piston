@@ -11,6 +11,7 @@ use event;
 use game_window_settings::GameWindowSettings;
 use keyboard;
 use mouse;
+use gl;
 
 /// A widow implemented by SDL2 back-end.
 pub struct GameWindowSDL2 {
@@ -37,6 +38,9 @@ impl GameWindow for GameWindowSDL2 {
         ).unwrap();
 
         let context = window.gl_create_context().unwrap();
+
+        // Load the OpenGL function pointers
+        gl::load_with(|s| sdl2::video::gl_get_proc_address(s));
 
         GameWindowSDL2 {
             window: window,

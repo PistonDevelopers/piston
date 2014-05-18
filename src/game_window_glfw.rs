@@ -4,6 +4,7 @@
 use collections::deque::Deque;
 use collections::ringbuf::RingBuf;
 use glfw;
+use gl;
 
 // Local crate.
 use event;
@@ -85,6 +86,9 @@ impl GameWindow for GameWindowGLFW {
         // or polling all event
         //window.set_all_polling(true);
         window.make_current();
+
+        // Load the OpenGL function pointers
+        gl::load_with(|s| glfw.get_proc_address(s));
 
         GameWindowGLFW {
             window: window,
