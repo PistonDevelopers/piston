@@ -65,7 +65,7 @@ impl AssetStore {
                     texture_id: texture_id,
                     texture_width: texture.width,
                     texture_height: texture.height,
-                    source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
+                    source_rect: [0, 0, texture.width, texture.height],
                 }
             },
         };
@@ -113,7 +113,7 @@ impl AssetStore {
             texture_id: texture_id,
             texture_width: texture.width,
             texture_height: texture.height,
-            source_rect: PixelRectangle([0, 0, texture.width, texture.height]),
+            source_rect: [0, 0, texture.width, texture.height],
         }
     }
 }
