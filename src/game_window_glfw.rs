@@ -23,10 +23,8 @@ pub struct GameWindowGLFW {
     events: Receiver<(f64, glfw::WindowEvent)>,
     /// GLFW context.
     glfw: glfw::Glfw,
-    /// Game window settings;
+    /// Game window settings.
     settings: GameWindowSettings,
-
-    should_close: bool,
     event_queue: RingBuf<event::Event>,
 }
 
@@ -40,9 +38,9 @@ impl GameWindowGLFW {
         for (_, event) in glfw::flush_messages(&self.events) {
             match event {
                 glfw::KeyEvent(glfw::KeyEscape, _, glfw::Press, _)
-                if self.settings.exit_on_esc => {
-                    self.should_close = true;
-                },
+                    if self.settings.exit_on_esc => {
+                        self.window.set_should_close(true);
+                    },
                 glfw::KeyEvent(key, _, glfw::Press, _) => {
                     self.event_queue.push_back(
                         event::KeyPressed(glfw_map_key(key)));
@@ -95,8 +93,6 @@ impl GameWindow for GameWindowGLFW {
             events: events,
             glfw: glfw,
             settings: settings,
-
-            should_close: false,
             event_queue: RingBuf::<event::Event>::new(),
         }
     }
@@ -106,7 +102,7 @@ impl GameWindow for GameWindowGLFW {
     }
 
     fn should_close(&self) -> bool {
-        self.should_close
+        self.window.should_close()
     }
 
     fn swap_buffers(&self) {
