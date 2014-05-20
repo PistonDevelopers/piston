@@ -4,26 +4,26 @@ use piston::keyboard;
 use {
     AddPress,
     AddPressing,
-    KeyboardPressEvent,
-    KeyboardPressingEvent,
+    PressKeyboardEvent,
+    PressingKeyboardEvent,
 };
 
 /// A event context which used to observe keyboard event.
 pub struct KeyboardEvent<'a>;
 
-impl<'a> AddPress<'a, keyboard::Key, KeyboardPressEvent<'a>> for KeyboardEvent<'a> {
+impl<'a> AddPress<'a, keyboard::Key, PressKeyboardEvent<'a>> for KeyboardEvent<'a> {
     #[inline(always)]
-    fn press(&self, key: keyboard::Key) -> KeyboardPressEvent<'a> {
-        KeyboardPressEvent {
+    fn press(&self, key: keyboard::Key) -> PressKeyboardEvent<'a> {
+        PressKeyboardEvent {
             key: Value(key),
         }
     }
 }
 
-impl<'a> AddPressing<'a, keyboard::Key, KeyboardPressingEvent<'a>> for KeyboardEvent<'a> {
+impl<'a> AddPressing<'a, keyboard::Key, PressingKeyboardEvent<'a>> for KeyboardEvent<'a> {
     #[inline(always)]
-    fn pressing(&self, key: keyboard::Key) -> KeyboardPressingEvent<'a> {
-        KeyboardPressingEvent {
+    fn pressing(&self, key: keyboard::Key) -> PressingKeyboardEvent<'a> {
+        PressingKeyboardEvent {
             key: Value(key),
         }
     }

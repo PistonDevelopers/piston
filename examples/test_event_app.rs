@@ -154,4 +154,3 @@ fn main() {
     app.run(&mut game_window, &mut asset_store);
 }
 
-
