@@ -21,7 +21,7 @@ pub use KeyboardPressEvent = keyboard_press_event::KeyboardPressEvent;
 pub use Map = map::Map;
 
 pub use BackEnd = back_end::BackEnd;
-pub use Observer = back_end::Observer;
+pub use Observer = observer::Observer;
 
 mod add_keyboard;
 mod add_lasting;
@@ -37,4 +37,5 @@ mod keyboard_press_event;
 mod map;
 
 mod back_end;
+mod observer;
 
