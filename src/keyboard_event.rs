@@ -4,8 +4,10 @@ use piston::keyboard;
 use {
     AddPress,
     AddPressing,
+    AddRelease,
     PressKeyboardEvent,
     PressingKeyboardEvent,
+    ReleaseKeyboardEvent,
 };
 
 /// A event context which used to observe keyboard event.
@@ -24,6 +26,15 @@ impl<'a> AddPressing<'a, keyboard::Key, PressingKeyboardEvent<'a>> for KeyboardE
     #[inline(always)]
     fn pressing(&self, key: keyboard::Key) -> PressingKeyboardEvent<'a> {
         PressingKeyboardEvent {
+            key: Value(key),
+        }
+    }
+}
+
+impl<'a> AddRelease<'a, keyboard::Key, ReleaseKeyboardEvent<'a>> for KeyboardEvent<'a> {
+    #[inline(always)]
+    fn release(&self, key: keyboard::Key) -> ReleaseKeyboardEvent<'a> {
+        ReleaseKeyboardEvent {
             key: Value(key),
         }
     }
