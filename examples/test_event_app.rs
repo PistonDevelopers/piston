@@ -7,19 +7,7 @@ extern crate event;
 
 use collections::treemap::TreeMap;
 use piston::*;
-use event::{
-    AddKeyboard,
-    AddLasting,
-    AddPress,
-    AddPressing,
-
-    Event,
-
-    Map,
-
-    BackEnd,
-    Observer,
-};
+use event::*;
 
 pub struct App<'a> {
     e: Event<'a>,
@@ -42,7 +30,7 @@ impl<'a> Game for App<'a> {
         });
 
         let e = self.e.keyboard().pressing(keyboard::Up);
-        let i =e.map(&mut self.back_end, || {
+        let i = e.map(&mut self.back_end, || {
             println!("Wow! You are pressing keyboard::Up");
         });
 
@@ -50,6 +38,10 @@ impl<'a> Game for App<'a> {
             println!("Wooooooow! You are pressing keybaord::Up at least 1.0 second!!");
         });
         self.back_end.remove_observer(i);
+
+        self.e.keyboard().release(keyboard::Up).map(&mut self.back_end, || {
+            println!("Hmm! You released keyboard::Up");
+        });
     }
 
     fn update(&mut self, dt: f64, _asset_store: &mut AssetStore) {
