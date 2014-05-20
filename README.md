@@ -16,7 +16,7 @@ e.keyboard().press(keyboard::Up).map(back_end, || {
 Maps "pressing and lasting certain time event" with a keyboard key:
 ```
 e.keyboard().pressing(keyboard::Up).lasting(1.0).map(back_end, || {
-    println!("Wooooooow! You are pressing keybaord::Up at least 1.0 second!!");
+    println!("Wooooooow! You are pressing keyboard::Up at least 1.0 second!!");
 });
 ```
 
