@@ -312,7 +312,7 @@ impl<'a> BackEnd for Gl<'a> {
             gl::BufferData(
                 gl::ARRAY_BUFFER, (colors.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&colors[0]), gl::DYNAMIC_DRAW);
             gl::VertexAttribPointer(
-                shader.a_v4FillColor as GLuint, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+                shader.a_v4FillColor as GLuint, 4, gl::FLOAT, gl::FALSE, 0, ptr::null());
 
             gl::BindBuffer(
                 gl::ARRAY_BUFFER, data.tex_coord_id);
