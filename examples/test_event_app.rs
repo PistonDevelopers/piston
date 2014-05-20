@@ -1,8 +1,11 @@
 #![feature(globs)]
 
+extern crate collections;
+
 extern crate piston;
 extern crate event;
 
+use collections::treemap::TreeMap;
 use piston::*;
 use event::{
     AddKeyboard,
@@ -39,13 +42,14 @@ impl<'a> Game for App<'a> {
         });
 
         let e = self.e.keyboard().pressing(keyboard::Up);
-        e.map(&mut self.back_end, || {
+        let i =e.map(&mut self.back_end, || {
             println!("Wow! You are pressing keyboard::Up");
         });
 
         e.lasting(1.0).map(&mut self.back_end, || {
             println!("Wooooooow! You are pressing keybaord::Up at least 1.0 second!!");
         });
+        self.back_end.remove_observer(i);
     }
 
     fn update(&mut self, dt: f64, _asset_store: &mut AssetStore) {
@@ -89,27 +93,33 @@ impl<'a> Game for App<'a> {
 }
 
 struct TestBackEnd<'a> {
-    observers: Vec<Box<Observer>>,
+    observers: TreeMap<uint, Box<Observer>>,
+    count: uint,
 }
 
 impl<'a> TestBackEnd<'a> {
     pub fn new() -> TestBackEnd {
         TestBackEnd {
-            observers: Vec::<Box<Observer>>::new(),
+            observers: TreeMap::<uint, Box<Observer>>::new(),
+            count: 0,
         }
     }
 }
 
 impl<'a> BackEnd for TestBackEnd<'a> {
     fn add_observer(&mut self, ob: Box<Observer>) -> uint {
-        self.observers.push(ob);
-        self.observers.len() - 1
+        let i = self.count;
+        self.count += 1;
+        self.observers.insert(i, ob);
+        i
+    }
+
+    fn remove_observer(&mut self, i: uint) {
+        self.observers.remove(&i);
     }
 
     fn update(&mut self, dt: f64) {
-        for i in range(0, self.observers.len()) {
-            let ob = self.observers.get_mut(i);
-
+        for (_, ob) in self.observers.mut_iter() {
             ob.update(dt);
 
             if ob.can_trigger() {
@@ -119,7 +129,7 @@ impl<'a> BackEnd for TestBackEnd<'a> {
     }
 
     fn on_event(&mut self, e: event::Event) {
-        for ob in self.observers.mut_iter() {
+        for (_, ob) in self.observers.mut_iter() {
             ob.on_event(e);
         }
     }
