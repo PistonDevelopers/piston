@@ -13,21 +13,21 @@ use {
 };
 
 /// A event context which used to observe whether a certain keyboard key is being pressed and lasting certain time.
-pub struct KeyboardPressingLastingEvent<'a> {
+pub struct LastingPressingKeyboardEvent<'a> {
     /// The key to be observed.
     pub key: Field<'a, keyboard::Key>,
     /// The time to lasting in seconds.
     pub lasting: Field<'a, f64>,
 }
 
-impl<'a> Map<'a> for KeyboardPressingLastingEvent<'a> {
+impl<'a> Map<'a> for LastingPressingKeyboardEvent<'a> {
     #[inline(always)]
     fn map<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
-        back_end.add_observer(box KeyboardPressingLastingEventObserver::new(command, *self.key.get(), *self.lasting.get()))
+        back_end.add_observer(box LastingPressingKeyboardEventObserver::new(command, *self.key.get(), *self.lasting.get()))
     }
 }
 
-struct KeyboardPressingLastingEventObserver<'a> {
+struct LastingPressingKeyboardEventObserver<'a> {
     command: ||: 'a,
     key: keyboard::Key,
     is_pressing: bool,
@@ -35,9 +35,9 @@ struct KeyboardPressingLastingEventObserver<'a> {
     lasting_time: f64,
 }
 
-impl<'a> KeyboardPressingLastingEventObserver<'a> {
-    pub fn new<'a>(command: ||: 'a, key: keyboard::Key, lasting: f64) -> KeyboardPressingLastingEventObserver<'a> {
-        KeyboardPressingLastingEventObserver {
+impl<'a> LastingPressingKeyboardEventObserver<'a> {
+    pub fn new<'a>(command: ||: 'a, key: keyboard::Key, lasting: f64) -> LastingPressingKeyboardEventObserver<'a> {
+        LastingPressingKeyboardEventObserver {
             command: command,
             key: key,
             is_pressing: false,
@@ -47,7 +47,7 @@ impl<'a> KeyboardPressingLastingEventObserver<'a> {
     }
 }
 
-impl<'a> Observer for KeyboardPressingLastingEventObserver<'a> {
+impl<'a> Observer for LastingPressingKeyboardEventObserver<'a> {
     fn can_trigger(&self) -> bool {
         self.is_pressing && self.cur_time > self.lasting_time
     }

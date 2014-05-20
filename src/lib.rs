@@ -14,9 +14,9 @@ pub use AddPressing = add_pressing::AddPressing;
 
 pub use Event = event::Event;
 pub use KeyboardEvent = keyboard_event::KeyboardEvent;
-pub use KeyboardPressingEvent = keyboard_pressing_event::KeyboardPressingEvent;
-pub use KeyboardPressingLastingEvent = keyboard_pressing_lasting_event::KeyboardPressingLastingEvent;
-pub use KeyboardPressEvent = keyboard_press_event::KeyboardPressEvent;
+pub use PressKeyboardEvent = press_keyboard_event::PressKeyboardEvent;
+pub use PressingKeyboardEvent = pressing_keyboard_event::PressingKeyboardEvent;
+pub use LastingPressingKeyboardEvent = lasting_pressing_keyboard_event::LastingPressingKeyboardEvent;
 
 pub use Map = map::Map;
 
@@ -30,9 +30,9 @@ mod add_pressing;
 
 mod event;
 mod keyboard_event;
-mod keyboard_pressing_event;
-mod keyboard_pressing_lasting_event;
-mod keyboard_press_event;
+mod press_keyboard_event;
+mod pressing_keyboard_event;
+mod lasting_pressing_keyboard_event;
 
 mod map;
 

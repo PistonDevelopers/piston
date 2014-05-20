@@ -14,28 +14,28 @@ use {
 };
 
 /// A event context which used to observe whether a certain keyboard key was pressed.
-pub struct KeyboardPressEvent<'a> {
+pub struct PressKeyboardEvent<'a> {
     /// The key to be observed.
     pub key: Field<'a, keyboard::Key>,
 }
 
-impl<'a> Map<'a> for KeyboardPressEvent<'a> {
+impl<'a> Map<'a> for PressKeyboardEvent<'a> {
     #[inline(always)]
     fn map<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
-        back_end.add_observer(box KeyboardPressEventObserver::new(command, *self.key.get()))
+        back_end.add_observer(box PressKeyboardEventObserver::new(command, *self.key.get()))
     }
 }
 
-struct KeyboardPressEventObserver<'a> {
+struct PressKeyboardEventObserver<'a> {
     command: ||: 'a,
     key: keyboard::Key,
     can_trigger: bool,
     is_pressed: bool,
 }
 
-impl<'a> KeyboardPressEventObserver<'a> {
-    pub fn new<'a>(command: ||: 'a, key: keyboard::Key) -> KeyboardPressEventObserver<'a> {
-        KeyboardPressEventObserver {
+impl<'a> PressKeyboardEventObserver<'a> {
+    pub fn new<'a>(command: ||: 'a, key: keyboard::Key) -> PressKeyboardEventObserver<'a> {
+        PressKeyboardEventObserver {
             command: command,
             key: key,
             can_trigger: false,
@@ -44,7 +44,7 @@ impl<'a> KeyboardPressEventObserver<'a> {
     }
 }
 
-impl<'a> Observer for KeyboardPressEventObserver<'a> {
+impl<'a> Observer for PressKeyboardEventObserver<'a> {
     fn can_trigger(&self) -> bool {
         self.can_trigger
     }
