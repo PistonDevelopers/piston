@@ -12,7 +12,7 @@ https://github.com/bvssvni/glfw-rs.git
   upstream/master
 
 target/x86_64-apple-darwin/lib/libgraphics-587c2edd-0.0.rlib
-a50ac97a398f5530932f8be009fcc0e33de36f7a
+dc06fc9f5552db4aa3c8d61e97f9be807a11141a
 https://github.com/bvssvni/rust-graphics.git
   upstream/master
 
