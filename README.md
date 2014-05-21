@@ -3,7 +3,7 @@ Piston
 
 A user friendly game engine written in Rust
 
-Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
+[List of games made with Piston](https://github.com/PistonDevelopers/piston/issues/64)
 
 [Piston online docs](http://bvssvni.github.io/docs/piston/piston/)  
 
@@ -15,6 +15,7 @@ Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
 | [rust-png](https://github.com/bvssvni/rust-png) | [rust-png docs](http://pistondevelopers.github.io/docs/rust-png/png/) |
 | [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://pistondevelopers.github.io/docs/rust-sdl2/sdl2/) |
 | [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://pistondevelopers.github.io/docs/glfw-rs/glfw/) |
+| [hgl-rs](https://github.com/cmr/hgl-rs) | [hgl-rs docs](http://pistondevelopers.github.io/docs/hgl-rs/hgl/) |
 | [gl-rs](https://github.com/bjz/gl-rs) | [gl-rs docs](http://pistondevelopers.github.io/docs/gl-rs/gl/) |
 
 ## Start new project with Piston
