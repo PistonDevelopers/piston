@@ -25,21 +25,22 @@ impl<'a> App<'a> {
 
 impl<'a> Game for App<'a> {
     fn load(&mut self, _asset_store: &mut AssetStore) {
-        self.e.keyboard().press(keyboard::Up).map(&mut self.back_end, || {
+        self.e.keyboard().press(keyboard::Up).call(&mut self.back_end, || {
             println!("Oops! You pressed keyboard::Up");
         });
 
         let e = self.e.keyboard().pressing(keyboard::Up);
-        let i = e.map(&mut self.back_end, || {
+
+        let i = e.call(&mut self.back_end, || {
             println!("Wow! You are pressing keyboard::Up");
         });
 
-        e.lasting(1.0).map(&mut self.back_end, || {
+        e.lasting(1.0).call(&mut self.back_end, || {
             println!("Wooooooow! You are pressing keybaord::Up at least 1.0 second!!");
         });
         self.back_end.remove_observer(i);
 
-        self.e.keyboard().release(keyboard::Up).map(&mut self.back_end, || {
+        self.e.keyboard().release(keyboard::Up).call(&mut self.back_end, || {
             println!("Hmm! You released keyboard::Up");
         });
     }

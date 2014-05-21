@@ -6,16 +6,16 @@ An experimental library using context types for event logic
 Examples
 --------
 
-Maps "press event" with a certain keyboard key:
+Call a command when press with a certain keyboard key:
 ```
-e.keyboard().press(keyboard::Up).map(back_end, || {
+e.keyboard().press(keyboard::Up).call(&mut back_end, || {
     println!("Oops! You pressed keyboard::Up");
 });
 ```
 
-Maps "pressing and lasting certain time event" with a keyboard key:
+Call a command when pressing with a keyboard key and lasting it with certain time:
 ```
-e.keyboard().pressing(keyboard::Up).lasting(1.0).map(back_end, || {
+e.keyboard().pressing(keyboard::Up).lasting(1.0).call(&mut back_end, || {
     println!("Wooooooow! You are pressing keyboard::Up at least 1.0 second!!");
 });
 ```

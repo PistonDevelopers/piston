@@ -20,7 +20,7 @@ pub use PressingKeyboardEvent = pressing_keyboard_event::PressingKeyboardEvent;
 pub use LastingPressingKeyboardEvent = lasting_pressing_keyboard_event::LastingPressingKeyboardEvent;
 pub use ReleaseKeyboardEvent = release_keyboard_event::ReleaseKeyboardEvent;
 
-pub use Map = map::Map;
+pub use Call = call::Call;
 
 pub use BackEnd = back_end::BackEnd;
 pub use Observer = observer::Observer;
@@ -38,7 +38,7 @@ mod pressing_keyboard_event;
 mod lasting_pressing_keyboard_event;
 mod release_keyboard_event;
 
-mod map;
+mod call;
 
 mod back_end;
 mod observer;
