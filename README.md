@@ -5,14 +5,14 @@ A user friendly game engine written in Rust
 
 [List of games made with Piston](https://github.com/PistonDevelopers/piston/issues/64)
 
-[Piston online docs](http://bvssvni.github.io/docs/piston/piston/)  
+[Piston online docs](http://pistondevelopers.github.io/docs/piston/piston)  
 
 [How to contribute](https://github.com/PistonDevelopers/piston/issues/70)
 
 | Dependency | Online Docs |
 |---------|------|------------|
-| [rust-graphics](https://github.com/bvssvni/rust-graphics) | [rust-graphics docs](http://pistondevelopers.github.io/docs/rust-graphics/graphics/) |
-| [rust-png](https://github.com/bvssvni/rust-png) | [rust-png docs](http://pistondevelopers.github.io/docs/rust-png/png/) |
+| [rust-graphics](https://github.com/PistonDevelopers/rust-graphics) | [rust-graphics docs](http://pistondevelopers.github.io/docs/rust-graphics/graphics) |
+| [rust-png](https://github.com/PistonDevelopers/rust-png) | [rust-png docs](http://pistondevelopers.github.io/docs/rust-png/png) |
 | [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://pistondevelopers.github.io/docs/rust-sdl2/sdl2/) |
 | [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://pistondevelopers.github.io/docs/glfw-rs/glfw/) |
 | [hgl-rs](https://github.com/cmr/hgl-rs) | [hgl-rs docs](http://pistondevelopers.github.io/docs/hgl-rs/hgl/) |
