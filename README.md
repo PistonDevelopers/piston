@@ -3,7 +3,7 @@ Piston
 
 A user friendly game engine written in Rust
 
-Test project: [rust-snake](https://github.com/bvssvni/rust-snake)
+[List of games made with Piston](https://github.com/PistonDevelopers/piston/issues/64)
 
 [Piston online docs](http://bvssvni.github.io/docs/piston/piston/)  
 
