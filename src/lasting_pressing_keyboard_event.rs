@@ -8,7 +8,7 @@ use piston::event::{
 };
 use {
     BackEnd,
-    Map,
+    Call,
     Observer,
 };
 
@@ -20,9 +20,9 @@ pub struct LastingPressingKeyboardEvent<'a> {
     pub lasting: Field<'a, f64>,
 }
 
-impl<'a> Map<'a> for LastingPressingKeyboardEvent<'a> {
+impl<'a> Call<'a> for LastingPressingKeyboardEvent<'a> {
     #[inline(always)]
-    fn map<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
+    fn call<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
         back_end.add_observer(box LastingPressingKeyboardEventObserver::new(command, *self.key.get(), *self.lasting.get()))
     }
 }

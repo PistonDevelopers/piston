@@ -16,7 +16,7 @@ use {
     LastingPressingKeyboardEvent,
 
     BackEnd,
-    Map,
+    Call,
     Observer,
 };
 
@@ -26,9 +26,9 @@ pub struct PressingKeyboardEvent<'a> {
     pub key: Field<'a, keyboard::Key>,
 }
 
-impl<'a> Map<'a> for PressingKeyboardEvent<'a> {
+impl<'a> Call<'a> for PressingKeyboardEvent<'a> {
     #[inline(always)]
-    fn map<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
+    fn call<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
         back_end.add_observer(box PressingKeyboardEventObserver::new(command, *self.key.get()))
     }
 }
