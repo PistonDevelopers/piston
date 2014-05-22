@@ -5,48 +5,49 @@ extern crate collections;
 extern crate piston;
 extern crate event;
 
-use collections::treemap::TreeMap;
 use piston::*;
 use event::*;
 
 pub struct App<'a> {
+    number: int,
     e: Event<'a>,
-    back_end: TestBackEnd<'a>,
+    ec: EventCenter,
 }
 
 impl<'a> App<'a> {
     pub fn new() -> App {
         App {
+            number: 0,
             e: Event::new(),
-            back_end: TestBackEnd::new(),
+            ec: EventCenter::new(),
         }
     }
 }
 
 impl<'a> Game for App<'a> {
     fn load(&mut self, _asset_store: &mut AssetStore) {
-        self.e.keyboard().press(keyboard::Up).call(&mut self.back_end, || {
+        self.e.keyboard().press(keyboard::Up).call(&mut self.ec, || {
             println!("Oops! You pressed keyboard::Up");
         });
 
         let e = self.e.keyboard().pressing(keyboard::Up);
 
-        let i = e.call(&mut self.back_end, || {
+        let i = e.call(&mut self.ec, || {
             println!("Wow! You are pressing keyboard::Up");
         });
 
-        e.lasting(1.0).call(&mut self.back_end, || {
+        e.lasting(1.0).call(&mut self.ec, || {
             println!("Wooooooow! You are pressing keybaord::Up at least 1.0 second!!");
         });
-        self.back_end.remove_observer(i);
+        self.ec.remove_observer(i);
 
-        self.e.keyboard().release(keyboard::Up).call(&mut self.back_end, || {
+        self.e.keyboard().release(keyboard::Up).call(&mut self.ec, || {
             println!("Hmm! You released keyboard::Up");
         });
     }
 
     fn update(&mut self, dt: f64, _asset_store: &mut AssetStore) {
-        self.back_end.update(dt);
+        self.ec.update(dt);
     }
 
 
@@ -57,7 +58,7 @@ impl<'a> Game for App<'a> {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        self.back_end.on_event(event::KeyPressed(key));
+        self.ec.receive_event(event::KeyPressed(key));
     }
 
     fn key_release(
@@ -65,7 +66,7 @@ impl<'a> Game for App<'a> {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        self.back_end.on_event(event::KeyReleased(key));
+        self.ec.receive_event(event::KeyReleased(key));
     }
 
     fn mouse_press(
@@ -73,7 +74,7 @@ impl<'a> Game for App<'a> {
         button: mouse::Button,
         _asset_store: &mut AssetStore
     ) {
-        self.back_end.on_event(event::MouseButtonPressed(button));
+        self.ec.receive_event(event::MouseButtonPressed(button));
     }
 
     fn mouse_release(
@@ -81,50 +82,7 @@ impl<'a> Game for App<'a> {
         button: mouse::Button,
         _asset_store: &mut AssetStore
     ) {
-        self.back_end.on_event(event::MouseButtonReleased(button));
-    }
-}
-
-struct TestBackEnd<'a> {
-    observers: TreeMap<uint, Box<Observer>>,
-    count: uint,
-}
-
-impl<'a> TestBackEnd<'a> {
-    pub fn new() -> TestBackEnd {
-        TestBackEnd {
-            observers: TreeMap::<uint, Box<Observer>>::new(),
-            count: 0,
-        }
-    }
-}
-
-impl<'a> BackEnd for TestBackEnd<'a> {
-    fn add_observer(&mut self, ob: Box<Observer>) -> uint {
-        let i = self.count;
-        self.count += 1;
-        self.observers.insert(i, ob);
-        i
-    }
-
-    fn remove_observer(&mut self, i: uint) {
-        self.observers.remove(&i);
-    }
-
-    fn update(&mut self, dt: f64) {
-        for (_, ob) in self.observers.mut_iter() {
-            ob.update(dt);
-
-            if ob.can_trigger() {
-                ob.trigger();
-            }
-        }
-    }
-
-    fn on_event(&mut self, e: event::Event) {
-        for (_, ob) in self.observers.mut_iter() {
-            ob.on_event(e);
-        }
+        self.ec.receive_event(event::MouseButtonReleased(button));
     }
 }
 
