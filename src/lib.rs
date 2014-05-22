@@ -4,6 +4,7 @@
 #![crate_id = "event#event:0.1"]
 #![deny(missing_doc)]
 
+extern crate collections;
 extern crate graphics;
 extern crate piston;
 
@@ -22,7 +23,7 @@ pub use ReleaseKeyboardEvent = release_keyboard_event::ReleaseKeyboardEvent;
 
 pub use Call = call::Call;
 
-pub use BackEnd = back_end::BackEnd;
+pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
 mod add_keyboard;
@@ -40,6 +41,6 @@ mod release_keyboard_event;
 
 mod call;
 
-mod back_end;
+mod event_center;
 mod observer;
 

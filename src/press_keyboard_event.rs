@@ -8,8 +8,8 @@ use piston::event::{
 };
 
 use {
-    BackEnd,
     Call,
+    EventCenter,
     Observer,
 };
 
@@ -21,8 +21,8 @@ pub struct PressKeyboardEvent<'a> {
 
 impl<'a> Call<'a> for PressKeyboardEvent<'a> {
     #[inline(always)]
-    fn call<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
-        back_end.add_observer(box PressKeyboardEventObserver::new(command, *self.key.get()))
+    fn call<'a>(&self, ec: &mut EventCenter, command: ||: 'a) -> uint {
+        ec.add_observer(box PressKeyboardEventObserver::new(command, *self.key.get()))
     }
 }
 

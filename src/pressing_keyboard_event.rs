@@ -15,8 +15,8 @@ use {
     AddLasting,
     LastingPressingKeyboardEvent,
 
-    BackEnd,
     Call,
+    EventCenter,
     Observer,
 };
 
@@ -28,8 +28,8 @@ pub struct PressingKeyboardEvent<'a> {
 
 impl<'a> Call<'a> for PressingKeyboardEvent<'a> {
     #[inline(always)]
-    fn call<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
-        back_end.add_observer(box PressingKeyboardEventObserver::new(command, *self.key.get()))
+    fn call<'a>(&self, ec: &mut EventCenter, command: ||: 'a) -> uint {
+        ec.add_observer(box PressingKeyboardEventObserver::new(command, *self.key.get()))
     }
 }
 

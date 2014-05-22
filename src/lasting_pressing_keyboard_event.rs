@@ -7,8 +7,8 @@ use piston::event::{
     KeyReleased,
 };
 use {
-    BackEnd,
     Call,
+    EventCenter,
     Observer,
 };
 
@@ -22,8 +22,8 @@ pub struct LastingPressingKeyboardEvent<'a> {
 
 impl<'a> Call<'a> for LastingPressingKeyboardEvent<'a> {
     #[inline(always)]
-    fn call<'a, B: BackEnd>(&self, back_end: &mut B, command: ||: 'a) -> uint {
-        back_end.add_observer(box LastingPressingKeyboardEventObserver::new(command, *self.key.get(), *self.lasting.get()))
+    fn call<'a>(&self, ec: &mut EventCenter, command: ||: 'a) -> uint {
+        ec.add_observer(box LastingPressingKeyboardEventObserver::new(command, *self.key.get(), *self.lasting.get()))
     }
 }
 
