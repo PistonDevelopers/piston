@@ -169,10 +169,9 @@ pub trait Game {
                 let mut gl = Gl::new(&mut gl_data, asset_store);
                 bg.clear(&mut gl);
                 self.render(&context
-                .trans_local(-1.0, 1.0)
-                .scale_local(2.0 / w as f64, -2.0 / h as f64)
-                .store_view()
-                .reset(), &mut gl);
+                .trans(-1.0, 1.0)
+                .scale(2.0 / w as f64, -2.0 / h as f64)
+                .store_view(), &mut gl);
             }
             self.swap_buffers(game_window);
             // Perform updates by fixed time step until it catches up.
