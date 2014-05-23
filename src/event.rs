@@ -1,9 +1,11 @@
 
 use {
+    AddInterval,
     AddPress,
+    IntervalEvent,
+    KeyType,
     PressEvent,
     Value,
-    KeyType,
 };
 
 /// An immutable event context. All Request starting here.
@@ -21,6 +23,15 @@ impl<'a> AddPress<'a, PressEvent<'a>> for Event {
     fn press(&'a self, key: &'a KeyType) -> PressEvent<'a> {
         PressEvent {
             key: Value(key),
+        }
+    }
+}
+
+impl<'a> AddInterval<IntervalEvent<'a>> for Event {
+    #[inline(always)]
+    fn interval(&self, seconds: f64) -> IntervalEvent<'a> {
+        IntervalEvent {
+            interval: Value(seconds),
         }
     }
 }

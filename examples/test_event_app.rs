@@ -38,6 +38,9 @@ impl Game for App {
             println!("Oops! You pressed mouse::Left");
         });
 
+        self.e.interval(1.0).call(&mut self.ec, || {
+            println!("ELAPSED 1.0 SECOND");
+        });
     }
 
     fn update(&mut self, dt: f64, _asset_store: &mut AssetStore) {

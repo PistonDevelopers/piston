@@ -7,12 +7,16 @@
 extern crate collections;
 extern crate graphics;
 
+
+pub use EventType = event_type::EventType;
+pub use KeyType = event_type::KeyType;
+
+pub use AddInterval = add_interval::AddInterval;
 pub use AddPress = add_press::AddPress;
 pub use AddRelease = add_release::AddRelease;
 
 pub use Event = event::Event;
-pub use EventType = event_type::EventType;
-pub use KeyType = event_type::KeyType;
+pub use IntervalEvent = interval_event::IntervalEvent;
 pub use PressEvent = press_event::PressEvent;
 pub use ReleasePressEvent = release_press_event::ReleasePressEvent;
 
@@ -21,18 +25,21 @@ pub use Call = call::Call;
 pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
+mod event_type;
+mod piston_event_type;
+
 mod add_press;
 mod add_release;
+mod add_interval;
 
 mod event;
-mod event_type;
+mod interval_event;
 mod press_event;
 mod release_press_event;
 
 mod call;
 
 mod event_center;
-mod piston_event_type;
 mod observer;
 
 /// ***************************
