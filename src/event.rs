@@ -4,8 +4,6 @@ use {
     PressEvent,
     Value,
     KeyType,
-    //AddKeyboard,
-    //KeyboardEvent,
 };
 
 /// An immutable event context. All Request starting here.
@@ -27,9 +25,3 @@ impl<'a> AddPress<'a, PressEvent<'a>> for Event {
     }
 }
 
-//impl<'a> AddKeyboard<'a, KeyboardEvent<'a>> for Event<'a> {
-    //#[inline(always)]
-    //fn keyboard(&self) -> KeyboardEvent<'a> {
-        //KeyboardEvent
-    //}
-//}

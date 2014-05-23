@@ -1,32 +1,44 @@
 
 use {
+    AddRelease,
+    Borrowed,
     Call,
-    KeyType,
-    Field,
-    Observer,
     EventCenter,
     EventType,
+    Field,
+    KeyType,
+    Observer,
+    ReleasePressEvent,
 };
 
 pub struct PressEvent<'a> {
     pub key: Field<'a, &'a KeyType>,
 }
 
-impl<'a> Call<'a> for PressEvent<'a> {
-    fn call<'a>(&self, ec: &mut EventCenter, command: ||: 'a) -> uint {
+impl<'a> AddRelease<'a, ReleasePressEvent<'a>> for PressEvent<'a> {
+    #[inline(always)]
+    fn release(&'a self) -> ReleasePressEvent<'a> {
+        ReleasePressEvent {
+            key: Borrowed(self.key.get())
+        }
+    }
+}
+
+impl<'a> Call for PressEvent<'a> {
+    fn call(&self, ec: &mut EventCenter, command: ||: 'static) -> uint {
         ec.add_observer(box PressEventObserver::new(*self.key.get(), command))
     }
 }
 
 struct PressEventObserver<'a> {
-    command: ||: 'a,
+    command: ||: 'static,
     key: &'a KeyType,
     can_trigger: bool,
     is_pressed: bool,
 }
 
 impl<'a> PressEventObserver<'a> {
-    pub fn new(key: &'a KeyType, command: ||: 'a) -> PressEventObserver<'a> {
+    pub fn new(key: &'a KeyType, command: ||: 'static) -> PressEventObserver<'a> {
         PressEventObserver {
             command: command,
             key: key,

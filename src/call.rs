@@ -2,8 +2,8 @@
 use EventCenter;
 
 /// Implemented by all contexts that can call a command.
-pub trait Call<'a> {
+pub trait Call {
     /// Returns a identifier for user to remove the mapping later.
-    fn call<'a>(&self, ec: &mut EventCenter, command: ||: 'a) -> uint;
+    fn call(&self, ec: &mut EventCenter, command: ||: 'static) -> uint;
 }
 

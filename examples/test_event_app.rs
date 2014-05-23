@@ -30,9 +30,14 @@ impl Game for App {
             println!("Oops! You pressed keyboard::Left");
         });
 
+        self.e.press(&keyboard::Right).release().call(&mut self.ec, || {
+            println!("Oops! You release keyboard::Right");
+        });
+
         self.e.press(&mouse::Left).call(&mut self.ec, || {
             println!("Oops! You pressed mouse::Left");
         });
+
     }
 
     fn update(&mut self, dt: f64, _asset_store: &mut AssetStore) {
