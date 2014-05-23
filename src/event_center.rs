@@ -1,9 +1,8 @@
 
 use collections::treemap::TreeMap;
-use piston;
 use Observer;
+use EventType;
 
-/// A event center to handle user's request
 pub struct EventCenter {
     observers: TreeMap<uint, Box<Observer>>,
     count: uint,
@@ -44,7 +43,7 @@ impl EventCenter {
     }
 
     /// Notify the event_center that there is a event occuring.
-    pub fn receive_event(&mut self, e: piston::event::Event) {
+    pub fn receive_event(&mut self, e: &EventType) {
         for (_, ob) in self.observers.mut_iter() {
             ob.on_event(e);
         }

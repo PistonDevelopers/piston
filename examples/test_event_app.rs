@@ -8,13 +8,13 @@ extern crate event;
 use piston::*;
 use event::*;
 
-pub struct App<'a> {
+pub struct App {
     number: int,
-    e: Event<'a>,
+    e: Event,
     ec: EventCenter,
 }
 
-impl<'a> App<'a> {
+impl App {
     pub fn new() -> App {
         App {
             number: 0,
@@ -24,25 +24,14 @@ impl<'a> App<'a> {
     }
 }
 
-impl<'a> Game for App<'a> {
+impl Game for App {
     fn load(&mut self, _asset_store: &mut AssetStore) {
-        self.e.keyboard().press(keyboard::Up).call(&mut self.ec, || {
-            println!("Oops! You pressed keyboard::Up");
+        self.e.press(&keyboard::Left).call(&mut self.ec, || {
+            println!("Oops! You pressed keyboard::Left");
         });
 
-        let e = self.e.keyboard().pressing(keyboard::Up);
-
-        let i = e.call(&mut self.ec, || {
-            println!("Wow! You are pressing keyboard::Up");
-        });
-
-        e.lasting(1.0).call(&mut self.ec, || {
-            println!("Wooooooow! You are pressing keybaord::Up at least 1.0 second!!");
-        });
-        self.ec.remove_observer(i);
-
-        self.e.keyboard().release(keyboard::Up).call(&mut self.ec, || {
-            println!("Hmm! You released keyboard::Up");
+        self.e.press(&mouse::Left).call(&mut self.ec, || {
+            println!("Oops! You pressed mouse::Left");
         });
     }
 
@@ -58,7 +47,7 @@ impl<'a> Game for App<'a> {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        self.ec.receive_event(event::KeyPressed(key));
+        self.ec.receive_event(&event::KeyPressed(key));
     }
 
     fn key_release(
@@ -66,7 +55,7 @@ impl<'a> Game for App<'a> {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        self.ec.receive_event(event::KeyReleased(key));
+        self.ec.receive_event(&event::KeyReleased(key));
     }
 
     fn mouse_press(
@@ -74,7 +63,7 @@ impl<'a> Game for App<'a> {
         button: mouse::Button,
         _asset_store: &mut AssetStore
     ) {
-        self.ec.receive_event(event::MouseButtonPressed(button));
+        self.ec.receive_event(&event::MouseButtonPressed(button));
     }
 
     fn mouse_release(
@@ -82,7 +71,7 @@ impl<'a> Game for App<'a> {
         button: mouse::Button,
         _asset_store: &mut AssetStore
     ) {
-        self.ec.receive_event(event::MouseButtonReleased(button));
+        self.ec.receive_event(&event::MouseButtonReleased(button));
     }
 }
 

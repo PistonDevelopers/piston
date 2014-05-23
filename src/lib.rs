@@ -2,45 +2,58 @@
 
 #![crate_type = "lib"]
 #![crate_id = "event#event:0.1"]
-#![deny(missing_doc)]
+//#![deny(missing_doc)]
 
 extern crate collections;
 extern crate graphics;
-extern crate piston;
 
-pub use AddKeyboard = add_keyboard::AddKeyboard;
-pub use AddLasting = add_lasting::AddLasting;
+pub use Key = event_type::Key;
 pub use AddPress = add_press::AddPress;
-pub use AddPressing = add_pressing::AddPressing;
-pub use AddRelease = add_release::AddRelease;
 
 pub use Event = event::Event;
-pub use KeyboardEvent = keyboard_event::KeyboardEvent;
-pub use PressKeyboardEvent = press_keyboard_event::PressKeyboardEvent;
-pub use PressingKeyboardEvent = pressing_keyboard_event::PressingKeyboardEvent;
-pub use LastingPressingKeyboardEvent = lasting_pressing_keyboard_event::LastingPressingKeyboardEvent;
-pub use ReleaseKeyboardEvent = release_keyboard_event::ReleaseKeyboardEvent;
+pub use EventType = event_type::EventType;
+pub use PressEvent = press_event::PressEvent;
 
 pub use Call = call::Call;
 
 pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
-mod add_keyboard;
-mod add_lasting;
 mod add_press;
-mod add_pressing;
 mod add_release;
 
 mod event;
-mod keyboard_event;
-mod press_keyboard_event;
-mod pressing_keyboard_event;
-mod lasting_pressing_keyboard_event;
-mod release_keyboard_event;
+mod event_type;
+mod press_event;
 
 mod call;
 
 mod event_center;
+mod piston_event_type;
 mod observer;
+
+/// ***************************
+/// * COPY FROM RUST-GRAPHICS *
+/// ***************************
+///
+/// A structure that might contain a value or a borrowed value.
+/// This is to used as building block to create data structure
+/// that is partially based on an existing structure.
+pub enum Field<'a, T> {
+    /// Contains a value.
+    Value(T),
+    /// Contains a borrowed pointer.
+    Borrowed(&'a T),
+}
+
+impl<'a, T> Field<'a, T> {
+    /// Gets a read only value.
+    #[inline(always)]
+    pub fn get(&'a self) -> &'a T {
+        match *self {
+            Value(ref val) => val,
+            Borrowed(rval) => rval,
+        }
+    }
+}
 

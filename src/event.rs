@@ -1,23 +1,35 @@
 
 use {
-    AddKeyboard,
-    KeyboardEvent,
+    AddPress,
+    PressEvent,
+    Value,
+    Key,
+    //AddKeyboard,
+    //KeyboardEvent,
 };
 
 /// An immutable event context. All Request starting here.
-pub struct Event<'a>;
+pub struct Event;
 
-impl<'a> Event<'a> {
+impl Event {
     /// Returns a new event context.
     pub fn new() -> Event {
         Event
     }
 }
 
-impl<'a> AddKeyboard<'a, KeyboardEvent<'a>> for Event<'a> {
+impl<'a> AddPress<'a, PressEvent<'a>> for Event {
     #[inline(always)]
-    fn keyboard(&self) -> KeyboardEvent<'a> {
-        KeyboardEvent
+    fn press(&'a self, key: &'a Key) -> PressEvent<'a> {
+        PressEvent {
+            key: Value(key),
+        }
     }
 }
 
+//impl<'a> AddKeyboard<'a, KeyboardEvent<'a>> for Event<'a> {
+    //#[inline(always)]
+    //fn keyboard(&self) -> KeyboardEvent<'a> {
+        //KeyboardEvent
+    //}
+//}
