@@ -2,7 +2,12 @@
 
 // External crates.
 use gl;
-use gl::types::*;
+use gl::types::{
+    GLchar,
+    GLenum,
+    GLint,
+    GLuint,
+};
 
 //use std::io;
 //use std::path;
@@ -10,13 +15,13 @@ use std::ptr;
 
 /// Compiles a vertex shader from file and fails if not succeeding.
 // pub fn compile_shader_file(
-//     shader_type: GLenum, 
+//     shader_type: GLenum,
 //     file: &str
 // ) -> GLuint {
 //     with_shader_file(file, |res| {
 //         match res {
 //             Err(err) => fail!("Failed opening shader file '{}':\r\n{}", file, err),
-//             Ok(source) => 
+//             Ok(source) =>
 //                 match compile_shader(shader_type, source) {
 //                     Err(err) => fail!("Failed compiling shader file '{}':\r\n{}", file, err),
 //                     Ok(shader) => shader
@@ -59,7 +64,7 @@ pub fn compile_shader(
     let shader = gl::CreateShader(shader_type);
     unsafe {
         source.with_c_str(|ptr| gl::ShaderSource(shader, 1, &ptr, ptr::null()));
-        gl::CompileShader(shader);    
+        gl::CompileShader(shader);
         let mut status = gl::FALSE as GLint;
         gl::GetShaderiv(shader, gl::COMPILE_STATUS, &mut status);
         if status == (gl::TRUE as GLint) {

@@ -1,10 +1,10 @@
 //! Game loop.
 
 // External crates.
-use gl;
-use gl::types::*;
-use time;
 use graphics::*;
+use gl;
+use gl::types::GLint;
+use time;
 
 // Local crate.
 use Gl = gl_back_end::Gl;
@@ -131,7 +131,7 @@ pub trait Game {
                 event::MouseMoved(x, y, relative_move) => {
                     self.mouse_move(x, y, asset_store);
                     match relative_move {
-                        Some((dx, dy)) => 
+                        Some((dx, dy)) =>
                             self.mouse_relative_move(dx, dy, asset_store),
                         None => {},
                     }
