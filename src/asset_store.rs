@@ -7,6 +7,7 @@ use HashMap = collections::HashMap;
 use gl;
 use gl::types::GLuint;
 use libc::c_void;
+use std::os::self_exe_path;
 
 // Local crate.
 use png;
@@ -56,25 +57,30 @@ impl AssetStore {
     }
 
     /// Loads image by relative file name to the asset root.
-    pub fn load_image(&mut self, file: &str) -> Image {
+    pub fn load_image(&mut self, file: &str) -> Result<Image, ~str> {
         match self.texture_files.find_equiv(&file) {
             None => {},
             Some(&texture_id) => {
                 let texture = self.textures.get(texture_id);
-                return Image {
+                return Ok(Image {
                     texture_id: texture_id,
                     texture_width: texture.width,
                     texture_height: texture.height,
                     source_rect: [0, 0, texture.width, texture.height],
-                }
+                })
             },
         };
 
         let folder = self.assets_folder.as_ref().unwrap();
-        let path = Path::new(format!("{}/{}", folder, file));
+        let exe_path = self_exe_path();
+        let exe_path = match exe_path {
+            Some(path) => path,
+            None => return Err("Could not get the path to executable".to_owned()),
+        };
+        let path = exe_path.join(Path::new(folder.as_slice())).join(Path::new(file));
         let img = match png::load_png(&path) {
             Ok(img) => img,
-            Err(msg) => fail!("Could not load '{}': {}", file, msg),
+            Err(msg) => return Err(format!("Could not load '{}': {}", file, msg)),
         };
 
         match img.color_type {
@@ -109,12 +115,12 @@ impl AssetStore {
         let texture_id = self.textures.len() - 1;
 
         self.texture_files.insert(file.to_owned(), texture_id);
-        Image {
+        Ok(Image {
             texture_id: texture_id,
             texture_width: texture.width,
             texture_height: texture.height,
             source_rect: [0, 0, texture.width, texture.height],
-        }
+        })
     }
 }
 

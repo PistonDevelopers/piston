@@ -20,3 +20,5 @@
 /.rust/
 rusti.sh
 
+
+examples/image
