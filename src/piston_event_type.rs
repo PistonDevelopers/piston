@@ -2,17 +2,17 @@
 extern crate piston;
 
 use {
-    Key,
+    KeyType,
     EventType,
 };
 
-impl Key for piston::keyboard::Key {
+impl KeyType for piston::keyboard::Key {
     fn id(&self) -> uint {
         *self as uint
     }
 }
 
-impl Key for piston::mouse::Button {
+impl KeyType for piston::mouse::Button {
     fn id(&self) -> uint {
         // add the last enum item in piston::keyboard::Key
         *self as uint + piston::keyboard::Space as uint + 1
@@ -20,7 +20,7 @@ impl Key for piston::mouse::Button {
 }
 
 impl EventType for piston::event::Event {
-    fn is_press_key(&self, key: &Key) -> bool {
+    fn is_press_key(&self, key: &KeyType) -> bool {
         match *self {
             piston::event::KeyPressed(k) if k.id() == key.id() => {
                 true
@@ -33,7 +33,7 @@ impl EventType for piston::event::Event {
             },
         }
     }
-    fn is_release_key(&self, key: &Key) -> bool {
+    fn is_release_key(&self, key: &KeyType) -> bool {
         match *self {
             piston::event::KeyReleased(k) if k.id() == key.id() => {
                 true

@@ -3,7 +3,7 @@ use {
     AddPress,
     PressEvent,
     Value,
-    Key,
+    KeyType,
     //AddKeyboard,
     //KeyboardEvent,
 };
@@ -20,7 +20,7 @@ impl Event {
 
 impl<'a> AddPress<'a, PressEvent<'a>> for Event {
     #[inline(always)]
-    fn press(&'a self, key: &'a Key) -> PressEvent<'a> {
+    fn press(&'a self, key: &'a KeyType) -> PressEvent<'a> {
         PressEvent {
             key: Value(key),
         }

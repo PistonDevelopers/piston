@@ -7,11 +7,11 @@
 extern crate collections;
 extern crate graphics;
 
-pub use Key = event_type::Key;
 pub use AddPress = add_press::AddPress;
 
 pub use Event = event::Event;
 pub use EventType = event_type::EventType;
+pub use KeyType = event_type::KeyType;
 pub use PressEvent = press_event::PressEvent;
 
 pub use Call = call::Call;
@@ -20,7 +20,6 @@ pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
 mod add_press;
-mod add_release;
 
 mod event;
 mod event_type;

@@ -1,7 +1,7 @@
 
 use {
     Call,
-    Key,
+    KeyType,
     Field,
     Observer,
     EventCenter,
@@ -9,7 +9,7 @@ use {
 };
 
 pub struct PressEvent<'a> {
-    pub key: Field<'a, &'a Key>,
+    pub key: Field<'a, &'a KeyType>,
 }
 
 impl<'a> Call<'a> for PressEvent<'a> {
@@ -20,13 +20,13 @@ impl<'a> Call<'a> for PressEvent<'a> {
 
 struct PressEventObserver<'a> {
     command: ||: 'a,
-    key: &'a Key,
+    key: &'a KeyType,
     can_trigger: bool,
     is_pressed: bool,
 }
 
 impl<'a> PressEventObserver<'a> {
-    pub fn new(key: &'a Key, command: ||: 'a) -> PressEventObserver<'a> {
+    pub fn new(key: &'a KeyType, command: ||: 'a) -> PressEventObserver<'a> {
         PressEventObserver {
             command: command,
             key: key,
