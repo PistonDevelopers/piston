@@ -2,7 +2,11 @@
 
 // External crates.
 use gl;
-use gl::types::*;
+use gl::types::{
+    GLfloat,
+    GLsizeiptr,
+    GLuint,
+};
 use std::ptr;
 use std::mem;
 use shader_utils::{compile_shader};
@@ -14,9 +18,9 @@ use AssetStore = asset_store::AssetStore;
 static VERTEX_SHADER_TRI_LIST_XY_RGBA: &'static str = "
 attribute vec4 a_v4Position;
 attribute vec4 a_v4FillColor;
- 
+
 varying vec4 v_v4FillColor;
- 
+
 void main()
 {
     v_v4FillColor = a_v4FillColor;
@@ -26,7 +30,7 @@ void main()
 
 static FRAGMENT_SHADER_TRI_LIST_XY_RGBA: &'static str = "
 varying vec4 v_v4FillColor;
- 
+
 void main()
 {
         gl_FragColor = v_v4FillColor;
@@ -72,7 +76,7 @@ pub struct Gl<'a> {
 impl<'a> Gl<'a> {
     /// Creates a new OpenGl back-end.
     pub fn new(
-        gl_data: &'a mut GlData, 
+        gl_data: &'a mut GlData,
         asset_store: &'a AssetStore
     ) -> Gl<'a> {
         Gl {
@@ -147,7 +151,7 @@ impl TriListXYRGBAUV {
         gl::AttachShader(program, fragment_shader);
         gl::LinkProgram(program);
         gl::UseProgram(program);
-        unsafe {        
+        unsafe {
             let a_v4Position = "a_v4Position".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
             gl::EnableVertexAttribArray(a_v4Position as GLuint);
             let a_v4FillColor = "a_v4FillColor".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
@@ -185,7 +189,7 @@ impl<'a> GlData {
     /// Creates a new OpenGl back-end.
     pub fn new() -> GlData {
         // Load the vertices, color and texture coord buffers.
-        unsafe {        
+        unsafe {
             let mut vbo : [GLuint, ..3] = [0, ..3];
             gl::GenBuffers(3, vbo.as_mut_ptr());
             let position_id = vbo[0];
@@ -211,7 +215,7 @@ impl<'a> GlData {
                 if program == current_program { return; }
             },
         }
-        
+
         gl::UseProgram(program);
         self.current_program = Some(program);
     }
@@ -249,8 +253,8 @@ impl<'a> BackEnd for Gl<'a> {
     fn supports_tri_list_xy_f32_rgba_f32(&self) -> bool { true }
 
     fn tri_list_xy_f32_rgba_f32(
-        &mut self, 
-        vertices: &[f32], 
+        &mut self,
+        vertices: &[f32],
         colors: &[f32]
     ) {
         {
@@ -286,8 +290,8 @@ impl<'a> BackEnd for Gl<'a> {
     fn supports_tri_list_xy_f32_rgba_f32_uv_f32(&self) -> bool { true }
 
     fn tri_list_xy_f32_rgba_f32_uv_f32(
-        &mut self, 
-        vertices: &[f32], 
+        &mut self,
+        vertices: &[f32],
         colors: &[f32],
         texture_coords: &[f32]
     ) {

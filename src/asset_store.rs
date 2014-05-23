@@ -5,7 +5,7 @@
 use graphics::*;
 use HashMap = collections::HashMap;
 use gl;
-use gl::types::*;
+use gl::types::GLuint;
 use libc::c_void;
 
 // Local crate.
