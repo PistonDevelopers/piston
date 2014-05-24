@@ -1,7 +1,10 @@
 
 use {
+    //Call,
+    //AddAny,
     AddInterval,
     AddPress,
+    //AnyEvent,
     IntervalEvent,
     KeyType,
     PressEvent,
@@ -35,4 +38,13 @@ impl<'a> AddInterval<IntervalEvent<'a>> for Event {
         }
     }
 }
+/*
+impl<'a> AddAny<'a, AnyEvent<'a>> for Event {
+    fn any(&'a self, events: &'a [&'a Call<'a>]) -> AnyEvent<'a> {
+        AnyEvent {
+            events: Value(events),
+        }
+    }
+}
+*/
 
