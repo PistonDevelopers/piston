@@ -28,9 +28,16 @@ impl Game for App {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        println!("{}", key);
+        println!("PRESSED  [{}]", key);
     }
 
+    fn key_release(
+        &mut self,
+        key: keyboard::Key,
+        _asset_store: &mut AssetStore
+    ) {
+        println!("RELEASED [{}]", key);
+    }
 }
 
 #[start]
