@@ -8,6 +8,7 @@ use piston::{
     AssetStore,
     Game,
     GameWindow,
+    GameWindowGLFW,
     GameWindowSDL2,
     GameWindowSettings,
     keyboard,
@@ -64,7 +65,7 @@ fn start(argc: int, argv: **u8) -> int {
 }
 
 fn main() {
-    let mut window: GameWindowSDL2 = GameWindow::new(
+    let mut window: GameWindowGLFW = GameWindow::new(
         GameWindowSettings {
             title: "Keycode".to_owned(),
             size: [300, 300],
