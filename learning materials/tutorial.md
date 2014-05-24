@@ -22,6 +22,8 @@
 
 ### Transformations
 
+### Drawing with OpenGL
+
 ## User input
 
 ### Handling keyboard events
