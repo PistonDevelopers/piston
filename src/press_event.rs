@@ -10,7 +10,9 @@ use {
     Triggered,
 };
 
+/// A event context that can be triggered after certain key was pressed.
 pub struct PressEvent<'a> {
+    /// The key which was pressed.
     pub key: Field<'a, &'a KeyType>,
 }
 

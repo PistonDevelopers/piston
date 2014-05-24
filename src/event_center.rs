@@ -3,6 +3,7 @@ use collections::treemap::TreeMap;
 use Observer;
 use EventType;
 
+/// A struct that contains all observers.
 pub struct EventCenter {
     observers: TreeMap<uint, Box<Observer>>,
     commands_call: TreeMap<uint, ||: 'static>,
@@ -24,7 +25,7 @@ impl EventCenter {
     /// Add an observer to the event center so that the it will notify the
     /// observer when there is a event occuring.
     ///
-    /// This will continuing trigger command until the observer is removed.
+    /// This will continuing trigger observer until the observer is removed.
     pub fn add_observer_call(&mut self, ob: Box<Observer>, command: ||: 'static) -> uint {
         let i = self.get_empty_id();
         self.observers.insert(i, ob);
@@ -32,6 +33,10 @@ impl EventCenter {
         i
     }
 
+    /// Add an observer to the event center so that the it will notify the
+    /// observer when there is a event occuring.
+    ///
+    /// This will only trigger observer once.
     pub fn add_observer_call_once(&mut self, ob: Box<Observer>, command: ||: 'static) -> uint {
         let i = self.get_empty_id();
         self.observers.insert(i, ob);

@@ -7,7 +7,9 @@ use {
     Triggered,
 };
 
+/// A context event that can be triggered after certain key was released.
 pub struct ReleasePressEvent<'a> {
+    /// The key which was released.
     pub key: Field<'a, &'a KeyType>,
 }
 

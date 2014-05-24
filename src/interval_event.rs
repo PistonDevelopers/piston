@@ -5,7 +5,9 @@ use {
     Triggered,
 };
 
+/// A event context that can be triggered after certain times in second.
 pub struct IntervalEvent<'a> {
+    /// Interval in seconds
     pub interval: Field<'a, f64>,
 }
 
