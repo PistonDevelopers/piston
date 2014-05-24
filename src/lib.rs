@@ -2,7 +2,7 @@
 
 #![crate_type = "lib"]
 #![crate_id = "event#event:0.1"]
-#![deny(missing_doc)]
+//#![deny(missing_doc)]
 
 extern crate collections;
 extern crate graphics;
@@ -11,10 +11,12 @@ extern crate graphics;
 pub use EventType = event_type::EventType;
 pub use KeyType = event_type::KeyType;
 
+pub use AddAny = add_any::AddAny;
 pub use AddInterval = add_interval::AddInterval;
 pub use AddPress = add_press::AddPress;
 pub use AddRelease = add_release::AddRelease;
 
+pub use AnyEvent = any_event::AnyEvent;
 pub use Event = event::Event;
 pub use IntervalEvent = interval_event::IntervalEvent;
 pub use PressEvent = press_event::PressEvent;
@@ -30,10 +32,12 @@ pub use Observer = observer::Observer;
 mod event_type;
 mod piston_event_type;
 
+mod add_any;
 mod add_press;
 mod add_release;
 mod add_interval;
 
+mod any_event;
 mod event;
 mod interval_event;
 mod press_event;

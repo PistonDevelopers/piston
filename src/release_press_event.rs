@@ -5,12 +5,21 @@ use {
     KeyType,
     Observer,
     Triggered,
+    Value,
 };
 
 /// A context event that can be triggered after certain key was released.
 pub struct ReleasePressEvent<'a> {
     /// The key which was released.
     pub key: Field<'a, &'a KeyType>,
+}
+
+impl<'a> Clone for ReleasePressEvent<'a> {
+    fn clone(&self) -> ReleasePressEvent<'a> {
+        ReleasePressEvent {
+            key: Value(*self.key.get()),
+        }
+    }
 }
 
 impl<'a> Triggered<'a> for ReleasePressEvent<'a> {
@@ -36,6 +45,11 @@ impl<'a> ReleasePressEventObserver<'a> {
 }
 
 impl<'a> Observer for ReleasePressEventObserver<'a> {
+    fn reset(&mut self) {
+        self.is_pressed = false;
+        self.can_trigger = false;
+    }
+
     fn can_trigger(&self) -> bool {
         self.can_trigger
     }

@@ -8,12 +8,21 @@ use {
     Observer,
     ReleasePressEvent,
     Triggered,
+    Value,
 };
 
 /// A event context that can be triggered after certain key was pressed.
 pub struct PressEvent<'a> {
     /// The key which was pressed.
     pub key: Field<'a, &'a KeyType>,
+}
+
+impl<'a> Clone for PressEvent<'a> {
+    fn clone(&self) -> PressEvent<'a> {
+        PressEvent {
+            key: Value(*self.key.get()),
+        }
+    }
 }
 
 impl<'a> Triggered<'a> for PressEvent<'a> {
@@ -48,6 +57,11 @@ impl<'a> PressEventObserver<'a> {
 }
 
 impl<'a> Observer for PressEventObserver<'a> {
+    fn reset(&mut self) {
+        self.is_pressed = false;
+        self.can_trigger = false;
+    }
+
     fn can_trigger(&self) -> bool {
         self.can_trigger
     }

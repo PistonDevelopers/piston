@@ -3,6 +3,8 @@ use EventType;
 
 /// Implemented by all observers.
 pub trait Observer {
+    /// Reset the observer, ignore previous events.
+    fn reset(&mut self);
     /// Whether the observer can be triggered
     fn can_trigger(&self) -> bool;
     /// Called after the observer was triggered.

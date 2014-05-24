@@ -1,13 +1,13 @@
 
 use {
-    //Call,
-    //AddAny,
+    AddAny,
     AddInterval,
     AddPress,
-    //AnyEvent,
+    AnyEvent,
     IntervalEvent,
     KeyType,
     PressEvent,
+    Triggered,
     Value,
 };
 
@@ -17,6 +17,12 @@ pub struct Event;
 impl Event {
     /// Returns a new event context.
     pub fn new() -> Event {
+        Event
+    }
+}
+
+impl Clone for Event {
+    fn clone(&self) -> Event {
         Event
     }
 }
@@ -38,13 +44,12 @@ impl<'a> AddInterval<IntervalEvent<'a>> for Event {
         }
     }
 }
-/*
+
 impl<'a> AddAny<'a, AnyEvent<'a>> for Event {
-    fn any(&'a self, events: &'a [&'a Call<'a>]) -> AnyEvent<'a> {
+    fn any(&'a self, events: &'a [&'a Triggered<'a>]) -> AnyEvent<'a> {
         AnyEvent {
             events: Value(events),
         }
     }
 }
-*/
 
