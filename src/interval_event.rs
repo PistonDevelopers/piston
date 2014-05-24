@@ -22,7 +22,7 @@ impl<'a> Clone for IntervalEvent<'a> {
 
 impl<'a> Triggered<'a> for IntervalEvent<'a> {
     fn get_observer(&'a self) -> Box<Observer> {
-        (box IntervalEventObserver::new(*self.interval.get())) as Box<Observer>
+        box IntervalEventObserver::new(*self.interval.get()) as Box<Observer>
     }
 }
 

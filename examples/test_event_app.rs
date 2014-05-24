@@ -38,12 +38,21 @@ impl Game for App {
             println!("Oops! You pressed mouse::Left");
         });
 
-        self.e.interval(1.0).call(&mut self.ec, || {
-            println!("ELAPSED 1.0 SECOND");
+        self.e.interval(10.0).call(&mut self.ec, || {
+            println!("ELAPSED 10.0 SECOND");
         });
 
-        self.e.interval(2.0).call_once(&mut self.ec, || {
-            println!("ELAPSED 2.0 SECOND, AND THIS WILL BE CALLED ONCE!!!");
+        self.e.interval(20.0).call_once(&mut self.ec, || {
+            println!("ELAPSED 20.0 SECOND, AND THIS WILL BE CALLED ONLY ONCE!!!");
+        });
+
+        let key_up = keyboard::Up;
+        let key_down = keyboard::Down;
+        let a = self.e.press(&key_up);
+        let b = self.e.press(&key_down);
+        let b = b.release();
+        self.e.any(&[&a as &Triggered, &b as &Triggered]).call(&mut self.ec, || {
+            println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
         });
     }
 
