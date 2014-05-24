@@ -41,6 +41,10 @@ impl Game for App {
         self.e.interval(1.0).call(&mut self.ec, || {
             println!("ELAPSED 1.0 SECOND");
         });
+
+        self.e.interval(2.0).call_once(&mut self.ec, || {
+            println!("ELAPSED 2.0 SECOND, AND THIS WILL BE CALLED ONCE!!!");
+        });
     }
 
     fn update(&mut self, dt: f64, _asset_store: &mut AssetStore) {

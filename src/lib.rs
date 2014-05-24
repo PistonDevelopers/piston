@@ -21,6 +21,7 @@ pub use PressEvent = press_event::PressEvent;
 pub use ReleasePressEvent = release_press_event::ReleasePressEvent;
 
 pub use Call = call::Call;
+pub use CallOnce = call_once::CallOnce;
 pub use Triggered = triggered::Triggered;
 
 pub use EventCenter = event_center::EventCenter;
@@ -39,6 +40,7 @@ mod press_event;
 mod release_press_event;
 
 mod call;
+mod call_once;
 mod triggered;
 
 mod event_center;
