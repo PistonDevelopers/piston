@@ -125,7 +125,7 @@ impl GameWindow for GameWindowGLFW {
 fn glfw_map_key(keycode: glfw::Key) -> keyboard::Key {
     match keycode {
         glfw::KeySpace => keyboard::Space,
-        glfw::KeyEnter => keyboard::Enter,
+        glfw::KeyEnter => keyboard::Return,
         glfw::KeyUp => keyboard::Up,
         glfw::KeyDown => keyboard::Down,
         glfw::KeyLeft => keyboard::Left,
