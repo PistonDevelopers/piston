@@ -8,7 +8,7 @@ use std::num::ToPrimitive;
 
 /// Represent a keyboard key.
 #[allow(missing_doc)]
-#[deriving(Eq, TotalEq)]
+#[deriving(Eq, TotalEq, Show)]
 pub enum Key {
     Unknown            = 0,
     Backspace          = 8,
