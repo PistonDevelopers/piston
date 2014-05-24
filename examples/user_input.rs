@@ -65,7 +65,7 @@ fn start(argc: int, argv: **u8) -> int {
 }
 
 fn main() {
-    let mut window: GameWindowGLFW = GameWindow::new(
+    let mut window: GameWindowSDL2 = GameWindow::new(
         GameWindowSettings {
             title: "Keycode".to_owned(),
             size: [300, 300],
