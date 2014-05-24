@@ -96,15 +96,8 @@ impl GameWindow for GameWindowSDL2 {
 }
 
 fn sdl2_map_key(keycode: sdl2::keycode::KeyCode) -> keyboard::Key {
-    match keycode {
-        sdl2::keycode::UpKey => keyboard::Up,
-        sdl2::keycode::DownKey => keyboard::Down,
-        sdl2::keycode::LeftKey => keyboard::Left,
-        sdl2::keycode::RightKey => keyboard::Right,
-        sdl2::keycode::ReturnKey => keyboard::Enter,
-        sdl2::keycode::SpaceKey => keyboard::Space,
-        _ => keyboard::Unknown,
-    }
+    use std::num::FromPrimitive;
+    FromPrimitive::from_u64(keycode.code() as u64).unwrap()
 }
 
 fn sdl2_map_mouse(button: sdl2::mouse::Mouse) -> mouse::Button {
