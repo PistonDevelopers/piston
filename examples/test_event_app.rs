@@ -51,7 +51,7 @@ impl Game for App {
         let a = self.e.press(&key_up);
         let b = self.e.press(&key_down);
         let b = b.release();
-        self.e.any(&[&a as &Triggered, &b as &Triggered]).call(&mut self.ec, || {
+        self.e.any([&a as &Triggered, &b as &Triggered]).call(&mut self.ec, || {
             println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
         });
     }

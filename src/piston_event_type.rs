@@ -8,14 +8,14 @@ use {
 
 impl KeyType for piston::keyboard::Key {
     fn id(&self) -> uint {
-        *self as uint
+        // add the last enum item in piston::mouse::Button
+        self.code() as uint + piston::mouse::Button8 as uint + 1
     }
 }
 
 impl KeyType for piston::mouse::Button {
     fn id(&self) -> uint {
-        // add the last enum item in piston::keyboard::Key
-        *self as uint + piston::keyboard::Space as uint + 1
+        *self as uint
     }
 }
 
