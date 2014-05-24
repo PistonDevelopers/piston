@@ -1,32 +1,29 @@
 
 use {
-    Call,
-    EventCenter,
     Field,
     Observer,
+    Triggered,
 };
 
 pub struct IntervalEvent<'a> {
     pub interval: Field<'a, f64>,
 }
 
-impl<'a> Call<'a> for IntervalEvent<'a> {
-    fn call(&'a self, ec: &mut EventCenter, command: ||: 'static) -> uint {
-        ec.add_observer(box IntervalEventObserver::new(*self.interval.get(), command))
+impl<'a> Triggered<'a> for IntervalEvent<'a> {
+    fn get_observer(&'a self) -> Box<Observer> {
+        (box IntervalEventObserver::new(*self.interval.get())) as Box<Observer>
     }
 }
 
 struct IntervalEventObserver {
-    command: ||: 'static,
     can_trigger: bool,
     cur_interval: f64,
     interval: f64,
 }
 
 impl IntervalEventObserver {
-    pub fn new(interval: f64, command: ||: 'static) -> IntervalEventObserver {
+    pub fn new(interval: f64) -> IntervalEventObserver {
         IntervalEventObserver {
-            command: command,
             can_trigger: false,
             cur_interval: 0.0,
             interval: interval,
@@ -39,8 +36,7 @@ impl Observer for IntervalEventObserver {
         self.can_trigger
     }
 
-    fn trigger(&mut self) {
-        (self.command)();
+    fn after_trigger(&mut self) {
         self.can_trigger = false
     }
 

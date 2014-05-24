@@ -3,14 +3,10 @@ use EventType;
 
 /// Implemented by all observers.
 pub trait Observer {
-    /// Whether the observer can trigger a command.
+    /// Whether the observer can be triggered
     fn can_trigger(&self) -> bool;
-    /// Trigger the observer's command.
-    fn trigger(&mut self);
-
-    // one way to optimize is to support following method for back-end to
-    // query, so it will not call `update` on the observer which don't need.
-    //fn need_to_update(&self) -> bool { false; }
+    /// Called after the observer was triggered.
+    fn after_trigger(&mut self) {}
     /// Update for every game loop.
     fn update(&mut self, _dt: f64) {}
     /// Notify the observer that there is a event occuring.

@@ -1,34 +1,31 @@
 
 use {
-    Call,
-    EventCenter,
     EventType,
     Field,
     KeyType,
     Observer,
+    Triggered,
 };
 
 pub struct ReleasePressEvent<'a> {
     pub key: Field<'a, &'a KeyType>,
 }
 
-impl<'a> Call<'a> for ReleasePressEvent<'a> {
-    fn call(&'a self, ec: &mut EventCenter, command: ||: 'static) -> uint {
-        ec.add_observer(box ReleasePressEventObserver::new(*self.key.get(), command))
+impl<'a> Triggered<'a> for ReleasePressEvent<'a> {
+    fn get_observer(&'a self) -> Box<Observer> {
+        (box ReleasePressEventObserver::new(*self.key.get())) as Box<Observer>
     }
 }
 
 struct ReleasePressEventObserver<'a> {
-    command: ||: 'static,
     key: &'a KeyType,
     can_trigger: bool,
     is_pressed: bool,
 }
 
 impl<'a> ReleasePressEventObserver<'a> {
-    pub fn new(key: &'a KeyType, command: ||: 'static) -> ReleasePressEventObserver<'a>{
+    pub fn new(key: &'a KeyType) -> ReleasePressEventObserver<'a>{
         ReleasePressEventObserver {
-            command: command,
             key: key,
             can_trigger: false,
             is_pressed: false,
@@ -41,8 +38,7 @@ impl<'a> Observer for ReleasePressEventObserver<'a> {
         self.can_trigger
     }
 
-    fn trigger(&mut self) {
-        (self.command)();
+    fn after_trigger(&mut self) {
         self.can_trigger = false
     }
 
