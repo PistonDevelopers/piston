@@ -11,6 +11,7 @@ use piston::{
     GameWindowSDL2,
     GameWindowSettings,
     keyboard,
+    mouse,
 };
 
 pub struct App;
@@ -28,7 +29,7 @@ impl Game for App {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        println!("PRESSED  [{}]", key);
+        println!("Pressed keyboard key '{}'", key);
     }
 
     fn key_release(
@@ -36,7 +37,23 @@ impl Game for App {
         key: keyboard::Key,
         _asset_store: &mut AssetStore
     ) {
-        println!("RELEASED [{}]", key);
+        println!("Released keyboard key '{}'", key);
+    }
+
+    fn mouse_press(
+        &mut self,
+        button: mouse::Button,
+        _asset_store: &mut AssetStore
+    ) {
+        println!("Pressed mouse button '{}'", button);
+    }
+
+    fn mouse_release(
+        &mut self, 
+        button: mouse::Button,
+        _asset_store: &mut AssetStore
+    ) {
+        println!("Released mouse button '{}'", button);
     }
 }
 
