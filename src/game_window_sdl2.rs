@@ -29,7 +29,7 @@ impl GameWindow for GameWindowSDL2 {
         sdl2::video::gl_set_attribute(sdl2::video::GLContextProfileMask, sdl2::video::ll::SDL_GL_CONTEXT_PROFILE_CORE as int);
 
         let window = sdl2::video::Window::new(
-            settings.title,
+            settings.title.as_slice(),
             sdl2::video::PosCentered,
             sdl2::video::PosCentered,
             settings.size[0] as int,
