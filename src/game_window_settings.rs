@@ -2,7 +2,7 @@
 /// Settings for window behavior.
 pub struct GameWindowSettings {
     /// Title of the window.
-    pub title: ~str,
+    pub title: StrBuf,
     /// The size of the window
     pub size: [u32, ..2],
     /// If true, the window is fullscreen.
@@ -30,7 +30,7 @@ impl GameWindowSettings {
 
     /// Creates a new Settings.
     pub fn new(
-        title: ~str,
+        title: StrBuf,
         size: [u32, ..2],
         fullscreen: bool,
         exit_on_esc: bool,

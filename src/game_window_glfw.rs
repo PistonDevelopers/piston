@@ -76,7 +76,7 @@ impl GameWindow for GameWindowGLFW {
         let (window, events) = glfw.create_window(
             settings.size[0],
             settings.size[1],
-            settings.title, glfw::Windowed
+            settings.title.as_slice(), glfw::Windowed
         ).expect("Failed to create GLFW window.");
         window.set_key_polling(true);
         window.set_mouse_button_polling(true);
