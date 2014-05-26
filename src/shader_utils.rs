@@ -60,7 +60,7 @@ use std::ptr;
 pub fn compile_shader(
     shader_type: GLenum,
     source: &str
-) -> Result<GLuint, StrBuf> {
+) -> Result<GLuint, String> {
     let shader = gl::CreateShader(shader_type);
     unsafe {
         source.with_c_str(|ptr| gl::ShaderSource(shader, 1, &ptr, ptr::null()));
@@ -77,7 +77,7 @@ pub fn compile_shader(
 
             gl::DeleteShader(shader);
 
-            Err(StrBuf::from_utf8(buf).ok().expect("ShaderInfoLog not valid utf8"))
+            Err(String::from_utf8(buf).ok().expect("ShaderInfoLog not valid utf8"))
         }
     }
 }
