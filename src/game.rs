@@ -10,7 +10,7 @@ use time;
 use Gl = gl_back_end::Gl;
 use GlData = gl_back_end::GlData;
 use GameWindow = game_window::GameWindow;
-use AssetStore = asset_store::AssetStore;
+use AssetStore;
 use keyboard;
 use event;
 use mouse;
@@ -165,7 +165,7 @@ pub trait Game {
         let billion: u64 = 1_000_000_000;
         let dt: f64 = 1.0 / updates_per_second;
         let update_time_in_ns: u64 = billion / updates_per_second as u64;
-        
+
         let start = time::precise_time_ns();
         let min_ns_per_frame = (billion as f64 / max_frames_per_second) as u64;
         let mut next_render = start;
@@ -174,8 +174,8 @@ pub trait Game {
         let mut updated = true;
         while !self.should_close(game_window) {
             let now = time::precise_time_ns();
-            
-            if updated && now >= next_render { 
+
+            if updated && now >= next_render {
                 // Render.
                 let (w, h) = game_window.get_size();
                 if w != 0 && h != 0 {
@@ -186,26 +186,26 @@ pub trait Game {
                     // 'now' is always bigger than 'last_update'.
                     let ext_dt = (now - last_update) as f64 / billion as f64;
                     self.render(
-                        ext_dt, 
+                        ext_dt,
                         &context
                         .trans(-1.0, 1.0)
                         .scale(2.0 / w as f64, -2.0 / h as f64)
-                        .store_view(), 
+                        .store_view(),
                         &mut gl
                     );
                     self.swap_buffers(game_window);
                 }
-            
+
                 // Set moment for next rendering.
                 next_render = now + min_ns_per_frame;
             }
-            
+
             // Perform updates by fixed time step until it catches up.
             updated = false;
             for _ in range(0, max_updates_per_frame) {
                 // Break when catching up to next frame.
                 if next_render <= last_update { break; }
-            
+
                 // Handle user input.
                 // This is handled every update to make it more responsive.
                 self.handle_events(game_window, asset_store);
