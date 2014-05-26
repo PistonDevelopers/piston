@@ -47,7 +47,7 @@ impl<'a> AddInterval<IntervalEvent<'a>> for Event {
 
 impl<'a> AddAny<'a, AnyEvent<'a>> for Event {
     #[inline(always)]
-    fn any(&'a self, events: &'a [&'a Triggered<'a>]) -> AnyEvent<'a> {
+    fn any(&'a self, events: &'a [&'a Triggered]) -> AnyEvent<'a> {
         AnyEvent {
             events: Value(events),
         }

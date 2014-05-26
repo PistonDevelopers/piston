@@ -10,7 +10,7 @@ use {
 /// A event context that can be triggered if ANY event in `events` happened.
 pub struct AnyEvent<'a> {
     /// A sequence of events.
-    pub events: Field<'a, &'a [&'a Triggered<'a>]>,
+    pub events: Field<'a, &'a [&'a Triggered]>,
 }
 
 impl<'a> Clone for AnyEvent<'a> {
@@ -21,7 +21,7 @@ impl<'a> Clone for AnyEvent<'a> {
     }
 }
 
-impl<'a> Triggered<'a> for AnyEvent<'a> {
+impl<'a> Triggered for AnyEvent<'a> {
     fn get_observer(&self) -> Box<Observer> {
         box AnyEventObserver::new(*self.events.get()) as Box<Observer>
     }
@@ -32,7 +32,7 @@ struct AnyEventObserver<'a> {
 }
 
 impl<'a> AnyEventObserver<'a> {
-    pub fn new(events: &'a [&'a Triggered<'a>]) -> AnyEventObserver<'a> {
+    pub fn new(events: &'a [&'a Triggered]) -> AnyEventObserver<'a> {
         let mut observers = Vec::<Box<Observer>>::new();
         for event in events.iter() {
             observers.push(event.get_observer());

@@ -31,7 +31,6 @@ pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
 mod event_type;
-//mod piston_event_type;
 mod event_game;
 
 mod add_any;

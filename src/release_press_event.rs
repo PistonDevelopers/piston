@@ -22,8 +22,8 @@ impl<'a> Clone for ReleasePressEvent<'a> {
     }
 }
 
-impl<'a> Triggered<'a> for ReleasePressEvent<'a> {
-    fn get_observer(&'a self) -> Box<Observer> {
+impl<'a> Triggered for ReleasePressEvent<'a> {
+    fn get_observer(&self) -> Box<Observer> {
         box ReleasePressEventObserver::new(*self.key.get()) as Box<Observer>
     }
 }
