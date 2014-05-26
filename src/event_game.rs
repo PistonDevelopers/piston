@@ -67,6 +67,11 @@ impl EventType for piston::event::Event {
     }
 }
 
+/// ******************************
+/// * MOST CODE COPY FROM PISTON *
+/// ******************************
+///
+/// Implemented by game application which want to use rust-event.
 pub trait EventGame {
     /// Perform tasks for loading before showing anything.
     fn load(&mut self, _asset_store: &mut AssetStore) {}
@@ -101,6 +106,7 @@ pub trait EventGame {
         game_window.swap_buffers()
     }
 
+    /// Handle current window's event with EventCenter.
     fn handle_events<W: GameWindow>(
         &mut self,
         game_window: &mut W,
@@ -126,7 +132,7 @@ pub trait EventGame {
     /// `gl` is the Piston OpenGL back-end for Rust-Graphics.
     fn render(&self, _ext_dt: f64, _context: &Context, _gl: &mut Gl) {}
 
-
+    /// Executes a game loop.
     fn run<W: GameWindow>(
         &mut self,
         game_window: &mut W,
