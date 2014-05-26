@@ -159,7 +159,6 @@ pub trait Game {
         let bg = game_window.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
         let updates_per_second: f64 = 120.0;
-        let max_updates_per_frame: u32 = 240;
         let max_frames_per_second: f64 = 60.0;
 
         let billion: u64 = 1_000_000_000;
@@ -171,11 +170,10 @@ pub trait Game {
         let mut next_render = start;
         let mut last_update = start;
         // Set updated to 'true' to trigger rendering before first update.
-        let mut updated = true;
         while !self.should_close(game_window) {
             let now = time::precise_time_ns();
 
-            if updated && now >= next_render {
+            if now >= next_render {
                 // Render.
                 let (w, h) = game_window.get_size();
                 if w != 0 && h != 0 {
@@ -201,11 +199,8 @@ pub trait Game {
             }
 
             // Perform updates by fixed time step until it catches up.
-            updated = false;
-            for _ in range(0, max_updates_per_frame) {
-                // Break when catching up to next frame.
-                if next_render <= last_update { break; }
-
+            while last_update < next_render &&
+                  time::precise_time_ns() < next_render {            
                 // Handle user input.
                 // This is handled every update to make it more responsive.
                 self.handle_events(game_window, asset_store);
@@ -213,7 +208,6 @@ pub trait Game {
                 // Update application state.
                 self.update(dt, asset_store);
                 last_update += update_time_in_ns;
-                updated = true;
             }
         }
     }
