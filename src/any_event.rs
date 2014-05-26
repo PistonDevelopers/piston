@@ -7,7 +7,9 @@ use {
     Value,
 };
 
+/// A event context that can be triggered if ANY event in `events` happened.
 pub struct AnyEvent<'a> {
+    /// A sequence of events.
     pub events: Field<'a, &'a [&'a Triggered<'a>]>,
 }
 

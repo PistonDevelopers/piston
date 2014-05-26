@@ -2,11 +2,12 @@
 
 #![crate_type = "lib"]
 #![crate_id = "event#event:0.1"]
-//#![deny(missing_doc)]
+#![deny(missing_doc)]
 
 extern crate collections;
 extern crate graphics;
 
+pub use EventGame = event_game::EventGame;
 
 pub use EventType = event_type::EventType;
 pub use KeyType = event_type::KeyType;
@@ -30,7 +31,8 @@ pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
 mod event_type;
-mod piston_event_type;
+//mod piston_event_type;
+mod event_game;
 
 mod add_any;
 mod add_press;
