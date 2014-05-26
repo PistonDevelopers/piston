@@ -25,11 +25,11 @@ pub struct Texture {
 /// to load assets for the game with a simple interface.
 pub struct AssetStore {
     // The folder to load assets from.
-    assets_folder: Option<StrBuf>,
+    assets_folder: Option<String>,
     // List of OpenGL textures.
     textures: Vec<Texture>,
     // Contains names of loaded textures.
-    texture_files: HashMap<StrBuf, uint>,
+    texture_files: HashMap<String, uint>,
 }
 
 impl AssetStore {
@@ -57,7 +57,7 @@ impl AssetStore {
     }
 
     /// Loads image by relative file name to the asset root.
-    pub fn load_image(&mut self, file: &str) -> Result<Image, StrBuf> {
+    pub fn load_image(&mut self, file: &str) -> Result<Image, String> {
         match self.texture_files.find_equiv(&file) {
             None => {},
             Some(&texture_id) => {
