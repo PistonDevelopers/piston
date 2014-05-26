@@ -13,7 +13,7 @@ use shader_utils::{compile_shader};
 use BackEnd = graphics::BackEnd;
 
 // Local crate.
-use AssetStore = asset_store::AssetStore;
+use AssetStore;
 
 static VERTEX_SHADER_TRI_LIST_XY_RGBA: &'static str = "
 attribute vec4 a_v4Position;
