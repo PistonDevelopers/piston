@@ -72,7 +72,7 @@ pub trait EventGame {
     fn load(&mut self, _asset_store: &mut AssetStore) {}
 
     /// Register event before game loop
-    fn register_event(&mut self, _event_center: &mut EventCenter) {}
+    fn register_event(&mut self, _event_center: &mut EventCenter<Self>) {}
 
     /// Sets up viewport.
     ///
@@ -104,7 +104,7 @@ pub trait EventGame {
     fn handle_events<W: GameWindow>(
         &mut self,
         game_window: &mut W,
-        event_center: &mut EventCenter
+        event_center: &mut EventCenter<Self>
     ) {
         loop {
             let event = game_window.poll_event();
@@ -118,7 +118,7 @@ pub trait EventGame {
     /// Update the physical state of the game.
     ///
     /// `dt` is the delta time from last update in seconds.
-    fn update(&mut self, _dt: f64, _event_center: &mut EventCenter, _asset_store: &mut AssetStore) {}
+    fn update(&mut self, _dt: f64, _event_center: &mut EventCenter<Self>, _asset_store: &mut AssetStore) {}
 
     /// Render graphics.
     ///
@@ -190,7 +190,7 @@ pub trait EventGame {
                 self.handle_events(game_window, &mut event_center);
 
                 // Update application state.
-                event_center.update(dt);
+                event_center.update(self, dt);
                 self.update(dt, &mut event_center, asset_store);
                 last_update += update_time_in_ns;
             }

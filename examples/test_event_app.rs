@@ -8,35 +8,40 @@ extern crate event;
 use piston::*;
 use event::*;
 
-pub struct App;
+pub struct App {
+    count: int,
+}
 
 impl App {
     pub fn new() -> App {
-        App
+        App {
+            count: 0
+        }
     }
 }
 
 impl EventGame for App {
-    fn register_event(&mut self, ec: &mut EventCenter) {
+    fn register_event(&mut self, ec: &mut EventCenter<App>) {
         let e = Event::new();
 
-        e.press(&keyboard::Left).call(ec, || {
-            println!("Oops! You pressed keyboard::Left");
+        e.press(&keyboard::Left).call(ec, |app| {
+            app.count += 1;
+            println!("Oops! You pressed keyboard::Left for {} times", app.count);
         });
 
-        e.press(&keyboard::Right).release().call(ec, || {
+        e.press(&keyboard::Right).release().call(ec, |_| {
             println!("Oops! You release keyboard::Right");
         });
 
-        e.press(&mouse::Left).call(ec, || {
+        e.press(&mouse::Left).call(ec, |_| {
             println!("Oops! You pressed mouse::Left");
         });
 
-        e.interval(10.0).call(ec, || {
+        e.interval(10.0).call(ec, |_| {
             println!("ELAPSED 10.0 SECOND");
         });
 
-        e.interval(20.0).call_once(ec, || {
+        e.interval(20.0).call_once(ec, |_| {
             println!("ELAPSED 20.0 SECOND, AND THIS WILL BE CALLED ONLY ONCE!!!");
         });
 
@@ -45,7 +50,7 @@ impl EventGame for App {
         let a = e.press(&key_up);
         let b = e.press(&key_down);
         let b = b.release();
-        e.any([&a as &Triggered, &b as &Triggered]).call(ec, || {
+        e.any([&a as &Triggered, &b as &Triggered]).call(ec, |_| {
             println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
         });
     }
@@ -67,6 +72,6 @@ fn main() {
     let mut asset_store = AssetStore::from_folder("assets");
     let mut app = App::new();
 
-    app.run_with_event(&mut game_window, &mut asset_store);
+    app.run(&mut game_window, &mut asset_store);
 }
 
