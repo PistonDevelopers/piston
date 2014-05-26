@@ -114,10 +114,14 @@ pub trait EventGame {
     ) {
         loop {
             let event = game_window.poll_event();
-            if event == event::NoEvent {
-                break;
+            match event {
+                event::NoEvent => {
+                    break;
+                },
+                _ => {
+                    event_center.receive_event(&event);
+                },
             }
-            event_center.receive_event(&event);
         }
     }
 
