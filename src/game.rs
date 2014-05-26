@@ -158,23 +158,28 @@ pub trait Game {
         let context = Context::new();
         let bg = game_window.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
-        let updates_per_second: f64 = 120.0;
-        let max_frames_per_second: f64 = 60.0;
+        let updates_per_second: u64 = 120;
+        let max_frames_per_second: u64 = 60;
+
+        // You can make this lower if needed
+        let min_updates_per_frame: u64 = updates_per_second / max_frames_per_second;
 
         let billion: u64 = 1_000_000_000;
-        let dt: f64 = 1.0 / updates_per_second;
-        let update_time_in_ns: u64 = billion / updates_per_second as u64;
+        let dt: f64 = 1.0 / updates_per_second as f64;
+        let update_time_in_ns: u64 = billion / updates_per_second;
 
         let start = time::precise_time_ns();
-        let min_ns_per_frame = (billion as f64 / max_frames_per_second) as u64;
+        let min_ns_per_frame = billion / max_frames_per_second;
         let mut next_render = start;
         let mut last_update = start;
-        // Set updated to 'true' to trigger rendering before first update.
+        let mut updated = min_updates_per_frame;
+
         while !self.should_close(game_window) {
             let now = time::precise_time_ns();
 
-            if now >= next_render {
-                // Render.
+            if now >= next_render &&
+               ( updated >= min_updates_per_frame ||
+                 next_render >= last_update ) {
                 let (w, h) = game_window.get_size();
                 if w != 0 && h != 0 {
                     self.viewport(game_window);
@@ -184,11 +189,11 @@ pub trait Game {
                     // 'now' is always bigger than 'last_update'.
                     let ext_dt = (now - last_update) as f64 / billion as f64;
                     self.render(
-                        ext_dt,
+                        ext_dt, 
                         &context
                         .trans(-1.0, 1.0)
                         .scale(2.0 / w as f64, -2.0 / h as f64)
-                        .store_view(),
+                        .store_view(), 
                         &mut gl
                     );
                     self.swap_buffers(game_window);
@@ -196,11 +201,13 @@ pub trait Game {
 
                 // Set moment for next rendering.
                 next_render = now + min_ns_per_frame;
+                updated = 0;
             }
 
             // Perform updates by fixed time step until it catches up.
-            while last_update < next_render &&
-                  time::precise_time_ns() < next_render {            
+            while last_update < next_render && 
+                  ( updated < min_updates_per_frame ||
+                    time::precise_time_ns() < next_render ) {           
                 // Handle user input.
                 // This is handled every update to make it more responsive.
                 self.handle_events(game_window, asset_store);
@@ -208,6 +215,7 @@ pub trait Game {
                 // Update application state.
                 self.update(dt, asset_store);
                 last_update += update_time_in_ns;
+                updated += 1
             }
         }
     }
