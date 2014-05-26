@@ -8,20 +8,20 @@ use {
 };
 
 /// A event context that can be triggered if ANY event in `events` happened.
-pub struct AnyEvent<'a> {
+pub struct AnyEvent<'a, 'b> {
     /// A sequence of events.
-    pub events: Field<'a, &'a [&'a Triggered]>,
+    pub events: Field<'a, &'b [&'b Triggered]>,
 }
 
-impl<'a> Clone for AnyEvent<'a> {
-    fn clone(&self) -> AnyEvent<'a> {
+impl<'a, 'b> Clone for AnyEvent<'a, 'b> {
+    fn clone(&self) -> AnyEvent<'static, 'b> {
         AnyEvent {
             events: Value(*self.events.get()),
         }
     }
 }
 
-impl<'a> Triggered for AnyEvent<'a> {
+impl<'a, 'b> Triggered for AnyEvent<'a, 'b> {
     fn get_observer(&self) -> Box<Observer> {
         box AnyEventObserver::new(*self.events.get()) as Box<Observer>
     }

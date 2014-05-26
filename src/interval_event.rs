@@ -13,7 +13,7 @@ pub struct IntervalEvent<'a> {
 }
 
 impl<'a> Clone for IntervalEvent<'a> {
-    fn clone(&self) -> IntervalEvent<'a> {
+    fn clone(&self) -> IntervalEvent<'static> {
         IntervalEvent {
             interval: Value(*self.interval.get()),
         }

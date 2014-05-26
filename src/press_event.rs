@@ -12,28 +12,28 @@ use {
 };
 
 /// A event context that can be triggered after certain key was pressed.
-pub struct PressEvent<'a> {
+pub struct PressEvent<'a, 'b> {
     /// The key which was pressed.
-    pub key: Field<'a, &'a KeyType>,
+    pub key: Field<'a, &'b KeyType>,
 }
 
-impl<'a> Clone for PressEvent<'a> {
-    fn clone(&self) -> PressEvent<'a> {
+impl<'a, 'b> Clone for PressEvent<'a, 'b> {
+    fn clone(&self) -> PressEvent<'static, 'b> {
         PressEvent {
             key: Value(*self.key.get()),
         }
     }
 }
 
-impl<'a> Triggered for PressEvent<'a> {
+impl<'a, 'b> Triggered for PressEvent<'a, 'b> {
     fn get_observer(&self) -> Box<Observer> {
         box PressEventObserver::new(*self.key.get()) as Box<Observer>
     }
 }
 
-impl<'a> AddRelease<'a, ReleasePressEvent<'a>> for PressEvent<'a> {
+impl<'a, 'b> AddRelease<'a, ReleasePressEvent<'a, 'b>> for PressEvent<'a, 'b> {
     #[inline(always)]
-    fn release(&'a self) -> ReleasePressEvent<'a> {
+    fn release(&'a self) -> ReleasePressEvent<'a, 'b> {
         ReleasePressEvent {
             key: Borrowed(self.key.get())
         }
