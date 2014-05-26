@@ -20,9 +20,9 @@ impl EventGame for App {
         // event logic goes here, see examples below.
     }
 
-    // other methods are same with Piston except there are no long
+    // other methods are same as Piston except there are no long
     // `key_press`, `key_release`, `mouse_press`, `mouse_release`,
-    // `mouse_move`, `mouse_relative_move`, and the update now has
+    // `mouse_move`, `mouse_relative_move` and the update now has
     // EventCenter method is:
     fn update(&mut self, dt: f64, event_center: &mut EventCenter, asset_store: &mut AssetStore) {
         // game logic goes here.
