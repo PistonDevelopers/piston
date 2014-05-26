@@ -67,7 +67,8 @@ impl<'a> Observer for PressEventObserver<'a> {
     }
 
     fn after_trigger(&mut self) {
-        self.can_trigger = false
+        self.is_pressed = false;
+        self.can_trigger = false;
     }
 
     fn on_event(&mut self, e: &EventType) {

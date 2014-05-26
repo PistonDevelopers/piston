@@ -53,6 +53,16 @@ impl EventGame for App {
         e.any([&a as &Triggered, &b as &Triggered]).call(ec, |_| {
             println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
         });
+
+        let key_q = keyboard::Q;
+        let key_w = keyboard::W;
+        let key_e = keyboard::E;
+        let a = e.press(&key_q);
+        let b = e.press(&key_w);
+        let c = e.press(&key_e);
+        e.all([&a as &Triggered, &b as &Triggered, &c as &Triggered]).call(ec, |_| {
+            println!("You have pressed Q, W and E!");
+        });
     }
 }
 

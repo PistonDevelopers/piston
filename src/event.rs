@@ -1,8 +1,10 @@
 
 use {
+    AddAll,
     AddAny,
     AddInterval,
     AddPress,
+    AllEvent,
     AnyEvent,
     IntervalEvent,
     KeyType,
@@ -41,6 +43,15 @@ impl<'a> AddInterval<IntervalEvent<'a>> for Event {
     fn interval(&self, seconds: f64) -> IntervalEvent<'a> {
         IntervalEvent {
             interval: Value(seconds),
+        }
+    }
+}
+
+impl<'a> AddAll<'a, AllEvent<'a>> for Event {
+    #[inline(always)]
+    fn all(&'a self, events: &'a [&'a Triggered]) -> AllEvent<'a> {
+        AllEvent {
+            events: Value(events),
         }
     }
 }
