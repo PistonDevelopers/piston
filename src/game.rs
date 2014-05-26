@@ -179,7 +179,7 @@ pub trait Game {
 
             if now >= next_render &&
                ( updated >= min_updates_per_frame ||
-                 next_render >= last_update ) {
+                 next_render <= last_update ) {
                 let (w, h) = game_window.get_size();
                 if w != 0 && h != 0 {
                     self.viewport(game_window);
