@@ -1,36 +1,38 @@
 target/x86_64-apple-darwin/lib/libgl-8febb75e-0.1.rlib
-a4d63c31fe6f3f07ecfab115d110b1e3923bca79
+b59620fa0a11228d9330cd053809a32e8d3c737e
 https://github.com/bjz/gl-rs
   origin/HEAD -> origin/master
   origin/master
 
 target/x86_64-apple-darwin/lib/libglfw-38369174-0.1.rlib
-44df7f5f1abdc4141c529f2bb311e3916f5311c7
+b3584ee881717e83998060f07308a88667714988
 https://github.com/bvssvni/glfw-rs.git
-  origin/master
   upstream/HEAD -> upstream/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libgraphics-587c2edd-0.0.rlib
-05b9fbf36bd7342e0f296e51e419ed4a734990a4
+8d9f88a8b03723929aaa562fd112526894384b32
 https://github.com/bvssvni/rust-graphics.git
+  origin/HEAD -> origin/master
+  origin/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libhgl-1a7d2676-0.0.1.rlib
-f07eb755a5dca4310e97e459f0671c2b916f546a
+3b4b1a45f0a1ee98eb4a54d14789b27fe3548750
 https://github.com/bvssvni/hgl-rs.git
   origin/HEAD -> origin/master
   origin/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libpng-1a4a27fd-0.1.rlib
-8a46b60b15dc5cbdea1422786970ccdab69a365b
+f52290bdbc1fed4d28f3874407ea733387389d57
 https://github.com/bvssvni/rust-png.git
   origin/HEAD -> origin/master
   origin/master
+  upstream/master
 
 target/x86_64-apple-darwin/lib/libsdl2-79c1f430-0.0.1.rlib
-a72659a173b0fcf319bf481ed58e8822b2556ff4
+a23ba0dd489fc239e4f8aacc67f6ff06c6c5eb46
 https://github.com/bvssvni/rust-sdl2
   upstream/HEAD -> upstream/master
   upstream/master
