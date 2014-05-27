@@ -28,19 +28,17 @@ One way to simplify working with multiple projects on the same machine is to sym
 
 ## How to build Piston
 
-Build the dependencies and put the '.rlib' files to '/target/cpu-vendor-os/lib/'.
+You can now use https://github.com/PistonDevelopers/piston-workspace repository to download and build Piston without having to set up symlinks manually.
 
-In the Terminal window, navigate to the project folder and type:
+Follow the instructions in the piston-workspace README before you add the libraries to your project.
 
-```
-make
-```
+The '.rlib' files are located in 'piston-workspace/piston/target/cpu-vendor-os/lib'.  
 
-This gives you a new '.rlib' file in the '/target/cpu-vendor-os/lib/' folder to put in your project.
+## Add libraries to your project
 
-## Compiling dynamic library
+After building Piston, you need to add the '.rlib' files to your '/target/cpu-vendor-os/lib/' folder.  
 
-The default make command can be modified by setting `DEFAULT = make dylib` in the `Makefile`. 
+The folder is created first time you build. If you do not see the folder, type `make exe`.  
 
 ## Goals
 
