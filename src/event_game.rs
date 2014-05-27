@@ -4,6 +4,7 @@ extern crate gl;
 extern crate graphics;
 extern crate piston;
 
+use std::io::timer::sleep;
 use self::gl::types::GLint;
 use self::graphics::{
     Context,
@@ -153,20 +154,34 @@ pub trait EventGame {
         let context = Context::new();
         let bg = game_window.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
-        let updates_per_second: f64 = 120.0;
-        let max_updates_per_frame: u32 = 240;
-        let max_frames_per_second: f64 = 60.0;
 
         let billion: u64 = 1_000_000_000;
+        let updates_per_second = 120.0;
         let dt: f64 = 1.0 / updates_per_second;
         let update_time_in_ns: u64 = billion / updates_per_second as u64;
 
-        let start = time::precise_time_ns();
+        let max_frames_per_second: f64 = 60.0;
         let min_ns_per_frame = (billion as f64 / max_frames_per_second) as u64;
-        let mut next_render = start;
-        let mut last_update = start;
+
+        let mut last_update = time::precise_time_ns();
+        let mut lag = 0;
         while !self.should_close(game_window) {
             let now = time::precise_time_ns();
+            let elapsed = now - last_update;
+            last_update = now;
+            lag += elapsed;
+
+            // Perform updates by fixed time step until it catches up.
+            while lag >= update_time_in_ns {
+                // Handle user input.
+                // This is handled every update to make it more responsive.
+                self.handle_events(game_window, &mut event_center);
+
+                // Update application state.
+                event_center.update(self, dt);
+                self.update(dt, &mut event_center, asset_store);
+                lag -= update_time_in_ns;
+            }
 
             // Render.
             let (w, h) = game_window.get_size();
@@ -175,8 +190,8 @@ pub trait EventGame {
                 let mut gl = Gl::new(&mut gl_data, asset_store);
                 bg.clear(&mut gl);
                 // Extrapolate time forward to allow smooth motion.
-                // 'now' is always bigger than 'last_update'.
-                let ext_dt = (now - last_update) as f64 / billion as f64;
+                // 'lag' is always less than 'update_time_in_ns'.
+                let ext_dt = lag as f64 / update_time_in_ns as f64;
                 self.render(
                     ext_dt,
                     &context
@@ -188,21 +203,9 @@ pub trait EventGame {
                 self.swap_buffers(game_window);
             }
 
-            // Set moment for next rendering.
-            next_render = now + min_ns_per_frame;
-            // Perform updates by fixed time step until it catches up.
-            for _ in range(0, max_updates_per_frame) {
-                // Break when catching up to next frame.
-                if next_render <= last_update { break; }
-
-                // Handle user input.
-                // This is handled every update to make it more responsive.
-                self.handle_events(game_window, &mut event_center);
-
-                // Update application state.
-                event_center.update(self, dt);
-                self.update(dt, &mut event_center, asset_store);
-                last_update += update_time_in_ns;
+            let used_frame_time = time::precise_time_ns() - now;
+            if min_ns_per_frame > used_frame_time {
+                sleep((min_ns_per_frame - used_frame_time) / 1_000_000);
             }
         }
     }
