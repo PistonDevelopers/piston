@@ -217,12 +217,14 @@ pub trait Game {
             }
 
             // Wait if possible
-            if next_render - time::precise_time_ns() > 2_000_000 { 
-                // Sleeps for 1-2 milisecond's less then needed for correction,
-                // It is better to be fast then slow, and it is safer to round into the range
-                // 1-2 then 0-1 because I don't trust the OS to wake me accurately.
-                sleep( (next_render - time::precise_time_ns() )/1_000_000 - 1 );
+
+            let t = (next_render - time::precise_time_ns() ) / 1_000_000;
+            if t > 1 && t < 1000000 { // The second half just checks if it overflowed,
+                                      // which tells us that t should have been negative 
+                                      // and we are running slow and shouldn't sleep.
+                sleep( t );
             }
+
         }
     }
 }
