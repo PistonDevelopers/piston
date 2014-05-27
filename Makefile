@@ -1,6 +1,6 @@
 # Rust-Empty: An Makefile to get started with Rust
 # https://github.com/bvssvni/rust-empty
-#
+# 
 # The MIT License (MIT)
 #
 # Copyright (c) 2014 Sven Nilsen
@@ -65,7 +65,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.3 005)" \
+	$(Q)echo "--- rust-empty (0.3 006)" \
 	&& echo "make run               - Runs executable" \
 	&& echo "make exe               - Builds main executable" \
 	&& echo "make lib               - Both static and dynamic library" \
@@ -446,7 +446,11 @@ symlink-info:
 		cd $$original_dir ; \
 		commit=$$(git rev-parse HEAD) ; \
 		echo $$commit ; \
+		echo "origin:" ; \
 		git config --get remote.origin.url ; \
+		echo "upstream:" ; \
+		git config --get remote.upstream.url ; \
+		echo "available in remote branches:" ; \
 		git branch -r --contains $$commit ; \
 		echo "" ; \
 	done \
