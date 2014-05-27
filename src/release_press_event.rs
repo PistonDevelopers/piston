@@ -9,21 +9,21 @@ use {
 };
 
 /// A context event that can be triggered after certain key was released.
-pub struct ReleasePressEvent<'a> {
+pub struct ReleasePressEvent<'a, 'b> {
     /// The key which was released.
-    pub key: Field<'a, &'a KeyType>,
+    pub key: Field<'a, &'b KeyType>,
 }
 
-impl<'a> Clone for ReleasePressEvent<'a> {
-    fn clone(&self) -> ReleasePressEvent<'a> {
+impl<'a, 'b> Clone for ReleasePressEvent<'a, 'b> {
+    fn clone(&self) -> ReleasePressEvent<'static, 'b> {
         ReleasePressEvent {
             key: Value(*self.key.get()),
         }
     }
 }
 
-impl<'a> Triggered<'a> for ReleasePressEvent<'a> {
-    fn get_observer(&'a self) -> Box<Observer> {
+impl<'a, 'b> Triggered for ReleasePressEvent<'a, 'b> {
+    fn get_observer(&self) -> Box<Observer> {
         box ReleasePressEventObserver::new(*self.key.get()) as Box<Observer>
     }
 }

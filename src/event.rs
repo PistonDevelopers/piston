@@ -1,8 +1,10 @@
 
 use {
+    AddAll,
     AddAny,
     AddInterval,
     AddPress,
+    AllEvent,
     AnyEvent,
     IntervalEvent,
     KeyType,
@@ -12,31 +14,31 @@ use {
 };
 
 /// An immutable event context. All Request starting here.
-pub struct Event;
+pub struct Event<'a>;
 
-impl Event {
+impl<'a> Event<'a> {
     /// Returns a new event context.
-    pub fn new() -> Event {
+    pub fn new() -> Event<'a> {
         Event
     }
 }
 
-impl Clone for Event {
-    fn clone(&self) -> Event {
+impl<'a> Clone for Event<'a> {
+    fn clone(&self) -> Event<'static> {
         Event
     }
 }
 
-impl<'a> AddPress<'a, PressEvent<'a>> for Event {
+impl<'a, 'b> AddPress<'a, PressEvent<'a, 'b>> for Event<'a> {
     #[inline(always)]
-    fn press(&'a self, key: &'a KeyType) -> PressEvent<'a> {
+    fn press(&'a self, key: &'a KeyType) -> PressEvent<'a, 'b> {
         PressEvent {
             key: Value(key),
         }
     }
 }
 
-impl<'a> AddInterval<IntervalEvent<'a>> for Event {
+impl<'a> AddInterval<IntervalEvent<'a>> for Event<'a> {
     #[inline(always)]
     fn interval(&self, seconds: f64) -> IntervalEvent<'a> {
         IntervalEvent {
@@ -45,9 +47,18 @@ impl<'a> AddInterval<IntervalEvent<'a>> for Event {
     }
 }
 
-impl<'a> AddAny<'a, AnyEvent<'a>> for Event {
+impl<'a, 'b> AddAll<'a, AllEvent<'a, 'b>> for Event<'a> {
     #[inline(always)]
-    fn any(&'a self, events: &'a [&'a Triggered<'a>]) -> AnyEvent<'a> {
+    fn all(&'a self, events: &'b [&'b Triggered]) -> AllEvent<'a, 'b> {
+        AllEvent {
+            events: Value(events),
+        }
+    }
+}
+
+impl<'a, 'b> AddAny<'a, AnyEvent<'a, 'b>> for Event<'a> {
+    #[inline(always)]
+    fn any(&'a self, events: &'b [&'b Triggered]) -> AnyEvent<'a, 'b> {
         AnyEvent {
             events: Value(events),
         }

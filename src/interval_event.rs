@@ -13,15 +13,15 @@ pub struct IntervalEvent<'a> {
 }
 
 impl<'a> Clone for IntervalEvent<'a> {
-    fn clone(&self) -> IntervalEvent<'a> {
+    fn clone(&self) -> IntervalEvent<'static> {
         IntervalEvent {
             interval: Value(*self.interval.get()),
         }
     }
 }
 
-impl<'a> Triggered<'a> for IntervalEvent<'a> {
-    fn get_observer(&'a self) -> Box<Observer> {
+impl<'a> Triggered for IntervalEvent<'a> {
+    fn get_observer(&self) -> Box<Observer> {
         box IntervalEventObserver::new(*self.interval.get()) as Box<Observer>
     }
 }

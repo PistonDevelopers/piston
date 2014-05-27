@@ -10,7 +10,7 @@ pub trait Call<'a, A> {
     fn call(&'a self, ec: &mut EventCenter<A>, command: |&mut A|: 'static) -> uint;
 }
 
-impl<'a, A, E: Triggered<'a>> Call<'a, A> for E {
+impl<'a, A, E: Triggered> Call<'a, A> for E {
     fn call(&'a self, ec: &mut EventCenter<A>, command: |&mut A|: 'static) -> uint {
         ec.add_observer_call(self.get_observer(), command)
     }

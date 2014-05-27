@@ -12,11 +12,13 @@ pub use EventGame = event_game::EventGame;
 pub use EventType = event_type::EventType;
 pub use KeyType = event_type::KeyType;
 
+pub use AddAll = add_all::AddAll;
 pub use AddAny = add_any::AddAny;
 pub use AddInterval = add_interval::AddInterval;
 pub use AddPress = add_press::AddPress;
 pub use AddRelease = add_release::AddRelease;
 
+pub use AllEvent = all_event::AllEvent;
 pub use AnyEvent = any_event::AnyEvent;
 pub use Event = event::Event;
 pub use IntervalEvent = interval_event::IntervalEvent;
@@ -31,14 +33,15 @@ pub use EventCenter = event_center::EventCenter;
 pub use Observer = observer::Observer;
 
 mod event_type;
-//mod piston_event_type;
 mod event_game;
 
+mod add_all;
 mod add_any;
 mod add_press;
 mod add_release;
 mod add_interval;
 
+mod all_event;
 mod any_event;
 mod event;
 mod interval_event;

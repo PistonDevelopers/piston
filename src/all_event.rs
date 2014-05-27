@@ -7,43 +7,43 @@ use {
     Value,
 };
 
-/// A event context that can be triggered if ANY event in `events` happened.
-pub struct AnyEvent<'a, 'b> {
+/// A event context that can be triggered if ALL event in `events` happened.
+pub struct AllEvent<'a, 'b> {
     /// A sequence of events.
     pub events: Field<'a, &'b [&'b Triggered]>,
 }
 
-impl<'a, 'b> Clone for AnyEvent<'a, 'b> {
-    fn clone(&self) -> AnyEvent<'static, 'b> {
-        AnyEvent {
+impl<'a, 'b> Clone for AllEvent<'a, 'b> {
+    fn clone(&self) -> AllEvent<'static, 'b> {
+        AllEvent {
             events: Value(*self.events.get()),
         }
     }
 }
 
-impl<'a, 'b> Triggered for AnyEvent<'a, 'b> {
+impl<'a, 'b> Triggered for AllEvent<'a, 'b> {
     fn get_observer(&self) -> Box<Observer> {
-        box AnyEventObserver::new(*self.events.get()) as Box<Observer>
+        box AllEventObserver::new(*self.events.get()) as Box<Observer>
     }
 }
 
-struct AnyEventObserver<'a> {
+struct AllEventObserver<'a> {
     observers: Vec<Box<Observer>>,
 }
 
-impl<'a> AnyEventObserver<'a> {
-    pub fn new(events: &'a [&'a Triggered]) -> AnyEventObserver<'a> {
+impl<'a> AllEventObserver<'a> {
+    pub fn new(events: &'a [&'a Triggered]) -> AllEventObserver<'a> {
         let mut observers = Vec::<Box<Observer>>::new();
         for event in events.iter() {
             observers.push(event.get_observer());
         }
-        AnyEventObserver {
+        AllEventObserver {
             observers: observers,
         }
     }
 }
 
-impl<'a> Observer for AnyEventObserver<'a> {
+impl<'a> Observer for AllEventObserver<'a> {
     fn reset(&mut self) {
         for observer in self.observers.mut_iter() {
             observer.reset();
@@ -52,19 +52,16 @@ impl<'a> Observer for AnyEventObserver<'a> {
 
     fn can_trigger(&self) -> bool {
         for observer in self.observers.iter() {
-            if observer.can_trigger() {
-                return true;
+            if !observer.can_trigger() {
+                return false;
             }
         }
-        false
+        true
     }
 
     fn after_trigger(&mut self) {
         for observer in self.observers.mut_iter() {
-            if observer.can_trigger() {
-                observer.after_trigger();
-                break;
-            }
+            observer.after_trigger();
         }
     }
 

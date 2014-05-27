@@ -59,7 +59,7 @@ e.interval(1.0).call(event_center, |_| {
 
 Call once:
 ```
-self.e.interval(20.0).call_once(&mut self.ec, |_| {
+e.interval(20.0).call_once(event_center, |_| {
     println!("ELAPSED 20.0 SECOND, AND THIS WILL BE CALLED ONLY ONCE!!!");
 });
 ```
@@ -71,8 +71,21 @@ let key_down = keyboard::Down;
 let a = self.e.press(&key_up);
 let b = self.e.press(&key_down);
 let b = b.release();
-self.e.any(&[&a as &Triggered, &b as &Triggered]).call(&mut self.ec, |_| {
+e.any(&[&a as &Triggered, &b as &Triggered]).call(event_center, |_| {
     println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
+});
+```
+
+All events happened:
+```
+let key_q = keyboard::Q;
+let key_w = keyboard::W;
+let key_e = keyboard::E;
+let a = e.press(&key_q);
+let b = e.press(&key_w);
+let c = e.press(&key_e);
+e.all([&a as &Triggered, &b as &Triggered, &c as &Triggered]).call(event_center, |_| {
+    println!("You have pressed Q, W and E!");
 });
 ```
 
