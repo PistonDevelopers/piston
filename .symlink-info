@@ -1,39 +1,64 @@
 target/x86_64-apple-darwin/lib/libgl-8febb75e-0.1.rlib
 b59620fa0a11228d9330cd053809a32e8d3c737e
+origin:
 https://github.com/bjz/gl-rs
+upstream:
+available in remote branches:
   origin/HEAD -> origin/master
   origin/master
 
 target/x86_64-apple-darwin/lib/libglfw-38369174-0.1.rlib
 b3584ee881717e83998060f07308a88667714988
+origin:
 https://github.com/bvssvni/glfw-rs.git
+upstream:
+https://github.com/bjz/glfw-rs.git
+available in remote branches:
+  origin/master
   upstream/HEAD -> upstream/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libgraphics-587c2edd-0.0.rlib
 8d9f88a8b03723929aaa562fd112526894384b32
+origin:
 https://github.com/bvssvni/rust-graphics.git
+upstream:
+https://github.com/PistonDevelopers/rust-graphics
+available in remote branches:
   origin/HEAD -> origin/master
   origin/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libhgl-1a7d2676-0.0.1.rlib
 3b4b1a45f0a1ee98eb4a54d14789b27fe3548750
+origin:
 https://github.com/bvssvni/hgl-rs.git
+upstream:
+https://github.com/cmr/hgl-rs
+available in remote branches:
   origin/HEAD -> origin/master
   origin/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libpng-1a4a27fd-0.1.rlib
 f52290bdbc1fed4d28f3874407ea733387389d57
+origin:
 https://github.com/bvssvni/rust-png.git
+upstream:
+https://github.com/PistonDevelopers/rust-png.git
+available in remote branches:
   origin/HEAD -> origin/master
   origin/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libsdl2-79c1f430-0.0.1.rlib
 a23ba0dd489fc239e4f8aacc67f6ff06c6c5eb46
+origin:
 https://github.com/bvssvni/rust-sdl2
+upstream:
+https://github.com/AngryLawyer/rust-sdl2.git
+available in remote branches:
+  origin/master
   upstream/HEAD -> upstream/master
   upstream/master
 
