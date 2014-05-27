@@ -15,8 +15,8 @@ A user friendly game engine written in Rust
 | [rust-png](https://github.com/PistonDevelopers/rust-png) | [rust-png docs](http://pistondevelopers.github.io/docs/rust-png/png) |
 | [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://pistondevelopers.github.io/docs/rust-sdl2/sdl2/) |
 | [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://pistondevelopers.github.io/docs/glfw-rs/glfw/) |
-| [hgl-rs](https://github.com/cmr/hgl-rs) | [hgl-rs docs](http://pistondevelopers.github.io/docs/hgl-rs/hgl/) |
 | [gl-rs](https://github.com/bjz/gl-rs) | [gl-rs docs](http://pistondevelopers.github.io/docs/gl-rs/gl/) |
+| [hgl-rs](https://github.com/cmr/hgl-rs) | [hgl-rs docs](http://pistondevelopers.github.io/docs/hgl-rs/hgl/) |
 
 ## Start new project with Piston
 
