@@ -5,6 +5,7 @@ use graphics::*;
 use gl;
 use gl::types::GLint;
 use time;
+use std::io::timer::sleep;
 
 // Local crate.
 use Gl = gl_back_end::Gl;
@@ -170,52 +171,57 @@ pub trait Game {
 
         let start = time::precise_time_ns();
         let min_ns_per_frame = billion / max_frames_per_second;
-        let mut next_render = start;
         let mut last_update = start;
-        let mut updated = min_updates_per_frame;
 
         while !self.should_close(game_window) {
-            let now = time::precise_time_ns();
 
-            if now >= next_render &&
-               ( updated >= min_updates_per_frame ||
-                 next_render <= last_update ) {
-                let (w, h) = game_window.get_size();
-                if w != 0 && h != 0 {
-                    self.viewport(game_window);
-                    let mut gl = Gl::new(&mut gl_data, asset_store);
-                    bg.clear(&mut gl);
-                    // Extrapolate time forward to allow smooth motion.
-                    // 'now' is always bigger than 'last_update'.
-                    let ext_dt = (now - last_update) as f64 / billion as f64;
-                    self.render(
-                        ext_dt, 
-                        &context
+            let start_render = time::precise_time_ns();
+
+            // Rendering code
+            let (w, h) = game_window.get_size();
+            if w != 0 && h != 0 {
+                self.viewport(game_window);
+                let mut gl = Gl::new(&mut gl_data, asset_store);
+                bg.clear(&mut gl);
+                // Extrapolate time forward to allow smooth motion.
+                // 'now' is always bigger than 'last_update'.
+                let ext_dt = (start_render - last_update) as f64 / billion as f64;
+                self.render(
+                    ext_dt, 
+                    &context
                         .trans(-1.0, 1.0)
                         .scale(2.0 / w as f64, -2.0 / h as f64)
                         .store_view(), 
-                        &mut gl
-                    );
-                    self.swap_buffers(game_window);
-                }
-
-                // Set moment for next rendering.
-                next_render = now + min_ns_per_frame;
-                updated = 0;
+                    &mut gl
+                        );
+                self.swap_buffers(game_window);
             }
 
-            // Perform updates by fixed time step until it catches up.
-            while last_update < next_render && 
-                  ( updated < min_updates_per_frame ||
-                    time::precise_time_ns() < next_render ) {           
-                // Handle user input.
-                // This is handled every update to make it more responsive.
-                self.handle_events(game_window, asset_store);
+            let next_render = start_render + min_ns_per_frame;
 
-                // Update application state.
+            // Update gamestate
+            let mut updated = 0;
+
+            while // If we haven't reached the required number of updates yet
+                  ( updated < min_updates_per_frame ||         
+                    // Or we have the time to update further
+                    time::precise_time_ns() < next_render ) && 
+                  //And we haven't already progressed time to far  
+                  last_update + update_time_in_ns < next_render {
+
+                self.handle_events(game_window, asset_store);
                 self.update(dt, asset_store);
+
+                updated += 1;
                 last_update += update_time_in_ns;
-                updated += 1
+            }
+
+            // Wait if possible
+            if next_render - time::precise_time_ns() > 2_000_000 { 
+                // Sleeps for 1-2 milisecond's less then needed for correction,
+                // It is better to be fast then slow, and it is safer to round into the range
+                // 1-2 then 0-1 because I don't trust the OS to wake me accurately.
+                sleep( (next_render - time::precise_time_ns() )/1_000_000 - 1 );
             }
         }
     }
