@@ -23,7 +23,7 @@ impl EventGame for App {
     // other methods are same as Piston except there are no long
     // `key_press`, `key_release`, `mouse_press`, `mouse_release`,
     // `mouse_move`, `mouse_relative_move` and the update now has
-    // EventCenter method is:
+    // EventCenter:
     fn update(&mut self, dt: f64, event_center: &mut EventCenter, asset_store: &mut AssetStore) {
         // game logic goes here.
     }
@@ -37,7 +37,7 @@ Here are some examples integrated with [piston](https://github.com/PistonDevelop
 
 Pressed a key to modify application state:
 ```
-e.press(keyboard::Up).call(event_center, |app| {
+e.press(&keyboard::Up).call(event_center, |app| {
     app.count += 1;
     println!("Oops! You pressed keyboard::Up for {} times", app.count);
 });
@@ -45,7 +45,7 @@ e.press(keyboard::Up).call(event_center, |app| {
 
 Released a key:
 ```
-e.press(mouse::Left).release().call(event_center, |_| {
+e.press(&mouse::Left).release().call(event_center, |_| {
     println!("Oops! You just releaseed mouse::Left");
 });
 ```
