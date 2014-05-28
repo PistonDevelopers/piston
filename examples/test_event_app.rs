@@ -49,15 +49,16 @@ impl EventGame for App {
                &e.press(&keyboard::Down) as &Triggered,
               ])
          .call(ec, |_| {
-            println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
-        });
+             println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
+         });
 
         e.all([&e.press(&keyboard::Q) as &Triggered,
                &e.press(&keyboard::W) as &Triggered,
                &e.press(&keyboard::E) as &Triggered,
-              ]).call(ec, |_| {
-            println!("You have pressed Q, W and E!");
-        });
+              ])
+         .call(ec, |_| {
+             println!("You have pressed Q, W and E!");
+         });
 
         e.press(&keyboard::S).after(&e.press(&keyboard::A)).call(ec, |_| {
             println!("You pressed keyboard::S AFTER you pressed keyboard::A.");
