@@ -205,7 +205,7 @@ pub trait EventGame {
 
             let used_frame_time = time::precise_time_ns() - now;
             // sleep at least 1 ms
-            if min_ns_per_frame - used_frame_time > 1_000_000  {
+            if min_ns_per_frame > used_frame_time + 1_000_000  {
                 sleep((min_ns_per_frame - used_frame_time) / 1_000_000);
             }
         }

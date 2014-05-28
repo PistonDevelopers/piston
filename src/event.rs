@@ -18,9 +18,19 @@ pub struct Event<'a>;
 
 impl<'a> Event<'a> {
     /// Returns a new event context.
+    #[inline(always)]
     pub fn new() -> Event<'a> {
         Event
     }
+/*
+    #[inline(always)]
+    pub fn after<'b>(before: &'a Triggered, after: &'a Triggered) -> AfterEvent<'a, 'b> {
+        AfterEvent {
+            before: Value(before),
+            after: Value(after),
+        }
+    }
+    */
 }
 
 impl<'a> Clone for Event<'a> {

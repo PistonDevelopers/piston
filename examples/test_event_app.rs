@@ -45,23 +45,23 @@ impl EventGame for App {
             println!("ELAPSED 20.0 SECOND, AND THIS WILL BE CALLED ONLY ONCE!!!");
         });
 
-        let key_up = keyboard::Up;
-        let key_down = keyboard::Down;
-        let a = e.press(&key_up);
-        let b = e.press(&key_down);
-        let b = b.release();
-        e.any([&a as &Triggered, &b as &Triggered]).call(ec, |_| {
-            println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
-        });
+        e.any([&e.press(&keyboard::Up) as &Triggered,
+               &e.press(&keyboard::Down).release() as &Triggered,
+              ])
+         .call(ec, |_| {
+             println!("Wow! You pressed keyboard::Up OR released keyboard::Down");
+         });
 
-        let key_q = keyboard::Q;
-        let key_w = keyboard::W;
-        let key_e = keyboard::E;
-        let a = e.press(&key_q);
-        let b = e.press(&key_w);
-        let c = e.press(&key_e);
-        e.all([&a as &Triggered, &b as &Triggered, &c as &Triggered]).call(ec, |_| {
-            println!("You have pressed Q, W and E!");
+        e.all([&e.press(&keyboard::Q) as &Triggered,
+               &e.press(&keyboard::W) as &Triggered,
+               &e.press(&keyboard::E) as &Triggered,
+              ])
+         .call(ec, |_| {
+             println!("You have pressed Q, W and E!");
+         });
+
+        e.press(&keyboard::S).after(&e.press(&keyboard::A)).call(ec, |_| {
+            println!("You pressed keyboard::S AFTER you pressed keyboard::A.");
         });
     }
 }
