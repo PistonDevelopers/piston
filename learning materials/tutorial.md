@@ -22,7 +22,7 @@ Some of the things that make Rust suitable for game development:
 
 ## How to get help
 
-If you experience problems or have difficulties getting started, ask in the [#rust-gamedev](http://chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust-gamedev) IRC channel or open an issue in the [Piston](https://github.com/PistonDevelopers/piston/) repository.
+If you experience problems with this tutorial, ask in the [#rust-gamedev](http://chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust-gamedev) IRC channel or open an issue in the [Piston](https://github.com/PistonDevelopers/piston/) repository.
 
 ## Getting started
 
