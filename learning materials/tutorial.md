@@ -20,13 +20,28 @@ Some of the things that make Rust suitable for game development:
 * Flexible module system for organizing large projects
 * Active and friendly community with a rapidly growing open source ecosystem
 
+## How to get help
+
+If you experience problems or have difficulties getting started, ask in the [#rust-gamedev](http://chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust-gamedev) IRC channel or open an issue in the [Piston](https://github.com/PistonDevelopers/piston/) repository.
+
 ## Getting started
 
-Linux or Mac OSX with developer tools:
+### Linux or Mac OSX (with developer tools)
 
-1. Clone https://github.com/PistonDevelopers/piston-workspace and follow the instructions to build Piston
-2. Copy 'Makefile' from https://github.com/bvssvni/rust-empty and type `make exe` to set up project
-3. Copy symlinks from the piston-symlinks folder in piston-workspace to the target/cpu-vendor-os/lib folder
+First you have to set up a new Rust project for executable:
+
+1. Create a new folder for your game project
+2. Copy 'Makefile' from https://github.com/bvssvni/rust-empty
+3. If `rustc --version` gives an error, type `make nightly-install` to install Rust nightly
+4. In the Terminal window, type `make exe` and `make git-ignore`
+
+You are now ready for writing Rust programs!  
+Before you can start coding, you need to build Piston:  
+
+2. Clone https://github.com/PistonDevelopers/piston-workspace and follow the instructions to build Piston
+4. Copy symlinks from the 'piston-symlinks' folder in piston-workspace your project's 'target/cpu-vendor-os/lib' folder
+
+You are now ready for making a game in Rust!
 
 ## The `Game` trait
 
