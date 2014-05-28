@@ -7,8 +7,11 @@ use {
     Triggered,
 };
 
+/// A event context that can be triggered after `before` happened.
 pub struct AfterEvent {
+    /// Previous event
     pub before: Rc<RefCell<Box<Observer>>>,
+    /// Next event
     pub after: Rc<RefCell<Box<Observer>>>,
 }
 

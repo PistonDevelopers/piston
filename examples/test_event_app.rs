@@ -46,7 +46,7 @@ impl EventGame for App {
         });
 
         e.any([&e.press(&keyboard::Up) as &Triggered,
-               &e.press(&keyboard::Down) as &Triggered,
+               &e.press(&keyboard::Down).release() as &Triggered,
               ])
          .call(ec, |_| {
              println!("Wow! You pressed keyboard::Up OR released keyboard::Down");

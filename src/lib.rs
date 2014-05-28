@@ -2,7 +2,7 @@
 
 #![crate_type = "lib"]
 #![crate_id = "event#event:0.1"]
-//#![deny(missing_doc)]
+#![deny(missing_doc)]
 
 extern crate collections;
 extern crate graphics;
