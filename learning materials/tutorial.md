@@ -43,6 +43,16 @@ Before you can start coding, you need to build Piston:
 
 You are now ready for making a game in Rust!
 
+## Piston documentation
+
+Online version of the docs: http://pistondevelopers.github.io/docs/piston/piston/
+
+### Generate docs
+
+1. In the Terminal window, navigate to the 'piston-workspace/piston' directory
+2. Type `make doc`
+3. In the file browser window, double-click the file 'docs/piston/index.html' to open up the docs in the browser
+
 ## The `Game` trait
 
 ## The `AssetStore` object
