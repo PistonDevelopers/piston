@@ -47,7 +47,7 @@ You are now ready for making a game in Rust!
 
 Online version of the documentation: http://pistondevelopers.github.io/docs/piston/piston/
 
-### Generate documentation
+### How to generate documentation
 
 1. In the Terminal window, navigate to the 'piston-workspace/piston' directory
 2. Type `make doc`
