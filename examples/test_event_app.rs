@@ -59,7 +59,7 @@ impl EventGame for App {
             println!("You have pressed Q, W and E!");
         });
 
-        Event::after(&e.press(&keyboard::A), &e.press(&keyboard::S)).call(ec, |_| {
+        e.press(&keyboard::S).after(&e.press(&keyboard::A)).call(ec, |_| {
             println!("You pressed keyboard::S AFTER you pressed keyboard::A.");
         });
     }

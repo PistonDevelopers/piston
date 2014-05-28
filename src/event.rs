@@ -4,7 +4,6 @@ use {
     AddAny,
     AddInterval,
     AddPress,
-    AfterEvent,
     AllEvent,
     AnyEvent,
     IntervalEvent,
@@ -23,14 +22,15 @@ impl<'a> Event<'a> {
     pub fn new() -> Event<'a> {
         Event
     }
-
+/*
     #[inline(always)]
-    pub fn after(before: &'a Triggered, after: &'a Triggered) -> AfterEvent<'a, 'a> {
+    pub fn after<'b>(before: &'a Triggered, after: &'a Triggered) -> AfterEvent<'a, 'b> {
         AfterEvent {
             before: Value(before),
             after: Value(after),
         }
     }
+    */
 }
 
 impl<'a> Clone for Event<'a> {

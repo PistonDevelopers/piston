@@ -1,74 +1,82 @@
 
+use std::cell::RefCell;
+use std::rc::Rc;
 use {
     EventType,
-    Field,
     Observer,
     Triggered,
-    Value,
 };
 
-pub struct AfterEvent<'a, 'b> {
-    pub before: Field<'a, &'b Triggered>,
-    pub after: Field<'a, &'b Triggered>,
+pub struct AfterEvent {
+    pub before: Rc<RefCell<Box<Observer>>>,
+    pub after: Rc<RefCell<Box<Observer>>>,
 }
 
-impl<'a, 'b> Clone for AfterEvent<'a, 'b> {
-    fn clone(&self) -> AfterEvent<'static, 'b> {
+impl Clone for AfterEvent {
+    fn clone(&self) -> AfterEvent {
         AfterEvent {
-            before: Value(*self.before.get()),
-            after: Value(*self.after.get()),
+            before: self.before.clone(),
+            after: self.after.clone(),
         }
     }
 }
 
-impl<'a, 'b> Triggered for AfterEvent<'a, 'b> {
+impl Triggered for AfterEvent {
     fn get_observer(&self) -> Box<Observer> {
-        box AfterEventObserver::new(*self.before.get(), *self.after.get()) as Box<Observer>
+        box AfterEventObserver::new(self.before.clone(), self.after.clone()) as Box<Observer>
     }
 }
 
-struct AfterEventObserver<'a> {
-    before: Box<Observer>,
-    after: Box<Observer>,
+struct AfterEventObserver {
+    before: Rc<RefCell<Box<Observer>>>,
+    after: Rc<RefCell<Box<Observer>>>,
 }
 
-impl<'a> AfterEventObserver<'a> {
-    pub fn new(before: &Triggered, after: &Triggered) -> AfterEventObserver<'a> {
+impl AfterEventObserver {
+    pub fn new(before: Rc<RefCell<Box<Observer>>>, after: Rc<RefCell<Box<Observer>>>) -> AfterEventObserver {
         AfterEventObserver {
-            before: before.get_observer(),
-            after: after.get_observer(),
+            before: before,
+            after: after,
         }
     }
 }
 
-impl<'a> Observer for AfterEventObserver<'a> {
+impl Observer for AfterEventObserver {
     fn reset(&mut self) {
-        self.before.reset();
-        self.after.reset();
+        self.before.borrow_mut().reset();
+        self.after.borrow_mut().reset();
     }
 
     fn can_trigger(&self) -> bool {
-        self.after.can_trigger()
+        self.after.borrow().can_trigger()
     }
 
     fn after_trigger(&mut self) {
-        self.after.after_trigger();
-        self.before.after_trigger();
+        self.after.borrow_mut().after_trigger();
+        self.before.borrow_mut().after_trigger();
     }
 
     fn update(&mut self, dt: f64) {
-        if self.before.can_trigger() {
-            self.after.update(dt);
+        let mut can_trigger;
+        {
+            can_trigger = self.before.borrow().can_trigger();
+        }
+        if can_trigger {
+            self.after.borrow_mut().update(dt);
         } else {
-            self.before.update(dt);
+            self.before.borrow_mut().update(dt);
         }
     }
 
     fn on_event(&mut self, e: &EventType) {
-        if self.before.can_trigger() {
-            self.after.on_event(e);
+        let mut can_trigger;
+        {
+            can_trigger = self.before.borrow().can_trigger();
+        }
+        if can_trigger {
+            self.after.borrow_mut().on_event(e);
         } else {
-            self.before.on_event(e);
+            self.before.borrow_mut().on_event(e);
         }
     }
 }

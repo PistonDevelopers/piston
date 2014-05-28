@@ -12,7 +12,7 @@ pub use EventGame = event_game::EventGame;
 pub use EventType = event_type::EventType;
 pub use KeyType = event_type::KeyType;
 
-//pub use AddAfter = add_after::AddAfter;
+pub use AddAfter = add_after::AddAfter;
 pub use AddAll = add_all::AddAll;
 pub use AddAny = add_any::AddAny;
 pub use AddInterval = add_interval::AddInterval;
@@ -37,7 +37,7 @@ pub use Observer = observer::Observer;
 mod event_type;
 mod event_game;
 
-//mod add_after;
+mod add_after;
 mod add_all;
 mod add_any;
 mod add_press;
