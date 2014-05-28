@@ -2,7 +2,7 @@
 
 #![crate_type = "lib"]
 #![crate_id = "event#event:0.1"]
-#![deny(missing_doc)]
+//#![deny(missing_doc)]
 
 extern crate collections;
 extern crate graphics;
@@ -12,12 +12,14 @@ pub use EventGame = event_game::EventGame;
 pub use EventType = event_type::EventType;
 pub use KeyType = event_type::KeyType;
 
+//pub use AddAfter = add_after::AddAfter;
 pub use AddAll = add_all::AddAll;
 pub use AddAny = add_any::AddAny;
 pub use AddInterval = add_interval::AddInterval;
 pub use AddPress = add_press::AddPress;
 pub use AddRelease = add_release::AddRelease;
 
+pub use AfterEvent = after_event::AfterEvent;
 pub use AllEvent = all_event::AllEvent;
 pub use AnyEvent = any_event::AnyEvent;
 pub use Event = event::Event;
@@ -35,12 +37,14 @@ pub use Observer = observer::Observer;
 mod event_type;
 mod event_game;
 
+//mod add_after;
 mod add_all;
 mod add_any;
 mod add_press;
 mod add_release;
 mod add_interval;
 
+mod after_event;
 mod all_event;
 mod any_event;
 mod event;

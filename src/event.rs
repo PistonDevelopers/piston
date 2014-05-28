@@ -4,6 +4,7 @@ use {
     AddAny,
     AddInterval,
     AddPress,
+    AfterEvent,
     AllEvent,
     AnyEvent,
     IntervalEvent,
@@ -18,8 +19,17 @@ pub struct Event<'a>;
 
 impl<'a> Event<'a> {
     /// Returns a new event context.
+    #[inline(always)]
     pub fn new() -> Event<'a> {
         Event
+    }
+
+    #[inline(always)]
+    pub fn after(before: &'a Triggered, after: &'a Triggered) -> AfterEvent<'a, 'a> {
+        AfterEvent {
+            before: Value(before),
+            after: Value(after),
+        }
     }
 }
 
