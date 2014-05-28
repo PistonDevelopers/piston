@@ -31,7 +31,7 @@ impl Game for App {
         self.image = Some(asset_store.load_image("rust-logo.png").unwrap());
     }
 
-    fn render(&self, c: &Context, gl: &mut Gl) {
+    fn render(&self, _ext_dt: f64, c: &Context, gl: &mut Gl) {
         c.image(self.image.unwrap()).draw(gl);
     }
 }
