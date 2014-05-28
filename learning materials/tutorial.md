@@ -22,6 +22,12 @@ Some of the things that make Rust suitable for game development:
 
 ## Getting started
 
+Linux or Mac OSX with developer tools:
+
+1. Clone https://github.com/PistonDevelopers/piston-workspace and follow the instructions to build Piston
+2. Copy 'Makefile' from https://github.com/bvssvni/rust-empty and type `make exe` to set up project
+3. Copy symlinks from the piston-symlinks folder in piston-workspace to the target/cpu-vendor-os/lib folder
+
 ## The `Game` trait
 
 ## The `AssetStore` object
