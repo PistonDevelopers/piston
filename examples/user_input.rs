@@ -50,7 +50,7 @@ impl Game for App {
     }
 
     fn mouse_release(
-        &mut self, 
+        &mut self,
         button: mouse::Button,
         _asset_store: &mut AssetStore
     ) {
@@ -65,7 +65,7 @@ fn start(argc: int, argv: **u8) -> int {
 }
 
 fn main() {
-    let mut window: GameWindowSDL2 = GameWindow::new(
+    let mut window: GameWindowGLFW = GameWindow::new(
         GameWindowSettings {
             title: "Keycode".to_owned(),
             size: [300, 300],
