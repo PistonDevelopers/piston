@@ -8,7 +8,7 @@ use std::num::ToPrimitive;
 
 /// Represent a keyboard key.
 #[allow(missing_doc)]
-#[deriving(Eq, TotalEq, Show)]
+#[deriving(Clone, Eq, TotalEq, Show)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
@@ -250,25 +250,45 @@ pub enum Key {
 
 impl Key {
     /// Returns an id of the key
+    #[inline(always)] 
     pub fn code(&self) -> i32 {
         *self as i32
     }
 }
 
 impl Hash for Key {
-    #[inline]
+    #[inline(always)]
     fn hash(&self, state: &mut SipState) {
         self.code().hash(state);
     }
 }
 
+impl Ord for Key {
+    #[inline(always)]
+    fn lt(&self, rhs: &Key) -> bool {
+        self.code() < rhs.code()
+    }
+}
+
+impl TotalOrd for Key {
+    #[inline(always)]
+    fn cmp(&self, rhs: &Key) -> Ordering {
+        self.code().cmp(&rhs.code())
+    }
+}
+
 impl ToPrimitive for Key {
+    #[inline(always)]
     fn to_i64(&self) -> Option<i64> {
         Some(self.code() as i64)
     }
+
+    #[inline(always)]
     fn to_u64(&self) -> Option<u64> {
         Some(self.code() as u64)
     }
+
+    #[inline(always)]
     fn to_int(&self) -> Option<int> {
         Some(self.code() as int)
     }
@@ -518,10 +538,12 @@ impl FromPrimitive for Key {
         }
     }
 
+    #[inline(always)]
     fn from_i64(n: i64) -> Option<Key> {
         FromPrimitive::from_u64(n as u64)
     }
 
+    #[inline(always)]
     fn from_int(n: int) -> Option<Key> {
         FromPrimitive::from_u64(n as u64)
     }

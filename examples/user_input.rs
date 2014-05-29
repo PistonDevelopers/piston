@@ -1,4 +1,3 @@
-
 #![feature(globs)]
 
 extern crate graphics;
@@ -8,7 +7,6 @@ use piston::{
     AssetStore,
     Game,
     GameWindow,
-    GameWindowGLFW,
     GameWindowSDL2,
     GameWindowSettings,
     keyboard,

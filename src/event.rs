@@ -5,6 +5,7 @@ use keyboard;
 use mouse;
 
 /// Contains the information associated with an event.
+#[deriving(Clone, Eq, Ord, Show)]
 pub enum Event {
     /// No event occured.
     NoEvent,
