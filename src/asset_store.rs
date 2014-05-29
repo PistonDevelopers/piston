@@ -36,7 +36,7 @@ impl AssetStore {
     /// Creates a new `AssetStore` from an assets folder.
     pub fn from_folder(assets_folder: &str) -> AssetStore {
         AssetStore {
-            assets_folder: Some(assets_folder.to_owned()),
+            assets_folder: Some(assets_folder.to_string()),
             textures: Vec::new(),
             texture_files: HashMap::new(),
         }
@@ -75,7 +75,7 @@ impl AssetStore {
         let exe_path = self_exe_path();
         let exe_path = match exe_path {
             Some(path) => path,
-            None => return Err("Could not get the path to executable".to_owned()),
+            None => return Err("Could not get the path to executable".to_string()),
         };
         let path = exe_path.join(Path::new(folder.as_slice())).join(Path::new(file));
         let img = match png::load_png(&path) {
@@ -114,7 +114,7 @@ impl AssetStore {
         self.textures.push(texture);
         let texture_id = self.textures.len() - 1;
 
-        self.texture_files.insert(file.to_owned(), texture_id);
+        self.texture_files.insert(file.to_string(), texture_id);
         Ok(Image {
             texture_id: texture_id,
             texture_width: texture.width,
