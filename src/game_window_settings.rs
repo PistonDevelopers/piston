@@ -20,7 +20,7 @@ impl GameWindowSettings {
     /// The background color is set to black.
     pub fn default() -> GameWindowSettings {
         GameWindowSettings {
-            title: "Piston".to_owned(),
+            title: "Piston".to_string(),
             size: [640, 480],
             fullscreen: false,
             exit_on_esc: true,
