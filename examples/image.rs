@@ -9,7 +9,7 @@ use piston::{
     Game,
     GameWindow,
     GameWindowSDL2,
-    GameWindowSettings, 
+    GameWindowSettings,
     Gl
 };
 
@@ -54,7 +54,7 @@ fn main() {
     );
 
     let mut asset_store = AssetStore::from_folder("assets");
-    
+
     let mut app = App::new();
     app.run(&mut window, &mut asset_store);
 }

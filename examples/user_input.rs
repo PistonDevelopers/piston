@@ -48,7 +48,7 @@ impl Game for App {
     }
 
     fn mouse_release(
-        &mut self, 
+        &mut self,
         button: mouse::Button,
         _asset_store: &mut AssetStore
     ) {
