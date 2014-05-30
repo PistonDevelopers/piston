@@ -65,7 +65,7 @@ fn start(argc: int, argv: **u8) -> int {
 fn main() {
     let mut window: GameWindowSDL2 = GameWindow::new(
         GameWindowSettings {
-            title: "Keycode".to_owned(),
+            title: "Keycode".to_string(),
             size: [300, 300],
             fullscreen: false,
             exit_on_esc: true,
