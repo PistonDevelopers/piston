@@ -20,7 +20,6 @@ extern crate debug;
 
 pub use Game = game::Game;
 
-pub use Load = game_iterator::Load;
 pub use Render = game_iterator::Render;
 pub use Update = game_iterator::Update;
 pub use KeyPress = game_iterator::KeyPress;
@@ -34,7 +33,6 @@ pub use GameEvent = game_iterator::GameEvent;
 pub use GameIterator = game_iterator::GameIterator;
 pub use RenderArgs = game_iterator::RenderArgs;
 pub use UpdateArgs = game_iterator::UpdateArgs;
-pub use LoadArgs = game_iterator::LoadArgs;
 pub use KeyPressArgs = game_iterator::KeyPressArgs;
 pub use KeyReleaseArgs = game_iterator::KeyReleaseArgs;
 pub use MousePressArgs = game_iterator::MousePressArgs;

@@ -39,12 +39,6 @@ pub struct UpdateArgs<'a> {
     pub asset_store: &'a mut AssetStore,
 }
 
-/// Load arguments.
-pub struct LoadArgs<'a> {
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
-}
-
 /// Key press arguments.
 pub struct KeyPressArgs<'a> {
     /// Keyboard key.
@@ -103,8 +97,6 @@ pub enum GameEvent<'a> {
     Render(RenderArgs<'a>),
     /// Update physical state of the game.
     Update(UpdateArgs<'a>),
-    /// Performs tasks for loading before showing anything.
-    Load(LoadArgs<'a>),
     /// Pressed a keyboard key.
     KeyPress(KeyPressArgs<'a>),
     /// Released a keyboard key.
@@ -120,7 +112,6 @@ pub enum GameEvent<'a> {
 }
 
 enum GameIteratorState {
-    LoadState,
     RenderState,
     SwapBuffersState,
     PrepareUpdateLoopState,
@@ -163,7 +154,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         GameIterator {
             game_window: game_window,
             asset_store: asset_store,
-            state: LoadState,
+            state: RenderState,
             gl_data: GlData::new(),
             context: context,
             last_update: start,
@@ -182,12 +173,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
     /// Returns the next game event.
     pub fn next<'a>(&'a mut self) -> Option<GameEvent<'a>> {
         match self.state {
-            LoadState => {
-                self.state = RenderState;
-                return Some(Load(LoadArgs {
-                    asset_store: self.asset_store
-                }));
-            },
             RenderState => {
                 if self.game_window.should_close() { return None; }
 

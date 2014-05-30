@@ -7,7 +7,6 @@ extern crate piston;
 use graphics::*;
 use piston::{
     AssetStore,
-    Load,
     GameIterator,
     GameWindow,
     GameWindowSDL2,
@@ -34,20 +33,16 @@ fn main() {
 
     let mut asset_store = AssetStore::from_folder("assets");
 
-    let mut image: Option<Image> = None;
+    let image = asset_store.load_image("rust-logo.png").unwrap();
     let mut game_iter = GameIterator::new(&mut window, &mut asset_store);
     loop {
         match game_iter.next() {
             None => { break },
             Some(e) => match e {
-                Load(e) => {
-                    let asset_store = e.asset_store;
-                    image = Some(asset_store.load_image("rust-logo.png").unwrap());
-                },
                 Render(e) => {
                     let c = e.context;
                     let mut gl = e.gl;
-                    c.image(image.unwrap()).draw(&mut gl);
+                    c.image(image).draw(&mut gl);
                 },
                 _ => {},       
             },
