@@ -123,6 +123,8 @@ enum GameIteratorState {
     LoadState,
     RenderState,
     SwapBuffersState,
+    PrepareUpdateLoopState,
+    UpdateLoopState,
     HandleEventsState,
     MouseRelativeMoveState(f64, f64),
     UpdateState,
@@ -142,6 +144,7 @@ pub struct GameIterator<'a, W> {
     min_updates_per_frame: u64,
     min_ns_per_frame: u64,
     start_render: u64,
+    next_render: u64,
     updated: u64,
 }
 
@@ -155,26 +158,22 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         let bg = context.color(bg);
         let updates_per_second: u64 = 120;
         let max_frames_per_second: u64 = 60;
-        // You can make this lower if needed
-        let min_updates_per_frame: u64 = updates_per_second / max_frames_per_second;
-        let dt: f64 = 1.0 / updates_per_second as f64;
-        let update_time_in_ns: u64 = billion / updates_per_second;
 
         let start = time::precise_time_ns();
-        let min_ns_per_frame = billion / max_frames_per_second;
-        let last_update = start;
         GameIterator {
             game_window: game_window,
             asset_store: asset_store,
             state: LoadState,
             gl_data: GlData::new(),
             context: context,
-            last_update: last_update,
-            update_time_in_ns: update_time_in_ns,
-            dt: dt,
-            min_updates_per_frame: min_updates_per_frame,
-            min_ns_per_frame: min_ns_per_frame,
+            last_update: start,
+            update_time_in_ns: billion / updates_per_second,
+            dt: 1.0 / updates_per_second as f64,
+            // You can make this lower if needed.
+            min_updates_per_frame: updates_per_second / max_frames_per_second,
+            min_ns_per_frame: billion / max_frames_per_second,
             start_render: start,
+            next_render: start,
             bg: bg.clone(),
             updated: 0,
         }
@@ -182,8 +181,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
 
     /// Returns the next game event.
     pub fn next<'a>(&'a mut self) -> Option<GameEvent<'a>> {
-        if self.game_window.should_close() { return None; }
-
         match self.state {
             LoadState => {
                 self.state = RenderState;
@@ -192,21 +189,22 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 }));
             },
             RenderState => {
-                let start_render = time::precise_time_ns();
+                if self.game_window.should_close() { return None; }
+
+                self.start_render = time::precise_time_ns();
                 // Rendering code
                 let (w, h) = self.game_window.get_size();
                 if w != 0 && h != 0 {
-                    // Swap buffers next time.
-                    self.state = SwapBuffersState;
                     gl::Viewport(0, 0, w as GLint, h as GLint);
                     // self.viewport(self.game_window);
                     let mut gl = Gl::new(&mut self.gl_data, self.asset_store);
                     self.bg.clear(&mut gl);
-                    // Extrapolate time forward to allow smooth motion.
-                    // 'now' is always bigger than 'last_update'.
-                    let ext_dt = (start_render - self.last_update) as f64 / billion as f64;
+                    // Swap buffers next time.
+                    self.state = SwapBuffersState;
                     return Some(Render(RenderArgs {
-                        ext_dt: ext_dt, 
+                        // Extrapolate time forward to allow smooth motion.
+                        // 'start_render' is always bigger than 'last_update'.
+                        ext_dt: (self.start_render - self.last_update) as f64 / billion as f64, 
                         context: self.context
                             .trans(-1.0, 1.0)
                             .scale(2.0 / w as f64, -2.0 / h as f64)
@@ -215,85 +213,85 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                     }));
                 }
 
-                // Jump to next state.
-                // Reset update counter.
-                self.updated = 0;
-                self.state = UpdateState;
+                self.state = PrepareUpdateLoopState;
                 return self.next();
             },
             SwapBuffersState => {
                 self.game_window.swap_buffers();
-                // Reset update counter.
-                self.updated = 0;
-                self.state = UpdateState;
+                self.state = PrepareUpdateLoopState;
                 return self.next();
             },
-            HandleEventsState => {
-                let next_render = self.start_render + self.min_ns_per_frame;
+            PrepareUpdateLoopState => {
+                self.updated = 0;
+                self.next_render = self.start_render + self.min_ns_per_frame;
+                self.state = UpdateLoopState;
+                return self.next();
+            },
+            UpdateLoopState => {
+                let got_min_updates = self.updated < self.min_updates_per_frame;
+                let got_time_to_update = time::precise_time_ns() < self.next_render;
+                let before_next_frame = self.last_update + self.update_time_in_ns < self.next_render;
 
-                if // If we haven't reached the required number of updates yet
-                  ( self.updated < self.min_updates_per_frame
-                  // Or we have the time to update further
-                  || time::precise_time_ns() < next_render )
-                  // And we haven't already progressed time to far  
-                  && self.last_update + self.update_time_in_ns < next_render {
-
-                    self.last_update += self.update_time_in_ns;
-
-                    // Handle all events before updating.
-                    return match self.game_window.poll_event() {
-                        event::KeyPressed(key) => {
-                            Some(KeyPress(KeyPressArgs {
-                                key: key,
-                                asset_store: self.asset_store,
-                            }))
-                        },
-                        event::KeyReleased(key) => {
-                            Some(KeyRelease(KeyReleaseArgs {
-                                key: key,
-                                asset_store: self.asset_store,
-                            }))
-                        },
-                        event::MouseButtonPressed(mouse_button) => {
-                            Some(MousePress(MousePressArgs {
-                                button: mouse_button,
-                                asset_store: self.asset_store,
-                            }))
-                        },
-                        event::MouseButtonReleased(mouse_button) => {
-                            Some(MouseRelease(MouseReleaseArgs {
-                                button: mouse_button,
-                                asset_store: self.asset_store,
-                            }))
-                        },
-                        event::MouseMoved(x, y, relative_move) => {
-                            match relative_move {
-                                Some((dx, dy)) =>
-                                    self.state = MouseRelativeMoveState(dx, dy),
-                                None => {},
-                            };
-                            Some(MouseMove(MouseMoveArgs {
-                                x: x,
-                                y: y,
-                                asset_store: self.asset_store,
-                            }))
-                        },
-                        event::NoEvent => {
-                            self.state = UpdateState;
-                            self.next()
-                        },
-                    }
+                if ( got_time_to_update || got_min_updates ) && before_next_frame {
+                    self.state = HandleEventsState;
+                    return self.next();
                 }
-
-                // Wait if possible
-                let t = (next_render - time::precise_time_ns() ) / 1_000_000;
+            
+                // Wait if possible.
+                // Convert to ms because that is what the sleep function takes.
+                let t = (self.next_render - time::precise_time_ns() ) / 1_000_000;
                 if t > 1 && t < 1000000 { // The second half just checks if it overflowed,
-                                          // which tells us that t should have been negative 
+                                          // which tells us that t should have been negative
                                           // and we are running slow and shouldn't sleep.
                     sleep( t );
                 }
                 self.state = RenderState;
                 return self.next();
+            },
+            HandleEventsState => {
+                // Handle all events before updating.
+                return match self.game_window.poll_event() {
+                    event::KeyPressed(key) => {
+                        Some(KeyPress(KeyPressArgs {
+                            key: key,
+                            asset_store: self.asset_store,
+                        }))
+                    },
+                    event::KeyReleased(key) => {
+                        Some(KeyRelease(KeyReleaseArgs {
+                            key: key,
+                            asset_store: self.asset_store,
+                        }))
+                    },
+                    event::MouseButtonPressed(mouse_button) => {
+                        Some(MousePress(MousePressArgs {
+                            button: mouse_button,
+                            asset_store: self.asset_store,
+                        }))
+                    },
+                    event::MouseButtonReleased(mouse_button) => {
+                        Some(MouseRelease(MouseReleaseArgs {
+                            button: mouse_button,
+                            asset_store: self.asset_store,
+                        }))
+                    },
+                    event::MouseMoved(x, y, relative_move) => {
+                        match relative_move {
+                            Some((dx, dy)) =>
+                                self.state = MouseRelativeMoveState(dx, dy),
+                            None => {},
+                        };
+                        Some(MouseMove(MouseMoveArgs {
+                            x: x,
+                            y: y,
+                            asset_store: self.asset_store,
+                        }))
+                    },
+                    event::NoEvent => {
+                        self.state = UpdateState;
+                        self.next()
+                    },
+                }
             },
             MouseRelativeMoveState(dx, dy) => {
                 self.state = HandleEventsState;
@@ -305,7 +303,8 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             },
             UpdateState => {
                 self.updated += 1;
-                self.state = HandleEventsState;
+                self.state = UpdateLoopState;
+                self.last_update += self.update_time_in_ns;
                 return Some(Update(UpdateArgs{
                     dt: self.dt,
                     asset_store: self.asset_store
