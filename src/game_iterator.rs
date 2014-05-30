@@ -14,8 +14,6 @@ use graphics::{
 use {
     AssetStore,
     GameWindow,
-    GameWindowSDL2,
-    GameWindowSettings,
     Gl,
     GlData,
 };
@@ -164,7 +162,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
 
         let start = time::precise_time_ns();
         let min_ns_per_frame = billion / max_frames_per_second;
-        let mut last_update = start;
+        let last_update = start;
         GameIterator {
             game_window: game_window,
             asset_store: asset_store,
@@ -373,28 +371,5 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         }
         */
     }
-}
-
-#[test]
-fn test_game_iterator() {
-    let mut window: GameWindowSDL2 = GameWindow::new(
-        GameWindowSettings {
-            title: "Test".to_owned(),
-            size: [300, 300],
-            fullscreen: false,
-            exit_on_esc: true,
-            background_color: [1.0, 1.0, 1.0, 1.0],
-        }
-    );
-
-    let mut asset_store = AssetStore::empty();
-
-    let mut game_loop = GameIterator::new(&mut window, &mut asset_store);
-    loop { match game_loop.next() { None => { break }, Some(e) => {
-        match e {
-            Load(e) => { println!("Loading...") },
-            _ => {},
-        };
-    } } }
 }
 
