@@ -8,12 +8,10 @@ use graphics::*;
 use piston::{
     AssetStore,
     Load,
-    Game,
     GameIterator,
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
-    Gl,
     Render,
 };
 
@@ -26,7 +24,7 @@ fn start(argc: int, argv: **u8) -> int {
 fn main() {
     let mut window: GameWindowSDL2 = GameWindow::new(
         GameWindowSettings {
-            title: "Image".to_owned(),
+            title: "Image".to_string(),
             size: [300, 300],
             fullscreen: false,
             exit_on_esc: true,
