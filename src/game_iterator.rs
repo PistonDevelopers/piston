@@ -4,17 +4,12 @@ use gl;
 use gl::types::GLint;
 
 use graphics::{
-    AddColor,
-    Clear,
     Context,
-    ColorContext,
     RelativeTransform2d,
     View,
 };
 use {
-    AssetStore,
     GameWindow,
-    Gl,
     GlData,
 };
 use keyboard;
@@ -25,50 +20,40 @@ use event;
 pub struct RenderArgs<'a> {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
-    /// Rust-Graphics context.
-    pub context: Context<'a>,
     /// OpenGL back-end for Rust-Graphics.
-    pub gl: Gl<'a>,
+    pub gl_data: &'a mut GlData,
+    /// The current context.
+    pub context: Context<'a>,
 }
 
 /// Update argument.
 pub struct UpdateArgs<'a> {
     /// Delta time in seconds.
     pub dt: f64,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Key press arguments.
 pub struct KeyPressArgs<'a> {
     /// Keyboard key.
     pub key: keyboard::Key,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Key release arguments.
 pub struct KeyReleaseArgs<'a> {
     /// Keyboard key.
     pub key: keyboard::Key,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Mouse press arguments.
 pub struct MousePressArgs<'a> {
     /// Mouse button.
     pub button: mouse::Button,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Mouse release arguments.
 pub struct MouseReleaseArgs<'a> {
     /// Mouse button.
     pub button: mouse::Button,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Mouse move arguments.
@@ -77,8 +62,6 @@ pub struct MouseMoveArgs<'a> {
     pub x: f64,
     /// x.
     pub y: f64,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Mouse relative move arguments.
@@ -87,8 +70,6 @@ pub struct MouseRelativeMoveArgs<'a> {
     pub dx: f64,
     /// Delta y.
     pub dy: f64,
-    /// Asset store.
-    pub asset_store: &'a mut AssetStore,
 }
 
 /// Contains the different game events.
@@ -124,11 +105,10 @@ enum GameIteratorState {
 /// A game loop iterator.
 pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
-    asset_store: &'a mut AssetStore,
     state: GameIteratorState,
     gl_data: GlData,
     context: Context<'a>,
-    bg: ColorContext<'a>,
+    bg_color: [f32, ..4],
     last_update: u64,
     update_time_in_ns: u64,
     dt: f64,
@@ -143,20 +123,17 @@ static billion: u64 = 1_000_000_000;
 
 impl<'a, W: GameWindow> GameIterator<'a, W> {
     /// Creates a new game iterator.
-    pub fn new(game_window: &'a mut W, asset_store: &'a mut AssetStore) -> GameIterator<'a, W> {
-        let bg = game_window.get_settings().background_color;
-        let context = Context::new();
-        let bg = context.color(bg);
+    pub fn new(game_window: &'a mut W) -> GameIterator<'a, W> {
+        let bg_color = game_window.get_settings().background_color;
         let updates_per_second: u64 = 120;
         let max_frames_per_second: u64 = 60;
 
         let start = time::precise_time_ns();
         GameIterator {
             game_window: game_window,
-            asset_store: asset_store,
             state: RenderState,
             gl_data: GlData::new(),
-            context: context,
+            context: Context::new(),
             last_update: start,
             update_time_in_ns: billion / updates_per_second,
             dt: 1.0 / updates_per_second as f64,
@@ -165,7 +142,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             min_ns_per_frame: billion / max_frames_per_second,
             start_render: start,
             next_render: start,
-            bg: bg.clone(),
+            bg_color: bg_color,
             updated: 0,
         }
     }
@@ -181,21 +158,25 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 let (w, h) = self.game_window.get_size();
                 if w != 0 && h != 0 {
                     gl::Viewport(0, 0, w as GLint, h as GLint);
-                    // self.viewport(self.game_window);
-                    let mut gl = Gl::new(&mut self.gl_data, self.asset_store);
-                    self.bg.clear(&mut gl);
+                    let r = self.bg_color[0];
+                    let g = self.bg_color[1];
+                    let b = self.bg_color[2];
+                    let a = self.bg_color[3];
+                    gl::ClearColor(r, g, b, a);
+                    gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
                     // Swap buffers next time.
                     self.state = SwapBuffersState;
                     return Some(Render(RenderArgs {
-                        // Extrapolate time forward to allow smooth motion.
-                        // 'start_render' is always bigger than 'last_update'.
-                        ext_dt: (self.start_render - self.last_update) as f64 / billion as f64, 
-                        context: self.context
-                            .trans(-1.0, 1.0)
-                            .scale(2.0 / w as f64, -2.0 / h as f64)
-                            .store_view().clone(), 
-                        gl: gl
-                    }));
+                            // Extrapolate time forward to allow smooth motion.
+                            // 'start_render' is always bigger than 'last_update'.
+                            ext_dt: (self.start_render - self.last_update) as f64 / billion as f64, 
+                            gl_data: &mut self.gl_data,
+                            context: self.context
+                                .trans(-1.0, 1.0)
+                                .scale(2.0 / w as f64, -2.0 / h as f64)
+                                .store_view().clone()
+                        }
+                    ));
                 }
 
                 self.state = PrepareUpdateLoopState;
@@ -239,25 +220,21 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                     event::KeyPressed(key) => {
                         Some(KeyPress(KeyPressArgs {
                             key: key,
-                            asset_store: self.asset_store,
                         }))
                     },
                     event::KeyReleased(key) => {
                         Some(KeyRelease(KeyReleaseArgs {
                             key: key,
-                            asset_store: self.asset_store,
                         }))
                     },
                     event::MouseButtonPressed(mouse_button) => {
                         Some(MousePress(MousePressArgs {
                             button: mouse_button,
-                            asset_store: self.asset_store,
                         }))
                     },
                     event::MouseButtonReleased(mouse_button) => {
                         Some(MouseRelease(MouseReleaseArgs {
                             button: mouse_button,
-                            asset_store: self.asset_store,
                         }))
                     },
                     event::MouseMoved(x, y, relative_move) => {
@@ -269,7 +246,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                         Some(MouseMove(MouseMoveArgs {
                             x: x,
                             y: y,
-                            asset_store: self.asset_store,
                         }))
                     },
                     event::NoEvent => {
@@ -283,7 +259,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 return Some(MouseRelativeMove(MouseRelativeMoveArgs {
                     dx: dx,
                     dy: dy,
-                    asset_store: self.asset_store,
                 }));
             },
             UpdateState => {
@@ -292,7 +267,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 self.last_update += self.update_time_in_ns;
                 return Some(Update(UpdateArgs{
                     dt: self.dt,
-                    asset_store: self.asset_store
                 }));
             },
         };

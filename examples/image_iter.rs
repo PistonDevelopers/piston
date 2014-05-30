@@ -11,6 +11,7 @@ use piston::{
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
+    Gl,
     Render,
 };
 
@@ -34,14 +35,14 @@ fn main() {
     let mut asset_store = AssetStore::from_folder("assets");
 
     let image = asset_store.load_image("rust-logo.png").unwrap();
-    let mut game_iter = GameIterator::new(&mut window, &mut asset_store);
+    let mut game_iter = GameIterator::new(&mut window);
     loop {
         match game_iter.next() {
             None => { break },
             Some(e) => match e {
-                Render(e) => {
-                    let c = e.context;
-                    let mut gl = e.gl;
+                Render(args) => {
+                    let c = args.context;
+                    let mut gl = Gl::new(args.gl_data, &mut asset_store);
                     c.image(image).draw(&mut gl);
                 },
                 _ => {},       
