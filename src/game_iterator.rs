@@ -27,37 +27,37 @@ pub struct RenderArgs<'a> {
 }
 
 /// Update argument.
-pub struct UpdateArgs<'a> {
+pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
 }
 
 /// Key press arguments.
-pub struct KeyPressArgs<'a> {
+pub struct KeyPressArgs {
     /// Keyboard key.
     pub key: keyboard::Key,
 }
 
 /// Key release arguments.
-pub struct KeyReleaseArgs<'a> {
+pub struct KeyReleaseArgs {
     /// Keyboard key.
     pub key: keyboard::Key,
 }
 
 /// Mouse press arguments.
-pub struct MousePressArgs<'a> {
+pub struct MousePressArgs {
     /// Mouse button.
     pub button: mouse::Button,
 }
 
 /// Mouse release arguments.
-pub struct MouseReleaseArgs<'a> {
+pub struct MouseReleaseArgs {
     /// Mouse button.
     pub button: mouse::Button,
 }
 
 /// Mouse move arguments.
-pub struct MouseMoveArgs<'a> {
+pub struct MouseMoveArgs {
     /// y.
     pub x: f64,
     /// x.
@@ -65,7 +65,7 @@ pub struct MouseMoveArgs<'a> {
 }
 
 /// Mouse relative move arguments.
-pub struct MouseRelativeMoveArgs<'a> {
+pub struct MouseRelativeMoveArgs {
     /// Delta x.
     pub dx: f64,
     /// Delta y.
@@ -77,19 +77,19 @@ pub enum GameEvent<'a> {
     /// Render graphics.
     Render(RenderArgs<'a>),
     /// Update physical state of the game.
-    Update(UpdateArgs<'a>),
+    Update(UpdateArgs),
     /// Pressed a keyboard key.
-    KeyPress(KeyPressArgs<'a>),
+    KeyPress(KeyPressArgs),
     /// Released a keyboard key.
-    KeyRelease(KeyReleaseArgs<'a>),
+    KeyRelease(KeyReleaseArgs),
     /// Pressed a mouse button.
-    MousePress(MousePressArgs<'a>),
+    MousePress(MousePressArgs),
     /// Released a mouse button.
-    MouseRelease(MouseReleaseArgs<'a>),
+    MouseRelease(MouseReleaseArgs),
     /// Moved mouse cursor.
-    MouseMove(MouseMoveArgs<'a>),
+    MouseMove(MouseMoveArgs),
     /// Moved mouse relative, not bounded by cursor.
-    MouseRelativeMove(MouseRelativeMoveArgs<'a>),
+    MouseRelativeMove(MouseRelativeMoveArgs),
 }
 
 enum GameIteratorState {
