@@ -13,7 +13,6 @@ use shader_utils::{compile_shader};
 use graphics::BackEnd;
 
 // Local crate.
-use AssetStore;
 use Texture;
 
 static VERTEX_SHADER_TRI_LIST_XY_RGBA: &'static str = "
@@ -67,25 +66,6 @@ void main()
         gl_FragColor = texture2D(s_texture, v_v2TexCoord) * v_v4FillColor;
 }
 ";
-
-/// OpenGL back-end for Rust-Graphics.
-pub struct Gl<'a> {
-    gl_data: &'a mut GlData,
-    asset_store: &'a AssetStore,
-}
-
-impl<'a> Gl<'a> {
-    /// Creates a new OpenGl back-end.
-    pub fn new(
-        gl_data: &'a mut GlData,
-        asset_store: &'a AssetStore
-    ) -> Gl<'a> {
-        Gl {
-            gl_data: gl_data,
-            asset_store: asset_store,
-        }
-    }
-}
 
 struct TriListXYRGBA {
     vertex_shader: GLuint,
@@ -172,7 +152,7 @@ impl TriListXYRGBAUV {
 }
 
 /// Contains OpenGL data.
-pub struct GlData {
+pub struct Gl {
     tri_list_xy_rgba: TriListXYRGBA,
     tri_list_xy_rgba_uv: TriListXYRGBAUV,
     // id of buffer for xy positions.
@@ -186,9 +166,9 @@ pub struct GlData {
 }
 
 
-impl<'a> GlData {
+impl<'a> Gl {
     /// Creates a new OpenGl back-end.
-    pub fn new() -> GlData {
+    pub fn new() -> Gl {
         // Load the vertices, color and texture coord buffers.
         unsafe {
             let mut vbo : [GLuint, ..3] = [0, ..3];
@@ -197,7 +177,7 @@ impl<'a> GlData {
             let fill_color_id = vbo[1];
             let tex_coord_id = vbo[2];
 
-            GlData {
+            Gl {
                 tri_list_xy_rgba: TriListXYRGBA::new(),
                 tri_list_xy_rgba_uv: TriListXYRGBAUV::new(),
                 position_id: position_id,
@@ -222,7 +202,7 @@ impl<'a> GlData {
     }
 }
 
-impl<'a> BackEnd<Texture> for Gl<'a> {
+impl BackEnd<Texture> for Gl {
     fn supports_clear_rgba(&self) -> bool { true }
 
     fn clear_rgba(&mut self, r: f32, g: f32, b: f32, a: f32) {
@@ -260,22 +240,21 @@ impl<'a> BackEnd<Texture> for Gl<'a> {
     ) {
         {
             // Set shader program.
-            let shader_program = self.gl_data.tri_list_xy_rgba.program;
-            self.gl_data.use_program(shader_program);
+            let shader_program = self.tri_list_xy_rgba.program;
+            self.use_program(shader_program);
         }
-        let data = &self.gl_data;
-        let shader = &data.tri_list_xy_rgba;
+        let shader = &self.tri_list_xy_rgba;
         let size_vertices: i32 = 2;
         unsafe {
             gl::BindBuffer(
-                gl::ARRAY_BUFFER, data.position_id);
+                gl::ARRAY_BUFFER, self.position_id);
             gl::BufferData(
                 gl::ARRAY_BUFFER, (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&vertices[0]), gl::DYNAMIC_DRAW);
             gl::VertexAttribPointer(
                 shader.a_v4Position as GLuint, size_vertices, gl::FLOAT, gl::TRUE, 0, ptr::null());
 
             gl::BindBuffer(
-                gl::ARRAY_BUFFER, data.fill_color_id);
+                gl::ARRAY_BUFFER, self.fill_color_id);
             gl::BufferData(
                 gl::ARRAY_BUFFER, (colors.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&colors[0]), gl::DYNAMIC_DRAW);
             gl::VertexAttribPointer(
@@ -298,29 +277,28 @@ impl<'a> BackEnd<Texture> for Gl<'a> {
     ) {
         {
             // Set shader program.
-            let shader_program = self.gl_data.tri_list_xy_rgba_uv.program;
-            self.gl_data.use_program(shader_program);
+            let shader_program = self.tri_list_xy_rgba_uv.program;
+            self.use_program(shader_program);
         }
-        let data = &self.gl_data;
-        let shader = &data.tri_list_xy_rgba_uv;
+        let shader = &self.tri_list_xy_rgba_uv;
         let size_vertices: i32 = 2;
         unsafe {
             gl::BindBuffer(
-                gl::ARRAY_BUFFER, data.position_id);
+                gl::ARRAY_BUFFER, self.position_id);
             gl::BufferData(
                 gl::ARRAY_BUFFER, (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&vertices[0]), gl::DYNAMIC_DRAW);
             gl::VertexAttribPointer(
                 shader.a_v4Position as GLuint, size_vertices, gl::FLOAT, gl::TRUE, 0, ptr::null());
 
             gl::BindBuffer(
-                gl::ARRAY_BUFFER, data.fill_color_id);
+                gl::ARRAY_BUFFER, self.fill_color_id);
             gl::BufferData(
                 gl::ARRAY_BUFFER, (colors.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&colors[0]), gl::DYNAMIC_DRAW);
             gl::VertexAttribPointer(
                 shader.a_v4FillColor as GLuint, 4, gl::FLOAT, gl::FALSE, 0, ptr::null());
 
             gl::BindBuffer(
-                gl::ARRAY_BUFFER, data.tex_coord_id);
+                gl::ARRAY_BUFFER, self.tex_coord_id);
             gl::BufferData(
                 gl::ARRAY_BUFFER, (texture_coords.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&texture_coords[0]), gl::DYNAMIC_DRAW);
             gl::VertexAttribPointer(

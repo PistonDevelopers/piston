@@ -46,7 +46,6 @@ pub use GameWindowSDL2 = game_window_sdl2::GameWindowSDL2;
 pub use GameWindowGLFW = game_window_glfw::GameWindowGLFW;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use Gl = gl_back_end::Gl;
-pub use GlData = gl_back_end::GlData;
 pub use AssetStore = asset_store::AssetStore;
 pub use Texture = texture::Texture;
 

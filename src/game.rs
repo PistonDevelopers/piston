@@ -9,7 +9,6 @@ use std::io::timer::sleep;
 
 // Local crate.
 use Gl = gl_back_end::Gl;
-use GlData = gl_back_end::GlData;
 use GameWindow = game_window::GameWindow;
 use AssetStore;
 use keyboard;
@@ -155,7 +154,7 @@ pub trait Game {
         use graphics::{Clear, AddColor};
 
         self.load(asset_store);
-        let mut gl_data = GlData::new();
+        let mut gl = Gl::new();
         let context = Context::new();
         let bg = game_window.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
@@ -181,7 +180,6 @@ pub trait Game {
             let (w, h) = game_window.get_size();
             if w != 0 && h != 0 {
                 self.viewport(game_window);
-                let mut gl = Gl::new(&mut gl_data, asset_store);
                 bg.clear(&mut gl);
                 // Extrapolate time forward to allow smooth motion.
                 // 'now' is always bigger than 'last_update'.
