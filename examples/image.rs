@@ -10,11 +10,12 @@ use piston::{
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
-    Gl
+    Gl,
+    Texture,
 };
 
 pub struct App {
-    image: Option<Image>,
+    image: Option<Texture>,
 }
 
 impl App {
@@ -32,7 +33,7 @@ impl Game for App {
     }
 
     fn render(&self, _ext_dt: f64, c: &Context, gl: &mut Gl) {
-        c.image(self.image.unwrap()).draw(gl);
+        c.image(self.image.as_ref().unwrap()).draw(gl);
     }
 }
 

@@ -48,6 +48,7 @@ pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use Gl = gl_back_end::Gl;
 pub use GlData = gl_back_end::GlData;
 pub use AssetStore = asset_store::AssetStore;
+pub use Texture = texture::Texture;
 
 pub mod shader_utils;
 pub mod game_window;
@@ -62,4 +63,5 @@ mod game_window_glfw;
 mod game_window_settings;
 mod gl_back_end;
 mod asset_store;
+mod texture;
 

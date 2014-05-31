@@ -14,6 +14,7 @@ use BackEnd = graphics::BackEnd;
 
 // Local crate.
 use AssetStore;
+use Texture;
 
 static VERTEX_SHADER_TRI_LIST_XY_RGBA: &'static str = "
 attribute vec4 a_v4Position;
@@ -221,7 +222,7 @@ impl<'a> GlData {
     }
 }
 
-impl<'a> BackEnd for Gl<'a> {
+impl<'a> BackEnd<Texture> for Gl<'a> {
     fn supports_clear_rgba(&self) -> bool { true }
 
     fn clear_rgba(&mut self, r: f32, g: f32, b: f32, a: f32) {
@@ -240,15 +241,15 @@ impl<'a> BackEnd for Gl<'a> {
 
     fn supports_single_texture(&self) -> bool { true }
 
-    fn enable_single_texture(&mut self, texture_id: uint) {
-        let texture = self.asset_store.get_texture(texture_id);
+    fn enable_single_texture(&mut self, texture: &Texture) {
+        let texture = self.asset_store.get_texture(texture.texture_id);
         gl::BindTexture(gl::TEXTURE_2D, texture);
     }
 
     fn disable_single_texture(&mut self) {}
 
     // Assume all textures has alpha channel for now.
-    fn has_texture_alpha(&self, _texture_id: uint) -> bool { true }
+    fn has_texture_alpha(&self, _texture: &Texture) -> bool { true }
 
     fn supports_tri_list_xy_f32_rgba_f32(&self) -> bool { true }
 

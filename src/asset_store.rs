@@ -2,18 +2,18 @@
 //! Storing sounds, textures, animations etc.
 
 // Extern crates.
-use graphics::*;
 use HashMap = collections::HashMap;
 use gl;
 use gl::types::GLuint;
 use libc::c_void;
 use std::os::self_exe_path;
-
-// Local crate.
 use png;
 
+// Local crate.
+use Texture;
+
 /// Represents a texture in Piston.
-pub struct Texture {
+pub struct AssetTexture {
     id: GLuint,
     width: u32,
     height: u32,
@@ -27,7 +27,7 @@ pub struct AssetStore {
     // The folder to load assets from.
     assets_folder: Option<String>,
     // List of OpenGL textures.
-    textures: Vec<Texture>,
+    textures: Vec<AssetTexture>,
     // Contains names of loaded textures.
     texture_files: HashMap<String, uint>,
 }
@@ -57,16 +57,15 @@ impl AssetStore {
     }
 
     /// Loads image by relative file name to the asset root.
-    pub fn load_image(&mut self, file: &str) -> Result<Image, String> {
+    pub fn load_image(&mut self, file: &str) -> Result<Texture, String> {
         match self.texture_files.find_equiv(&file) {
             None => {},
             Some(&texture_id) => {
                 let texture = self.textures.get(texture_id);
-                return Ok(Image {
+                return Ok(Texture {
                     texture_id: texture_id,
                     texture_width: texture.width,
                     texture_height: texture.height,
-                    source_rect: [0, 0, texture.width, texture.height],
                 })
             },
         };
@@ -106,7 +105,7 @@ impl AssetStore {
                 img.pixels.as_ptr() as *c_void
             );
         }
-        let texture = Texture {
+        let texture = AssetTexture {
             id: id,
             width: img.width,
             height: img.height,
@@ -115,11 +114,10 @@ impl AssetStore {
         let texture_id = self.textures.len() - 1;
 
         self.texture_files.insert(file.to_string(), texture_id);
-        Ok(Image {
+        Ok(Texture {
             texture_id: texture_id,
             texture_width: texture.width,
             texture_height: texture.height,
-            source_rect: [0, 0, texture.width, texture.height],
         })
     }
 }
