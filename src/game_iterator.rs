@@ -99,6 +99,14 @@ enum GameIteratorState {
     UpdateState,
 }
 
+/// Settings for the game loop behavior.
+pub struct GameIteratorSettings {
+    /// The number of updates per second (UPS).
+    pub updates_per_second: u64,
+    /// The maximum number of frames per second (FPS target).
+    pub max_frames_per_second: u64,
+}
+
 /// A game loop iterator.
 pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
@@ -119,10 +127,10 @@ static billion: u64 = 1_000_000_000;
 
 impl<'a, W: GameWindow> GameIterator<'a, W> {
     /// Creates a new game iterator.
-    pub fn new(game_window: &'a mut W) -> GameIterator<'a, W> {
+    pub fn new(game_window: &'a mut W, settings: &GameIteratorSettings) -> GameIterator<'a, W> {
         let bg_color = game_window.get_settings().background_color;
-        let updates_per_second: u64 = 120;
-        let max_frames_per_second: u64 = 60;
+        let updates_per_second: u64 = settings.updates_per_second;
+        let max_frames_per_second: u64 = settings.max_frames_per_second;
 
         let start = time::precise_time_ns();
         GameIterator {
