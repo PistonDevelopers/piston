@@ -31,6 +31,7 @@ pub use MouseRelativeMove = game_iterator::MouseRelativeMove;
 
 pub use GameEvent = game_iterator::GameEvent;
 pub use GameIterator = game_iterator::GameIterator;
+pub use GameIteratorSettings = game_iterator::GameIteratorSettings;
 pub use RenderArgs = game_iterator::RenderArgs;
 pub use UpdateArgs = game_iterator::UpdateArgs;
 pub use KeyPressArgs = game_iterator::KeyPressArgs;
