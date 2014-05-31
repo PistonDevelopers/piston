@@ -24,6 +24,10 @@ pub struct RenderArgs<'a> {
     pub gl_data: &'a mut GlData,
     /// The current context.
     pub context: Context<'a>,
+    /// The width of rendered area.
+    pub width: u32,
+    /// The height of rendered area.
+    pub height: u32,
 }
 
 /// Update argument.
@@ -174,7 +178,9 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                             context: self.context
                                 .trans(-1.0, 1.0)
                                 .scale(2.0 / w as f64, -2.0 / h as f64)
-                                .store_view().clone()
+                                .store_view().clone(),
+                            width: w,
+                            height: h,
                         }
                     ));
                 }
