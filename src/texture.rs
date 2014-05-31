@@ -32,7 +32,7 @@ impl Texture {
     }
     
     /// Loads image by relative file name to the asset root.
-    pub fn from_path(&mut self, path: &Path) -> Result<Texture, String> {
+    pub fn from_path(path: &Path) -> Result<Texture, String> {
         let img = match png::load_png(path) {
             Ok(img) => img,
             Err(msg) => return Err(format!("Could not load '{}': {}", path.filename_str().unwrap(), msg)),
