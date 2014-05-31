@@ -13,6 +13,7 @@ use piston::{
     GameWindowSDL2,
     GameWindowSettings,
     Render,
+    Texture,
 };
 
 #[start]
@@ -34,7 +35,8 @@ fn main() {
 
     let mut asset_store = AssetStore::from_folder("assets");
 
-    let image = asset_store.load_image("rust-logo.png").unwrap();
+    let image = asset_store.path("rust-logo.png").unwrap();
+    let image = Texture::from_path(&image).unwrap();
     let game_iter_settings = GameIteratorSettings {
             updates_per_second: 120,
             max_frames_per_second: 60,
