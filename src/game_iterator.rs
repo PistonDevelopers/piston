@@ -4,8 +4,8 @@ use gl;
 use gl::types::GLint;
 
 use {
+    Gl,
     GameWindow,
-    GlData,
 };
 use keyboard;
 use mouse;
@@ -16,7 +16,7 @@ pub struct RenderArgs<'a> {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
     /// OpenGL back-end for Rust-Graphics.
-    pub gl_data: &'a mut GlData,
+    pub gl: &'a mut Gl,
     /// The width of rendered area.
     pub width: u32,
     /// The height of rendered area.
@@ -111,7 +111,7 @@ pub struct GameIteratorSettings {
 pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
     state: GameIteratorState,
-    gl_data: GlData,
+    gl: Gl,
     bg_color: [f32, ..4],
     last_update: u64,
     update_time_in_ns: u64,
@@ -136,7 +136,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         GameIterator {
             game_window: game_window,
             state: RenderState,
-            gl_data: GlData::new(),
+            gl: Gl::new(),
             last_update: start,
             update_time_in_ns: billion / updates_per_second,
             dt: 1.0 / updates_per_second as f64,
@@ -173,7 +173,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                             // Extrapolate time forward to allow smooth motion.
                             // 'start_render' is always bigger than 'last_update'.
                             ext_dt: (self.start_render - self.last_update) as f64 / billion as f64, 
-                            gl_data: &mut self.gl_data,
+                            gl: &mut self.gl,
                             width: w,
                             height: h,
                         }
