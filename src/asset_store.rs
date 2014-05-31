@@ -2,7 +2,6 @@
 //! Storing sounds, textures, animations etc.
 
 // Extern crates.
-use collections::HashMap;
 use gl;
 use gl::types::GLuint;
 use libc::c_void;
@@ -12,13 +11,6 @@ use png;
 // Local crate.
 use Texture;
 
-/// Represents a texture in Piston.
-pub struct AssetTexture {
-    id: GLuint,
-    width: u32,
-    height: u32,
-}
-
 /// A place to store sounds, textures, animations etc.
 ///
 /// The idea is to have one object which the app can use
@@ -26,10 +18,6 @@ pub struct AssetTexture {
 pub struct AssetStore {
     // The folder to load assets from.
     assets_folder: Option<String>,
-    // List of OpenGL textures.
-    textures: Vec<AssetTexture>,
-    // Contains names of loaded textures.
-    texture_files: HashMap<String, uint>,
 }
 
 impl AssetStore {
@@ -37,8 +25,6 @@ impl AssetStore {
     pub fn from_folder(assets_folder: &str) -> AssetStore {
         AssetStore {
             assets_folder: Some(assets_folder.to_string()),
-            textures: Vec::new(),
-            texture_files: HashMap::new(),
         }
     }
 
@@ -46,30 +32,11 @@ impl AssetStore {
     pub fn empty() -> AssetStore {
         AssetStore {
             assets_folder: None,
-            textures: Vec::new(),
-            texture_files: HashMap::new(),
         }
-    }
-
-    /// Gets OpenGL texture from texture id.
-    pub fn get_texture(&self, texture_id: uint) -> GLuint {
-        self.textures.get(texture_id).id
     }
 
     /// Loads image by relative file name to the asset root.
     pub fn load_image(&mut self, file: &str) -> Result<Texture, String> {
-        match self.texture_files.find_equiv(&file) {
-            None => {},
-            Some(&texture_id) => {
-                let texture = self.textures.get(texture_id);
-                return Ok(Texture {
-                    texture_id: texture_id,
-                    texture_width: texture.width,
-                    texture_height: texture.height,
-                })
-            },
-        };
-
         let folder = self.assets_folder.as_ref().unwrap();
         let exe_path = self_exe_path();
         let exe_path = match exe_path {
@@ -105,20 +72,8 @@ impl AssetStore {
                 img.pixels.as_ptr() as *c_void
             );
         }
-        let texture = AssetTexture {
-            id: id,
-            width: img.width,
-            height: img.height,
-        };
-        self.textures.push(texture);
-        let texture_id = self.textures.len() - 1;
-
-        self.texture_files.insert(file.to_string(), texture_id);
-        Ok(Texture {
-            texture_id: texture_id,
-            texture_width: texture.width,
-            texture_height: texture.height,
-        })
+        
+        Ok(Texture::new(id, img.width, img.height))
     }
 }
 
