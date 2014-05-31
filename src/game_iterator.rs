@@ -3,11 +3,6 @@ use std::io::timer::sleep;
 use gl;
 use gl::types::GLint;
 
-use graphics::{
-    Context,
-    RelativeTransform2d,
-    View,
-};
 use {
     GameWindow,
     GlData,
@@ -22,8 +17,6 @@ pub struct RenderArgs<'a> {
     pub ext_dt: f64,
     /// OpenGL back-end for Rust-Graphics.
     pub gl_data: &'a mut GlData,
-    /// The current context.
-    pub context: Context<'a>,
     /// The width of rendered area.
     pub width: u32,
     /// The height of rendered area.
@@ -111,7 +104,6 @@ pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
     state: GameIteratorState,
     gl_data: GlData,
-    context: Context<'a>,
     bg_color: [f32, ..4],
     last_update: u64,
     update_time_in_ns: u64,
@@ -137,7 +129,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             game_window: game_window,
             state: RenderState,
             gl_data: GlData::new(),
-            context: Context::new(),
             last_update: start,
             update_time_in_ns: billion / updates_per_second,
             dt: 1.0 / updates_per_second as f64,
@@ -175,10 +166,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                             // 'start_render' is always bigger than 'last_update'.
                             ext_dt: (self.start_render - self.last_update) as f64 / billion as f64, 
                             gl_data: &mut self.gl_data,
-                            context: self.context
-                                .trans(-1.0, 1.0)
-                                .scale(2.0 / w as f64, -2.0 / h as f64)
-                                .store_view().clone(),
                             width: w,
                             height: h,
                         }
