@@ -242,7 +242,7 @@ impl<'a> BackEnd<Texture> for Gl<'a> {
     fn supports_single_texture(&self) -> bool { true }
 
     fn enable_single_texture(&mut self, texture: &Texture) {
-        let texture = self.asset_store.get_texture(texture.texture_id);
+        let texture = texture.get_id();
         gl::BindTexture(gl::TEXTURE_2D, texture);
     }
 
