@@ -2,7 +2,7 @@
 //! Storing sounds, textures, animations etc.
 
 // Extern crates.
-use HashMap = collections::HashMap;
+use collections::HashMap;
 use gl;
 use gl::types::GLuint;
 use libc::c_void;
