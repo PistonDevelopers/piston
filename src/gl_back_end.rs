@@ -10,7 +10,7 @@ use gl::types::{
 use std::ptr;
 use std::mem;
 use shader_utils::{compile_shader};
-use BackEnd = graphics::BackEnd;
+use graphics::BackEnd;
 
 // Local crate.
 use AssetStore;
