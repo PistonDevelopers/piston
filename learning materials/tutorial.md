@@ -57,12 +57,36 @@ Follow these instructions to generate the documentation for all the projects in 
 The `AssetStore` object is used to access files in your game assets folder.  
 By default it uses the same directory as the game.  
 
+Example:
+
 ```Rust
-use piston::AssetStore; // import the `AssetStore` object.
-let asset_store = AssetStore::from_folder("assets");
+use piston::AssetStore; // import the `AssetStore` object
+
+fn create_asset_store() -> AssetStore {
+    AssetStore::from_folder("assets")
+}
 ```
 
 ### Loading images
+
+The first step is to get a path to the file in the assets folder.  
+The second step is to construct a `Texture` object from the path.
+
+Example:
+
+```Rust
+use piston::{
+    AssetStore, // import the `AssetStore` object.
+    Texture; // import the `Texture` object.
+};
+
+fn load_rust_logo(asset_store: &AssetStore) -> Texture {
+    // Get the path to the file "rust-logo.png", fail if not succeeding.
+    let path = asset_store.path("rust-logo.png").unwrap();
+    // Load the texture from the path.
+    Texture::from_path(&path).unwrap()
+}
+```
 
 ### Loading sounds
 
