@@ -53,9 +53,15 @@ Online version of the documentation: http://pistondevelopers.github.io/docs/pist
 2. Type `make doc`
 3. In the file browser window, double-click the file 'docs/piston/index.html' to open up the docs in the browser
 
-## The `Game` trait
-
 ## The `AssetStore` object
+
+The `AssetStore` object is used to access files in your game assets folder.  
+By default it uses the directory of the executable.  
+
+```Rust
+use piston::AssetStore; // import the `AssetStore` object.
+let asset_store = AssetStore::from_folder("assets");
+```
 
 ### Loading images
 
