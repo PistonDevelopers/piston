@@ -49,9 +49,8 @@ Online version of the documentation: http://pistondevelopers.github.io/docs/pist
 
 ### How to generate documentation
 
-1. In the Terminal window, navigate to the 'piston-workspace/piston' directory
-2. Type `make doc`
-3. In the file browser window, double-click the file 'docs/piston/index.html' to open up the docs in the browser
+The README.md in https://github.com/PistonDevelopers/piston-workspace tells you how to generate documentation.  
+Follow these instructions to generate the documentation for all the projects in one go.  
 
 ## The `AssetStore` object
 
