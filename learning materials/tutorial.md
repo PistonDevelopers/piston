@@ -56,7 +56,7 @@ Online version of the documentation: http://pistondevelopers.github.io/docs/pist
 ## The `AssetStore` object
 
 The `AssetStore` object is used to access files in your game assets folder.  
-By default it uses the directory of the executable.  
+By default it uses the same directory as the game.  
 
 ```Rust
 use piston::AssetStore; // import the `AssetStore` object.
