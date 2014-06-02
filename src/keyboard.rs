@@ -8,7 +8,7 @@ use std::num::ToPrimitive;
 
 /// Represent a keyboard key.
 #[allow(missing_doc)]
-#[deriving(Clone, Eq, TotalEq, Show)]
+#[deriving(Clone, PartialEq, Eq, Show)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
@@ -263,7 +263,7 @@ impl Hash for Key {
     }
 }
 
-impl Ord for Key {
+impl PartialOrd for Key {
     #[inline(always)]
     fn lt(&self, rhs: &Key) -> bool {
         self.code() < rhs.code()
