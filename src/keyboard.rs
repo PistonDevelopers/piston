@@ -270,7 +270,7 @@ impl PartialOrd for Key {
     }
 }
 
-impl TotalOrd for Key {
+impl Ord for Key {
     #[inline(always)]
     fn cmp(&self, rhs: &Key) -> Ordering {
         self.code().cmp(&rhs.code())

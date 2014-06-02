@@ -2,7 +2,7 @@
 //! Back-end agnostic mouse buttons.
 
 /// Represent a mouse button.
-#[deriving(Clone, PartialEq, Eq, TotalOrd, PartialOrd, Hash, Show)]
+#[deriving(Clone, PartialEq, Eq, Ord, PartialOrd, Hash, Show)]
 pub enum Button {
     /// Unknown mouse button.
     Unknown,
