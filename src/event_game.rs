@@ -13,7 +13,6 @@ use self::graphics::{
 };
 use self::piston::{
     AssetStore,
-    GlData,
     event,
     Game,
     GameWindow,
@@ -150,7 +149,7 @@ pub trait EventGame {
         self.load(asset_store);
         self.register_event(&mut event_center);
 
-        let mut gl_data = GlData::new();
+        let mut gl = Gl::new();
         let context = Context::new();
         let bg = game_window.get_settings().background_color;
         let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
@@ -187,7 +186,6 @@ pub trait EventGame {
             let (w, h) = game_window.get_size();
             if w != 0 && h != 0 {
                 self.viewport(game_window);
-                let mut gl = Gl::new(&mut gl_data, asset_store);
                 bg.clear(&mut gl);
                 // Extrapolate time forward to allow smooth motion.
                 // 'lag' is always less than 'update_time_in_ns'.
