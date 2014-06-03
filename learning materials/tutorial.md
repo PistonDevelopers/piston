@@ -88,8 +88,6 @@ fn load_rust_logo(asset_store: &AssetStore) -> Texture {
 }
 ```
 
-### Loading sounds
-
 ## Rendering
 
 ### Drawing rectangles and ellipses
