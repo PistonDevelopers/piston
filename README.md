@@ -30,10 +30,6 @@ One way to simplify working with multiple projects on the same machine is to sym
 
 You can now use https://github.com/PistonDevelopers/piston-workspace repository to download and build Piston without having to set up symlinks manually.
 
-Follow the instructions in the piston-workspace README before you add the libraries to your project.
-
-The '.rlib' files are located in 'piston-workspace/piston/target/cpu-vendor-os/lib'.  
-
 ## Add libraries to your project
 
 After building Piston, you need to add the '.rlib' files to your '/target/cpu-vendor-os/lib/' folder.  
