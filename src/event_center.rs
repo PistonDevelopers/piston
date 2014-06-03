@@ -4,20 +4,20 @@ use Observer;
 use EventType;
 
 /// A struct that contains all observers.
-pub struct EventCenter<A> {
+pub struct EventCenter<'a, A> {
     observers: TreeMap<uint, Box<Observer>>,
-    commands_call: TreeMap<uint, |&mut A|: 'static>,
-    commands_call_once: TreeMap<uint, |&mut A|: 'static>,
+    commands_call: TreeMap<uint, |&mut A|: 'a>,
+    commands_call_once: TreeMap<uint, |&mut A|: 'a>,
     count: uint,
 }
 
-impl<A> EventCenter<A> {
+impl<'a, A> EventCenter<'a, A> {
     /// Returns a new event center
-    pub fn new() -> EventCenter<A> {
+    pub fn new() -> EventCenter<'a, A> {
         EventCenter {
             observers: TreeMap::<uint, Box<Observer>>::new(),
-            commands_call: TreeMap::<uint, |&mut A|: 'static>::new(),
-            commands_call_once: TreeMap::<uint, |&mut A|: 'static>::new(),
+            commands_call: TreeMap::<uint, |&mut A|: 'a>::new(),
+            commands_call_once: TreeMap::<uint, |&mut A|: 'a>::new(),
             count: 0,
         }
     }
@@ -26,7 +26,7 @@ impl<A> EventCenter<A> {
     /// observer when there is a event occuring.
     ///
     /// This will continuing trigger observer until the observer is removed.
-    pub fn add_observer_call(&mut self, ob: Box<Observer>, command: |&mut A|: 'static) -> uint {
+    pub fn add_observer_call(&mut self, ob: Box<Observer>, command: |&mut A|: 'a) -> uint {
         let i = self.get_empty_id();
         self.observers.insert(i, ob);
         self.commands_call.insert(i, command);
@@ -37,7 +37,7 @@ impl<A> EventCenter<A> {
     /// observer when there is a event occuring.
     ///
     /// This will only trigger observer once.
-    pub fn add_observer_call_once(&mut self, ob: Box<Observer>, command: |&mut A|: 'static) -> uint {
+    pub fn add_observer_call_once(&mut self, ob: Box<Observer>, command: |&mut A|: 'a) -> uint {
         let i = self.get_empty_id();
         self.observers.insert(i, ob);
         self.commands_call_once.insert(i, command);
