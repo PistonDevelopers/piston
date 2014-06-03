@@ -27,9 +27,9 @@ impl AssetStore {
             assets_folder: None,
         }
     }
-   
-    /// Returns the path of an asset file. 
-    pub fn path(&mut self, file: &str) -> Result<Path, String> {
+
+    /// Returns the path of an asset file.
+    pub fn path(&self, file: &str) -> Result<Path, String> {
         let folder = self.assets_folder.as_ref().unwrap();
         let exe_path = self_exe_path();
         let exe_path = match exe_path {

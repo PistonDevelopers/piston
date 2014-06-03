@@ -33,7 +33,7 @@ fn main() {
         }
     );
 
-    let mut asset_store = AssetStore::from_folder("assets");
+    let asset_store = AssetStore::from_folder("assets");
 
     let image = asset_store.path("rust-logo.png").unwrap();
     let image = Texture::from_path(&image).unwrap();
