@@ -70,13 +70,13 @@ type GameWindowBackEnd = GameWindowSDL2;
 
 fn main() {
     let mut game_window: GameWindowBackEnd = GameWindow::new(
-        GameWindowSettings::new (
-            "Piston-Lab".to_owned(),
-            [300, 300],
-            false,
-            true,
-            [1.0, 1.0, 1.0, 1.0]
-        )
+        GameWindowSettings {
+            title: "Rust Event Examples".to_string(),
+            size: [300, 300],
+            fullscreen: false,
+            exit_on_esc: true,
+            background_color: [1.0, 1.0, 1.0, 1.0],
+        }
     );
 
     let mut asset_store = AssetStore::from_folder("assets");
