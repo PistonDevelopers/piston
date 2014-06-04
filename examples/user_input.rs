@@ -27,7 +27,6 @@ impl App {
 impl Game for App {
     fn key_press(
         &mut self,
-        _asset_store: &mut AssetStore,
         args: KeyPressArgs
     ) {
         println!("Pressed keyboard key '{}'", args.key);
@@ -35,7 +34,6 @@ impl Game for App {
 
     fn key_release(
         &mut self,
-        _asset_store: &mut AssetStore,
         args: KeyReleaseArgs
     ) {
         println!("Released keyboard key '{}'", args.key);
@@ -43,7 +41,6 @@ impl Game for App {
 
     fn mouse_press(
         &mut self,
-        _asset_store: &mut AssetStore,
         args: MousePressArgs
     ) {
         println!("Pressed mouse button '{}'", args.button);
@@ -51,7 +48,6 @@ impl Game for App {
 
     fn mouse_release(
         &mut self,
-        _asset_store: &mut AssetStore,
         args: MouseReleaseArgs
     ) {
         println!("Released mouse button '{}'", args.button);
