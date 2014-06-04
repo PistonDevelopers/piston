@@ -6,21 +6,26 @@ use gl;
 use gl::types::GLint;
 
 // Local crate.
-use Gl = gl_back_end::Gl;
 use GameWindow = game_window::GameWindow;
 use GameIteratorSettings;
 use AssetStore;
 use GameIterator;
 use KeyPress;
+use KeyPressArgs;
 use KeyRelease;
+use KeyReleaseArgs;
 use MouseMove;
+use MouseMoveArgs;
 use MouseRelativeMove;
+use MouseRelativeMoveArgs;
 use MousePress;
+use MousePressArgs;
 use MouseRelease;
+use MouseReleaseArgs;
 use Render;
+use RenderArgs;
 use Update;
-use keyboard;
-use mouse;
+use UpdateArgs;
 
 /// Implemented by game applications.
 pub trait Game {
@@ -28,12 +33,12 @@ pub trait Game {
     ///
     /// `context` is a Rust-Graphics context.
     /// `gl` is the Piston OpenGL back-end for Rust-Graphics.
-    fn render(&self, _ext_dt: f64, _context: &Context, _gl: &mut Gl) {}
+    fn render(&self, _context: &Context, _args: RenderArgs) {}
 
     /// Update the physical state of the game.
     ///
     /// `dt` is the delta time from last update in seconds.
-    fn update(&mut self, _dt: f64, _asset_store: &mut AssetStore) {}
+    fn update(&mut self, _asset_store: &mut AssetStore, _args: UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
     fn load(&mut self, _asset_store: &mut AssetStore) {}
@@ -43,8 +48,8 @@ pub trait Game {
     /// This can be overridden to handle key pressed events.
     fn key_press(
         &mut self,
-        _key: keyboard::Key,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        _args: KeyPressArgs
     ) {}
 
     /// User released a key.
@@ -52,38 +57,36 @@ pub trait Game {
     /// This can be overridden to handle key released events.
     fn key_release(
         &mut self,
-        _key: keyboard::Key,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        _args: KeyReleaseArgs
     ) {}
 
     /// Pressed a mouse button.
     fn mouse_press(
         &mut self,
-        _button: mouse::Button,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        _args: MousePressArgs
     ) {}
 
     /// Released a mouse button.
     fn mouse_release(
         &mut self,
-        _button: mouse::Button,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        _args: MouseReleaseArgs
     ) {}
 
     /// Moved mouse cursor.
     fn mouse_move(
         &mut self,
-        _x: f64,
-        _y: f64,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        _args: MouseMoveArgs
     ) {}
 
     /// Moved mouse relative, not bounded by cursor.
     fn mouse_relative_move(
         &mut self,
-        _dx: f64,
-        _dy: f64,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        _args: MouseRelativeMoveArgs
     ) {}
 
     /// Sets up viewport.
@@ -135,21 +138,17 @@ pub trait Game {
                 Some(e) => match e {
 
 Render(args) => self.render(
-    args.ext_dt,
-    &Context::abs(args.width as f64, args.height as f64),
-    args.gl
-),
-Update(args) => self.update(args.dt, asset_store),
-KeyPress(args) => self.key_press(args.key, asset_store),
-KeyRelease(args) => self.key_release(args.key, asset_store),
-MousePress(args) => self.mouse_press(args.button, asset_store),
-MouseRelease(args) => self.mouse_release(args.button, asset_store),
-MouseMove(args) => self.mouse_move(args.x, args.y, asset_store),
-MouseRelativeMove(args) => self.mouse_relative_move(
-    args.dx, 
-    args.dy, 
-    asset_store
-),
+    &Context::abs(
+        args.width as f64, 
+        args.height as f64
+    ), args),
+Update(args) => self.update(asset_store, args),
+KeyPress(args) => self.key_press(asset_store, args),
+KeyRelease(args) => self.key_release(asset_store, args),
+MousePress(args) => self.mouse_press(asset_store, args),
+MouseRelease(args) => self.mouse_release(asset_store, args),
+MouseMove(args) => self.mouse_move(asset_store, args),
+MouseRelativeMove(args) => self.mouse_relative_move(asset_store, args),
 
                 }
             }

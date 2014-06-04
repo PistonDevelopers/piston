@@ -10,7 +10,7 @@ use piston::{
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
-    Gl,
+    RenderArgs,
     Texture,
 };
 
@@ -33,8 +33,8 @@ impl Game for App {
         self.image = Some(Texture::from_path(&image).unwrap());
     }
 
-    fn render(&self, _ext_dt: f64, c: &Context, gl: &mut Gl) {
-        c.image(self.image.as_ref().unwrap()).draw(gl);
+    fn render(&self, c: &Context, args: RenderArgs) {
+        c.image(self.image.as_ref().unwrap()).draw(args.gl);
     }
 }
 
