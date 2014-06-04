@@ -4,15 +4,22 @@
 use graphics::*;
 use gl;
 use gl::types::GLint;
-use time;
-use std::io::timer::sleep;
 
 // Local crate.
 use Gl = gl_back_end::Gl;
 use GameWindow = game_window::GameWindow;
+use GameIteratorSettings;
 use AssetStore;
+use GameIterator;
+use KeyPress;
+use KeyRelease;
+use MouseMove;
+use MouseRelativeMove;
+use MousePress;
+use MouseRelease;
+use Render;
+use Update;
 use keyboard;
-use event;
 use mouse;
 
 /// Implemented by game applications.
@@ -106,43 +113,6 @@ pub trait Game {
         game_window.swap_buffers()
     }
 
-    /// Handles events using current game window settings.
-    ///
-    /// This can be overriden to do custom event handling.
-    fn handle_events<W: GameWindow>(
-        &mut self,
-        game_window: &mut W,
-        asset_store: &mut AssetStore
-    ) {
-        loop {
-            match game_window.poll_event() {
-                event::KeyPressed(keycode) => {
-                    self.key_press(keycode, asset_store)
-                },
-                event::KeyReleased(keycode) => {
-                    self.key_release(keycode, asset_store)
-                },
-                event::MouseButtonPressed(mouse_button) => {
-                    self.mouse_press(mouse_button, asset_store)
-                },
-                event::MouseButtonReleased(mouse_button) => {
-                    self.mouse_release(mouse_button, asset_store)
-                },
-                event::MouseMoved(x, y, relative_move) => {
-                    self.mouse_move(x, y, asset_store);
-                    match relative_move {
-                        Some((dx, dy)) =>
-                            self.mouse_relative_move(dx, dy, asset_store),
-                        None => {},
-                    }
-                },
-                event::NoEvent => {
-                    break
-                },
-            }
-        }
-    }
-
     /// Executes a game loop.
     ///
     /// The loop continues until `should_close` returns true.
@@ -151,78 +121,38 @@ pub trait Game {
         game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
-        use graphics::{Clear, AddColor};
-
         self.load(asset_store);
-        let mut gl = Gl::new();
-        let context = Context::new();
-        let bg = game_window.get_settings().background_color;
-        let bg = context.rgba(bg[0], bg[1], bg[2], bg[3]);
-        let updates_per_second: u64 = 120;
-        let max_frames_per_second: u64 = 60;
 
-        // You can make this lower if needed
-        let min_updates_per_frame: u64 = updates_per_second / max_frames_per_second;
+        let mut game_iter = GameIterator::new(
+            game_window,
+            &GameIteratorSettings {
+                updates_per_second: 120,
+                max_frames_per_second: 60
+            });
+        loop {
+            match game_iter.next() {
+                None => { break }
+                Some(e) => match e {
 
-        let billion: u64 = 1_000_000_000;
-        let dt: f64 = 1.0 / updates_per_second as f64;
-        let update_time_in_ns: u64 = billion / updates_per_second;
+Render(args) => self.render(
+    args.ext_dt,
+    &Context::abs(args.width as f64, args.height as f64),
+    args.gl
+),
+Update(args) => self.update(args.dt, asset_store),
+KeyPress(args) => self.key_press(args.key, asset_store),
+KeyRelease(args) => self.key_release(args.key, asset_store),
+MousePress(args) => self.mouse_press(args.button, asset_store),
+MouseRelease(args) => self.mouse_release(args.button, asset_store),
+MouseMove(args) => self.mouse_move(args.x, args.y, asset_store),
+MouseRelativeMove(args) => self.mouse_relative_move(
+    args.dx, 
+    args.dy, 
+    asset_store
+),
 
-        let start = time::precise_time_ns();
-        let min_ns_per_frame = billion / max_frames_per_second;
-        let mut last_update = start;
-
-        while !self.should_close(game_window) {
-
-            let start_render = time::precise_time_ns();
-
-            // Rendering code
-            let (w, h) = game_window.get_size();
-            if w != 0 && h != 0 {
-                self.viewport(game_window);
-                bg.clear(&mut gl);
-                // Extrapolate time forward to allow smooth motion.
-                // 'now' is always bigger than 'last_update'.
-                let ext_dt = (start_render - last_update) as f64 / billion as f64;
-                self.render(
-                    ext_dt, 
-                    &context
-                        .trans(-1.0, 1.0)
-                        .scale(2.0 / w as f64, -2.0 / h as f64)
-                        .store_view(), 
-                    &mut gl
-                        );
-                self.swap_buffers(game_window);
+                }
             }
-
-            let next_render = start_render + min_ns_per_frame;
-
-            // Update gamestate
-            let mut updated = 0;
-
-            while // If we haven't reached the required number of updates yet
-                  ( updated < min_updates_per_frame ||         
-                    // Or we have the time to update further
-                    time::precise_time_ns() < next_render ) && 
-                  //And we haven't already progressed time to far  
-                  last_update + update_time_in_ns < next_render {
-
-                self.handle_events(game_window, asset_store);
-                self.update(dt, asset_store);
-
-                updated += 1;
-                last_update += update_time_in_ns;
-            }
-
-            // Wait if possible
-
-            let t = (next_render - time::precise_time_ns() ) / 1_000_000;
-            if t > 1 && t < 1000000 { // The second half just checks if it overflowed,
-                                      // which tells us that t should have been negative 
-                                      // and we are running slow and shouldn't sleep.
-                sleep( t );
-            }
-
         }
     }
 }
