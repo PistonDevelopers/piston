@@ -1,9 +1,7 @@
 //! Game loop.
 
 // External crates.
-use graphics::*;
-use gl;
-use gl::types::GLint;
+use graphics::Context;
 
 // Local crate.
 use GameWindow = game_window::GameWindow;
@@ -65,33 +63,6 @@ pub trait Game {
     /// Moved mouse relative, not bounded by cursor.
     fn mouse_relative_move(&mut self, _args: MouseRelativeMoveArgs) {}
 
-    /// Sets up viewport.
-    ///
-    /// A viewport is the region of the window where graphics is rendered.
-    #[inline(always)]
-    fn viewport<W: GameWindow>(&self, game_window: &W) {
-        let (w, h) = game_window.get_size();
-        gl::Viewport(0, 0, w as GLint, h as GLint);
-    }
-
-    /// Whether the window should be closed.
-    ///
-    /// When this is `true` the application shuts down.
-    /// This can be overridden to emulate a user closing the window.
-    /// One can also override this method to prevent window from closing.
-    fn should_close<W: GameWindow>(&self, game_window: &W) -> bool {
-        game_window.should_close()
-    }
-
-    /// Swaps the front buffer with the back buffer.
-    ///
-    /// When called, This shows the next frame.
-    /// The graphics is rendered to the back buffer.
-    /// The front buffer is displayed on the screen.
-    fn swap_buffers<W: GameWindow>(&self, game_window: &W) {
-        game_window.swap_buffers()
-    }
-
     /// Executes a game loop.
     ///
     /// The loop continues until `should_close` returns true.
@@ -112,19 +83,20 @@ pub trait Game {
             match game_iter.next() {
                 None => { break }
                 Some(e) => match e {
-
-Render(args) => self.render(
-    &Context::abs(
-        args.width as f64, 
-        args.height as f64
-    ), args),
-Update(args) => self.update(args),
-KeyPress(args) => self.key_press(args),
-KeyRelease(args) => self.key_release(args),
-MousePress(args) => self.mouse_press(args),
-MouseRelease(args) => self.mouse_release(args),
-MouseMove(args) => self.mouse_move(args),
-MouseRelativeMove(args) => self.mouse_relative_move(args),
+                    Render(args) => self.render(
+                        &Context::abs(
+                            args.width as f64, 
+                            args.height as f64
+                        ), 
+                        args
+                    ),
+                    Update(args) => self.update(args),
+                    KeyPress(args) => self.key_press(args),
+                    KeyRelease(args) => self.key_release(args),
+                    MousePress(args) => self.mouse_press(args),
+                    MouseRelease(args) => self.mouse_release(args),
+                    MouseMove(args) => self.mouse_move(args),
+                    MouseRelativeMove(args) => self.mouse_relative_move(args),
 
                 }
             }
