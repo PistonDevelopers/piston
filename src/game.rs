@@ -38,7 +38,7 @@ pub trait Game {
     /// Update the physical state of the game.
     ///
     /// `dt` is the delta time from last update in seconds.
-    fn update(&mut self, _asset_store: &mut AssetStore, _args: UpdateArgs) {}
+    fn update(&mut self, _args: UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
     fn load(&mut self, _asset_store: &mut AssetStore) {}
@@ -46,48 +46,24 @@ pub trait Game {
     /// User pressed a key.
     ///
     /// This can be overridden to handle key pressed events.
-    fn key_press(
-        &mut self,
-        _asset_store: &mut AssetStore,
-        _args: KeyPressArgs
-    ) {}
+    fn key_press(&mut self, _args: KeyPressArgs) {}
 
     /// User released a key.
     ///
     /// This can be overridden to handle key released events.
-    fn key_release(
-        &mut self,
-        _asset_store: &mut AssetStore,
-        _args: KeyReleaseArgs
-    ) {}
+    fn key_release(&mut self, _args: KeyReleaseArgs) {}
 
     /// Pressed a mouse button.
-    fn mouse_press(
-        &mut self,
-        _asset_store: &mut AssetStore,
-        _args: MousePressArgs
-    ) {}
+    fn mouse_press(&mut self, _args: MousePressArgs) {}
 
     /// Released a mouse button.
-    fn mouse_release(
-        &mut self,
-        _asset_store: &mut AssetStore,
-        _args: MouseReleaseArgs
-    ) {}
+    fn mouse_release(&mut self, _args: MouseReleaseArgs) {}
 
     /// Moved mouse cursor.
-    fn mouse_move(
-        &mut self,
-        _asset_store: &mut AssetStore,
-        _args: MouseMoveArgs
-    ) {}
+    fn mouse_move(&mut self, _args: MouseMoveArgs) {}
 
     /// Moved mouse relative, not bounded by cursor.
-    fn mouse_relative_move(
-        &mut self,
-        _asset_store: &mut AssetStore,
-        _args: MouseRelativeMoveArgs
-    ) {}
+    fn mouse_relative_move(&mut self, _args: MouseRelativeMoveArgs) {}
 
     /// Sets up viewport.
     ///
@@ -142,13 +118,13 @@ Render(args) => self.render(
         args.width as f64, 
         args.height as f64
     ), args),
-Update(args) => self.update(asset_store, args),
-KeyPress(args) => self.key_press(asset_store, args),
-KeyRelease(args) => self.key_release(asset_store, args),
-MousePress(args) => self.mouse_press(asset_store, args),
-MouseRelease(args) => self.mouse_release(asset_store, args),
-MouseMove(args) => self.mouse_move(asset_store, args),
-MouseRelativeMove(args) => self.mouse_relative_move(asset_store, args),
+Update(args) => self.update(args),
+KeyPress(args) => self.key_press(args),
+KeyRelease(args) => self.key_release(args),
+MousePress(args) => self.mouse_press(args),
+MouseRelease(args) => self.mouse_release(args),
+MouseMove(args) => self.mouse_move(args),
+MouseRelativeMove(args) => self.mouse_relative_move(args),
 
                 }
             }
