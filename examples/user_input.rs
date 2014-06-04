@@ -9,8 +9,10 @@ use piston::{
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
-    keyboard,
-    mouse,
+    KeyPressArgs,
+    KeyReleaseArgs,
+    MousePressArgs,
+    MouseReleaseArgs,
 };
 
 pub struct App;
@@ -25,34 +27,34 @@ impl App {
 impl Game for App {
     fn key_press(
         &mut self,
-        key: keyboard::Key,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        args: KeyPressArgs
     ) {
-        println!("Pressed keyboard key '{}'", key);
+        println!("Pressed keyboard key '{}'", args.key);
     }
 
     fn key_release(
         &mut self,
-        key: keyboard::Key,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        args: KeyReleaseArgs
     ) {
-        println!("Released keyboard key '{}'", key);
+        println!("Released keyboard key '{}'", args.key);
     }
 
     fn mouse_press(
         &mut self,
-        button: mouse::Button,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        args: MousePressArgs
     ) {
-        println!("Pressed mouse button '{}'", button);
+        println!("Pressed mouse button '{}'", args.button);
     }
 
     fn mouse_release(
         &mut self,
-        button: mouse::Button,
-        _asset_store: &mut AssetStore
+        _asset_store: &mut AssetStore,
+        args: MouseReleaseArgs
     ) {
-        println!("Released mouse button '{}'", button);
+        println!("Released mouse button '{}'", args.button);
     }
 }
 
