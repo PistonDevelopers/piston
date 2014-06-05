@@ -14,6 +14,7 @@ extern crate collections;
 extern crate gl;
 extern crate glfw;
 extern crate sdl2;
+extern crate sdl2_mixer;
 extern crate png;
 extern crate libc;
 extern crate debug;
@@ -49,6 +50,13 @@ pub use Gl = gl_back_end::Gl;
 pub use AssetStore = asset_store::AssetStore;
 pub use Texture = texture::Texture;
 
+pub use Music = music::Music;
+pub use Sound = sound::Sound;
+pub use AudioBackEnd = audio_back_end::AudioBackEnd;
+pub use AudioSDL2 = sdl2_audio_back_end::AudioSDL2;
+pub use MusicSDL2 = sdl2_audio_back_end::MusicSDL2;
+pub use SoundSDL2 = sdl2_audio_back_end::SoundSDL2;
+
 pub mod shader_utils;
 pub mod game_window;
 pub mod keyboard;
@@ -63,4 +71,9 @@ mod game_window_settings;
 mod gl_back_end;
 mod asset_store;
 mod texture;
+
+mod music;
+mod sound;
+mod audio_back_end;
+mod sdl2_audio_back_end;
 

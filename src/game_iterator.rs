@@ -6,6 +6,7 @@ use gl::types::GLint;
 use {
     Gl,
     GameWindow,
+    AudioSDL2,
 };
 use keyboard;
 use mouse;
@@ -24,9 +25,11 @@ pub struct RenderArgs<'a> {
 }
 
 /// Update argument.
-pub struct UpdateArgs {
+pub struct UpdateArgs<'a> {
     /// Delta time in seconds.
     pub dt: f64,
+    /// SDL2 audio back-end
+    pub audio: &'a mut AudioSDL2,
 }
 
 /// Key press arguments.
@@ -74,7 +77,7 @@ pub enum GameEvent<'a> {
     /// Render graphics.
     Render(RenderArgs<'a>),
     /// Update physical state of the game.
-    Update(UpdateArgs),
+    Update(UpdateArgs<'a>),
     /// Pressed a keyboard key.
     KeyPress(KeyPressArgs),
     /// Released a keyboard key.
@@ -112,6 +115,7 @@ pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
     state: GameIteratorState,
     gl: Gl,
+    audio: AudioSDL2,
     bg_color: [f32, ..4],
     last_update: u64,
     update_time_in_ns: u64,
@@ -137,6 +141,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             game_window: game_window,
             state: RenderState,
             gl: Gl::new(),
+            audio: AudioSDL2::new(),
             last_update: start,
             update_time_in_ns: billion / updates_per_second,
             dt: 1.0 / updates_per_second as f64,
@@ -172,7 +177,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                     return Some(Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             // 'start_render' is always bigger than 'last_update'.
-                            ext_dt: (self.start_render - self.last_update) as f64 / billion as f64, 
+                            ext_dt: (self.start_render - self.last_update) as f64 / billion as f64,
                             gl: &mut self.gl,
                             width: w,
                             height: h,
@@ -203,7 +208,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                     self.state = HandleEventsState;
                     return self.next();
                 }
-            
+
                 // Wait if possible.
                 // Convert to ms because that is what the sleep function takes.
                 let t = (self.next_render - time::precise_time_ns() ) / 1_000_000;
@@ -268,6 +273,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 self.last_update += self.update_time_in_ns;
                 return Some(Update(UpdateArgs{
                     dt: self.dt,
+                    audio: &mut self.audio,
                 }));
             },
         };
@@ -289,11 +295,11 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 // 'now' is always bigger than 'last_update'.
                 let ext_dt = (start_render - last_update) as f64 / billion as f64;
                 self.render(
-                    ext_dt, 
+                    ext_dt,
                     &context
                         .trans(-1.0, 1.0)
                         .scale(2.0 / w as f64, -2.0 / h as f64)
-                        .store_view(), 
+                        .store_view(),
                     &mut gl
                         );
                 self.swap_buffers(game_window);
@@ -305,10 +311,10 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             let mut updated = 0;
 
             while // If we haven't reached the required number of updates yet
-                  ( updated < min_updates_per_frame ||         
+                  ( updated < min_updates_per_frame ||
                     // Or we have the time to update further
-                    time::precise_time_ns() < next_render ) && 
-                  //And we haven't already progressed time to far  
+                    time::precise_time_ns() < next_render ) &&
+                  //And we haven't already progressed time to far
                   last_update + update_time_in_ns < next_render {
 
                 self.handle_events(game_window, asset_store);
@@ -322,7 +328,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
 
             let t = (next_render - time::precise_time_ns() ) / 1_000_000;
             if t > 1 && t < 1000000 { // The second half just checks if it overflowed,
-                                      // which tells us that t should have been negative 
+                                      // which tells us that t should have been negative
                                       // and we are running slow and shouldn't sleep.
                 sleep( t );
             }
