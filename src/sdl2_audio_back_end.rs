@@ -22,9 +22,9 @@ impl SoundSDL2 {
                     loops: 1,
                 })
             },
-            Err(_) => {
-                Err(format!("Could not load '{}'", path.filename_str().unwrap()))
-            }
+            Err(msg) => {
+                Err(format!("Could not load '{}': {}", path.filename_str().unwrap(), msg))
+            },
         }
     }
 }
@@ -33,7 +33,27 @@ impl Sound for SoundSDL2 {
 }
 
 /// Wraps SDL2_mixer music data.
-pub struct MusicSDL2;
+pub struct MusicSDL2 {
+    music: mix::Music,
+    loops: int,
+}
+
+impl MusicSDL2 {
+    /// Loads music by relative file name to the asset root.
+    pub fn from_path(path: &Path) -> Result<MusicSDL2, String> {
+        match mix::Music::from_file(path) {
+            Ok(music) => {
+                Ok(MusicSDL2 {
+                    music: music,
+                    loops: 1,
+                })
+            },
+            Err(msg) => {
+                Err(format!("Could not load '{}': {}", path.filename_str().unwrap(), msg))
+            },
+        }
+    }
+}
 
 impl Music for MusicSDL2 {
 }
@@ -65,6 +85,15 @@ impl Drop for AudioSDL2 {
 impl AudioBackEnd<MusicSDL2, SoundSDL2> for AudioSDL2 {
     fn play_sound(&self, sound: &SoundSDL2) {
         match mix::Channel::all().play(&sound.chunk, sound.loops) {
+            Err(msg) => {
+                println!("Warning: {}", msg);
+            },
+            _ => {}
+        }
+    }
+
+    fn play_music(&self, music: &MusicSDL2) {
+        match music.music.play(music.loops) {
             Err(msg) => {
                 println!("Warning: {}", msg);
             },
