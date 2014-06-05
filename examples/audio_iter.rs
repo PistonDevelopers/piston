@@ -18,6 +18,7 @@ use piston::{
     KeyPress,
     AudioBackEnd,
     SoundSDL2,
+    MusicSDL2,
 };
 
 #[start]
@@ -29,7 +30,7 @@ fn start(argc: int, argv: **u8) -> int {
 fn main() {
     let mut window: GameWindowSDL2 = GameWindow::new(
         GameWindowSettings {
-            title: "Image".to_string(),
+            title: "Audio".to_string(),
             size: [300, 300],
             fullscreen: false,
             exit_on_esc: true,
@@ -48,7 +49,11 @@ fn main() {
     let sound = asset_store.path("beeep.ogg").unwrap();
     let sound = SoundSDL2::from_path(&sound).unwrap();
 
-    let mut is_play_sound = false;
+    let music = asset_store.path("background-music.ogg").unwrap();
+    let music = MusicSDL2::from_path(&music).unwrap();
+
+    let mut play_sound = false;
+    let mut is_playing_background_music = false;
 
     loop {
         match game_iter.next() {
@@ -56,13 +61,18 @@ fn main() {
             Some(e) => match e {
                 KeyPress(args) => {
                     if args.key == keyboard::Space {
-                        is_play_sound = true;
+                        play_sound = true;
                     }
                 },
                 Update(args) => {
-                    if is_play_sound {
+                    if play_sound {
                         args.audio.play_sound(&sound);
-                        is_play_sound = false;
+                        play_sound = false;
+                    }
+
+                    if !is_playing_background_music {
+                        args.audio.play_music(&music);
+                        is_playing_background_music = true;
                     }
                 },
                 _ => {}
@@ -70,5 +80,4 @@ fn main() {
         }
     }
 }
-
 
