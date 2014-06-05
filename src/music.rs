@@ -1,6 +1,4 @@
 
-#![allow(missing_doc)]
-
 /// Implemented by all the music.
 ///
 /// Music is for long music like background music.
