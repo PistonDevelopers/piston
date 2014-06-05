@@ -1,12 +1,12 @@
 
-#![allow(missing_doc)]
-
 use {
     Music,
     Sound,
 };
 
+/// Implemented by all audio back-ends.
 pub trait AudioBackEnd<M: Music, S: Sound> {
+    /// Play a sound.
     fn play_sound(&self, sound: &S);
     /*
     fn set_sound_volumn(&mut self, sound: &S, volumn: f64);
