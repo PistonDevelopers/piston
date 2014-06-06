@@ -41,6 +41,8 @@ Before you can start coding, you need to build Piston:
 2. Clone https://github.com/PistonDevelopers/piston-workspace and follow the instructions to build Piston
 4. Copy symlinks from the 'piston-symlinks' folder in piston-workspace to your project's 'target/cpu-vendor-os/lib' folder
 
+If you don't have the 'target' folder, use the command `make target-dir`.
+
 You are now ready for making a game in Rust!
 
 ## Piston documentation
