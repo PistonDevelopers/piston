@@ -54,7 +54,7 @@ Online version of the documentation: http://pistondevelopers.github.io/docs/pist
 The README.md in https://github.com/PistonDevelopers/piston-workspace tells you how to generate documentation.  
 Follow these instructions to generate the documentation for all the projects in one go.  
 
-### How to build the examples
+## How to build the examples
 
 1. Open the Terminal and navigate to the 'piston' project.
 2. Type `make examples`
