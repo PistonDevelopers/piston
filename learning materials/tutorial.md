@@ -54,59 +54,9 @@ Online version of the documentation: http://pistondevelopers.github.io/docs/pist
 The README.md in https://github.com/PistonDevelopers/piston-workspace tells you how to generate documentation.  
 Follow these instructions to generate the documentation for all the projects in one go.  
 
-## The `AssetStore` object
+### How to build the examples
 
-The `AssetStore` object is used to access files in your game assets folder.  
-By default it uses the same directory as the game.  
+1. Open the Terminal and navigate to the 'piston' project.
+2. Type `make examples`
 
-Example:
-
-```Rust
-use piston::AssetStore; // import the `AssetStore` object
-
-fn create_asset_store() -> AssetStore {
-    AssetStore::from_folder("assets")
-}
-```
-
-### Loading images
-
-The first step is to get a path to the file in the assets folder.  
-The second step is to construct a `Texture` object from the path.
-
-Example:
-
-```Rust
-use piston::{
-    AssetStore, // import the `AssetStore` object.
-    Texture; // import the `Texture` object.
-};
-
-fn load_rust_logo(asset_store: &AssetStore) -> Texture {
-    // Get the path to the file "rust-logo.png", fail if not succeeding.
-    let path = asset_store.path("rust-logo.png").unwrap();
-    // Load the texture from the path.
-    Texture::from_path(&path).unwrap()
-}
-```
-
-## Rendering
-
-### Drawing rectangles and ellipses
-
-### Drawing lines
-
-### Drawing images
-
-### Transformations
-
-### Drawing with OpenGL
-
-## User input
-
-### Handling keyboard events
-
-### Handling mouse events
-
-## What's next?
-
+If you use tab out of habit, you will get `make examples/` which will not work.
