@@ -12,6 +12,7 @@ A user friendly game engine written in Rust
 | Dependency | Online Docs |
 |---------|------|------------|
 | [rust-graphics](https://github.com/PistonDevelopers/rust-graphics) | [rust-graphics docs](http://pistondevelopers.github.io/docs/rust-graphics/graphics) |
+| [rust-image](https://github.com/PistonDevelopers/rust-image) | [rust-image docs](http://www.piston.rs/docs/rust-image/image/)
 | [rust-png](https://github.com/PistonDevelopers/rust-png) | [rust-png docs](http://pistondevelopers.github.io/docs/rust-png/png) |
 | [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://pistondevelopers.github.io/docs/rust-sdl2/sdl2/) |
 | [rust-sdl2_mixer](https://github.com/andelf/rust-sdl2_mixer) | [rust-sdl2_mixer docs](http://pistondevelopers.github.io/docs/rust-sdl2_mixer/sdl2_mixer/) |
