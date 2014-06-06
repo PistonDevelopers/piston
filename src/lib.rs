@@ -15,7 +15,7 @@ extern crate gl;
 extern crate glfw;
 extern crate sdl2;
 extern crate sdl2_mixer;
-extern crate png;
+extern crate image;
 extern crate libc;
 extern crate debug;
 
@@ -76,4 +76,3 @@ mod music;
 mod sound;
 mod audio_back_end;
 mod sdl2_audio_back_end;
-

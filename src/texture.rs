@@ -1,10 +1,14 @@
-use png;
+use std::io;
+
 use gl;
 use gl::types::GLuint;
 use libc::c_void;
 use graphics::{
     Image,
 };
+
+use image;
+use image::ColorType;
 
 /// Wraps OpenGL texture data.
 /// The texture gets deleted when running out of scope.
@@ -30,18 +34,22 @@ impl Texture {
     pub fn get_id(&self) -> GLuint {
         self.id
     }
-    
+
     /// Loads image by relative file name to the asset root.
     pub fn from_path(path: &Path) -> Result<Texture, String> {
-        let img = match png::load_png(path) {
+        let fin = File::open(path).unwrap();
+
+        let img = match image::load(fin, image::PNG) {
             Ok(img) => img,
-            Err(msg) => return Err(format!("Could not load '{}': {}", path.filename_str().unwrap(), msg)),
+            Err(e)  => return Err(format!("Could not load '{}': {}", path.filename_str().unwrap(), e)),
         };
 
-        match img.color_type {
-            png::RGBA8 => {},
-            t => fail!("Unsupported color type {:?} in png", t),
+        match img.colortype() {
+            image::RGBA(8) => {},
+            c              => fail!("Unsupported color type {} in png", c),
         };
+
+        let (width, height) = img.dimensions();
 
         let mut id: GLuint = 0;
         unsafe {
@@ -53,16 +61,16 @@ impl Texture {
                 gl::TEXTURE_2D,
                 0,
                 gl::RGBA as i32,
-                img.width as i32,
-                img.height as i32,
+                width as i32,
+                height as i32,
                 0,
                 gl::RGBA,
                 gl::UNSIGNED_BYTE,
-                img.pixels.as_ptr() as *c_void
+                img.raw_pixels().as_ptr() as *c_void
             );
         }
-        
-        Ok(Texture::new(id, img.width, img.height))
+
+        Ok(Texture::new(id, width, height))
     }
 }
 
