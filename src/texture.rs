@@ -1,14 +1,12 @@
-use std::io;
+use std::io::fs::File;
 
 use gl;
 use gl::types::GLuint;
 use libc::c_void;
-use graphics::{
-    Image,
-};
+use graphics;
 
 use image;
-use image::ColorType;
+use image::Image;
 
 /// Wraps OpenGL texture data.
 /// The texture gets deleted when running out of scope.
@@ -39,7 +37,7 @@ impl Texture {
     pub fn from_path(path: &Path) -> Result<Texture, String> {
         let fin = File::open(path).unwrap();
 
-        let img = match image::load(fin, image::PNG) {
+        let img = match Image::load(fin, image::PNG) {
             Ok(img) => img,
             Err(e)  => return Err(format!("Could not load '{}': {}", path.filename_str().unwrap(), e)),
         };
@@ -82,7 +80,7 @@ impl Drop for Texture {
     }
 }
 
-impl Image for Texture {
+impl graphics::Image for Texture {
     fn get_size(&self) -> (u32, u32) {
         (self.width, self.height)
     }
