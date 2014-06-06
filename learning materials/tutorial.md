@@ -49,6 +49,8 @@ You are now ready for making a game in Rust!
 
 Online version of the documentation: http://pistondevelopers.github.io/docs/piston/piston/
 
+There are links to online version of the dependencies documentation in [README](https://github.com/PistonDevelopers/piston/blob/master/README.md)
+
 ### How to generate documentation
 
 The README.md in https://github.com/PistonDevelopers/piston-workspace tells you how to generate documentation.  
