@@ -1,25 +1,28 @@
 target/x86_64-apple-darwin/lib/libgl-8febb75e-0.1.rlib
-b59620fa0a11228d9330cd053809a32e8d3c737e
+d1bcf9ad1f1d6b9ba182f31c44f30a3ee98abe59
 origin:
-https://github.com/bjz/gl-rs
+https://github.com/bvssvni/gl-rs.git
 upstream:
+https://github.com/bjz/gl-rs
 available in remote branches:
   origin/HEAD -> origin/master
   origin/master
+  pistondevelopers/master
 
 target/x86_64-apple-darwin/lib/libglfw-38369174-0.1.rlib
-b3584ee881717e83998060f07308a88667714988
+44a3c953d39a14015d4e3dfcf2a4ee982e3ead31
 origin:
 https://github.com/bvssvni/glfw-rs.git
 upstream:
 https://github.com/bjz/glfw-rs.git
 available in remote branches:
+  origin/HEAD -> origin/master
   origin/master
-  upstream/HEAD -> upstream/master
+  pistondevelopers/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libgraphics-587c2edd-0.0.rlib
-8d9f88a8b03723929aaa562fd112526894384b32
+1bf01f076e1619aeaa9277223ac3c796ab7e25d7
 origin:
 https://github.com/bvssvni/rust-graphics.git
 upstream:
@@ -29,19 +32,19 @@ available in remote branches:
   origin/master
   upstream/master
 
-target/x86_64-apple-darwin/lib/libhgl-1a7d2676-0.0.1.rlib
-3b4b1a45f0a1ee98eb4a54d14789b27fe3548750
+target/x86_64-apple-darwin/lib/libimage-42438c15-0.0.rlib
+955aa609d77920479a649ac3d8e9baa7df951930
 origin:
-https://github.com/bvssvni/hgl-rs.git
+https://github.com/bvssvni/rust-image.git
 upstream:
-https://github.com/cmr/hgl-rs
+https://github.com/PistonDevelopers/rust-image.git
 available in remote branches:
   origin/HEAD -> origin/master
   origin/master
   upstream/master
 
 target/x86_64-apple-darwin/lib/libpng-1a4a27fd-0.1.rlib
-f52290bdbc1fed4d28f3874407ea733387389d57
+c9d53406f24ca0f920472a9c7bbf36c6b1f45913
 origin:
 https://github.com/bvssvni/rust-png.git
 upstream:
@@ -49,16 +52,23 @@ https://github.com/PistonDevelopers/rust-png.git
 available in remote branches:
   origin/HEAD -> origin/master
   origin/master
-  upstream/master
 
 target/x86_64-apple-darwin/lib/libsdl2-79c1f430-0.0.1.rlib
-a23ba0dd489fc239e4f8aacc67f6ff06c6c5eb46
+629def9c247f707b0d6cd2638247580f1d6779d6
 origin:
-https://github.com/bvssvni/rust-sdl2
+https://github.com/bvssvni/rust-sdl2.git
 upstream:
 https://github.com/AngryLawyer/rust-sdl2.git
 available in remote branches:
-  origin/master
-  upstream/HEAD -> upstream/master
+  pistondevelopers/master
   upstream/master
+
+target/x86_64-apple-darwin/lib/libsdl2_mixer-1aa14961-0.1.rlib
+a3557fd7d138dcd79c876846ae7d3db31cd030e5
+origin:
+https://github.com/bvssvni/rust-sdl2_mixer.git
+upstream:
+available in remote branches:
+  origin/HEAD -> origin/master
+  origin/master
 
