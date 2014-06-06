@@ -62,3 +62,10 @@ Follow these instructions to generate the documentation for all the projects in 
 2. Type `make examples`
 
 If you use tab out of habit, you will get `make examples/` which will not work.
+
+## Rendering with OpenGL
+
+OpenGL is supported through [hgl-rs](https://github.com/cmr/hgl-rs/) which also comes with Piston-Workspace.
+
+When switching to a custom shader, use `args.gl.use_program(program)`.  
+This makes the 2D back-end aware that the current shader has changed.  
