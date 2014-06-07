@@ -3,6 +3,8 @@ Piston
 
 A user friendly game engine written in Rust
 
+[Tutorial](https://github.com/PistonDevelopers/piston/blob/master/learning%20materials/tutorial.md)
+
 [List of games made with Piston](https://github.com/PistonDevelopers/piston/issues/64)
 
 [Piston online docs](http://pistondevelopers.github.io/docs/piston/piston)  
