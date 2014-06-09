@@ -1,7 +1,7 @@
 //! Create window.
 
 // External crates.
-use collections::deque::Deque;
+use collections::Deque;
 use collections::ringbuf::RingBuf;
 use glfw;
 use gl;
