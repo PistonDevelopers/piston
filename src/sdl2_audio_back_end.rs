@@ -76,12 +76,6 @@ impl AudioSDL2 {
     }
 }
 
-impl Drop for AudioSDL2 {
-    fn drop(&mut self) {
-        mix::quit();
-    }
-}
-
 impl AudioBackEnd<MusicSDL2, SoundSDL2> for AudioSDL2 {
     fn play_sound(&self, sound: &SoundSDL2) {
         match mix::Channel::all().play(&sound.chunk, sound.loops) {
