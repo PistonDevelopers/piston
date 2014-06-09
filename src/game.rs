@@ -71,23 +71,24 @@ pub trait Game {
         game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
-        self.load(asset_store);
-
         let mut game_iter = GameIterator::new(
             game_window,
             &GameIteratorSettings {
                 updates_per_second: 120,
                 max_frames_per_second: 60
             });
+
+        self.load(asset_store);
+
         loop {
             match game_iter.next() {
                 None => { break }
                 Some(e) => match e {
                     Render(args) => self.render(
                         &Context::abs(
-                            args.width as f64, 
+                            args.width as f64,
                             args.height as f64
-                        ), 
+                        ),
                         args
                     ),
                     Update(args) => self.update(args),
