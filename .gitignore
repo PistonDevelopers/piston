@@ -27,4 +27,6 @@ examples/user_input
 
 examples/image_iter
 
+examples/audio
+
 examples/audio_iter
