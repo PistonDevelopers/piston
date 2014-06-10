@@ -9,7 +9,7 @@ A user friendly game engine written in Rust
 
 [Piston online docs](http://www.piston.rs/docs/piston/piston)
 
-[How to contribute](https://github.com/PistonDevelopers/piston/issues/70)
+[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 
 | Dependency | Online Docs |
 |---------|------|------------|
