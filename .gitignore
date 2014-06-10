@@ -20,3 +20,7 @@
 /.rust/
 rusti.sh
 
+
+examples/expression
+
+examples/test_event_app
