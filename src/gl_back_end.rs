@@ -75,6 +75,14 @@ struct TriListXYRGBA {
     a_v4FillColor: GLuint,
 }
 
+impl Drop for TriListXYRGBA {
+    fn drop(&mut self) {
+        gl::DeleteProgram(self.program);
+        gl::DeleteShader(self.vertex_shader);
+        gl::DeleteShader(self.fragment_shader);
+    }
+}
+
 impl TriListXYRGBA {
     fn new() -> TriListXYRGBA {
         let vertex_shader = match compile_shader(gl::VERTEX_SHADER, VERTEX_SHADER_TRI_LIST_XY_RGBA) {
@@ -114,6 +122,14 @@ struct TriListXYRGBAUV {
     a_v4Position: GLuint,
     a_v4FillColor: GLuint,
     a_v2TexCoord: GLuint,
+}
+
+impl Drop for TriListXYRGBAUV {
+    fn drop(&mut self) {
+        gl::DeleteProgram(self.program);
+        gl::DeleteShader(self.vertex_shader);
+        gl::DeleteShader(self.fragment_shader);
+    }
 }
 
 impl TriListXYRGBAUV {
