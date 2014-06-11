@@ -85,11 +85,17 @@ impl Drop for TriListXYRGBA {
 
 impl TriListXYRGBA {
     fn new() -> TriListXYRGBA {
-        let vertex_shader = match compile_shader(gl::VERTEX_SHADER, VERTEX_SHADER_TRI_LIST_XY_RGBA) {
+        let vertex_shader = match compile_shader(
+            gl::VERTEX_SHADER,                  // shader type
+            VERTEX_SHADER_TRI_LIST_XY_RGBA      // shader source
+        ) {
             Ok(id) => id,
             Err(s) => fail!("compile_shader: {}", s)
         };
-        let fragment_shader = match compile_shader(gl::FRAGMENT_SHADER, FRAGMENT_SHADER_TRI_LIST_XY_RGBA) {
+        let fragment_shader = match compile_shader(
+            gl::FRAGMENT_SHADER,                // shader type
+            FRAGMENT_SHADER_TRI_LIST_XY_RGBA    // shader source
+        ) {
             Ok(id) => id,
             Err(s) => fail!("compile_shader: {}", s)
         };
@@ -100,9 +106,13 @@ impl TriListXYRGBA {
         gl::LinkProgram(program);
         gl::UseProgram(program);
         unsafe {
-            let a_v4Position = "a_v4Position".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
+            let a_v4Position = "a_v4Position".with_c_str(
+                |ptr| gl::GetAttribLocation(program, ptr)
+            );
             gl::EnableVertexAttribArray(a_v4Position as GLuint);
-            let a_v4FillColor = "a_v4FillColor".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
+            let a_v4FillColor = "a_v4FillColor".with_c_str(
+                |ptr| gl::GetAttribLocation(program, ptr)
+            );
             gl::EnableVertexAttribArray(a_v4FillColor as GLuint);
             TriListXYRGBA {
                 vertex_shader: vertex_shader,
@@ -134,11 +144,17 @@ impl Drop for TriListXYRGBAUV {
 
 impl TriListXYRGBAUV {
     fn new() -> TriListXYRGBAUV {
-        let vertex_shader = match compile_shader(gl::VERTEX_SHADER, VERTEX_SHADER_TRI_LIST_XY_RGBA_UV) {
+        let vertex_shader = match compile_shader(
+            gl::VERTEX_SHADER,                  // shader type
+            VERTEX_SHADER_TRI_LIST_XY_RGBA_UV   // shader type
+        ) {
             Ok(id) => id,
             Err(s) => fail!("compile_shader: {}", s)
         };
-        let fragment_shader = match compile_shader(gl::FRAGMENT_SHADER, FRAGMENT_SHADER_TRI_LIST_XY_RGBA_UV) {
+        let fragment_shader = match compile_shader(
+            gl::FRAGMENT_SHADER,                // shader type
+            FRAGMENT_SHADER_TRI_LIST_XY_RGBA_UV // shader source
+        ) {
             Ok(id) => id,
             Err(s) => fail!("compile_shader: {}", s)
         };
@@ -149,11 +165,17 @@ impl TriListXYRGBAUV {
         gl::LinkProgram(program);
         gl::UseProgram(program);
         unsafe {
-            let a_v4Position = "a_v4Position".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
+            let a_v4Position = "a_v4Position".with_c_str(
+                |ptr| gl::GetAttribLocation(program, ptr)
+            );
             gl::EnableVertexAttribArray(a_v4Position as GLuint);
-            let a_v4FillColor = "a_v4FillColor".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
+            let a_v4FillColor = "a_v4FillColor".with_c_str(
+                |ptr| gl::GetAttribLocation(program, ptr)
+            );
             gl::EnableVertexAttribArray(a_v4FillColor as GLuint);
-            let a_v2TexCoord = "a_v2TexCoord".with_c_str(|ptr| gl::GetAttribLocation(program, ptr));
+            let a_v2TexCoord = "a_v2TexCoord".with_c_str(
+                |ptr| gl::GetAttribLocation(program, ptr)
+            );
             gl::EnableVertexAttribArray(a_v4FillColor as GLuint);
             TriListXYRGBAUV {
                 vertex_shader: vertex_shader,
@@ -260,23 +282,66 @@ impl BackEnd<Texture> for Gl {
             self.use_program(shader_program);
         }
         let shader = &self.tri_list_xy_rgba;
+        // xy makes two floats.
         let size_vertices: i32 = 2;
+        let vertices_byte_len = (
+                vertices.len() * mem::size_of::<GLfloat>()
+            ) as GLsizeiptr;
+        let normalize_vertices = gl::FALSE;
+        // The data is tightly packed.
+        let stride_vertices = 0;
         unsafe {
             gl::BindBuffer(
-                gl::ARRAY_BUFFER, self.position_id);
+                gl::ARRAY_BUFFER,   // buffer type
+                self.position_id    // position buffer for xy coordinates
+            );
             gl::BufferData(
-                gl::ARRAY_BUFFER, (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&vertices[0]), gl::DYNAMIC_DRAW);
+                gl::ARRAY_BUFFER, 
+                vertices_byte_len, 
+                mem::transmute(&vertices[0]), 
+                gl::DYNAMIC_DRAW
+            );
             gl::VertexAttribPointer(
-                shader.a_v4Position as GLuint, size_vertices, gl::FLOAT, gl::TRUE, 0, ptr::null());
-
-            gl::BindBuffer(
-                gl::ARRAY_BUFFER, self.fill_color_id);
-            gl::BufferData(
-                gl::ARRAY_BUFFER, (colors.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&colors[0]), gl::DYNAMIC_DRAW);
-            gl::VertexAttribPointer(
-                shader.a_v4FillColor as GLuint, 4, gl::FLOAT, gl::FALSE, 0, ptr::null());
+                shader.a_v4Position as GLuint, 
+                size_vertices,
+                gl::FLOAT,
+                normalize_vertices,
+                stride_vertices, 
+                ptr::null()
+            );
         }
-        // gl::enable(gl::DEPTH_TEST);
+
+        // rgba makes 4 floats.
+        let size_fill_colors = 4;
+        let normalize_colors = gl::FALSE;
+        let fill_colors_byte_len = (
+                colors.len() * mem::size_of::<GLfloat>()
+            ) as GLsizeiptr;
+        // The data is tightly packed.
+        let stride_fill_colors = 0;
+        unsafe {
+            gl::BindBuffer(
+                gl::ARRAY_BUFFER, 
+                self.fill_color_id
+            );
+            gl::BufferData(
+                gl::ARRAY_BUFFER, 
+                fill_colors_byte_len, 
+                mem::transmute(&colors[0]), 
+                gl::DYNAMIC_DRAW
+            );
+            gl::VertexAttribPointer(
+                shader.a_v4FillColor as GLuint, 
+                size_fill_colors, 
+                gl::FLOAT, 
+                normalize_colors, 
+                stride_fill_colors, 
+                ptr::null()
+            );
+        }
+        
+        // Render triangles whether they are facing 
+        // clockwise or counter clockwise.
         gl::CullFace(gl::FRONT_AND_BACK);
 
         let items: i32 = vertices.len() as i32 / size_vertices;
@@ -298,29 +363,91 @@ impl BackEnd<Texture> for Gl {
         }
         let shader = &self.tri_list_xy_rgba_uv;
         let size_vertices: i32 = 2;
+        let normalize_vertices = gl::FALSE;
+        let vertices_byte_len = (
+                vertices.len() * mem::size_of::<GLfloat>()
+            ) as GLsizeiptr;
+        // The data is tightly packed.
+        let stride_vertices = 0;
         unsafe {
             gl::BindBuffer(
                 gl::ARRAY_BUFFER, self.position_id);
             gl::BufferData(
-                gl::ARRAY_BUFFER, (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&vertices[0]), gl::DYNAMIC_DRAW);
+                gl::ARRAY_BUFFER, 
+                vertices_byte_len, 
+                mem::transmute(&vertices[0]), 
+                gl::DYNAMIC_DRAW
+            );
             gl::VertexAttribPointer(
-                shader.a_v4Position as GLuint, size_vertices, gl::FLOAT, gl::TRUE, 0, ptr::null());
-
-            gl::BindBuffer(
-                gl::ARRAY_BUFFER, self.fill_color_id);
-            gl::BufferData(
-                gl::ARRAY_BUFFER, (colors.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&colors[0]), gl::DYNAMIC_DRAW);
-            gl::VertexAttribPointer(
-                shader.a_v4FillColor as GLuint, 4, gl::FLOAT, gl::FALSE, 0, ptr::null());
-
-            gl::BindBuffer(
-                gl::ARRAY_BUFFER, self.tex_coord_id);
-            gl::BufferData(
-                gl::ARRAY_BUFFER, (texture_coords.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, mem::transmute(&texture_coords[0]), gl::DYNAMIC_DRAW);
-            gl::VertexAttribPointer(
-                shader.a_v2TexCoord as GLuint, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+                shader.a_v4Position as GLuint, 
+                size_vertices, 
+                gl::FLOAT, 
+                normalize_vertices,
+                stride_vertices, 
+                ptr::null()
+            );
         }
-        // gl::enable(gl::DEPTH_TEST);
+
+        // rgba makes 4 floats.
+        let size_fill_color = 4;
+        let normalize_fill_color = gl::FALSE;
+        let fill_colors_byte_len = (
+                colors.len() * mem::size_of::<GLfloat>()
+            ) as GLsizeiptr;
+        // The data is tightly packed.
+        let stride_fill_colors = 0;
+        unsafe {
+            gl::BindBuffer(
+                gl::ARRAY_BUFFER, 
+                self.fill_color_id
+            );
+            gl::BufferData(
+                gl::ARRAY_BUFFER, 
+                fill_colors_byte_len, 
+                mem::transmute(&colors[0]), 
+                gl::DYNAMIC_DRAW
+            );
+            gl::VertexAttribPointer(
+                shader.a_v4FillColor as GLuint, 
+                size_fill_color, 
+                gl::FLOAT, 
+                normalize_fill_color,
+                stride_fill_colors, 
+                ptr::null()
+            );
+        }
+
+        // uv makes two floats.
+        let size_tex_coord = 2;
+        let texture_coords_byte_len = (
+                texture_coords.len() * mem::size_of::<GLfloat>()
+            ) as GLsizeiptr;
+        let normalize_texture_coords = gl::FALSE;
+        // The data is tightly packed.
+        let stride_texture_coords = 0;
+        unsafe {
+            gl::BindBuffer(
+                gl::ARRAY_BUFFER, 
+                self.tex_coord_id
+            );
+            gl::BufferData(
+                gl::ARRAY_BUFFER, 
+                texture_coords_byte_len, 
+                mem::transmute(&texture_coords[0]), 
+                gl::DYNAMIC_DRAW
+            );
+            gl::VertexAttribPointer(
+                shader.a_v2TexCoord as GLuint, 
+                size_tex_coord, 
+                gl::FLOAT, 
+                normalize_texture_coords,
+                stride_texture_coords, 
+                ptr::null()
+            );
+        }
+        
+        // Render triangles whether they are facing 
+        // clockwise or counter clockwise.
         gl::CullFace(gl::FRONT_AND_BACK);
 
         let items: i32 = vertices.len() as i32 / size_vertices;
