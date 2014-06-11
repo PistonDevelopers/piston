@@ -1,6 +1,6 @@
 #![crate_id = "piston"]
 #![deny(missing_doc)]
-#![deny(dead_code)]
+#![warn(dead_code)]
 #![feature(globs)]
 #![feature(macro_rules)]
 #![feature(phase)]
