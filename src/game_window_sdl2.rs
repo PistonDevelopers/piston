@@ -16,6 +16,9 @@ use gl;
 /// A widow implemented by SDL2 back-end.
 pub struct GameWindowSDL2 {
     window: sdl2::video::Window,
+    // Allow dead code because this keeps track of the OpenGL context.
+    // Will be released on drop.
+    #[allow(dead_code)]
     context: sdl2::video::GLContext,
     settings: GameWindowSettings,
     should_close: bool,
