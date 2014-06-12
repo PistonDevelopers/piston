@@ -103,9 +103,9 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
             },
             WaitCursor(wait_t, ref mut t) => {
                 if *t + dt >= wait_t {
+                    let remaining_dt = *t + dt - wait_t;
                     *t = wait_t;
-                    // Return the 'dt' that is left.
-                    Some(*t + dt - wait_t)
+                    Some(remaining_dt)
                 } else {
                     *t += dt;
                     None
@@ -130,6 +130,30 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
                     **cur = seq.get(*i).to_cursor();
+                }
+                None
+            },
+            RepeatCursor(
+                rep, 
+                ref mut i, 
+                ref mut cursor
+            ) => {
+                let cur = cursor;
+                let mut dt = dt;
+                loop {
+                    match cur.update(dt, |action, state| f(action, state)) {
+                        None => { break },
+                        Some(new_dt) => {
+                            dt = new_dt;
+                        }
+                    };
+                    *i += 1;
+                    // If end of repeated events,
+                    // start over from the first one.
+                    if *i >= rep.len() { *i = 0; }
+                    // Create a new cursor for next event.
+                    // Use the same pointer to avoid allocation.
+                    **cur = rep.get(*i).to_cursor();
                 }
                 None
             },
@@ -207,11 +231,20 @@ fn wait_two_waits() {
     assert_eq!(a, 1);
 }
 
+fn loop_ten_times() {
+    let a: u32 = 0;
+    let rep = Repeat(vec![Wait(0.5), Action(Inc), Wait(0.5)]);
+    let mut cursor = rep.to_cursor();
+    let a = exec(a, 10.0, &mut cursor);
+    assert_eq!(a, 10);
+}
+
 fn main() {
     print_2();
     wait_sec();
     wait_half_sec();
     wait_two_waits();
+    loop_ten_times();
 }
 
 
