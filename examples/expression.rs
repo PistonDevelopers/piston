@@ -39,7 +39,7 @@ pub enum Cursor<'a, A, S> {
     /// Keeps track of an event where you wait and do nothing.
     WaitCursor(f64, f64),
     /// Keeps track of an event where sub events happens sequentially.
-    SequenceCursor(&'a Vec<Event<A>>, uint, f64, f64, Box<Cursor<'a, A, S>>),
+    SequenceCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where sub events are repeated sequentially.
     RepeatCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where any sub event might happen.
@@ -67,7 +67,7 @@ impl<A: StartState<S>, S> Event<A> {
             Wait(dt) 
                 => WaitCursor(dt, 0.0),
             Sequence(ref seq) 
-                => SequenceCursor(seq, 0, 0.0, 0.0, box seq.get(0).to_cursor()),
+                => SequenceCursor(seq, 0, box seq.get(0).to_cursor()),
             Repeat(ref rep)
                 => RepeatCursor(rep, 0, box rep.get(0).to_cursor()),
             WhenAny(ref any)
@@ -82,7 +82,7 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
     /// Updates the cursor that tracks an event.
     ///
     /// Returns `None` if the action did not terminate.
-    /// or `Some(dt)` that tells how much time was consumed by the action.
+    /// or `Some(dt)` that tells how much time is left of the update time.
     pub fn update(
         &mut self, 
         dt: f64, 
@@ -92,36 +92,43 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
             State(action, ref mut state) => {
                 // Call the function that updates the state.
                 match f(action, state) {
-                    Some(new_state) => {*state = new_state; None},
-                    None => Some(0.0),
+                    Some(new_state) => {
+                        *state = new_state; 
+                        None
+                    },
+                    // Actions are considered instant,
+                    // so there is always a full 'dt' left.
+                    None => Some(dt),
                 }
             },
-            WaitCursor(dt, ref mut t) => {
-                // Update the time and return 'false' if we completed.
-                *t = dt.min(dt + *t);
-                if *t < dt { None } else { Some(dt) }
+            WaitCursor(wait_t, ref mut t) => {
+                if *t + dt >= wait_t {
+                    *t = wait_t;
+                    // Return the 'dt' that is left.
+                    Some(*t + dt - wait_t)
+                } else {
+                    *t += dt;
+                    None
+                }
             },
             SequenceCursor(
                 seq, 
                 ref mut i, 
-                ref mut inc_dt, 
-                ref mut waited_dt, 
                 ref mut cursor
             ) => {
-                // Update a sequence of events.
-                let next_update = *waited_dt + dt;
                 let cur = cursor;
-                while *i < seq.len() && *inc_dt <= next_update {
-                    // If the sub event terminates,
-                    // decrement the delta time for next events.
-                    match cur.update(next_update  - *inc_dt, |action, state| f(action, state)) {
-                        None => { *waited_dt += dt; break },
-                        Some(consumed_dt) => { *waited_dt = 0.0; *inc_dt += consumed_dt },
+                let mut dt = dt;
+                while *i < seq.len() {
+                    match cur.update(dt, |action, state| f(action, state)) {
+                        None => { break },
+                        Some(new_dt) => { dt = new_dt; }
                     };
+                    *i += 1;
+                    // If end of sequence,
+                    // return the 'dt' that is left.
+                    if *i >= seq.len() { return Some(dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    *i += 1;
-                    if *i >= seq.len() { return Some(*inc_dt); }
                     **cur = seq.get(*i).to_cursor();
                 }
                 None
@@ -148,7 +155,6 @@ impl StartState<()> for TestActions {
 
 fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
     cursor.update(dt, |action, _| {
-        println!("{:?}", action);
         match *action {
             Inc => { acc += 1; None },
             Dec => { acc -= 1; None },
@@ -157,27 +163,55 @@ fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
     acc
 }
 
+// Each action that terminates immediately
+// consumes a time of 0.0 seconds.
+// This makes it possible to execute one action
+// after another without delay or waiting for next update.
 fn print_2() {
-    // Prints 2.
     let a: u32 = 0;
     let seq = Sequence(vec![Action(Inc), Action(Inc)]);
     let mut cursor = seq.to_cursor();
     let a = exec(a, 0.0, &mut cursor);
-    println!("{}", a);
+    assert_eq!(a, 2);
 }
 
+// If you wait the exact amount before to execute an action,
+// it will execute. This behavior makes it easy to predict
+// when an action will run.
 fn wait_sec() {
-    // Prints 2.
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(1.0), Action(Inc)]);
     let mut cursor = seq.to_cursor();
     let a = exec(a, 1.0, &mut cursor);
-    println!("{}", a);
+    assert_eq!(a, 1);
+}
+
+// When we execute half the time and then the other half,
+// then the action should be executed. 
+fn wait_half_sec() {
+    let a: u32 = 0;
+    let seq = Sequence(vec![Wait(1.0), Action(Inc)]);
+    let mut cursor = seq.to_cursor();
+    let a = exec(a, 0.5, &mut cursor);
+    assert_eq!(a, 0);
+    let a = exec(a, 0.5, &mut cursor);
+    assert_eq!(a, 1);
+}
+
+// A sequence of wait events is the same as one wait event.
+fn wait_two_waits() {
+    let a: u32 = 0;
+    let seq = Sequence(vec![Wait(0.5), Wait(0.5), Action(Inc)]);
+    let mut cursor = seq.to_cursor();
+    let a = exec(a, 1.0, &mut cursor);
+    assert_eq!(a, 1);
 }
 
 fn main() {
     print_2();
     wait_sec();
+    wait_half_sec();
+    wait_two_waits();
 }
 
 
