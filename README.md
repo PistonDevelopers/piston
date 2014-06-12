@@ -52,7 +52,7 @@ e.press(&mouse::Left).release().call(event_center, |_| {
 
 Time interval:
 ```
-e.interval(1.0).call(event_center, |_| {
+e.interval(10.0).call(event_center, |_| {
     println!("ELAPSED 10.0 SECOND");
 });
 ```
