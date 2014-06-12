@@ -24,10 +24,8 @@ pub enum Event<A> {
     Wait(f64),
     /// An event where sub events are happening sequentially.
     Sequence(Vec<Event<A>>),
-    /// An event where sub events are repeated sequentially forever.
-    Repeat(Vec<Event<A>>),
-    /// An event where any sub event might happen.
-    WhenAny(Vec<Event<A>>),
+    /// While an event is executing, run a sequence of events in a loop..
+    While(Box<Event<A>>, Vec<Event<A>>),
     /// An event where all sub events happen.
     WhenAll(Vec<Event<A>>),
 }
@@ -41,9 +39,7 @@ pub enum Cursor<'a, A, S> {
     /// Keeps track of an event where sub events happens sequentially.
     SequenceCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where sub events are repeated sequentially.
-    RepeatCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
-    /// Keeps track of an event where any sub event might happen.
-    WhenAnyCursor(&'a Vec<Event<A>>, Vec<Cursor<'a, A, S>>),
+    WhileCursor(Box<Cursor<'a, A, S>>, &'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where all sub events must happen.
     WhenAllCursor(&'a Vec<Event<A>>, Vec<Option<Cursor<'a, A, S>>>),
 }
@@ -68,10 +64,8 @@ impl<A: StartState<S>, S> Event<A> {
                 => WaitCursor(dt, 0.0),
             Sequence(ref seq) 
                 => SequenceCursor(seq, 0, box seq.get(0).to_cursor()),
-            Repeat(ref rep)
-                => RepeatCursor(rep, 0, box rep.get(0).to_cursor()),
-            WhenAny(ref any)
-                => WhenAnyCursor(any, any.iter().map(|ev| ev.to_cursor()).collect()),
+            While(ref ev, ref rep)
+                => WhileCursor(box ev.to_cursor(), rep, 0, box rep.get(0).to_cursor()),
             WhenAll(ref all)
                 => WhenAllCursor(all, all.iter().map(|ev| Some(ev.to_cursor())).collect()),
         }
@@ -133,11 +127,17 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                 }
                 None
             },
-            RepeatCursor(
+            WhileCursor(
+                ref mut ev_cursor,
                 rep, 
                 ref mut i, 
                 ref mut cursor
             ) => {
+                // If the event terminates, do not execute the loop.
+                match ev_cursor.update(dt, |action, state| f(action, state)) {
+                    Some(new_dt) => return Some(new_dt),
+                    None => {}
+                };
                 let cur = cursor;
                 let mut dt = dt;
                 loop {
@@ -177,6 +177,7 @@ impl StartState<()> for TestActions {
     fn start_state(&self) {}
 }
 
+// A test state machine that can increment and decrement.
 fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
     cursor.update(dt, |action, _| {
         match *action {
@@ -231,9 +232,10 @@ fn wait_two_waits() {
     assert_eq!(a, 1);
 }
 
+// Increase counter ten times.
 fn loop_ten_times() {
     let a: u32 = 0;
-    let rep = Repeat(vec![Wait(0.5), Action(Inc), Wait(0.5)]);
+    let rep = While(box Wait(50.0), vec![Wait(0.5), Action(Inc), Wait(0.5)]);
     let mut cursor = rep.to_cursor();
     let a = exec(a, 10.0, &mut cursor);
     assert_eq!(a, 10);
