@@ -41,7 +41,7 @@ pub enum Cursor<'a, A, S> {
     /// Keeps track of an event where sub events are repeated sequentially.
     WhileCursor(Box<Cursor<'a, A, S>>, &'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where all sub events must happen.
-    WhenAllCursor(&'a Vec<Event<A>>, Vec<Option<Cursor<'a, A, S>>>),
+    WhenAllCursor(Vec<Option<Cursor<'a, A, S>>>),
 }
 
 /// Implemented by all actions.
@@ -67,7 +67,7 @@ impl<A: StartState<S>, S> Event<A> {
             While(ref ev, ref rep)
                 => WhileCursor(box ev.to_cursor(), rep, 0, box rep.get(0).to_cursor()),
             WhenAll(ref all)
-                => WhenAllCursor(all, all.iter().map(|ev| Some(ev.to_cursor())).collect()),
+                => WhenAllCursor(all.iter().map(|ev| Some(ev.to_cursor())).collect()),
         }
     }
 }
@@ -157,7 +157,38 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                 }
                 None
             },
-            _ => unimplemented!(),
+            WhenAllCursor(
+                ref mut cursors
+            ) => {
+                // Get the least delta time left over.
+                let mut min_dt = std::f64::MAX_VALUE;
+                // Count number of terminated events.
+                let mut terminated = 0;
+                for cur in cursors.mut_iter() {
+                    match *cur {
+                        None => terminated += 1,
+                        Some(ref mut cur) => {
+                            match cur.update(
+                                dt,
+                                |action, state| f(action, state)
+                            ) {
+                                None => {},
+                                Some(new_dt) => {
+                                    min_dt = min_dt.min(new_dt);
+                                    terminated += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+                match terminated {
+                    // If there are no events, there is a whole 'dt' left.
+                    0 if cursors.len() == 0 => Some(dt),
+                    // If all events terminated, the least delta time is left.
+                    n if cursors.len() == n => Some(min_dt),
+                    _ => None
+                }
+            }
         }
     }
 }
@@ -241,12 +272,27 @@ fn loop_ten_times() {
     assert_eq!(a, 10);
 }
 
+fn when_all_wait() {
+    let a: u32 = 0;
+    let all = Sequence(vec![
+            // Wait in parallel.
+            WhenAll(vec![Wait(0.5), Wait(1.0)]),
+            Action(Inc)
+        ]);
+    let mut cursor = all.to_cursor();
+    let a = exec(a, 0.5, &mut cursor);
+    assert_eq!(a, 0);
+    let a = exec(a, 0.5, &mut cursor);
+    assert_eq!(a, 1);
+}
+
 fn main() {
     print_2();
     wait_sec();
     wait_half_sec();
     wait_two_waits();
     loop_ten_times();
+    when_all_wait();
 }
 
 
