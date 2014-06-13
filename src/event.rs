@@ -1,76 +1,46 @@
 
 use {
-    AddAll,
-    AddAny,
-    AddInterval,
-    AddPress,
-    AllEvent,
-    AnyEvent,
-    IntervalEvent,
-    KeyType,
-    PressEvent,
-    Triggered,
-    Value,
+    Cursor,
+    SequenceCursor,
+    StartState,
+    State,
+    WaitCursor,
+    WhenAllCursor,
+    WhileCursor,
 };
 
-/// An immutable event context. All Request starting here.
-pub struct Event<'a>;
-
-impl<'a> Event<'a> {
-    /// Returns a new event context.
-    #[inline(always)]
-    pub fn new() -> Event<'a> {
-        Event
-    }
-/*
-    #[inline(always)]
-    pub fn after<'b>(before: &'a Triggered, after: &'a Triggered) -> AfterEvent<'a, 'b> {
-        AfterEvent {
-            before: Value(before),
-            after: Value(after),
-        }
-    }
-    */
+/// Describes an event.
+pub enum Event<A> {
+    /// An event where some action is performed.
+    Action(A),
+    /// An event
+    Wait(f64),
+    /// An event where sub events are happening sequentially.
+    Sequence(Vec<Event<A>>),
+    /// While an event is executing, run a sequence of events in a loop..
+    While(Box<Event<A>>, Vec<Event<A>>),
+    /// An event where all sub events happen.
+    WhenAll(Vec<Event<A>>),
 }
 
-impl<'a> Clone for Event<'a> {
-    fn clone(&self) -> Event<'static> {
-        Event
-    }
-}
-
-impl<'a, 'b> AddPress<'a, PressEvent<'a, 'b>> for Event<'a> {
-    #[inline(always)]
-    fn press(&'a self, key: &'a KeyType) -> PressEvent<'a, 'b> {
-        PressEvent {
-            key: Value(key),
-        }
-    }
-}
-
-impl<'a> AddInterval<IntervalEvent<'a>> for Event<'a> {
-    #[inline(always)]
-    fn interval(&self, seconds: f64) -> IntervalEvent<'a> {
-        IntervalEvent {
-            interval: Value(seconds),
-        }
-    }
-}
-
-impl<'a, 'b> AddAll<'a, AllEvent<'a, 'b>> for Event<'a> {
-    #[inline(always)]
-    fn all(&'a self, events: &'b [&'b Triggered]) -> AllEvent<'a, 'b> {
-        AllEvent {
-            events: Value(events),
-        }
-    }
-}
-
-impl<'a, 'b> AddAny<'a, AnyEvent<'a, 'b>> for Event<'a> {
-    #[inline(always)]
-    fn any(&'a self, events: &'b [&'b Triggered]) -> AnyEvent<'a, 'b> {
-        AnyEvent {
-            events: Value(events),
+impl<A: StartState<S>, S> Event<A> {
+    /// Creates a cursor structure from an event structure.
+    ///
+    /// The cursor structure keeps track of the state.
+    /// You can define your own actions and use the combinations
+    /// to create more complex states.
+    pub fn to_cursor<'a>(&'a self) -> Cursor<'a, A, S> {
+        match *self {
+            Action(ref action)
+                => State(action, action.start_state()),
+            Wait(dt)
+                => WaitCursor(dt, 0.0),
+            Sequence(ref seq)
+                => SequenceCursor(seq, 0, box seq.get(0).to_cursor()),
+            While(ref ev, ref rep)
+                => WhileCursor(box ev.to_cursor(), rep, 0, box rep.get(0).to_cursor()),
+            WhenAll(ref all)
+                => WhenAllCursor(all.iter().map(|ev| Some(ev.to_cursor())).collect()),
         }
     }
 }
