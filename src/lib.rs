@@ -1,86 +1,39 @@
-//! An experimental library using context types for event logic
+//! An experimental library using expression for event logic
+//!
+//! The idea is to use combinators of events to describe more complex events.
+//! An 'Action' is a variant of an event that spans across time.
+//! You program the actions like a state machine, controlling how they interact with the world.
+//!
+//! Assume you have a complete list of the actions.
+//! Any event you can construct from these actions has a corresponding `Cursor`.
+//! The cursor keeps track of the combinatorial state.
+//!
+//! This design is useful in environments where all actions can be broken down
+//! into simple interacitons while needing complex combinations of those actions.
 
 #![crate_type = "lib"]
 #![crate_id = "event#event:0.1"]
 #![deny(missing_doc)]
 
-extern crate collections;
-extern crate graphics;
+pub use event::{
+    Action,
+    Event,
+    Sequence,
+    Wait,
+    WhenAll,
+    While,
+};
+pub use cursor::{
+    Cursor,
+    SequenceCursor,
+    State,
+    WaitCursor,
+    WhenAllCursor,
+    WhileCursor,
+};
+pub use start_state::StartState;
 
-pub use EventGame = event_game::EventGame;
-
-pub use EventType = event_type::EventType;
-pub use KeyType = event_type::KeyType;
-
-pub use AddAfter = add_after::AddAfter;
-pub use AddAll = add_all::AddAll;
-pub use AddAny = add_any::AddAny;
-pub use AddInterval = add_interval::AddInterval;
-pub use AddPress = add_press::AddPress;
-pub use AddRelease = add_release::AddRelease;
-
-pub use AfterEvent = after_event::AfterEvent;
-pub use AllEvent = all_event::AllEvent;
-pub use AnyEvent = any_event::AnyEvent;
-pub use Event = event::Event;
-pub use IntervalEvent = interval_event::IntervalEvent;
-pub use PressEvent = press_event::PressEvent;
-pub use ReleasePressEvent = release_press_event::ReleasePressEvent;
-
-pub use Call = call::Call;
-pub use CallOnce = call_once::CallOnce;
-pub use Triggered = triggered::Triggered;
-
-pub use EventCenter = event_center::EventCenter;
-pub use Observer = observer::Observer;
-
-mod event_type;
-mod event_game;
-
-mod add_after;
-mod add_all;
-mod add_any;
-mod add_press;
-mod add_release;
-mod add_interval;
-
-mod after_event;
-mod all_event;
-mod any_event;
+mod cursor;
 mod event;
-mod interval_event;
-mod press_event;
-mod release_press_event;
-
-mod call;
-mod call_once;
-mod triggered;
-
-mod event_center;
-mod observer;
-
-/// ***************************
-/// * COPY FROM RUST-GRAPHICS *
-/// ***************************
-///
-/// A structure that might contain a value or a borrowed value.
-/// This is to used as building block to create data structure
-/// that is partially based on an existing structure.
-pub enum Field<'a, T> {
-    /// Contains a value.
-    Value(T),
-    /// Contains a borrowed pointer.
-    Borrowed(&'a T),
-}
-
-impl<'a, T> Field<'a, T> {
-    /// Gets a read only value.
-    #[inline(always)]
-    pub fn get(&'a self) -> &'a T {
-        match *self {
-            Value(ref val) => val,
-            Borrowed(rval) => rval,
-        }
-    }
-}
+mod start_state;
 
