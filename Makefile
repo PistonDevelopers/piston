@@ -27,6 +27,13 @@ SHELL := /bin/bash
 # The default make command.
 # Change this to 'lib' if you are building a library.
 DEFAULT = lib
+# The entry file of library source.
+# Change this to support multi-crate source structure.
+# For advanced usage, you can rename the file 'rust-empty.mk'
+# and call it with 'make -f rust-empty.mk <command>' from your Makefile.
+LIB_ENTRY_FILE = src/lib.rs
+# The entry file of executable source.
+EXE_ENTRY_FILE = src/main.rs
 
 EXAMPLE_FILES = examples/*.rs
 SOURCE_FILES = $(shell test -e src/ && find src -type f)
@@ -41,7 +48,7 @@ COMPILER = rustc
 RUSTDOC = rustdoc
 
 # Extracts target from rustc.
-TARGET = $(shell rustc --version | awk "/host:/ { print \$$2 }")
+TARGET = $(shell rustc --version 2> /dev/null | awk "/host:/ { print \$$2 }")
 # TARGET = x86_64-unknown-linux-gnu
 # TARGET = x86_64-apple-darwin
 
@@ -50,12 +57,13 @@ TARGET_LIB_DIR = target/$(TARGET)/lib/
 # Ask 'rustc' the file name of the library and use a dummy name if the source has not been created yet.
 # The dummy file name is used to trigger the creation of the source first time.
 # Next time 'rustc' will return the right file name.
-RLIB_FILE = $(shell (rustc --crate-type=rlib --crate-file-name "src/lib.rs" 2> /dev/null) || (echo "dummy.rlib"))
+RLIB_FILE = $(shell (rustc --crate-type=rlib --crate-file-name "$(LIB_ENTRY_FILE)" 2> /dev/null) || (echo "dummy.rlib"))
 # You can't have quotes around paths because 'make' doesn't see it exists.
 RLIB = target/$(TARGET)/lib/$(RLIB_FILE)
-DYLIB_FILE = $(shell (rustc --crate-type=dylib --crate-file-name "src/lib.rs" 2> /dev/null) || (echo "dummy.dylib"))
+DYLIB_FILE = $(shell (rustc --crate-type=dylib --crate-file-name "$(LIB_ENTRY_FILE)" 2> /dev/null) || (echo "dummy.dylib"))
 DYLIB = target/$(TARGET)/lib/$(DYLIB_FILE)
 
+# Use 'VERBOSE=1' to echo all commands, for example 'make help VERBOSE=1'.
 ifdef VERBOSE
   Q :=
 else
@@ -65,7 +73,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.3 006)" \
+	$(Q)echo "--- rust-empty (0.4 004)" \
 	&& echo "make run               - Runs executable" \
 	&& echo "make exe               - Builds main executable" \
 	&& echo "make lib               - Both static and dynamic library" \
@@ -93,7 +101,8 @@ help:
 	&& echo "make clean             - Deletes binaries and documentation." \
 	&& echo "make clear-project     - WARNING: Deletes project files except 'Makefile'" \
 	&& echo "make clear-git         - WARNING: Deletes Git setup" \
-	&& echo "make symlink-info      - Symlinked libraries dependency info"
+	&& echo "make symlink-info      - Symlinked libraries dependency info" \
+	&& echo "make target-dir        - Creates directory for current target"
 
 .PHONY: \
 		bench \
@@ -114,6 +123,7 @@ help:
 		rust-ci-lib \
 		rust-ci-exe \
 		symlink-info \
+		target-dir \
 		test \
 		test-internal \
 		test-external
@@ -144,31 +154,31 @@ nightly-uninstall:
 		fi \
 	)
 
-cargo-lite-exe: src/main.rs
+cargo-lite-exe: $(EXE_ENTRY_FILE)
 	$(Q)( \
 		test -e cargo-lite.conf \
 		&& echo "--- The file 'cargo-lite.conf' already exists" \
 	) \
 	|| \
 	( \
-		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"src/main.rs\"\nrustc_args = []\n" > cargo-lite.conf \
+		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"$(EXE_ENTRY_FILE)\"\nrustc_args = []\n" > cargo-lite.conf \
 		&& echo "--- Created 'cargo-lite.conf' for executable" \
 		&& cat cargo-lite.conf \
 	)
 
-cargo-lite-lib: src/lib.rs
+cargo-lite-lib: $(LIB_ENTRY_FILE)
 	$(Q)( \
 		test -e cargo-lite.conf \
 		&& echo "--- The file 'cargo-lite.conf' already exists" \
 	) \
 	|| \
 	( \
-		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"src/lib.rs\"\ncrate_type = \"library\"\nrustc_args = []\n" > cargo-lite.conf \
+		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"$(LIB_ENTRY_FILE)\"\ncrate_type = \"library\"\nrustc_args = []\n" > cargo-lite.conf \
 		&& echo "--- Created 'cargo-lite.conf' for library" \
 		&& cat cargo-lite.conf \
 	)
 
-cargo-exe: src/main.rs
+cargo-exe: $(EXE_ENTRY_FILE)
 	$(Q)( \
 		test -e Cargo.toml \
 		&& echo "--- The file 'Cargo.toml' already exists" \
@@ -177,12 +187,12 @@ cargo-exe: src/main.rs
 	( \
 		name=$${PWD##/*/} ; \
 		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
-		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[bin]]\n\nname = \"$$name\"\npath = \"bin/main.rs\"\n" > Cargo.toml \
+		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[bin]]\n\nname = \"$$name\"\npath = \"$(EXE_ENTRY_FILE)\"\n" > Cargo.toml \
 		&& echo "--- Created 'Cargo.toml' for executable" \
 		&& cat Cargo.toml \
 	)
 
-cargo-lib: src/main.rs
+cargo-lib: $(EXE_ENTRY_FILE)
 	$(Q)( \
 		test -e Cargo.toml \
 		&& echo "--- The file 'Cargo.toml' already exists" \
@@ -191,47 +201,49 @@ cargo-lib: src/main.rs
 	( \
 		name=$${PWD##/*/} ; \
 		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
-		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"bin/lib.rs\"\n" > Cargo.toml \
+		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"$(LIB_ENTRY_FILE)\"\n" > Cargo.toml \
 		&& echo "--- Created 'Cargo.toml' for executable" \
 		&& cat Cargo.toml \
 	)
 
-rust-ci-lib: src/lib.rs
+rust-ci-lib: $(LIB_ENTRY_FILE)
 	$(Q)( \
 		test -e .travis.yml \
 		&& echo "--- The file '.travis.yml' already exists" \
 	) \
 	|| \
 	( \
-		echo -e "before_install:\n\t- yes | sudo add-apt-repository ppa:hansjorg/rust\n\t- sudo apt-get update\ninstall:\n\t- sudo apt-get install rust-nightly\nscript:\n\t- make lib\n" > .travis.yml \
+		echo -e "install:\n  - wget http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz -O - | sudo tar zxf - --strip-components 1 -C /usr/local\nscript:\n  - make lib\n" > .travis.yml \
 		&& echo "--- Created '.travis.yml' for library" \
 		&& cat .travis.yml \
 	)
 
-rust-ci-exe: src/main.rs
+rust-ci-exe: $(EXE_ENTRY_FILE)
 	$(Q)( \
 		test -e .travis.yml \
 		&& echo "--- The file '.travis.yml' already exists" \
 	) \
 	|| \
 	( \
-		echo -e "before_install:\n\t- yes | sudo add-apt-repository ppa:hansjorg/rust\n\t- sudo apt-get update\ninstall:\n\t- sudo apt-get install rust-nightly\nscript:\n\t- make exe\n" > .travis.yml \
+		echo -e "install:\n  - wget http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz -O - | sudo tar zxf - --strip-components 1 -C /usr/local\nscript:\n  - make exe\n" > .travis.yml \
 		&& echo "--- Created '.travis.yml' for executable" \
 		&& cat .travis.yml \
 	)
 
 doc: $(SOURCE_FILES) | src/
-	$(Q)$(RUSTDOC) src/lib.rs -L "target/$(TARGET)/lib" \
+	$(Q)$(RUSTDOC) $(LIB_ENTRY_FILE) -L "target/$(TARGET)/lib" \
 	&& echo "--- Built documentation"
 
 run: exe
 	$(Q)cd bin/ \
 	&& ./main
 
+target-dir: $(TARGET_LIB_DIR)
+
 exe: bin/main | $(TARGET_LIB_DIR)
 
-bin/main: $(SOURCE_FILES) | bin/ src/main.rs
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) src/main.rs -o bin/main -L "target/$(TARGET)/lib" \
+bin/main: $(SOURCE_FILES) | bin/ $(EXE_ENTRY_FILE)
+	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) $(EXE_ENTRY_FILE) -o bin/main -L "target/$(TARGET)/lib" \
 	&& echo "--- Built executable" \
 	&& echo "--- Type 'make run' to run executable"
 
@@ -252,7 +264,7 @@ test-internal: bin/test-internal
 	&& ./test-internal
 
 bin/test-internal: $(SOURCE_FILES) | rlib src/ bin/
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --test src/lib.rs -o bin/test-internal -L "target/$(TARGET)/lib" \
+	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --test $(LIB_ENTRY_FILE) -o bin/test-internal -L "target/$(TARGET)/lib" \
 	&& echo "--- Built internal test runner"
 
 bench: bench-internal bench-external
@@ -268,23 +280,23 @@ lib: rlib dylib
 
 rlib: $(RLIB)
 
-$(RLIB): $(SOURCE_FILES) | src/lib.rs $(TARGET_LIB_DIR)
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=rlib src/lib.rs -L "target/$(TARGET)/lib" --out-dir "target/$(TARGET)/lib/" \
+$(RLIB): $(SOURCE_FILES) | $(LIB_ENTRY_FILE) $(TARGET_LIB_DIR)
+	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=rlib $(LIB_ENTRY_FILE) -L "target/$(TARGET)/lib" --out-dir "target/$(TARGET)/lib/" \
 	&& echo "--- Built rlib"
 
 dylib: $(DYLIB)
 
-$(DYLIB): $(SOURCE_FILES) | src/lib.rs $(TARGET_LIB_DIR)
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=dylib src/lib.rs -L "target/$(TARGET)/lib" --out-dir "target/$(TARGET)/lib/" \
+$(DYLIB): $(SOURCE_FILES) | $(LIB_ENTRY_FILE) $(TARGET_LIB_DIR)
+	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=dylib $(LIB_ENTRY_FILE) -L "target/$(TARGET)/lib" --out-dir "target/$(TARGET)/lib/" \
 	&& echo "--- Built dylib"
 
-bin:
+bin/:
 	$(Q)mkdir -p bin
 
 $(TARGET_LIB_DIR):
 	$(Q)mkdir -p $(TARGET_LIB_DIR)
 
-src:
+src/:
 	$(Q)mkdir -p src
 
 examples-dir:
@@ -306,7 +318,7 @@ git-ignore:
 	) \
 	|| \
 	( \
-		echo -e ".DS_Store\n*~\n*#\n*.o\n*.so\n*.swp\n*.dylib\n*.dSYM\n*.dll\n*.rlib\n*.dummy\n*.exe\n*-test\n/bin/main\n/bin/test-internal\n/bin/test-external\n/doc/\n/target/\n/build/\n/.rust/\nrusti.sh\n" > .gitignore \
+		echo -e ".DS_Store\n*~\n*#\n*.o\n*.so\n*.swp\n*.dylib\n*.dSYM\n*.dll\n*.rlib\n*.dummy\n*.exe\n*-test\n/bin/main\n/bin/test-internal\n/bin/test-external\n/doc/\n/target/\n/build/\n/.rust/\nrusti.sh\n/examples/*\n!/examples/*.rs" > .gitignore \
 		&& echo "--- Created '.gitignore' for git" \
 		&& cat .gitignore \
 	)
@@ -317,11 +329,11 @@ $(EXAMPLE_FILES): lib examples-dir
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) $@ -L "target/$(TARGET)/lib" --out-dir examples/ \
 	&& echo "--- Built examples"
 
-src/main.rs: | src/
-	$(Q)test -e src/main.rs \
+$(EXE_ENTRY_FILE): | src/
+	$(Q)test -e $(EXE_ENTRY_FILE) \
 	|| \
 	( \
-		echo -e "fn main() {\n\tprintln!(\"Hello world!\");\n}" > src/main.rs \
+		echo -e "fn main() {\n\tprintln!(\"Hello world!\");\n}" > $(EXE_ENTRY_FILE) \
 	)
 
 src/test.rs: | src/
@@ -331,11 +343,11 @@ src/test.rs: | src/
 		touch src/test.rs \
 	)
 
-src/lib.rs: | src/
-	$(Q)test -e src/lib.rs \
+$(LIB_ENTRY_FILE): | src/
+	$(Q)test -e $(LIB_ENTRY_FILE) \
 	|| \
 	( \
-		echo -e "#![crate_id = \"\"]\n#![deny(missing_doc)]\n\n//! Documentation goes here.\n" > src/lib.rs \
+		echo -e "#![crate_id = \"\"]\n#![deny(missing_doc)]\n\n//! Documentation goes here.\n" > $(LIB_ENTRY_FILE) \
 	)
 
 clean:
@@ -392,6 +404,8 @@ while true; do
   extern crate native;
   extern crate num;
   extern crate rand;
+  extern crate regex;
+  #[phase(syntax)] extern crate regex_macros;
   extern crate rustc;
   extern crate rustdoc;
   extern crate rustuv;
