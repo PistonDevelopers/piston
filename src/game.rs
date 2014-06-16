@@ -31,12 +31,12 @@ pub trait Game {
     ///
     /// `context` is a Rust-Graphics context.
     /// `gl` is the Piston OpenGL back-end for Rust-Graphics.
-    fn render(&self, _context: &Context, _args: RenderArgs) {}
+    fn render(&self, _context: &Context, _args: &mut RenderArgs) {}
 
     /// Update the physical state of the game.
     ///
     /// `dt` is the delta time from last update in seconds.
-    fn update(&mut self, _args: UpdateArgs) {}
+    fn update(&mut self, _args: &mut UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
     fn load(&mut self, _asset_store: &mut AssetStore) {}
@@ -44,24 +44,24 @@ pub trait Game {
     /// User pressed a key.
     ///
     /// This can be overridden to handle key pressed events.
-    fn key_press(&mut self, _args: KeyPressArgs) {}
+    fn key_press(&mut self, _args: &KeyPressArgs) {}
 
     /// User released a key.
     ///
     /// This can be overridden to handle key released events.
-    fn key_release(&mut self, _args: KeyReleaseArgs) {}
+    fn key_release(&mut self, _args: &KeyReleaseArgs) {}
 
     /// Pressed a mouse button.
-    fn mouse_press(&mut self, _args: MousePressArgs) {}
+    fn mouse_press(&mut self, _args: &MousePressArgs) {}
 
     /// Released a mouse button.
-    fn mouse_release(&mut self, _args: MouseReleaseArgs) {}
+    fn mouse_release(&mut self, _args: &MouseReleaseArgs) {}
 
     /// Moved mouse cursor.
-    fn mouse_move(&mut self, _args: MouseMoveArgs) {}
+    fn mouse_move(&mut self, _args: &MouseMoveArgs) {}
 
     /// Moved mouse relative, not bounded by cursor.
-    fn mouse_relative_move(&mut self, _args: MouseRelativeMoveArgs) {}
+    fn mouse_relative_move(&mut self, _args: &MouseRelativeMoveArgs) {}
 
     /// Executes a game loop.
     ///
@@ -84,20 +84,20 @@ pub trait Game {
             match game_iter.next() {
                 None => { break }
                 Some(e) => match e {
-                    Render(args) => self.render(
+                    Render(mut args) => self.render(
                         &Context::abs(
                             args.width as f64,
                             args.height as f64
                         ),
-                        args
+                        &mut args
                     ),
-                    Update(args) => self.update(args),
-                    KeyPress(args) => self.key_press(args),
-                    KeyRelease(args) => self.key_release(args),
-                    MousePress(args) => self.mouse_press(args),
-                    MouseRelease(args) => self.mouse_release(args),
-                    MouseMove(args) => self.mouse_move(args),
-                    MouseRelativeMove(args) => self.mouse_relative_move(args),
+                    Update(mut args) => self.update(&mut args),
+                    KeyPress(args) => self.key_press(&args),
+                    KeyRelease(args) => self.key_release(&args),
+                    MousePress(args) => self.mouse_press(&args),
+                    MouseRelease(args) => self.mouse_release(&args),
+                    MouseMove(args) => self.mouse_move(&args),
+                    MouseRelativeMove(args) => self.mouse_relative_move(&args),
 
                 }
             }

@@ -33,7 +33,7 @@ impl Game for App {
         self.image = Some(Texture::from_path(&image).unwrap());
     }
 
-    fn render(&self, c: &Context, args: RenderArgs) {
+    fn render(&self, c: &Context, args: &mut RenderArgs) {
         c.image(self.image.as_ref().unwrap()).draw(args.gl);
     }
 }

@@ -47,7 +47,7 @@ impl Game for App {
         self.music = Some(MusicSDL2::from_path(&music).unwrap());
     }
 
-    fn update(&mut self, args: UpdateArgs) {
+    fn update(&mut self, args: &mut UpdateArgs) {
         if !self.is_playing_background_music {
             args.audio.play_music(self.music.get_ref());
             self.is_playing_background_music = true;
@@ -59,7 +59,7 @@ impl Game for App {
         }
     }
 
-    fn key_press(&mut self, args: KeyPressArgs) {
+    fn key_press(&mut self, args: &KeyPressArgs) {
         if args.key == keyboard::Space {
             self.play_sound = true;
         }
