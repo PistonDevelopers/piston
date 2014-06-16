@@ -27,28 +27,28 @@ impl App {
 impl Game for App {
     fn key_press(
         &mut self,
-        args: KeyPressArgs
+        args: &KeyPressArgs
     ) {
         println!("Pressed keyboard key '{}'", args.key);
     }
 
     fn key_release(
         &mut self,
-        args: KeyReleaseArgs
+        args: &KeyReleaseArgs
     ) {
         println!("Released keyboard key '{}'", args.key);
     }
 
     fn mouse_press(
         &mut self,
-        args: MousePressArgs
+        args: &MousePressArgs
     ) {
         println!("Pressed mouse button '{}'", args.button);
     }
 
     fn mouse_release(
         &mut self,
-        args: MouseReleaseArgs
+        args: &MouseReleaseArgs
     ) {
         println!("Released mouse button '{}'", args.button);
     }
