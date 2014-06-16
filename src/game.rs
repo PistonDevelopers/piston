@@ -4,6 +4,7 @@
 use graphics::Context;
 
 // Local crate.
+use GameEvent;
 use GameWindow = game_window::GameWindow;
 use GameIteratorSettings;
 use AssetStore;
@@ -63,9 +64,27 @@ pub trait Game {
     /// Moved mouse relative, not bounded by cursor.
     fn mouse_relative_move(&mut self, _args: &MouseRelativeMoveArgs) {}
 
+    /// Handles a game event.
+    fn event(&mut self, event: &mut GameEvent) {
+        match *event {
+            Render(ref mut args) => self.render(
+                &Context::abs(
+                    args.width as f64,
+                    args.height as f64
+                ),
+                args
+            ),
+            Update(ref mut args) => self.update(args),
+            KeyPress(ref args) => self.key_press(args),
+            KeyRelease(ref args) => self.key_release(args),
+            MousePress(ref args) => self.mouse_press(args),
+            MouseRelease(ref args) => self.mouse_release(args),
+            MouseMove(ref args) => self.mouse_move(args),
+            MouseRelativeMove(ref args) => self.mouse_relative_move(args),
+        }
+    }
+
     /// Executes a game loop.
-    ///
-    /// The loop continues until `should_close` returns true.
     fn run<W: GameWindow>(
         &mut self,
         game_window: &mut W,
@@ -82,24 +101,8 @@ pub trait Game {
 
         loop {
             match game_iter.next() {
-                None => { break }
-                Some(e) => match e {
-                    Render(mut args) => self.render(
-                        &Context::abs(
-                            args.width as f64,
-                            args.height as f64
-                        ),
-                        &mut args
-                    ),
-                    Update(mut args) => self.update(&mut args),
-                    KeyPress(args) => self.key_press(&args),
-                    KeyRelease(args) => self.key_release(&args),
-                    MousePress(args) => self.mouse_press(&args),
-                    MouseRelease(args) => self.mouse_release(&args),
-                    MouseMove(args) => self.mouse_move(&args),
-                    MouseRelativeMove(args) => self.mouse_relative_move(&args),
-
-                }
+                None => break,
+                Some(mut e) => self.event(&mut e)
             }
         }
     }
