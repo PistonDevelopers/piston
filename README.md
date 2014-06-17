@@ -17,9 +17,11 @@ A user friendly game engine written in Rust
 | [rust-image](https://github.com/PistonDevelopers/rust-image) | [rust-image docs](http://www.piston.rs/docs/rust-image/image/)
 | [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://www.piston.rs/docs/rust-sdl2/sdl2/) |
 | [rust-sdl2_mixer](https://github.com/andelf/rust-sdl2_mixer) | [rust-sdl2_mixer docs](http://www.piston.rs/docs/rust-sdl2_mixer/sdl2_mixer/) |
+| [rust-sdl2_ttf](https://github.com/andelf/rust-sdl2_ttf) | [rust-sdl2_ttf docs](http://www.piston.rs/docs/rust-sdl2_ttf/sdl2_ttf/) |
 | [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://www.piston.rs/docs/glfw-rs/glfw/) |
 | [gl-rs](https://github.com/bjz/gl-rs) | [gl-rs docs](http://www.piston.rs/docs/gl-rs/gl/) |
 | [hgl-rs](https://github.com/cmr/hgl-rs) | [hgl-rs docs](http://www.piston.rs/docs/hgl-rs/hgl/) |
+| [cgmath-rs](https://github.com/bjz/cgmath-rs) | [cgmath-rs docs](http://www.piston.rs/docs/cgmath-rs/cgmath/) |
 
 ## Start new project with Piston
 
