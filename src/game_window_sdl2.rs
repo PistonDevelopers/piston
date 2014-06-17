@@ -1,6 +1,7 @@
 //! A window implemented by SDL2 back-end.
 
 // External crates.
+use std;
 use sdl2;
 
 // Local crate.
@@ -43,7 +44,9 @@ impl GameWindow for GameWindowSDL2 {
         let context = window.gl_create_context().unwrap();
 
         // Load the OpenGL function pointers
-        gl::load_with(|s| sdl2::video::gl_get_proc_address(s));
+        gl::load_with(|s| unsafe {
+            std::mem::transmute(sdl2::video::gl_get_proc_address(s))
+        });
 
         GameWindowSDL2 {
             window: window,
@@ -78,7 +81,7 @@ impl GameWindow for GameWindowSDL2 {
                 };
                 self.last_pressed_key = Some(key);
 
-                if self.settings.exit_on_esc 
+                if self.settings.exit_on_esc
                 && key == sdl2::keycode::EscapeKey {
                     self.should_close = true;
                 } else {
