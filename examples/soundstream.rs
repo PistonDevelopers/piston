@@ -13,10 +13,10 @@
 extern crate piston;
 
 use piston::{
-    InteractiveEvent,
     keyboard,
     AssetStore,
     Game,
+    GameEvent,
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
@@ -38,13 +38,13 @@ static NUM_CHANNELS: i32 = 2i32;
 /// Main application struct.
 pub struct App {
     /// Channel for sending information to the audio stream.
-    stream_chan: Option<Sender<InteractiveEvent>> // Channel for sending Events.
+    stream_chan: Option<Sender<GameEvent<'static>>> // Channel for sending Events.
 }
 
 /// The audio is non-blocking and needs it's own struct.
 pub struct AppSoundStream {
     /// Channel for receiving game events from main game stream.
-    chan: Option<Receiver<InteractiveEvent>>, // Channel for receiving Events.
+    chan: Option<Receiver<GameEvent<'static>>>, // Channel for receiving Events.
     is_exit: bool, // Trigger for closing the stream.
     is_print: bool, // Toggle for printing the sample_rate.
     buffer: Vec<f32> // Buffer for passing input to output.
@@ -80,12 +80,13 @@ impl Game for App {
         println!("Game thread key: {}", args.key);
     }
 
+    /*
     /// Specify the event sending channel. This must be done if we wish
     /// to send interactive events to the SoundStream.
-    fn get_event_sender(&self) -> Option<Sender<InteractiveEvent>> {
+    fn get_event_sender(&self) -> Option<Sender<GameEvent<'static>>> {
         self.stream_chan.clone()
     }
-
+    */
 }
 
 impl Drop for App {
@@ -148,8 +149,9 @@ impl SoundStream for AppSoundStream {
         }
     }
 
+    /*
     /// Retrieve Events for callback (i.e. mouse, keyboard).
-    fn check_for_event(&self) -> Option<InteractiveEvent> {
+    fn check_for_event(&self) -> Option<GameEvent<'static>> {
         match self.chan {
             Some(ref receiver) => match receiver.try_recv() {
                 Ok(event) => Some(event),
@@ -158,6 +160,7 @@ impl SoundStream for AppSoundStream {
             None => None
         }
     }
+    */
 
     /// Setup the exit condition (is checked once per buffer).
     fn exit(&self) -> bool { self.is_exit }
@@ -166,7 +169,7 @@ impl SoundStream for AppSoundStream {
 
 impl AppSoundStream {
     /// AppSoundStream constructor.
-    pub fn new(recv: Option<Receiver<InteractiveEvent>>) -> AppSoundStream {
+    pub fn new(recv: Option<Receiver<GameEvent<'static>>>) -> AppSoundStream {
         AppSoundStream {
             chan: recv,
             is_exit: false,
