@@ -1,10 +1,5 @@
-//
-//  audio_io.rs
-//
-//  Created by Mitchell Nordine at 06:01AM on June 17, 2014.
-//
-//
-
+//! soundstream.rs
+//!
 //! A real-time soundstream demo that smoothly copies input
 //! from a microphone straight to the output. If <Space> is
 //! pressed, the SoundStream thread will begin to calculate
