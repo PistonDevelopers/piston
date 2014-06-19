@@ -18,6 +18,7 @@ use piston::{
     Interactive,
     KeyPress,
     AudioBackEnd,
+    AudioSDL2,
     SoundSDL2,
     MusicSDL2,
 };
@@ -47,6 +48,8 @@ fn main() {
         };
     let mut game_iter = GameIterator::new(&mut window, &game_iter_settings);
 
+    let audio = AudioSDL2::new();
+
     let sound = asset_store.path("beeep.ogg").unwrap();
     let sound = SoundSDL2::from_path(&sound).unwrap();
 
@@ -65,14 +68,14 @@ fn main() {
                         play_sound = true;
                     }
                 },
-                Update(args) => {
+                Update(_) => {
                     if play_sound {
-                        args.audio.play_sound(&sound);
+                        audio.play_sound(&sound);
                         play_sound = false;
                     }
 
                     if !is_playing_background_music {
-                        args.audio.play_music(&music);
+                        audio.play_music(&music);
                         is_playing_background_music = true;
                     }
                 },
