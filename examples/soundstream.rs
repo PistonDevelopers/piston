@@ -16,11 +16,9 @@ use piston::{
     keyboard,
     AssetStore,
     Game,
-    GameEvent,
     GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
-    KeyPress,
     KeyPressArgs,
     SoundStream,
     SoundStreamSettings
@@ -32,15 +30,15 @@ use piston::{
 /// Main application struct.
 pub struct App {
     /// Channel for sending information to the audio stream.
-    stream_chan: Option<Sender<GameEvent<'static>>> // Channel for sending Events.
+    kill_chan: Option<Sender<bool>> // Channel for sending kill message.
 }
 
 /// The audio is non-blocking and needs it's own struct.
 pub struct AppSoundStream {
     /// Channel for receiving game events from main game stream.
-    chan: Option<Receiver<GameEvent<'static>>>, // Channel for receiving Events.
-    is_exit: bool, // Trigger for closing the stream.
-    is_print: bool, // Toggle for printing the sample_rate.
+    kill_chan: Option<Receiver<bool>>, // Channel for receiving kill message.
+    should_exit: bool, // Trigger for closing the stream.
+    should_print: bool, // Toggle for printing the sample_rate.
     buffer: Vec<f32> // Buffer for passing input to output.
 }
 
@@ -58,7 +56,7 @@ impl Game for App {
         // the same technique could be used here to create custom channels
         // that can safely send any kind of unique data.
         let (send, recv) = channel();
-        self.stream_chan = Some(send);
+        self.kill_chan = Some(send);
 
         // Create the soundstream on it's own thread for non-blocking, real-time audio.
         // "soundstreamer" will setup and iterate soundstream using portaudio.
@@ -86,9 +84,9 @@ impl Game for App {
 impl Drop for App {
     /// Tell the soundstream to exit when App is destroyed.
     fn drop(&mut self) {
-        let chan = self.stream_chan.clone();
+        let chan = self.kill_chan.clone();
         match chan {
-            Some(sender) => sender.send(KeyPress(KeyPressArgs { key: keyboard::Escape })),
+            Some(sender) => sender.send(true),
             None => ()
         }
     }
@@ -98,7 +96,7 @@ impl App {
     /// Creates a new application.
     pub fn new() -> App {
         App {
-            stream_chan: None
+            kill_chan: None
         }
     }
 }
@@ -115,9 +113,16 @@ impl SoundStream for AppSoundStream {
 
     /// Update (gets called prior to audio_in/audio_out).
     fn update(&mut self, settings: &SoundStreamSettings, dt: u64) {
-        if self.is_print {
+        if self.should_print {
             let dtsec: f64 = dt as f64 / 1000000000f64;
             println!("Real-time sample rate: {}", (1f64 / dtsec) * settings.frames as f64);
+        }
+        match self.kill_chan {
+            Some(ref receiver) => match receiver.try_recv() {
+                Ok(_) => self.should_exit = true,
+                Err(_) => ()
+            },
+            None => ()
         }
     }
 
@@ -135,11 +140,11 @@ impl SoundStream for AppSoundStream {
     fn key_press(&mut self, args: &KeyPressArgs) {
         println!("Soundstream thread key: {}", args.key);
         if args.key == keyboard::Space {
-            let b_print = if self.is_print { false } else { true };
-            self.is_print = b_print;
+            let print = if self.should_print { false } else { true };
+            self.should_print = print;
         }
         if args.key == keyboard::Escape {
-            self.is_exit = true;
+            self.should_exit = true;
         }
     }
 
@@ -157,17 +162,17 @@ impl SoundStream for AppSoundStream {
     */
 
     /// Setup the exit condition (is checked once per buffer).
-    fn exit(&self) -> bool { self.is_exit }
+    fn exit(&self) -> bool { self.should_exit }
 
 }
 
 impl AppSoundStream {
     /// AppSoundStream constructor.
-    pub fn new(recv: Option<Receiver<GameEvent<'static>>>) -> AppSoundStream {
+    pub fn new(recv: Option<Receiver<bool>>) -> AppSoundStream {
         AppSoundStream {
-            chan: recv,
-            is_exit: false,
-            is_print: false,
+            kill_chan: recv,
+            should_exit: false,
+            should_print: false,
             buffer: vec![]
         }
     }
