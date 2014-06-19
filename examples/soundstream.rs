@@ -39,8 +39,8 @@ pub struct App {
 pub struct AppSoundStream {
     /// Channel for receiving game events from main game stream.
     chan: Option<Receiver<GameEvent<'static>>>, // Channel for receiving Events.
-    is_exit: bool, // Trigger for closing the stream.
-    is_print: bool, // Toggle for printing the sample_rate.
+    should_exit: bool, // Trigger for closing the stream.
+    should_print: bool, // Toggle for printing the sample_rate.
     buffer: Vec<f32> // Buffer for passing input to output.
 }
 
@@ -115,7 +115,7 @@ impl SoundStream for AppSoundStream {
 
     /// Update (gets called prior to audio_in/audio_out).
     fn update(&mut self, settings: &SoundStreamSettings, dt: u64) {
-        if self.is_print {
+        if self.should_print {
             let dtsec: f64 = dt as f64 / 1000000000f64;
             println!("Real-time sample rate: {}", (1f64 / dtsec) * settings.frames as f64);
         }
@@ -135,11 +135,11 @@ impl SoundStream for AppSoundStream {
     fn key_press(&mut self, args: &KeyPressArgs) {
         println!("Soundstream thread key: {}", args.key);
         if args.key == keyboard::Space {
-            let b_print = if self.is_print { false } else { true };
-            self.is_print = b_print;
+            let print = if self.should_print { false } else { true };
+            self.should_print = print;
         }
         if args.key == keyboard::Escape {
-            self.is_exit = true;
+            self.should_exit = true;
         }
     }
 
@@ -157,7 +157,7 @@ impl SoundStream for AppSoundStream {
     */
 
     /// Setup the exit condition (is checked once per buffer).
-    fn exit(&self) -> bool { self.is_exit }
+    fn exit(&self) -> bool { self.should_exit }
 
 }
 
@@ -166,8 +166,8 @@ impl AppSoundStream {
     pub fn new(recv: Option<Receiver<GameEvent<'static>>>) -> AppSoundStream {
         AppSoundStream {
             chan: recv,
-            is_exit: false,
-            is_print: false,
+            should_exit: false,
+            should_print: false,
             buffer: vec![]
         }
     }
