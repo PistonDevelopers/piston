@@ -5,7 +5,6 @@
  *
  * */
 
-#[cfg(portaudio)]
 use portaudio::*;
 use std::cell::Cell;
 use sound_stream::SoundStream;
