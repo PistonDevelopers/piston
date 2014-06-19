@@ -24,3 +24,7 @@ rusti.sh
 examples/expression
 
 examples/test_event_app
+
+examples/adventure
+
+watch.sh
