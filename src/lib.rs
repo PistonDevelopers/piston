@@ -18,6 +18,7 @@ extern crate sdl2_mixer;
 extern crate image;
 extern crate libc;
 extern crate debug;
+#[cfg(port_audio)]
 extern crate portaudio;
 
 pub use Game = game::Game;
@@ -60,7 +61,7 @@ pub use AudioBackEnd = audio_back_end::AudioBackEnd;
 pub use AudioSDL2 = sdl2_audio_back_end::AudioSDL2;
 pub use MusicSDL2 = sdl2_audio_back_end::MusicSDL2;
 pub use SoundSDL2 = sdl2_audio_back_end::SoundSDL2;
-
+#[cfg(port_audio)]
 pub use soundstreamer = pa_audio_back_end::soundstreamer;
 
 pub mod shader_utils;
@@ -83,4 +84,5 @@ mod music;
 mod sound;
 mod audio_back_end;
 mod sdl2_audio_back_end;
+#[cfg(port_audio)]
 mod pa_audio_back_end;

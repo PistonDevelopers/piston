@@ -21,7 +21,7 @@ pub trait SoundStream {
     fn load(&mut self) {}
 
     /// Update the physical state of the SoundStream.
-    fn update(&mut self, dt: u64) {}
+    fn update(&mut self, _dt: u64) {}
 
     /// User pressed a key.
     ///
@@ -48,12 +48,12 @@ pub trait SoundStream {
     /// Offers input via buffer of interleaved f32 samples (amplitude between -1 to 1).
     /// The input buffer's size is num_frames * num_channels.
     /// Get's called at a rate of (sample_rate / num_frames)hz.
-    fn audio_in(&mut self, input: &Vec<f32>,  num_frames: u32, num_channels: i32) {}
+    fn audio_in(&mut self, _input: &Vec<f32>,  _num_frames: u32, _num_channels: i32) {}
 
     /// Requests output via buffer as interleaved f32 samples (amplitude between -1 to 1).
     /// The output buffer's size is num_frames * num_channels.
     /// Get's called at a rate of (sample_rate / num_frames)hz.
-    fn audio_out(&mut self, output: &mut Vec<f32>,  num_frames: u32, num_channels: i32) {}
+    fn audio_out(&mut self, _output: &mut Vec<f32>,  _num_frames: u32, _num_channels: i32) {}
 
     /// Override this using a Receiver<GameEvent> to receive GameEvents from main app.
     fn check_for_event(&self) -> Option<InteractiveEvent> { None }

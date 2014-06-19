@@ -32,3 +32,5 @@ examples/audio
 examples/audio_iter
 
 examples/soundstream
+
+watch.sh
