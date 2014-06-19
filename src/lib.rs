@@ -23,6 +23,7 @@ extern crate portaudio;
 
 pub use Game = game::Game;
 pub use SoundStream = sound_stream::SoundStream;
+pub use SoundStreamSettings = sound_stream::SoundStreamSettings;
 
 pub use Render = game_iterator::Render;
 pub use Update = game_iterator::Update;
@@ -59,8 +60,7 @@ pub use AudioBackEnd = audio_back_end::AudioBackEnd;
 pub use AudioSDL2 = sdl2_audio_back_end::AudioSDL2;
 pub use MusicSDL2 = sdl2_audio_back_end::MusicSDL2;
 pub use SoundSDL2 = sdl2_audio_back_end::SoundSDL2;
-#[cfg(port_audio)]
-pub use soundstreamer = pa_audio_back_end::soundstreamer;
+//#[cfg(port_audio)]
 
 pub mod shader_utils;
 pub mod game_window;
@@ -83,4 +83,4 @@ mod sound;
 mod audio_back_end;
 mod sdl2_audio_back_end;
 #[cfg(port_audio)]
-mod pa_audio_back_end;
+mod port_audio_back_end;

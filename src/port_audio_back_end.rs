@@ -1,16 +1,11 @@
+//! PortAudio backend for Piston!
 
-/**
- *
- * PortAudio backend for Piston!
- *
- * */
 
-use portaudio::*;
+use portaudio::{ types, pa };
 use std::cell::Cell;
 use sound_stream::SoundStream;
-use time::precise_time_ns;
+use sound_stream::SoundStreamSettings;
 
-//------------------------------
 
 /// PortAudio Stream Parameters (required to setup stream).
 pub struct StreamParamsPA {
@@ -21,15 +16,14 @@ pub struct StreamParamsPA {
 /// PortAudio Stream (for reading from and writing to real-time audio stream).
 pub struct StreamPA {
     stream: pa::PaStream<f32>,
-    is_streaming: Cell<bool>
+    pub is_streaming: Cell<bool>
 }
 
-//------------------------------
-
+/// The parameters required to set up the PortAudio stream.
 impl StreamParamsPA {
 
     /// Creates the port audio stream parameters.
-    pub fn new(num_channels: i32) -> StreamParamsPA {
+    pub fn new(channels: i32) -> StreamParamsPA {
 
         //println!("Portaudio version : {}", pa::get_version());
         //println!("Portaudio version text : {}", pa::get_version_text());
@@ -57,14 +51,14 @@ impl StreamParamsPA {
         println!("Creating input");
         let stream_params_in = types::PaStreamParameters {
             device: def_input,
-            channel_count: 2,
+            channel_count: channels,
             sample_format: types::PaFloat32,
             suggested_latency: pa::get_device_info(def_input).unwrap().default_low_input_latency
         };
         println!("Creating output");
         let stream_params_out = types::PaStreamParameters {
             device: def_output,
-            channel_count: num_channels,
+            channel_count: channels,
             sample_format: types::PaFloat32,
             suggested_latency: pa::get_device_info(def_output).unwrap().default_low_output_latency
         };
@@ -99,7 +93,6 @@ impl StreamParamsPA {
 
 }
 
-//------------------------------
 
 impl StreamPA {
 
@@ -112,62 +105,35 @@ impl StreamPA {
     }
 
     /// Setup the portaudio stream.
-    pub fn setup(&mut self, sample_rate: f64, num_frames: u32, num_channels: i32) {
-        let params = StreamParamsPA::new(num_channels);
+    pub fn setup(&mut self, settings: &SoundStreamSettings) {
+        let params = StreamParamsPA::new(settings.channels);
         self.stream.open(Some(&params.input),
                          Some(&params.output),
-                         sample_rate,
-                         num_frames,
+                         settings.samples_per_second,
+                         settings.frames,
                          types::PaClipOff);
     }
 
-    /// Runs the portaudio stream stuff.
-    fn run<T: SoundStream>(&mut self, num_frames: u32, num_channels: i32, sound: &mut T) {
-        sound.load();
-        self.start();
-        let mut last_time: u64 = precise_time_ns();
-        let mut this_time: u64;
-        let mut diff_time: u64;
-        loop {
-            let event = sound.check_for_event();
-            match event {
-                Some(mut e) => sound.event(&mut e),
-                None => ()
-            }
-            this_time = precise_time_ns();
-            diff_time = this_time - last_time;
-            last_time = this_time;
-            sound.update(diff_time);
-            if sound.exit() {
-                self.is_streaming.set(false);
-                break;
-            }
-            else if self.is_streaming.get() {
-                self.callback(num_frames, num_channels, sound);
-            }
-        }
-        self.stop();
-    }
-
     /// Performs the audio read/write.
-    pub fn callback<T: SoundStream>(&mut self, num_frames: u32, num_channels: i32, sound: &mut T) {
+    pub fn callback<T: SoundStream>(&mut self, settings: &SoundStreamSettings, stream: &mut T) {
         let mut ready = 0;
         while ready == 0 {
             ready = self.stream.get_stream_write_available();
         }
-        let mut read: Vec<f32> = Vec::from_elem((num_frames * num_channels as u32) as uint, 0f32);
-        self.read(&mut read, num_frames, num_channels, sound);
-        let mut write: Vec<f32> = Vec::from_elem((num_frames * num_channels as u32) as uint, 0f32);
-        self.write(&mut write, num_frames, num_channels, sound);
+        let empty_buffer = Vec::from_elem((settings.frames * settings.channels as u32) as uint, 0f32);
+        let mut read: Vec<f32> = empty_buffer.clone();
+        self.read(&mut read, settings, stream);
+        let mut write: Vec<f32> = empty_buffer.clone();
+        self.write(&mut write, settings, stream);
     }
 
     /// Read audio in from stream.
-    pub fn read<T: SoundStream>(&self, buffer: &mut Vec<f32>, num_frames: u32,
-                                num_channels: i32, sound: &mut T) {
-        *buffer = match self.stream.read(num_frames as u32) {
-            Ok(res) => {
-                sound.audio_in(&res, num_frames, num_channels);
-                res
+    pub fn read<T: SoundStream>(&self, buffer: &mut Vec<f32>,
+                                settings: &SoundStreamSettings, stream: &mut T) {
+        *buffer = match self.stream.read(settings.frames as u32) {
+            Ok(in_buffer) => {
+                stream.audio_in(&in_buffer, settings);
+                in_buffer
             },
             Err(err) => {
                 fail!(format!("Portaudio error read : {}", pa::get_error_text(err)));
@@ -176,11 +142,11 @@ impl StreamPA {
     }
 
     /// Write audio to stream
-    pub fn write<T: SoundStream>(&mut self, buffer: &mut Vec<f32>, num_frames: u32,
-                                 num_channels: i32, sound: &mut T) {
-        sound.audio_out(buffer, num_frames, num_channels);
+    pub fn write<T: SoundStream>(&mut self, buffer: &mut Vec<f32>,
+                                 settings: &SoundStreamSettings, stream: &mut T) {
+        stream.audio_out(buffer, settings);
         let write: Vec<f32> = buffer.clone();
-        self.stream.write(write, num_frames);
+        self.stream.write(write, settings.frames);
     }
 
     /// Start the audio stream.
@@ -208,16 +174,3 @@ impl Drop for StreamPA {
     }
 }
 
-//------------------------------
-
-/// Run this in a separate task to initiate the realtime input/output
-/// audio stream. The SoundStream type will be iterated using the
-/// portaudio stream.
-pub fn soundstreamer<T: SoundStream>(sample_rate: f64, num_frames: u32,
-                                     num_channels: i32, sound: &mut T) {
-    let mut stream_pa = StreamPA::new();
-    stream_pa.setup(sample_rate, num_frames, num_channels);
-    stream_pa.run(num_frames, num_channels, sound);
-}
-
-//------------------------------
