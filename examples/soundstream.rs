@@ -23,14 +23,8 @@ use piston::{
     KeyPress,
     KeyPressArgs,
     SoundStream,
-    soundstreamer
+    SoundStreamSettings
 };
-
-//------------------------------
-
-static SAMPLE_RATE: f64 = 44100f64;
-static NUM_FRAMES: u32 = 1024u32;
-static NUM_CHANNELS: i32 = 2i32;
 
 // Structs
 //------------------------------
@@ -69,8 +63,8 @@ impl Game for App {
         // Create the soundstream on it's own thread for non-blocking, real-time audio.
         // "soundstreamer" will setup and iterate soundstream using portaudio.
         spawn(proc() {
-            let mut soundstream = AppSoundStream::new(Some(recv));
-            soundstreamer(SAMPLE_RATE, NUM_FRAMES, NUM_CHANNELS, &mut soundstream);
+            let mut soundstream =
+                AppSoundStream::new(Some(recv)).run(SoundStreamSettings::cd_quality());
         });
 
     }
@@ -120,20 +114,20 @@ impl SoundStream for AppSoundStream {
     }
 
     /// Update (gets called prior to audio_in/audio_out).
-    fn update(&mut self, dt: u64) {
+    fn update(&mut self, settings: &SoundStreamSettings, dt: u64) {
         if self.is_print {
             let dtsec: f64 = dt as f64 / 1000000000f64;
-            println!("Real-time sample rate: {}", (1f64 / dtsec) * NUM_FRAMES as f64);
+            println!("Real-time sample rate: {}", (1f64 / dtsec) * settings.frames as f64);
         }
     }
 
     /// AudioInput
-    fn audio_in(&mut self, input: &Vec<f32>, num_frames: u32, num_channels: i32) {
+    fn audio_in(&mut self, input: &Vec<f32>, settings: &SoundStreamSettings) {
         self.buffer = input.clone();
     }
 
     /// AudioOutput
-    fn audio_out(&mut self, output: &mut Vec<f32>, num_frames: u32, num_channels: i32) {
+    fn audio_out(&mut self, output: &mut Vec<f32>, settings: &SoundStreamSettings) {
         *output = self.buffer.clone()
     }
 
