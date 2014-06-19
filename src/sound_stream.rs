@@ -1,6 +1,6 @@
 //! SoundStream (real-time audio IO).
 
-use InteractiveEvent;
+use GameEvent;
 use KeyPress;
 use KeyPressArgs;
 use KeyRelease;
@@ -56,13 +56,13 @@ pub trait SoundStream {
     fn audio_out(&mut self, _output: &mut Vec<f32>,  _num_frames: u32, _num_channels: i32) {}
 
     /// Override this using a Receiver<GameEvent> to receive GameEvents from main app.
-    fn check_for_event(&self) -> Option<InteractiveEvent> { None }
+    fn check_for_event(&self) -> Option<GameEvent> { None }
 
     /// Override this with your exit condition for the soundstream task.
     fn exit(&self) -> bool { false }
 
     /// Handles a game event.
-    fn event(&mut self, event: &mut InteractiveEvent) {
+    fn event(&mut self, event: &mut GameEvent) {
         match *event {
             KeyPress(ref args) => self.key_press(args),
             KeyRelease(ref args) => self.key_release(args),
@@ -70,6 +70,7 @@ pub trait SoundStream {
             MouseRelease(ref args) => self.mouse_release(args),
             MouseMove(ref args) => self.mouse_move(args),
             MouseRelativeMove(ref args) => self.mouse_relative_move(args),
+            _ => {},
         }
     }
 
