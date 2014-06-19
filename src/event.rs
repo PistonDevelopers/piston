@@ -41,7 +41,7 @@ impl<'a> Clone for Event<'a> {
 
 impl<'a, 'b> AddPress<'a, PressEvent<'a, 'b>> for Event<'a> {
     #[inline(always)]
-    fn press(&'a self, key: &'a KeyType) -> PressEvent<'a, 'b> {
+    fn press(&'a self, key: &'a KeyType) -> PressEvent<'a, 'a> {
         PressEvent {
             key: Value(key),
         }
