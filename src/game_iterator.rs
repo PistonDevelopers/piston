@@ -6,7 +6,6 @@ use gl::types::GLint;
 use {
     Gl,
     GameWindow,
-    AudioSDL2,
 };
 use keyboard;
 use mouse;
@@ -25,11 +24,9 @@ pub struct RenderArgs<'a> {
 }
 
 /// Update argument.
-pub struct UpdateArgs<'a> {
+pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
-    /// SDL2 audio back-end
-    pub audio: &'a mut AudioSDL2,
 }
 
 /// Key press arguments.
@@ -93,7 +90,7 @@ pub enum GameEvent<'a> {
     /// Render graphics.
     Render(RenderArgs<'a>),
     /// Update physical state of the game.
-    Update(UpdateArgs<'a>),
+    Update(UpdateArgs),
     /// Interactive events.
     Interactive(InteractiveEvent)
 }
@@ -121,7 +118,6 @@ pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
     state: GameIteratorState,
     gl: Gl,
-    audio: AudioSDL2,
     bg_color: [f32, ..4],
     last_update: u64,
     update_time_in_ns: u64,
@@ -147,7 +143,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             game_window: game_window,
             state: RenderState,
             gl: Gl::new(),
-            audio: AudioSDL2::new(),
             last_update: start,
             update_time_in_ns: billion / updates_per_second,
             dt: 1.0 / updates_per_second as f64,
@@ -280,7 +275,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 self.last_update += self.update_time_in_ns;
                 return Some(Update(UpdateArgs{
                     dt: self.dt,
-                    audio: &mut self.audio,
                 }));
             },
         };

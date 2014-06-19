@@ -7,6 +7,7 @@ use piston::{
     keyboard,
     AssetStore,
     AudioBackEnd,
+    AudioSDL2,
     Game,
     GameWindow,
     GameWindowSDL2,
@@ -20,7 +21,7 @@ use piston::{
 pub struct App {
     play_sound: bool,
     is_playing_background_music: bool,
-
+    audio: AudioSDL2,
     sound: Option<SoundSDL2>,
     music: Option<MusicSDL2>,
 }
@@ -31,7 +32,7 @@ impl App {
         App {
             play_sound: false,
             is_playing_background_music: false,
-
+            audio: AudioSDL2::new(),
             sound: None,
             music: None,
         }
@@ -47,14 +48,14 @@ impl Game for App {
         self.music = Some(MusicSDL2::from_path(&music).unwrap());
     }
 
-    fn update(&mut self, args: &mut UpdateArgs) {
+    fn update(&mut self, _args: &mut UpdateArgs) {
         if !self.is_playing_background_music {
-            args.audio.play_music(self.music.get_ref());
+            self.audio.play_music(self.music.get_ref());
             self.is_playing_background_music = true;
         }
 
         if self.play_sound {
-            args.audio.play_sound(self.sound.get_ref());
+            self.audio.play_sound(self.sound.get_ref());
             self.play_sound = false;
         }
     }
