@@ -72,12 +72,8 @@ pub struct MouseRelativeMoveArgs {
     pub dy: f64,
 }
 
-/// Contains the different game events.
-pub enum GameEvent<'a> {
-    /// Render graphics.
-    Render(RenderArgs<'a>),
-    /// Update physical state of the game.
-    Update(UpdateArgs<'a>),
+/// Contains interactive type events.
+pub enum InteractiveEvent {
     /// Pressed a keyboard key.
     KeyPress(KeyPressArgs),
     /// Released a keyboard key.
@@ -89,7 +85,17 @@ pub enum GameEvent<'a> {
     /// Moved mouse cursor.
     MouseMove(MouseMoveArgs),
     /// Moved mouse relative, not bounded by cursor.
-    MouseRelativeMove(MouseRelativeMoveArgs),
+    MouseRelativeMove(MouseRelativeMoveArgs)
+}
+
+/// Contains the different game events.
+pub enum GameEvent<'a> {
+    /// Render graphics.
+    Render(RenderArgs<'a>),
+    /// Update physical state of the game.
+    Update(UpdateArgs<'a>),
+    /// Interactive events.
+    Interactive(InteractiveEvent)
 }
 
 enum GameIteratorState {
@@ -185,6 +191,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                     ));
                 }
 
+
                 self.state = PrepareUpdateLoopState;
                 return self.next();
             },
@@ -224,24 +231,24 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 // Handle all events before updating.
                 return match self.game_window.poll_event() {
                     event::KeyPressed(key) => {
-                        Some(KeyPress(KeyPressArgs {
+                        Some(Interactive(KeyPress(KeyPressArgs {
                             key: key,
-                        }))
+                        })))
                     },
                     event::KeyReleased(key) => {
-                        Some(KeyRelease(KeyReleaseArgs {
+                        Some(Interactive(KeyRelease(KeyReleaseArgs {
                             key: key,
-                        }))
+                        })))
                     },
                     event::MouseButtonPressed(mouse_button) => {
-                        Some(MousePress(MousePressArgs {
+                        Some(Interactive(MousePress(MousePressArgs {
                             button: mouse_button,
-                        }))
+                        })))
                     },
                     event::MouseButtonReleased(mouse_button) => {
-                        Some(MouseRelease(MouseReleaseArgs {
+                        Some(Interactive(MouseRelease(MouseReleaseArgs {
                             button: mouse_button,
-                        }))
+                        })))
                     },
                     event::MouseMoved(x, y, relative_move) => {
                         match relative_move {
@@ -249,10 +256,10 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                                 self.state = MouseRelativeMoveState(dx, dy),
                             None => {},
                         };
-                        Some(MouseMove(MouseMoveArgs {
+                        Some(Interactive(MouseMove(MouseMoveArgs {
                             x: x,
                             y: y,
-                        }))
+                        })))
                     },
                     event::NoEvent => {
                         self.state = UpdateState;
@@ -262,10 +269,10 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             },
             MouseRelativeMoveState(dx, dy) => {
                 self.state = HandleEventsState;
-                return Some(MouseRelativeMove(MouseRelativeMoveArgs {
+                return Some(Interactive(MouseRelativeMove(MouseRelativeMoveArgs {
                     dx: dx,
                     dy: dy,
-                }));
+                })));
             },
             UpdateState => {
                 self.updated += 1;

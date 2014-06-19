@@ -15,6 +15,7 @@ use piston::{
     GameWindowSDL2,
     GameWindowSettings,
     Update,
+    Interactive,
     KeyPress,
     AudioBackEnd,
     SoundSDL2,
@@ -59,7 +60,7 @@ fn main() {
         match game_iter.next() {
             None => { break },
             Some(e) => match e {
-                KeyPress(args) => {
+                Interactive(KeyPress(args)) => {
                     if args.key == keyboard::Space {
                         play_sound = true;
                     }

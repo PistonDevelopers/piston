@@ -30,3 +30,5 @@ examples/image_iter
 examples/audio
 
 examples/audio_iter
+
+examples/soundstream
