@@ -62,7 +62,7 @@ fn main() {
         match game_iter.next() {
             None => { break },
             Some(e) => match e {
-                Interactive(KeyPress(args)) => {
+                KeyPress(args) => {
                     if args.key == keyboard::Space {
                         play_sound = true;
                     }
