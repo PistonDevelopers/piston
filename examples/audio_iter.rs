@@ -15,7 +15,6 @@ use piston::{
     GameWindowSDL2,
     GameWindowSettings,
     Update,
-    Interactive,
     KeyPress,
     AudioBackEnd,
     AudioSDL2,
