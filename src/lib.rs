@@ -18,11 +18,14 @@ extern crate sdl2_mixer;
 extern crate image;
 extern crate libc;
 extern crate debug;
+extern crate portaudio;
 
 pub use Game = game::Game;
+pub use SoundStream = sound_stream::SoundStream;
 
 pub use Render = game_iterator::Render;
 pub use Update = game_iterator::Update;
+pub use Interactive = game_iterator::Interactive;
 pub use KeyPress = game_iterator::KeyPress;
 pub use KeyRelease = game_iterator::KeyRelease;
 pub use MousePress = game_iterator::MousePress;
@@ -30,6 +33,7 @@ pub use MouseRelease = game_iterator::MouseRelease;
 pub use MouseMove = game_iterator::MouseMove;
 pub use MouseRelativeMove = game_iterator::MouseRelativeMove;
 
+pub use InteractiveEvent = game_iterator::InteractiveEvent;
 pub use GameEvent = game_iterator::GameEvent;
 pub use GameIterator = game_iterator::GameIterator;
 pub use GameIteratorSettings = game_iterator::GameIteratorSettings;
@@ -57,6 +61,8 @@ pub use AudioSDL2 = sdl2_audio_back_end::AudioSDL2;
 pub use MusicSDL2 = sdl2_audio_back_end::MusicSDL2;
 pub use SoundSDL2 = sdl2_audio_back_end::SoundSDL2;
 
+pub use soundstreamer = pa_audio_back_end::soundstreamer;
+
 pub mod shader_utils;
 pub mod game_window;
 pub mod keyboard;
@@ -64,6 +70,7 @@ pub mod event;
 pub mod mouse;
 
 mod game;
+mod sound_stream;
 mod game_iterator;
 mod game_window_sdl2;
 mod game_window_glfw;
@@ -76,3 +83,4 @@ mod music;
 mod sound;
 mod audio_back_end;
 mod sdl2_audio_back_end;
+mod pa_audio_back_end;

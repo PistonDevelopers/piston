@@ -5,6 +5,7 @@ use graphics::Context;
 
 // Local crate.
 use GameEvent;
+use Interactive;
 use GameWindow = game_window::GameWindow;
 use GameIteratorSettings;
 use AssetStore;
@@ -25,6 +26,7 @@ use Render;
 use RenderArgs;
 use Update;
 use UpdateArgs;
+use InteractiveEvent;
 
 /// Implemented by game applications.
 pub trait Game {
@@ -64,6 +66,9 @@ pub trait Game {
     /// Moved mouse relative, not bounded by cursor.
     fn mouse_relative_move(&mut self, _args: &MouseRelativeMoveArgs) {}
 
+    /// Override to specify event broadcaster.
+    fn get_event_sender(&self) -> Option<Sender<InteractiveEvent>> { None }
+
     /// Handles a game event.
     fn event(&mut self, event: &mut GameEvent) {
         match *event {
@@ -75,12 +80,20 @@ pub trait Game {
                 args
             ),
             Update(ref mut args) => self.update(args),
-            KeyPress(ref args) => self.key_press(args),
-            KeyRelease(ref args) => self.key_release(args),
-            MousePress(ref args) => self.mouse_press(args),
-            MouseRelease(ref args) => self.mouse_release(args),
-            MouseMove(ref args) => self.mouse_move(args),
-            MouseRelativeMove(ref args) => self.mouse_relative_move(args),
+            Interactive(ref interactive) => {
+                match self.get_event_sender() {
+                    Some(sender) => sender.send(*interactive),
+                    None => ()
+                };
+                match *interactive {
+                    KeyPress(ref args) => self.key_press(args),
+                    KeyRelease(ref args) => self.key_release(args),
+                    MousePress(ref args) => self.mouse_press(args),
+                    MouseRelease(ref args) => self.mouse_release(args),
+                    MouseMove(ref args) => self.mouse_move(args),
+                    MouseRelativeMove(ref args) => self.mouse_relative_move(args),
+                }
+            }
         }
     }
 
@@ -90,6 +103,7 @@ pub trait Game {
         game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
+        println!("Pre-GameIterator::new");
         let mut game_iter = GameIterator::new(
             game_window,
             &GameIteratorSettings {
@@ -97,7 +111,9 @@ pub trait Game {
                 max_frames_per_second: 60
             });
 
+        println!("Pre-load");
         self.load(asset_store);
+        println!("Post-load");
 
         loop {
             match game_iter.next() {
