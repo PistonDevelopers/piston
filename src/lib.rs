@@ -26,7 +26,6 @@ pub use SoundStream = sound_stream::SoundStream;
 
 pub use Render = game_iterator::Render;
 pub use Update = game_iterator::Update;
-pub use Interactive = game_iterator::Interactive;
 pub use KeyPress = game_iterator::KeyPress;
 pub use KeyRelease = game_iterator::KeyRelease;
 pub use MousePress = game_iterator::MousePress;
@@ -34,7 +33,6 @@ pub use MouseRelease = game_iterator::MouseRelease;
 pub use MouseMove = game_iterator::MouseMove;
 pub use MouseRelativeMove = game_iterator::MouseRelativeMove;
 
-pub use InteractiveEvent = game_iterator::InteractiveEvent;
 pub use GameEvent = game_iterator::GameEvent;
 pub use GameIterator = game_iterator::GameIterator;
 pub use GameIteratorSettings = game_iterator::GameIteratorSettings;

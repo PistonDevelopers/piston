@@ -69,8 +69,12 @@ pub struct MouseRelativeMoveArgs {
     pub dy: f64,
 }
 
-/// Contains interactive type events.
-pub enum InteractiveEvent {
+/// Contains the different game events.
+pub enum GameEvent<'a> {
+    /// Render graphics.
+    Render(RenderArgs<'a>),
+    /// Update physical state of the game.
+    Update(UpdateArgs),
     /// Pressed a keyboard key.
     KeyPress(KeyPressArgs),
     /// Released a keyboard key.
@@ -85,14 +89,22 @@ pub enum InteractiveEvent {
     MouseRelativeMove(MouseRelativeMoveArgs)
 }
 
-/// Contains the different game events.
-pub enum GameEvent<'a> {
-    /// Render graphics.
-    Render(RenderArgs<'a>),
-    /// Update physical state of the game.
-    Update(UpdateArgs),
-    /// Interactive events.
-    Interactive(InteractiveEvent)
+impl<'a> GameEvent<'a> {
+    /// Maps event to something that can be sent between tasks if possible.
+    ///
+    /// Render events are not sendable between tasks. 
+    pub fn to_sendable(&'a self) -> Option<GameEvent<'static>> {
+        match *self {
+            Render(_) => None,
+            Update(args) => Some(Update(args)),
+            KeyPress(args) => Some(KeyPress(args)),
+            KeyRelease(args) => Some(KeyRelease(args)),
+            MousePress(args) => Some(MousePress(args)),
+            MouseRelease(args) => Some(MouseRelease(args)),
+            MouseMove(args) => Some(MouseMove(args)),
+            MouseRelativeMove(args) => Some(MouseRelativeMove(args)),
+        }
+    }
 }
 
 enum GameIteratorState {
@@ -226,24 +238,24 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 // Handle all events before updating.
                 return match self.game_window.poll_event() {
                     event::KeyPressed(key) => {
-                        Some(Interactive(KeyPress(KeyPressArgs {
+                        Some(KeyPress(KeyPressArgs {
                             key: key,
-                        })))
+                        }))
                     },
                     event::KeyReleased(key) => {
-                        Some(Interactive(KeyRelease(KeyReleaseArgs {
+                        Some(KeyRelease(KeyReleaseArgs {
                             key: key,
-                        })))
+                        }))
                     },
                     event::MouseButtonPressed(mouse_button) => {
-                        Some(Interactive(MousePress(MousePressArgs {
+                        Some(MousePress(MousePressArgs {
                             button: mouse_button,
-                        })))
+                        }))
                     },
                     event::MouseButtonReleased(mouse_button) => {
-                        Some(Interactive(MouseRelease(MouseReleaseArgs {
+                        Some(MouseRelease(MouseReleaseArgs {
                             button: mouse_button,
-                        })))
+                        }))
                     },
                     event::MouseMoved(x, y, relative_move) => {
                         match relative_move {
@@ -251,10 +263,10 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                                 self.state = MouseRelativeMoveState(dx, dy),
                             None => {},
                         };
-                        Some(Interactive(MouseMove(MouseMoveArgs {
+                        Some(MouseMove(MouseMoveArgs {
                             x: x,
                             y: y,
-                        })))
+                        }))
                     },
                     event::NoEvent => {
                         self.state = UpdateState;
@@ -264,10 +276,10 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             },
             MouseRelativeMoveState(dx, dy) => {
                 self.state = HandleEventsState;
-                return Some(Interactive(MouseRelativeMove(MouseRelativeMoveArgs {
+                return Some(MouseRelativeMove(MouseRelativeMoveArgs {
                     dx: dx,
                     dy: dy,
-                })));
+                }));
             },
             UpdateState => {
                 self.updated += 1;
