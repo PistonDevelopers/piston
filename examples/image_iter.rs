@@ -9,7 +9,6 @@ use piston::{
     AssetStore,
     GameIterator,
     GameIteratorSettings,
-    GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
     Render,
@@ -23,7 +22,7 @@ fn start(argc: int, argv: **u8) -> int {
 }
 
 fn main() {
-    let mut window: GameWindowSDL2 = GameWindow::new(
+    let mut window = GameWindowSDL2::new(
         GameWindowSettings {
             title: "Image".to_string(),
             size: [300, 300],

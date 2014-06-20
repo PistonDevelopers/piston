@@ -9,7 +9,6 @@ use piston::{
     AudioBackEnd,
     AudioSDL2,
     Game,
-    GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
     SoundSDL2,
@@ -74,7 +73,7 @@ fn start(argc: int, argv: **u8) -> int {
 }
 
 fn main() {
-    let mut window: GameWindowSDL2 = GameWindow::new(
+    let mut window = GameWindowSDL2::new(
         GameWindowSettings {
             title: "Audio".to_string(),
             size: [300, 300],
