@@ -137,9 +137,9 @@ pub struct GameIteratorSettings {
 /// let mut game_iter = GameIterator::new(&mut window, &game_iter_settings);
 /// loop {
 ///     match game_iter.next() {
-///         None => { break },
-///         Some(e) => match e {
-///             Render(args) => {
+///         None => break,
+///         Some(mut e) => match e {
+///             Render(ref mut args) => {
 ///                 // Create graphics context with absolute coordinates.
 ///                 let c = Context::abs(args.width as f64, args.height as f64);
 ///                 // Do rendering here.
