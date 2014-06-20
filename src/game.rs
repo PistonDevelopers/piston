@@ -90,7 +90,6 @@ pub trait Game {
         game_window: &mut W,
         asset_store: &mut AssetStore
     ) {
-        println!("Pre-GameIterator::new");
         let mut game_iter = GameIterator::new(
             game_window,
             &GameIteratorSettings {
@@ -98,9 +97,7 @@ pub trait Game {
                 max_frames_per_second: 60
             });
 
-        println!("Pre-load");
         self.load(asset_store);
-        println!("Post-load");
 
         loop {
             match game_iter.next() {
