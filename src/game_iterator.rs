@@ -126,6 +126,27 @@ pub struct GameIteratorSettings {
 }
 
 /// A game loop iterator.
+///
+/// Example:
+///
+/// ```Rust
+/// let game_iter_settings = GameIteratorSettings {
+///     updates_per_second: 120,
+///     max_frames_per_second: 60,
+/// };
+/// let mut game_iter = GameIterator::new(&mut window, &game_iter_settings);
+/// loop {
+///     match game_iter.next() {
+///         None => { break },
+///         Some(e) => match e {
+///             Render(args) => {
+///                 // Do rendering here.
+///             },
+///             _ => {},       
+///         },
+///     }
+/// }
+/// ```
 pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
     state: GameIteratorState,
