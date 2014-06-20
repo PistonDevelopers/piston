@@ -26,8 +26,9 @@ pub struct GameWindowSDL2 {
     last_pressed_key: Option<sdl2::keycode::KeyCode>,
 }
 
-impl GameWindow for GameWindowSDL2 {
-    fn new(settings: GameWindowSettings) -> GameWindowSDL2 {
+impl GameWindowSDL2 {
+    /// Creates a new game window for SDL2.
+    pub fn new(settings: GameWindowSettings) -> GameWindowSDL2 {
         sdl2::video::gl_set_attribute(sdl2::video::GLContextMajorVersion, 3);
         sdl2::video::gl_set_attribute(sdl2::video::GLContextMinorVersion, 3);
         sdl2::video::gl_set_attribute(sdl2::video::GLContextProfileMask, sdl2::video::ll::SDL_GL_CONTEXT_PROFILE_CORE as int);
@@ -56,7 +57,9 @@ impl GameWindow for GameWindowSDL2 {
             last_pressed_key: None,
         }
     }
+}
 
+impl GameWindow for GameWindowSDL2 {
     fn get_settings<'a>(&'a self) -> &'a GameWindowSettings {
         &self.settings
     }

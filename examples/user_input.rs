@@ -6,7 +6,6 @@ extern crate piston;
 use piston::{
     AssetStore,
     Game,
-    GameWindow,
     GameWindowSDL2,
     GameWindowSettings,
     KeyPressArgs,
@@ -61,7 +60,7 @@ fn start(argc: int, argv: **u8) -> int {
 }
 
 fn main() {
-    let mut window: GameWindowSDL2 = GameWindow::new(
+    let mut window = GameWindowSDL2::new(
         GameWindowSettings {
             title: "Keycode".to_string(),
             size: [300, 300],

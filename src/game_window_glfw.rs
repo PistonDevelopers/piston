@@ -29,6 +29,36 @@ pub struct GameWindowGLFW {
 }
 
 impl GameWindowGLFW {
+    /// Creates a new game window for GLFW.
+    pub fn new(settings: GameWindowSettings) -> GameWindowGLFW {
+        use glfw::Context;
+
+        // Create GLFW window.
+        let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+        let (window, events) = glfw.create_window(
+            settings.size[0],
+            settings.size[1],
+            settings.title.as_slice(), glfw::Windowed
+        ).expect("Failed to create GLFW window.");
+        window.set_key_polling(true);
+        window.set_mouse_button_polling(true);
+        window.set_cursor_pos_polling(true);
+        // or polling all event
+        //window.set_all_polling(true);
+        window.make_current();
+
+        // Load the OpenGL function pointers
+        gl::load_with(|s| glfw.get_proc_address(s));
+
+        GameWindowGLFW {
+            window: window,
+            events: events,
+            glfw: glfw,
+            settings: settings,
+            event_queue: RingBuf::<event::Event>::new(),
+        }
+    }
+
     fn flush_messages(&mut self) {
         if self.event_queue.len() != 0 {
             return;
@@ -68,35 +98,6 @@ impl GameWindowGLFW {
 }
 
 impl GameWindow for GameWindowGLFW {
-    fn new(settings: GameWindowSettings) -> GameWindowGLFW {
-        use glfw::Context;
-
-        // Create GLFW window.
-        let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-        let (window, events) = glfw.create_window(
-            settings.size[0],
-            settings.size[1],
-            settings.title.as_slice(), glfw::Windowed
-        ).expect("Failed to create GLFW window.");
-        window.set_key_polling(true);
-        window.set_mouse_button_polling(true);
-        window.set_cursor_pos_polling(true);
-        // or polling all event
-        //window.set_all_polling(true);
-        window.make_current();
-
-        // Load the OpenGL function pointers
-        gl::load_with(|s| glfw.get_proc_address(s));
-
-        GameWindowGLFW {
-            window: window,
-            events: events,
-            glfw: glfw,
-            settings: settings,
-            event_queue: RingBuf::<event::Event>::new(),
-        }
-    }
-
     fn get_settings<'a>(&'a self) -> &'a GameWindowSettings {
         &self.settings
     }
