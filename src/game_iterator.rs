@@ -140,6 +140,8 @@ pub struct GameIteratorSettings {
 ///         None => { break },
 ///         Some(e) => match e {
 ///             Render(args) => {
+///                 // Create graphics context with absolute coordinates.
+///                 let c = Context::abs(args.width as f64, args.height as f64);
 ///                 // Do rendering here.
 ///             },
 ///             _ => {},       
