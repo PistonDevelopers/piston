@@ -97,8 +97,8 @@ help:
 	&& echo "make rusti             - Setup 'rusti.sh' for interactive Rust" \
 	&& echo "make watch             - Setup 'watch.sh' for compilation on save" \
 	&& echo "make loc               - Count lines of code in src folder" \
-	&& echo "make nightly-install   - Installs Rust nightly built" \
-	&& echo "make nightly-uninstall - Uninstalls Rust nightly built" \
+	&& echo "make nightly-install   - Installs Rust nightly build" \
+	&& echo "make nightly-uninstall - Uninstalls Rust nightly build" \
 	&& echo "make clean             - Deletes binaries and documentation." \
 	&& echo "make clear-project     - WARNING: Deletes project files except 'Makefile'" \
 	&& echo "make clear-git         - WARNING: Deletes Git setup" \
@@ -234,7 +234,7 @@ rust-ci-exe: $(EXE_ENTRY_FILE)
 
 doc: $(SOURCE_FILES) | src/
 	$(Q)$(RUSTDOC) $(LIB_ENTRY_FILE) -L "target/$(TARGET)/lib" \
-	&& echo "--- Built documentation"
+	&& echo "--- Build documentation"
 
 run: exe
 	$(Q)cd bin/ \
@@ -246,7 +246,7 @@ exe: bin/main | $(TARGET_LIB_DIR)
 
 bin/main: $(SOURCE_FILES) | bin/ $(EXE_ENTRY_FILE)
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) $(EXE_ENTRY_FILE) -o bin/main -L "target/$(TARGET)/lib" \
-	&& echo "--- Built executable" \
+	&& echo "--- Build executable" \
 	&& echo "--- Type 'make run' to run executable"
 
 test: test-internal test-external
@@ -259,7 +259,7 @@ test-external: bin/test-external
 
 bin/test-external: $(SOURCE_FILES) | rlib bin/ src/test.rs
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --test src/test.rs -o bin/test-external -L "target/$(TARGET)/lib" \
-	&& echo "--- Built external test runner"
+	&& echo "--- Build external test runner"
 
 test-internal: bin/test-internal
 	$(Q)cd "bin/" \
@@ -267,7 +267,7 @@ test-internal: bin/test-internal
 
 bin/test-internal: $(SOURCE_FILES) | rlib src/ bin/
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --test $(LIB_ENTRY_FILE) -o bin/test-internal -L "target/$(TARGET)/lib" \
-	&& echo "--- Built internal test runner"
+	&& echo "--- Build internal test runner"
 
 bench: bench-internal bench-external
 
@@ -284,13 +284,13 @@ rlib: $(RLIB)
 
 $(RLIB): $(SOURCE_FILES) | $(LIB_ENTRY_FILE) $(TARGET_LIB_DIR)
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=rlib $(LIB_ENTRY_FILE) -L "target/$(TARGET)/lib" --out-dir "target/$(TARGET)/lib/" \
-	&& echo "--- Built rlib"
+	&& echo "--- Build rlib"
 
 dylib: $(DYLIB)
 
 $(DYLIB): $(SOURCE_FILES) | $(LIB_ENTRY_FILE) $(TARGET_LIB_DIR)
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=dylib $(LIB_ENTRY_FILE) -L "target/$(TARGET)/lib" --out-dir "target/$(TARGET)/lib/" \
-	&& echo "--- Built dylib"
+	&& echo "--- Build dylib"
 
 bin/:
 	$(Q)mkdir -p bin
@@ -329,7 +329,7 @@ examples: $(EXAMPLE_FILES)
 
 $(EXAMPLE_FILES): lib examples-dir
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) $@ -L "target/$(TARGET)/lib" --out-dir examples/ \
-	&& echo "--- Built examples"
+	&& echo "--- Build examples"
 
 $(EXE_ENTRY_FILE): | src/
 	$(Q)test -e $(EXE_ENTRY_FILE) \
