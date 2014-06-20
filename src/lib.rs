@@ -22,7 +22,9 @@ extern crate debug;
 extern crate portaudio;
 
 pub use Game = game::Game;
+#[cfg(port_audio)]
 pub use SoundStream = sound_stream::SoundStream;
+#[cfg(port_audio)]
 pub use SoundStreamSettings = sound_stream::SoundStreamSettings;
 
 pub use Render = game_iterator::Render;
@@ -60,7 +62,6 @@ pub use AudioBackEnd = audio_back_end::AudioBackEnd;
 pub use AudioSDL2 = sdl2_audio_back_end::AudioSDL2;
 pub use MusicSDL2 = sdl2_audio_back_end::MusicSDL2;
 pub use SoundSDL2 = sdl2_audio_back_end::SoundSDL2;
-//#[cfg(port_audio)]
 
 pub mod shader_utils;
 pub mod game_window;
@@ -69,6 +70,7 @@ pub mod event;
 pub mod mouse;
 
 mod game;
+#[cfg(port_audio)]
 mod sound_stream;
 mod game_iterator;
 mod game_window_sdl2;
