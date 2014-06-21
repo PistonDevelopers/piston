@@ -32,7 +32,7 @@ pub trait Game {
     ///
     /// `context` is a Rust-Graphics context.
     /// `gl` is the Piston OpenGL back-end for Rust-Graphics.
-    fn render(&self, _context: &Context, _args: &mut RenderArgs) {}
+    fn render(&mut self, _context: &Context, _args: &mut RenderArgs) {}
 
     /// Update the physical state of the game.
     ///
