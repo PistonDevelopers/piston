@@ -18,14 +18,8 @@ extern crate sdl2_mixer;
 extern crate image;
 extern crate libc;
 extern crate debug;
-#[cfg(port_audio)]
-extern crate portaudio;
 
 pub use Game = game::Game;
-#[cfg(port_audio)]
-pub use SoundStream = sound_stream::SoundStream;
-#[cfg(port_audio)]
-pub use SoundStreamSettings = sound_stream::SoundStreamSettings;
 
 pub use Render = game_iterator::Render;
 pub use Update = game_iterator::Update;
@@ -70,8 +64,6 @@ pub mod event;
 pub mod mouse;
 
 mod game;
-#[cfg(port_audio)]
-mod sound_stream;
 mod game_iterator;
 mod game_window_sdl2;
 mod game_window_glfw;
@@ -84,5 +76,3 @@ mod music;
 mod sound;
 mod audio_back_end;
 mod sdl2_audio_back_end;
-#[cfg(port_audio)]
-mod port_audio_back_end;
