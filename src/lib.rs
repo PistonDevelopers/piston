@@ -7,14 +7,13 @@
 extern crate glfw;
 #[cfg(sdl2)]
 extern crate sdl2;
-
+#[cfg(glfw)]
+#[cfg(sdl2)]
+extern crate gl;
 extern crate time;
 extern crate graphics;
 extern crate log;
 extern crate collections;
-extern crate gl;
-extern crate image;
-extern crate libc;
 extern crate debug;
 
 pub use Game = game::Game;
@@ -46,11 +45,8 @@ pub use GameWindowSDL2 = game_window_sdl2::GameWindowSDL2;
 #[cfg(glfw)]
 pub use GameWindowGLFW = game_window_glfw::GameWindowGLFW;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
-pub use Gl = gl_back_end::Gl;
 pub use AssetStore = asset_store::AssetStore;
-pub use Texture = texture::Texture;
 
-pub mod shader_utils;
 pub mod game_window;
 pub mod keyboard;
 pub mod event;
@@ -59,9 +55,7 @@ pub mod mouse;
 mod game;
 mod game_iterator;
 mod game_window_settings;
-mod gl_back_end;
 mod asset_store;
-mod texture;
 
 #[cfg(sdl2)]
 mod game_window_sdl2;
