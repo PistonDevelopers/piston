@@ -46,7 +46,6 @@ impl App {
 
         let program = Program::link([Shader::compile(VERTEX_SHADER, hgl::VertexShader).unwrap(),
         Shader::compile(FRAGMENT_SHADER, hgl::FragmentShader).unwrap()]).unwrap();
-        program.bind_frag(0, "out_color");
         program.bind();
 
         let vbo = Vbo::from_data([
