@@ -1,12 +1,7 @@
 use time;
 use std::io::timer::sleep;
-use gl;
-use gl::types::GLint;
 
-use {
-    Gl,
-    GameWindow,
-};
+use GameWindow;
 use keyboard;
 use mouse;
 use event;
@@ -16,8 +11,6 @@ pub struct RenderArgs<'a> {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
     /// OpenGL back-end for Rust-Graphics.
-    pub gl: &'a mut Gl,
-    /// The width of rendered area.
     pub width: u32,
     /// The height of rendered area.
     pub height: u32,
@@ -152,8 +145,6 @@ pub struct GameIteratorSettings {
 pub struct GameIterator<'a, W> {
     game_window: &'a mut W,
     state: GameIteratorState,
-    gl: Gl,
-    bg_color: [f32, ..4],
     last_update: u64,
     update_time_in_ns: u64,
     dt: f64,
@@ -169,7 +160,6 @@ static billion: u64 = 1_000_000_000;
 impl<'a, W: GameWindow> GameIterator<'a, W> {
     /// Creates a new game iterator.
     pub fn new(game_window: &'a mut W, settings: &GameIteratorSettings) -> GameIterator<'a, W> {
-        let bg_color = game_window.get_settings().background_color;
         let updates_per_second: u64 = settings.updates_per_second;
         let max_frames_per_second: u64 = settings.max_frames_per_second;
 
@@ -177,7 +167,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         GameIterator {
             game_window: game_window,
             state: RenderState,
-            gl: Gl::new(),
             last_update: start,
             update_time_in_ns: billion / updates_per_second,
             dt: 1.0 / updates_per_second as f64,
@@ -186,7 +175,6 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             min_ns_per_frame: billion / max_frames_per_second,
             start_render: start,
             next_render: start,
-            bg_color: bg_color,
             updated: 0,
         }
     }
@@ -201,20 +189,12 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                 // Rendering code
                 let (w, h) = self.game_window.get_size();
                 if w != 0 && h != 0 {
-                    gl::Viewport(0, 0, w as GLint, h as GLint);
-                    let r = self.bg_color[0];
-                    let g = self.bg_color[1];
-                    let b = self.bg_color[2];
-                    let a = self.bg_color[3];
-                    gl::ClearColor(r, g, b, a);
-                    gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
                     // Swap buffers next time.
                     self.state = SwapBuffersState;
                     return Some(Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             // 'start_render' is always bigger than 'last_update'.
                             ext_dt: (self.start_render - self.last_update) as f64 / billion as f64,
-                            gl: &mut self.gl,
                             width: w,
                             height: h,
                         }

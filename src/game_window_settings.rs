@@ -9,8 +9,6 @@ pub struct GameWindowSettings {
     pub fullscreen: bool,
     /// If true, exit when pressing Esc.
     pub exit_on_esc: bool,
-    /// The background color.
-    pub background_color: [f32, ..4],
 }
 
 impl GameWindowSettings {
@@ -24,7 +22,6 @@ impl GameWindowSettings {
             size: [640, 480],
             fullscreen: false,
             exit_on_esc: true,
-            background_color: [0.0, 0.0, 0.0, 1.0],
         }
     }
 }
