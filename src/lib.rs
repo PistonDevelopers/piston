@@ -3,14 +3,16 @@
 #![warn(dead_code)]
 
 //! A user friendly graphics engine.
+#[cfg(glfw)]
+extern crate glfw;
+#[cfg(sdl2)]
+extern crate sdl2;
 
 extern crate time;
 extern crate graphics;
 extern crate log;
 extern crate collections;
 extern crate gl;
-extern crate glfw;
-extern crate sdl2;
 extern crate image;
 extern crate libc;
 extern crate debug;
@@ -39,7 +41,9 @@ pub use MouseMoveArgs = game_iterator::MouseMoveArgs;
 pub use MouseRelativeMoveArgs = game_iterator::MouseRelativeMoveArgs;
 
 pub use GameWindow = game_window::GameWindow;
+#[cfg(sdl2)]
 pub use GameWindowSDL2 = game_window_sdl2::GameWindowSDL2;
+#[cfg(glfw)]
 pub use GameWindowGLFW = game_window_glfw::GameWindowGLFW;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use Gl = gl_back_end::Gl;
@@ -54,10 +58,13 @@ pub mod mouse;
 
 mod game;
 mod game_iterator;
-mod game_window_sdl2;
-mod game_window_glfw;
 mod game_window_settings;
 mod gl_back_end;
 mod asset_store;
 mod texture;
+
+#[cfg(sdl2)]
+mod game_window_sdl2;
+#[cfg(glfw)]
+mod game_window_glfw;
 
