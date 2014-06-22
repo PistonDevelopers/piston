@@ -7,6 +7,7 @@ use graphics::*;
 use piston::{
     AssetStore,
     Game,
+    GameIteratorSettings,
     GameWindowSDL2,
     GameWindowSettings,
     RenderArgs,
@@ -63,7 +64,11 @@ fn main() {
     let mut asset_store = AssetStore::from_folder("assets");
 
     let mut app = App::new();
-    app.run(&mut window, &mut asset_store);
+    let game_iter_settings = GameIteratorSettings {
+            updates_per_second: 120,
+            max_frames_per_second: 60,
+        };
+    app.run(&mut window, &mut asset_store, &game_iter_settings);
 }
 
 
