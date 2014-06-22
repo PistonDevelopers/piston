@@ -66,7 +66,6 @@ fn main() {
             size: [300, 300],
             fullscreen: false,
             exit_on_esc: true,
-            background_color: [1.0, 1.0, 1.0, 1.0],
         }
     );
 

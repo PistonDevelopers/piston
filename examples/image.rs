@@ -10,10 +10,10 @@ use piston::{
     GameWindowSDL2,
     GameWindowSettings,
     RenderArgs,
-    Texture,
 };
 
 pub struct App {
+    gl: Gl,
     image: Option<Texture>,
 }
 
@@ -22,6 +22,7 @@ impl App {
     pub fn new() -> App {
         App {
             image: None,
+            gl: Gl::new(),
         }
     }
 }
@@ -33,7 +34,12 @@ impl Game for App {
     }
 
     fn render(&mut self, c: &Context, args: &mut RenderArgs) {
-        c.image(self.image.as_ref().unwrap()).draw(args.gl);
+        let ref mut gl = self.gl;
+        gl.viewport(0, 0, args.width as i32, args.height as i32);
+        c.rgb(1.0, 1.0, 1.0).clear(gl);
+
+        // Draw image.
+        c.image(self.image.as_ref().unwrap()).draw(gl);
     }
 }
 
@@ -50,7 +56,6 @@ fn main() {
             size: [300, 300],
             fullscreen: false,
             exit_on_esc: true,
-            background_color: [1.0, 1.0, 1.0, 1.0],
         }
     );
 
