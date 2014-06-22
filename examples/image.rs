@@ -33,9 +33,10 @@ impl Game for App {
         self.image = Some(Texture::from_path(&image).unwrap());
     }
 
-    fn render(&mut self, c: &Context, args: &mut RenderArgs) {
+    fn render(&mut self, args: &mut RenderArgs) {
         let ref mut gl = self.gl;
         gl.viewport(0, 0, args.width as i32, args.height as i32);
+        let ref c = Context::abs(args.width as f64, args.height as f64);
         c.rgb(1.0, 1.0, 1.0).clear(gl);
 
         // Draw image.

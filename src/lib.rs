@@ -11,10 +11,6 @@ extern crate sdl2;
 #[cfg(sdl2)]
 extern crate gl;
 extern crate time;
-extern crate graphics;
-extern crate log;
-extern crate collections;
-extern crate debug;
 
 pub use Game = game::Game;
 

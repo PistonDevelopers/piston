@@ -1,8 +1,5 @@
 //! Game loop.
 
-// External crates.
-use graphics::Context;
-
 // Local crate.
 use GameEvent;
 use GameWindow = game_window::GameWindow;
@@ -32,7 +29,7 @@ pub trait Game {
     ///
     /// `context` is a Rust-Graphics context.
     /// `gl` is the Piston OpenGL back-end for Rust-Graphics.
-    fn render(&mut self, _context: &Context, _args: &mut RenderArgs) {}
+    fn render(&mut self, _args: &mut RenderArgs) {}
 
     /// Update the physical state of the game.
     ///
@@ -67,13 +64,7 @@ pub trait Game {
     /// Handles a game event.
     fn event(&mut self, event: &mut GameEvent) {
         match *event {
-            Render(ref mut args) => self.render(
-                &Context::abs(
-                    args.width as f64,
-                    args.height as f64
-                ),
-                args
-            ),
+            Render(ref mut args) => self.render(args),
             Update(ref mut args) => self.update(args),
             KeyPress(ref args) => self.key_press(args),
             KeyRelease(ref args) => self.key_release(args),
