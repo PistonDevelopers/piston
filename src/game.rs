@@ -79,14 +79,13 @@ pub trait Game {
     fn run<W: GameWindow>(
         &mut self,
         game_window: &mut W,
-        asset_store: &mut AssetStore
+        asset_store: &mut AssetStore,
+        game_iter_settings: &GameIteratorSettings
     ) {
         let mut game_iter = GameIterator::new(
             game_window,
-            &GameIteratorSettings {
-                updates_per_second: 120,
-                max_frames_per_second: 60
-            });
+            game_iter_settings
+        );
 
         self.load(asset_store);
 
