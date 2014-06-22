@@ -34,3 +34,5 @@ examples/audio_iter
 examples/soundstream
 
 watch.sh
+
+examples/hgl_triangle
