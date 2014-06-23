@@ -4,7 +4,6 @@ extern crate graphics;
 extern crate piston;
 
 use piston::{
-    AssetStore,
     Game,
     GameIteratorSettings,
     GameWindowSDL2,
@@ -70,13 +69,11 @@ fn main() {
         }
     );
 
-    let mut asset_store = AssetStore::empty();
-
     let mut app = App::new();
     let game_iter_settings = GameIteratorSettings {
             updates_per_second: 120,
             max_frames_per_second: 60,
         };
-    app.run(&mut window, &mut asset_store, &game_iter_settings);
+    app.run(&mut window, &game_iter_settings);
 }
 

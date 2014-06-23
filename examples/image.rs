@@ -29,7 +29,8 @@ impl App {
 }
 
 impl Game for App {
-    fn load(&mut self, asset_store: &mut AssetStore) {
+    fn load(&mut self) {
+        let asset_store = AssetStore::from_folder("assets");
         let image = asset_store.path("rust-logo.png").unwrap();
         self.image = Some(Texture::from_path(&image).unwrap());
     }
@@ -61,14 +62,13 @@ fn main() {
         }
     );
 
-    let mut asset_store = AssetStore::from_folder("assets");
 
     let mut app = App::new();
     let game_iter_settings = GameIteratorSettings {
             updates_per_second: 120,
             max_frames_per_second: 60,
         };
-    app.run(&mut window, &mut asset_store, &game_iter_settings);
+    app.run(&mut window, &game_iter_settings);
 }
 
 

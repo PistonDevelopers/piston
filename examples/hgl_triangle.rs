@@ -6,7 +6,6 @@ extern crate hgl;
 extern crate gl;
 
 use piston::{
-    AssetStore, 
     Game, 
     GameIteratorSettings,
     GameWindowSDL2, 
@@ -89,6 +88,6 @@ fn main() {
             updates_per_second: 120,
             max_frames_per_second: 60,
         };
-    App::new().run(&mut window, &mut AssetStore::empty(), &game_iter_settings);
+    App::new().run(&mut window, &game_iter_settings);
 }
 
