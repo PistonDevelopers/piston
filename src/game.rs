@@ -4,7 +4,6 @@
 use GameEvent;
 use GameWindow = game_window::GameWindow;
 use GameIteratorSettings;
-use AssetStore;
 use GameIterator;
 use KeyPress;
 use KeyPressArgs;
@@ -37,7 +36,7 @@ pub trait Game {
     fn update(&mut self, _args: &mut UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
-    fn load(&mut self, _asset_store: &mut AssetStore) {}
+    fn load(&mut self) {}
 
     /// User pressed a key.
     ///
@@ -79,7 +78,6 @@ pub trait Game {
     fn run<W: GameWindow>(
         &mut self,
         game_window: &mut W,
-        asset_store: &mut AssetStore,
         game_iter_settings: &GameIteratorSettings
     ) {
         let mut game_iter = GameIterator::new(
@@ -87,7 +85,7 @@ pub trait Game {
             game_iter_settings
         );
 
-        self.load(asset_store);
+        self.load();
 
         loop {
             match game_iter.next() {
