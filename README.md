@@ -35,6 +35,16 @@ One way to simplify working with multiple projects on the same machine is to sym
 
 You can now use https://github.com/PistonDevelopers/piston-workspace repository to download and build Piston without having to set up symlinks manually.
 
+## Compile manually
+
+Piston uses conditional compilation to specify a window back-end.
+
+SDL2: `make COMPILER_FLAGS+="--cfg sdl2"`
+
+GLFW: `make COMPILER_FLAGS+="--cfg glfw"`
+
+To write your own back-end, you can do just `make` and implement the `GameWindow` trait.
+
 ## Add libraries to your project
 
 After building Piston, you need to add the '.rlib' files to your '/target/cpu-vendor-os/lib/' folder.
