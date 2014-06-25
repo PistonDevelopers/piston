@@ -8,7 +8,7 @@ extern crate glfw;
 #[cfg(sdl2)]
 extern crate sdl2;
 #[cfg(glfw)]
-#[cfg(sdl2)]
+extern crate collections;
 extern crate gl;
 extern crate time;
 
