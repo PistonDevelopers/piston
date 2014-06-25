@@ -1,0 +1,32 @@
+[package]
+
+name = "piston"
+version = "0.0.0"
+authors = [
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>",
+    "gmorenz",
+    "leonkunert <info@leonkunert.de>",
+    "mitchmindtree <me@michellnordine.com>",
+    "Christiandh",
+    "Apointos",
+    "ccgn",
+    "reem",
+    "TyOverby <ty@pre-alpha.com>"]
+
+[dependencies.gl-rs]
+
+git = "https://github.com/bjz/gl-rs.git"
+
+[dependencies.sdl2]
+
+git = "https://github.com/AngryLawyer/rust-sdl2.git"
+
+[dependencies.glfw-rs]
+
+git = "https://github.com/bjz/glfw-rs.git"
+
+[[lib]]
+
+name = "piston"
+path = "./src/lib.rs"
