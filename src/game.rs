@@ -25,14 +25,9 @@ use UpdateArgs;
 /// Implemented by game applications.
 pub trait Game {
     /// Render graphics.
-    ///
-    /// `context` is a Rust-Graphics context.
-    /// `gl` is the Piston OpenGL back-end for Rust-Graphics.
     fn render(&mut self, _args: &mut RenderArgs) {}
 
     /// Update the physical state of the game.
-    ///
-    /// `dt` is the delta time from last update in seconds.
     fn update(&mut self, _args: &mut UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
