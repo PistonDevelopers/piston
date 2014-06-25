@@ -3,11 +3,16 @@
 name = "piston"
 version = "0.0.0"
 authors = [
-    "bvssvni@gmail.com",
-    "coeuvre@gmail.com",
-    "info@leonkunert.de",
-    "me@michellnordine.com",
-    "ty@pre-alpha.com"]
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>",
+    "gmorenz",
+    "leonkunert <info@leonkunert.de>",
+    "mitchmindtree <me@michellnordine.com>",
+    "Christiandh",
+    "Apointos",
+    "ccgn",
+    "reem",
+    "TyOverby <ty@pre-alpha.com>"]
 
 [dependencies.gl-rs]
 
