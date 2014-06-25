@@ -48,7 +48,7 @@ fn main() {
                     gl.viewport(0, 0, args.width as i32, args.height as i32);
 
                     let c = Context::abs(args.width as f64, args.height as f64);
-                    c.rgb(1.0, 1.0, 1.0).clear(gl);
+                    c.rgb(1.0, 1.0, 1.0).draw(gl);
                     c.image(&image).draw(gl);
                 },
                 _ => {},       
