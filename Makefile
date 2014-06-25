@@ -73,7 +73,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.5 004)"
+	$(Q)echo "--- rust-empty (0.5 006)"
 	$(Q)echo "make run               - Runs executable"
 	$(Q)echo "make exe               - Builds main executable"
 	$(Q)echo "make lib               - Both static and dynamic library"
@@ -102,6 +102,7 @@ help:
 	$(Q)echo "make clean             - Deletes binaries and documentation."
 	$(Q)echo "make clear-project     - WARNING: Deletes project files except 'Makefile'"
 	$(Q)echo "make clear-git         - WARNING: Deletes Git setup"
+	$(Q)echo "make symlink-build     - Creates a script for building dependencies
 	$(Q)echo "make symlink-info      - Symlinked libraries dependency info"
 	$(Q)echo "make target-dir        - Creates directory for current target"
 
@@ -123,6 +124,7 @@ help:
 		rusti \
 		rust-ci-lib \
 		rust-ci-exe \
+		symlink-build \
 		symlink-info \
 		target-dir \
 		test \
@@ -189,7 +191,7 @@ cargo-exe: $(EXE_ENTRY_FILE)
 	( \
 		name=$${PWD##/*/} ; \
 		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
-		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[bin]]\n\nname = \"$$name\"\npath = \"$(EXE_ENTRY_FILE)\"\n" > Cargo.toml \
+		echo -e "[package]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[bin]]\n\nname = \"$$name\"\npath = \"$(EXE_ENTRY_FILE)\"\n" > Cargo.toml \
 		&& echo "--- Created 'Cargo.toml' for executable" \
 		&& cat Cargo.toml \
 	)
@@ -203,7 +205,7 @@ cargo-lib: $(EXE_ENTRY_FILE)
 	( \
 		name=$${PWD##/*/} ; \
 		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
-		echo -e "[project]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"$(LIB_ENTRY_FILE)\"\n" > Cargo.toml \
+		echo -e "[package]\n\nname = \"$$name\"\nversion = \"0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"$(LIB_ENTRY_FILE)\"\n" > Cargo.toml \
 		&& echo "--- Created 'Cargo.toml' for executable" \
 		&& cat Cargo.toml \
 	)
@@ -526,6 +528,123 @@ watch: $(TARGET_LIB_DIR)
 		&& echo "--- Created 'watch.sh'" \
 		&& echo "--- Type './watch.sh' to start compilation on save" \
 		&& echo "--- Type './watch.sh -h' for more options" \
+	)
+
+# borrowed from http://stackoverflow.com/q/649246/1256624
+define SYMLINK_BUILD_SCRIPT
+#!/bin/bash
+# written by bvssvni
+# Modify the setting to do conditional compilation.
+# For example "--cfg my_feature"
+SETTINGS=""
+# ================================================
+
+MAKE=make
+if [ "$$OS" == "Windows_NT" ]; then
+    MAKE=mingw32-make
+fi
+
+# Checks if an item exists in an array.
+# Copied from http://stackoverflow.com/questions/3685970/check-if-an-array-contains-a-value
+function contains() {
+    local n=$$#
+    local value=$${!n}
+    for ((i=1;i < $$#;i++)) {
+        if [ "$${!i}" == "$${value}" ]; then
+            echo "y"
+            return 0
+        fi
+    }
+    echo "n"
+    return 1
+}
+
+# This is a counter used to insert dependencies.
+# It is global because we need an array of all the
+# visited dependencies.
+i=0
+function build_deps {
+    local current=$$(pwd)
+    for symlib in $$(find target/*/lib -type l) ; do
+        cd $$current
+        echo $$symlib
+        local original_file=$$(readlink $$symlib)
+        local original_dir=$$(dirname $$original_file)
+        cd $$original_dir
+
+        # Go to the git root directory.
+        local current_git_dir=$$(git rev-parse --show-toplevel)
+        echo "--- Parent $$current"
+        echo "--- Child $$current_git_dir"
+        cd $$current_git_dir
+
+        # Skip building if it is already built.
+        if [ $$(contains "$${git_dir[@]}" $$current_git_dir) == "y" ]; then
+            echo "--- Visited $$current_git_dir"
+            continue
+        fi
+
+        # Remember git directory to not build it twice
+        git_dir[i]=$$current_git_dir
+
+        # Visit the symlinks and build the dependencies
+        build_deps
+
+        # First check for a 'build.sh' script with default settings.
+        # Check for additional 'rust-empty.mk' file. \
+        # Compile with the settings flags. \
+        # If no other options, build with make.
+        ( \
+            test -e build.sh \
+            && ./build.sh \
+        ) \
+        || \
+        ( \
+            test -e rust-empty.mk \
+            && $$MAKE -f rust-empty.mk clean \
+            && $$MAKE -f rust-empty.mk \
+        ) \
+        || \
+        ( \
+            echo "--- Building $$current_git_dir" \
+            && $$MAKE clean \
+            && $$MAKE \
+        )
+        let i+=1
+    done
+    cd $$current
+}
+
+if [ "$$1" == "deps" ]; then
+    build_deps
+fi
+
+echo "--- Building $$(pwd)"
+( \
+    test -e rust-empty.mk \
+    && $$MAKE -f rust-empty.mk clean \
+    && $$MAKE -f rust-empty.mk COMPILER_FLAGS+="$$SETTINGS" \
+) \
+|| \
+( \
+    $$MAKE clean
+    $$MAKE COMPILER_FLAGS+="$$SETTINGS"
+)
+
+endef
+export SYMLINK_BUILD_SCRIPT
+
+symlink-build:
+	$(Q)( \
+		test -e build.sh \
+		&& echo "--- The file 'build.sh' already exists" \
+	) \
+	|| \
+	( \
+		echo -e "$$SYMLINK_BUILD_SCRIPT" > build.sh \
+		&& chmod +x build.sh \
+		&& echo "--- Created 'build.sh'" \
+		&& echo "--- Type './build.sh deps' to build everything" \
 	)
 
 loc:
