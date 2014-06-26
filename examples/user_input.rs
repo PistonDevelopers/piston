@@ -2,11 +2,12 @@
 
 extern crate graphics;
 extern crate piston;
+extern crate sdl2_game_window;
 
+use sdl2_game_window::GameWindowSDL2;
 use piston::{
     Game,
     GameIteratorSettings,
-    GameWindowSDL2,
     GameWindowSettings,
     KeyPressArgs,
     KeyReleaseArgs,
