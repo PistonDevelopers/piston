@@ -2,13 +2,19 @@
 
 extern crate graphics;
 extern crate piston;
+extern crate sdl2_game_window;
+extern crate opengl_graphics;
 
+use opengl_graphics::{
+    Gl,
+    Texture,
+};
+use sdl2_game_window::GameWindowSDL2;
 use graphics::*;
 use piston::{
     AssetStore,
     Game,
     GameIteratorSettings,
-    GameWindowSDL2,
     GameWindowSettings,
     RenderArgs,
 };
