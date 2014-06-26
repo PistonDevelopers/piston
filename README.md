@@ -11,7 +11,7 @@ A user friendly game engine written in Rust
 
 [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 
-| Dependency | Online Docs |
+| Partner Project | Online Docs |
 |---------|------|------------|
 | [rust-graphics](https://github.com/PistonDevelopers/rust-graphics) | [rust-graphics docs](http://www.piston.rs/docs/rust-graphics/graphics) |
 | [rust-image](https://github.com/PistonDevelopers/rust-image) | [rust-image docs](http://www.piston.rs/docs/rust-image/image/)
