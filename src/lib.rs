@@ -3,13 +3,7 @@
 #![warn(dead_code)]
 
 //! A user friendly graphics engine.
-#[cfg(glfw)]
-extern crate glfw;
-#[cfg(sdl2)]
-extern crate sdl2;
-#[cfg(glfw)]
-extern crate collections;
-extern crate gl;
+
 extern crate time;
 
 pub use Game = game::Game;
@@ -36,10 +30,6 @@ pub use MouseMoveArgs = game_iterator::MouseMoveArgs;
 pub use MouseRelativeMoveArgs = game_iterator::MouseRelativeMoveArgs;
 
 pub use GameWindow = game_window::GameWindow;
-#[cfg(sdl2)]
-pub use GameWindowSDL2 = game_window_sdl2::GameWindowSDL2;
-#[cfg(glfw)]
-pub use GameWindowGLFW = game_window_glfw::GameWindowGLFW;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use AssetStore = asset_store::AssetStore;
 
@@ -52,9 +42,3 @@ mod game;
 mod game_iterator;
 mod game_window_settings;
 mod asset_store;
-
-#[cfg(sdl2)]
-mod game_window_sdl2;
-#[cfg(glfw)]
-mod game_window_glfw;
-

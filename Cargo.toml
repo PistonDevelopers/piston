@@ -14,18 +14,6 @@ authors = [
     "reem",
     "TyOverby <ty@pre-alpha.com>"]
 
-[dependencies.gl-rs]
-
-git = "https://github.com/bjz/gl-rs.git"
-
-[dependencies.sdl2]
-
-git = "https://github.com/AngryLawyer/rust-sdl2.git"
-
-[dependencies.glfw-rs]
-
-git = "https://github.com/bjz/glfw-rs.git"
-
 [[lib]]
 
 name = "piston"

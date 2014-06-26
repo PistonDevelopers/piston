@@ -1,9 +1,8 @@
 #!/bin/bash
 # written by bvssvni
 # Modify the setting to do conditional compilation.
-# "--cfg sdl2" = SDL2 window back-end
-# "--cfg glfw" = GLFW window back-end
-SETTINGS="--cfg sdl2"
+# For example "--cfg my_feature"
+SETTINGS=""
 # ================================================
 
 MAKE=make
@@ -32,7 +31,7 @@ function contains() {
 i=0
 function build_deps {
     local current=$(pwd)
-    for symlib in $(find target/*/lib -type l) ; do
+    for symlib in $(find target/deps/ -type l) ; do
         cd $current
         echo $symlib
         local original_file=$(readlink $symlib)
