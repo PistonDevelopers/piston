@@ -64,6 +64,9 @@ function build_deps {
     cd $current
 }
 
+# Mark main project as visited to avoid infinite loop.
+git_dir[i]=$(pwd)
+let i+=1
 if [ "$1" == "deps" ]; then
     build_deps
 fi

@@ -10,7 +10,7 @@ use event;
 pub struct RenderArgs<'a> {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
-    /// OpenGL back-end for Rust-Graphics.
+    /// The width of rendered area.
     pub width: u32,
     /// The height of rendered area.
     pub height: u32,
