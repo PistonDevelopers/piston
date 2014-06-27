@@ -30,11 +30,18 @@ impl AssetStore {
 
     /// Returns the path of an asset file.
     pub fn path(&self, file: &str) -> Result<Path, String> {
-        let folder = self.assets_folder.as_ref().unwrap();
+        let folder = match self.assets_folder.as_ref() {
+            Some(folder) => folder,
+            None => return Err(
+                    "The assets folder is not set".to_string()
+                )
+        };
         let exe_path = self_exe_path();
         let exe_path = match exe_path {
             Some(path) => path,
-            None => return Err("Could not get the path to executable".to_string()),
+            None => return Err(
+                    "Could not get the path to executable".to_string()
+                ),
         };
         Ok(exe_path.join(Path::new(folder.as_slice())).join(Path::new(file)))
     }
