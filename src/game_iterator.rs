@@ -7,6 +7,7 @@ use mouse;
 use event;
 
 /// Render argument.
+#[deriving(Clone)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
@@ -17,36 +18,42 @@ pub struct RenderArgs {
 }
 
 /// Update argument.
+#[deriving(Clone)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
 }
 
 /// Key press arguments.
+#[deriving(Clone)]
 pub struct KeyPressArgs {
     /// Keyboard key.
     pub key: keyboard::Key,
 }
 
 /// Key release arguments.
+#[deriving(Clone)]
 pub struct KeyReleaseArgs {
     /// Keyboard key.
     pub key: keyboard::Key,
 }
 
 /// Mouse press arguments.
+#[deriving(Clone)]
 pub struct MousePressArgs {
     /// Mouse button.
     pub button: mouse::Button,
 }
 
 /// Mouse release arguments.
+#[deriving(Clone)]
 pub struct MouseReleaseArgs {
     /// Mouse button.
     pub button: mouse::Button,
 }
 
 /// Mouse move arguments.
+#[deriving(Clone)]
 pub struct MouseMoveArgs {
     /// x.
     pub x: f64,
@@ -55,6 +62,7 @@ pub struct MouseMoveArgs {
 }
 
 /// Mouse relative move arguments.
+#[deriving(Clone)]
 pub struct MouseRelativeMoveArgs {
     /// Delta x.
     pub dx: f64,
@@ -63,6 +71,7 @@ pub struct MouseRelativeMoveArgs {
 }
 
 /// Mouse scroll arguments.
+#[deriving(Clone)]
 pub struct MouseScrollArgs {
     /// x.
     pub x: f64,
@@ -71,6 +80,7 @@ pub struct MouseScrollArgs {
 }
 
 /// Contains the different game events.
+#[deriving(Clone)]
 pub enum GameEvent {
     /// Render graphics.
     Render(RenderArgs),
@@ -122,6 +132,7 @@ enum GameIteratorState {
 }
 
 /// Settings for the game loop behavior.
+#[deriving(Clone)]
 pub struct GameIteratorSettings {
     /// The number of updates per second (UPS).
     pub updates_per_second: u64,
