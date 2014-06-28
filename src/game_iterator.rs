@@ -7,7 +7,8 @@ use mouse;
 use event;
 
 /// Render argument.
-pub struct RenderArgs<'a> {
+#[deriving(Clone)]
+pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
     /// The width of rendered area.
@@ -17,44 +18,51 @@ pub struct RenderArgs<'a> {
 }
 
 /// Update argument.
+#[deriving(Clone)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
 }
 
 /// Key press arguments.
+#[deriving(Clone)]
 pub struct KeyPressArgs {
     /// Keyboard key.
     pub key: keyboard::Key,
 }
 
 /// Key release arguments.
+#[deriving(Clone)]
 pub struct KeyReleaseArgs {
     /// Keyboard key.
     pub key: keyboard::Key,
 }
 
 /// Mouse press arguments.
+#[deriving(Clone)]
 pub struct MousePressArgs {
     /// Mouse button.
     pub button: mouse::Button,
 }
 
 /// Mouse release arguments.
+#[deriving(Clone)]
 pub struct MouseReleaseArgs {
     /// Mouse button.
     pub button: mouse::Button,
 }
 
 /// Mouse move arguments.
+#[deriving(Clone)]
 pub struct MouseMoveArgs {
-    /// y.
-    pub x: f64,
     /// x.
+    pub x: f64,
+    /// y.
     pub y: f64,
 }
 
 /// Mouse relative move arguments.
+#[deriving(Clone)]
 pub struct MouseRelativeMoveArgs {
     /// Delta x.
     pub dx: f64,
@@ -62,10 +70,20 @@ pub struct MouseRelativeMoveArgs {
     pub dy: f64,
 }
 
+/// Mouse scroll arguments.
+#[deriving(Clone)]
+pub struct MouseScrollArgs {
+    /// x.
+    pub x: f64,
+    /// y.
+    pub y: f64,
+}
+
 /// Contains the different game events.
-pub enum GameEvent<'a> {
+#[deriving(Clone)]
+pub enum GameEvent {
     /// Render graphics.
-    Render(RenderArgs<'a>),
+    Render(RenderArgs),
     /// Update physical state of the game.
     Update(UpdateArgs),
     /// Pressed a keyboard key.
@@ -79,25 +97,9 @@ pub enum GameEvent<'a> {
     /// Moved mouse cursor.
     MouseMove(MouseMoveArgs),
     /// Moved mouse relative, not bounded by cursor.
-    MouseRelativeMove(MouseRelativeMoveArgs)
-}
-
-impl<'a> GameEvent<'a> {
-    /// Maps event to something that can be sent between tasks if possible.
-    ///
-    /// Render events are not sendable between tasks. 
-    pub fn to_sendable(&'a self) -> Option<GameEvent<'static>> {
-        match *self {
-            Render(_) => None,
-            Update(args) => Some(Update(args)),
-            KeyPress(args) => Some(KeyPress(args)),
-            KeyRelease(args) => Some(KeyRelease(args)),
-            MousePress(args) => Some(MousePress(args)),
-            MouseRelease(args) => Some(MouseRelease(args)),
-            MouseMove(args) => Some(MouseMove(args)),
-            MouseRelativeMove(args) => Some(MouseRelativeMove(args)),
-        }
-    }
+    MouseRelativeMove(MouseRelativeMoveArgs),
+    /// Scrolled mouse.
+    MouseScroll(MouseScrollArgs)
 }
 
 enum GameIteratorState {
@@ -111,6 +113,7 @@ enum GameIteratorState {
 }
 
 /// Settings for the game loop behavior.
+#[deriving(Clone)]
 pub struct GameIteratorSettings {
     /// The number of updates per second (UPS).
     pub updates_per_second: u64,
@@ -159,7 +162,10 @@ static billion: u64 = 1_000_000_000;
 
 impl<'a, W: GameWindow> GameIterator<'a, W> {
     /// Creates a new game iterator.
-    pub fn new(game_window: &'a mut W, settings: &GameIteratorSettings) -> GameIterator<'a, W> {
+    pub fn new(
+        game_window: &'a mut W, 
+        settings: &GameIteratorSettings
+    ) -> GameIterator<'a, W> {
         let updates_per_second: u64 = settings.updates_per_second;
         let max_frames_per_second: u64 = settings.max_frames_per_second;
 
@@ -178,9 +184,13 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             updated: 0,
         }
     }
+}
 
+impl<'a, W: GameWindow> 
+Iterator<GameEvent> 
+for GameIterator<'a, W> {
     /// Returns the next game event.
-    pub fn next<'a>(&'a mut self) -> Option<GameEvent<'a>> {
+    fn next(&mut self) -> Option<GameEvent> {
         match self.state {
             RenderState => {
                 if self.game_window.should_close() { return None; }
@@ -271,6 +281,12 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                             y: y,
                         }))
                     },
+                    event::MouseScrolled(x, y) => {
+                        Some(MouseScroll(MouseScrollArgs { 
+                            x: x, 
+                            y: y
+                        }))
+                    },
                     event::NoEvent => {
                         self.state = UpdateState;
                         self.next()
@@ -353,4 +369,3 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         */
     }
 }
-

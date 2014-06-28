@@ -40,6 +40,29 @@ pub use RenderWindow = concurrent_window::RenderWindow;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use AssetStore = asset_store::AssetStore;
 
+pub use game_iterator::Render;
+pub use game_iterator::Update;
+pub use game_iterator::KeyPress;
+pub use game_iterator::KeyRelease;
+pub use game_iterator::MousePress;
+pub use game_iterator::MouseRelease;
+pub use game_iterator::MouseMove;
+pub use game_iterator::MouseRelativeMove;
+pub use game_iterator::MouseScroll;
+
+pub use game_iterator::GameEvent;
+pub use game_iterator::GameIterator;
+pub use game_iterator::GameIteratorSettings;
+pub use game_iterator::RenderArgs;
+pub use game_iterator::UpdateArgs;
+pub use game_iterator::KeyPressArgs;
+pub use game_iterator::KeyReleaseArgs;
+pub use game_iterator::MousePressArgs;
+pub use game_iterator::MouseReleaseArgs;
+pub use game_iterator::MouseMoveArgs;
+pub use game_iterator::MouseRelativeMoveArgs;
+pub use game_iterator::MouseScrollArgs;
+
 pub mod concurrent_window;
 pub mod game_window;
 pub mod keyboard;
