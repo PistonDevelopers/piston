@@ -102,25 +102,6 @@ pub enum GameEvent {
     MouseScroll(MouseScrollArgs)
 }
 
-impl GameEvent {
-    /// Maps event to something that can be sent between tasks if possible.
-    ///
-    /// Render events are not sendable between tasks. 
-    pub fn to_sendable(&self) -> Option<GameEvent> {
-        match *self {
-            Render(_) => None,
-            Update(args) => Some(Update(args)),
-            KeyPress(args) => Some(KeyPress(args)),
-            KeyRelease(args) => Some(KeyRelease(args)),
-            MousePress(args) => Some(MousePress(args)),
-            MouseRelease(args) => Some(MouseRelease(args)),
-            MouseMove(args) => Some(MouseMove(args)),
-            MouseRelativeMove(args) => Some(MouseRelativeMove(args)),
-            MouseScroll(args) => Some(MouseScroll(args)),
-        }
-    }
-}
-
 enum GameIteratorState {
     RenderState,
     SwapBuffersState,
