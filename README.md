@@ -35,17 +35,14 @@ One way to simplify working with multiple projects on the same machine is to sym
 
 ## How to build Piston
 
-You can now use https://github.com/PistonDevelopers/piston-workspace repository to download and build Piston without having to set up symlinks manually.
+1. Install [Cargo](https://github.com/rust-lang/cargo)
+2. Open up the Terminal window and type:
 
-## Compile manually
-
-Piston uses conditional compilation to specify a window back-end.
-
-SDL2: `make COMPILER_FLAGS+="--cfg sdl2"`
-
-GLFW: `make COMPILER_FLAGS+="--cfg glfw"`
-
-To write your own back-end, you can do just `make` and implement the `GameWindow` trait.
+```
+git clone https://github.com/PistonDevelopers/piston
+cd piston
+cargo build
+```
 
 ## Add libraries to your project
 
