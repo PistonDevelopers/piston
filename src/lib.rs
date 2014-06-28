@@ -5,8 +5,15 @@
 //! A user friendly graphics engine.
 
 extern crate time;
+extern crate sync;
 
+pub use ConcurrentGame = concurrent_game::ConcurrentGame;
 pub use Game = game::Game;
+
+pub use GameWindow = game_window::GameWindow;
+pub use RenderWindow = game_window::RenderWindow;
+pub use GameWindowSettings = game_window_settings::GameWindowSettings;
+pub use AssetStore = asset_store::AssetStore;
 
 pub use game_iterator::Render;
 pub use game_iterator::Update;
@@ -31,15 +38,12 @@ pub use game_iterator::MouseMoveArgs;
 pub use game_iterator::MouseRelativeMoveArgs;
 pub use game_iterator::MouseScrollArgs;
 
-pub use game_window::GameWindow;
-pub use game_window_settings::GameWindowSettings;
-pub use asset_store::AssetStore;
-
 pub mod game_window;
 pub mod keyboard;
 pub mod event;
 pub mod mouse;
 
+mod concurrent_game;
 mod game;
 mod game_iterator;
 mod game_window_settings;
