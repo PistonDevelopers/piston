@@ -25,10 +25,10 @@ use UpdateArgs;
 /// Implemented by game applications.
 pub trait Game {
     /// Render graphics.
-    fn render(&mut self, _args: &mut RenderArgs) {}
+    fn render(&mut self, _args: &RenderArgs) {}
 
     /// Update the physical state of the game.
-    fn update(&mut self, _args: &mut UpdateArgs) {}
+    fn update(&mut self, _args: &UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
     fn load(&mut self) {}
