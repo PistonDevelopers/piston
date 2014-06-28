@@ -5,13 +5,11 @@ use std::mem::replace;
 use sync::{Mutex, Arc};
 
 // Local crate.
-use ConcurrentWindow;
-use GameLoopWindow;
+use GameWindow;
 use RenderWindow;
 
-use GameEvent;
 use GameIteratorSettings;
-use ConcurrentIterator;
+use GameIterator;
 use KeyPress;
 use KeyPressArgs;
 use KeyRelease;
@@ -24,6 +22,8 @@ use MousePress;
 use MousePressArgs;
 use MouseRelease;
 use MouseReleaseArgs;
+use MouseScroll;
+use MouseScrollArgs;
 use Render;
 use RenderArgs;
 use Update;
@@ -62,10 +62,14 @@ pub trait ConcurrentGame<R>: Copy + Send {
     /// Moved mouse relative, not bounded by cursor.
     fn mouse_relative_move(&mut self, _args: &MouseRelativeMoveArgs) {}
 
+    /// Scrolled mouse.
+    fn mouse_scroll(&mut self, _args: &MouseScrollArgs) {}
+
     /// Executes a game loop.
-    fn run<RW: RenderWindow, GLW: GameLoopWindow, W: ConcurrentWindow<RW, GLW>> (
+    fn run<W: GameWindow + Send, RW: RenderWindow> (
         mut self,
-        combined_window: W,
+        game_window: W,
+        render_window: RW,
         game_iter_settings: GameIteratorSettings,
         mut render_resources: R
     ) {
@@ -73,7 +77,6 @@ pub trait ConcurrentGame<R>: Copy + Send {
         // Setup.
 
         self.load();
-        let (render_window, game_loop_window) = combined_window.get_windows();
         let mutex_self1 = Arc::new( Mutex::new( self ) );
         let mutex_self2 = mutex_self1.clone();
         let (tx, rx) = channel();
@@ -82,17 +85,17 @@ pub trait ConcurrentGame<R>: Copy + Send {
 
         spawn(proc() {
             let mut buf2 = self;
-            let mut window = game_loop_window;
+            let mut game_window = game_window;
             
-            let mut game_iter = ConcurrentIterator::new(
-                &mut window,
+            let mut game_iter = GameIterator::new(
+                &mut game_window,
                 &game_iter_settings
              );
             
             loop {
                 match game_iter.next() {
                     None => break,
-                    Some(mut e) => match e {
+                    Some(e) => match e {
                         Render(args) => {    
                             let mut mutex_guard = mutex_self2.lock();
                             {
@@ -102,13 +105,14 @@ pub trait ConcurrentGame<R>: Copy + Send {
                             mutex_guard.cond.signal();
                             tx.send(args);
                         },
-                        Update(ref mut args) => buf2.update(args),
+                        Update(ref args) => buf2.update(args),
                         KeyPress(ref args) => buf2.key_press(args),
                         KeyRelease(ref args) => buf2.key_release(args),
                         MousePress(ref args) => buf2.mouse_press(args),
                         MouseRelease(ref args) => buf2.mouse_release(args),
                         MouseMove(ref args) => buf2.mouse_move(args),
                         MouseRelativeMove(ref args) => buf2.mouse_relative_move(args),
+                        MouseScroll(ref args) => buf2.mouse_scroll(args),
                     }
                 }
             }

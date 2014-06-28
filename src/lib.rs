@@ -20,7 +20,6 @@ pub use MouseRelease = game_iterator::MouseRelease;
 pub use MouseMove = game_iterator::MouseMove;
 pub use MouseRelativeMove = game_iterator::MouseRelativeMove;
 
-pub use ConcurrentIterator = concurrent_iterator::ConcurrentIterator;
 pub use GameEvent = game_iterator::GameEvent;
 pub use GameIterator = game_iterator::GameIterator;
 pub use GameIteratorSettings = game_iterator::GameIteratorSettings;
@@ -34,9 +33,7 @@ pub use MouseMoveArgs = game_iterator::MouseMoveArgs;
 pub use MouseRelativeMoveArgs = game_iterator::MouseRelativeMoveArgs;
 
 pub use GameWindow = game_window::GameWindow;
-pub use ConcurrentWindow = concurrent_window::ConcurrentWindow;
-pub use GameLoopWindow = concurrent_window::GameLoopWindow;
-pub use RenderWindow = concurrent_window::RenderWindow;
+pub use RenderWindow = game_window::RenderWindow;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
 pub use AssetStore = asset_store::AssetStore;
 
@@ -63,14 +60,12 @@ pub use game_iterator::MouseMoveArgs;
 pub use game_iterator::MouseRelativeMoveArgs;
 pub use game_iterator::MouseScrollArgs;
 
-pub mod concurrent_window;
 pub mod game_window;
 pub mod keyboard;
 pub mod event;
 pub mod mouse;
 
 mod concurrent_game;
-mod concurrent_iterator;
 mod game;
 mod game_iterator;
 mod game_window_settings;
