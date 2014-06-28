@@ -8,32 +8,32 @@ extern crate time;
 
 pub use Game = game::Game;
 
-pub use Render = game_iterator::Render;
-pub use Update = game_iterator::Update;
-pub use KeyPress = game_iterator::KeyPress;
-pub use KeyRelease = game_iterator::KeyRelease;
-pub use MousePress = game_iterator::MousePress;
-pub use MouseRelease = game_iterator::MouseRelease;
-pub use MouseMove = game_iterator::MouseMove;
-pub use MouseRelativeMove = game_iterator::MouseRelativeMove;
-pub use MouseScroll = game_iterator::MouseScroll;
+pub use game_iterator::Render;
+pub use game_iterator::Update;
+pub use game_iterator::KeyPress;
+pub use game_iterator::KeyRelease;
+pub use game_iterator::MousePress;
+pub use game_iterator::MouseRelease;
+pub use game_iterator::MouseMove;
+pub use game_iterator::MouseRelativeMove;
+pub use game_iterator::MouseScroll;
 
-pub use GameEvent = game_iterator::GameEvent;
-pub use GameIterator = game_iterator::GameIterator;
-pub use GameIteratorSettings = game_iterator::GameIteratorSettings;
-pub use RenderArgs = game_iterator::RenderArgs;
-pub use UpdateArgs = game_iterator::UpdateArgs;
-pub use KeyPressArgs = game_iterator::KeyPressArgs;
-pub use KeyReleaseArgs = game_iterator::KeyReleaseArgs;
-pub use MousePressArgs = game_iterator::MousePressArgs;
-pub use MouseReleaseArgs = game_iterator::MouseReleaseArgs;
-pub use MouseMoveArgs = game_iterator::MouseMoveArgs;
-pub use MouseRelativeMoveArgs = game_iterator::MouseRelativeMoveArgs;
-pub use MouseScrollArgs = game_iterator::MouseScrollArgs;
+pub use game_iterator::GameEvent;
+pub use game_iterator::GameIterator;
+pub use game_iterator::GameIteratorSettings;
+pub use game_iterator::RenderArgs;
+pub use game_iterator::UpdateArgs;
+pub use game_iterator::KeyPressArgs;
+pub use game_iterator::KeyReleaseArgs;
+pub use game_iterator::MousePressArgs;
+pub use game_iterator::MouseReleaseArgs;
+pub use game_iterator::MouseMoveArgs;
+pub use game_iterator::MouseRelativeMoveArgs;
+pub use game_iterator::MouseScrollArgs;
 
-pub use GameWindow = game_window::GameWindow;
-pub use GameWindowSettings = game_window_settings::GameWindowSettings;
-pub use AssetStore = asset_store::AssetStore;
+pub use game_window::GameWindow;
+pub use game_window_settings::GameWindowSettings;
+pub use asset_store::AssetStore;
 
 pub mod game_window;
 pub mod keyboard;
