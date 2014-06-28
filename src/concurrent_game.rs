@@ -68,11 +68,11 @@ pub trait ConcurrentGame<R>: Copy + Send {
     /// Executes a game loop.
     fn run<W: GameWindow + Send, RW: RenderWindow> (
         mut self,
-        game_window: W,
-        render_window: RW,
+        windows: (W, RW),
         game_iter_settings: GameIteratorSettings,
         mut render_resources: R
     ) {
+        let (game_window, render_window) = windows;
 
         // Setup.
 
