@@ -103,7 +103,7 @@ pub trait ConcurrentGame<R>: Copy + Send {
                                 replace( render_buf, buf2 );
                             }
                             mutex_guard.cond.signal();
-                            tx.send(args);
+                            tx.send(Some(args));
                         },
                         Update(ref args) => buf2.update(args),
                         KeyPress(ref args) => buf2.key_press(args),
@@ -116,12 +116,17 @@ pub trait ConcurrentGame<R>: Copy + Send {
                     }
                 }
             }
+            tx.send(None);
         });
 
         // Rendering thread.
 
         loop {
-            let mut args: RenderArgs = rx.recv();
+            let mut args: RenderArgs = match rx.recv() {
+                Some( args ) => args,
+                None => break,
+            };
+
             let mut mutex_guard = mutex_self1.lock();
             {
                 let render_buf = mutex_guard.deref_mut();
