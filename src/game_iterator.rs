@@ -48,9 +48,9 @@ pub struct MouseReleaseArgs {
 
 /// Mouse move arguments.
 pub struct MouseMoveArgs {
-    /// y.
-    pub x: f64,
     /// x.
+    pub x: f64,
+    /// y.
     pub y: f64,
 }
 
@@ -60,6 +60,14 @@ pub struct MouseRelativeMoveArgs {
     pub dx: f64,
     /// Delta y.
     pub dy: f64,
+}
+
+/// Mouse scroll arguments.
+pub struct MouseScrollArgs {
+    /// x.
+    pub x: f64,
+    /// y.
+    pub y: f64,
 }
 
 /// Contains the different game events.
@@ -79,7 +87,9 @@ pub enum GameEvent<'a> {
     /// Moved mouse cursor.
     MouseMove(MouseMoveArgs),
     /// Moved mouse relative, not bounded by cursor.
-    MouseRelativeMove(MouseRelativeMoveArgs)
+    MouseRelativeMove(MouseRelativeMoveArgs),
+    /// Scrolled mouse.
+    MouseScroll(MouseScrollArgs)
 }
 
 impl<'a> GameEvent<'a> {
@@ -96,6 +106,7 @@ impl<'a> GameEvent<'a> {
             MouseRelease(args) => Some(MouseRelease(args)),
             MouseMove(args) => Some(MouseMove(args)),
             MouseRelativeMove(args) => Some(MouseRelativeMove(args)),
+            MouseScroll(args) => Some(MouseScroll(args)),
         }
     }
 }
@@ -159,7 +170,10 @@ static billion: u64 = 1_000_000_000;
 
 impl<'a, W: GameWindow> GameIterator<'a, W> {
     /// Creates a new game iterator.
-    pub fn new(game_window: &'a mut W, settings: &GameIteratorSettings) -> GameIterator<'a, W> {
+    pub fn new(
+        game_window: &'a mut W, 
+        settings: &GameIteratorSettings
+    ) -> GameIterator<'a, W> {
         let updates_per_second: u64 = settings.updates_per_second;
         let max_frames_per_second: u64 = settings.max_frames_per_second;
 
@@ -269,6 +283,12 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
                         Some(MouseMove(MouseMoveArgs {
                             x: x,
                             y: y,
+                        }))
+                    },
+                    event::MouseScrolled(x, y) => {
+                        Some(MouseScroll(MouseScrollArgs { 
+                            x: x, 
+                            y: y
                         }))
                     },
                     event::NoEvent => {

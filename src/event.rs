@@ -23,5 +23,9 @@ pub enum Event {
     /// The second part is relative motion which is not bounded.
     /// Relative motion might not be supported by all window back-ends.
     MouseMoved(f64, f64, Option<(f64, f64)>),
+    /// The mouse wheel.
+    ///
+    /// (x, y)
+    MouseScrolled(f64, f64),
 }
 
