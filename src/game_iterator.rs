@@ -184,9 +184,13 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             updated: 0,
         }
     }
+}
 
+impl<'a, W: GameWindow> 
+Iterator<GameEvent> 
+for GameIterator<'a, W> {
     /// Returns the next game event.
-    pub fn next(&mut self) -> Option<GameEvent> {
+    fn next(&mut self) -> Option<GameEvent> {
         match self.state {
             RenderState => {
                 if self.game_window.should_close() { return None; }
@@ -365,4 +369,3 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
         */
     }
 }
-
