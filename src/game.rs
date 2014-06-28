@@ -17,6 +17,8 @@ use MousePress;
 use MousePressArgs;
 use MouseRelease;
 use MouseReleaseArgs;
+use MouseScroll;
+use MouseScrollArgs;
 use Render;
 use RenderArgs;
 use Update;
@@ -55,6 +57,9 @@ pub trait Game {
     /// Moved mouse relative, not bounded by cursor.
     fn mouse_relative_move(&mut self, _args: &MouseRelativeMoveArgs) {}
 
+    /// Scrolled mouse.
+    fn mouse_scroll(&mut self, _args: &MouseScrollArgs) {}
+
     /// Handles a game event.
     fn event(&mut self, event: &mut GameEvent) {
         match *event {
@@ -66,6 +71,7 @@ pub trait Game {
             MouseRelease(ref args) => self.mouse_release(args),
             MouseMove(ref args) => self.mouse_move(args),
             MouseRelativeMove(ref args) => self.mouse_relative_move(args),
+            MouseScroll(ref args) => self.mouse_scroll(args),
         }
     }
 

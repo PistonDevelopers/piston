@@ -16,6 +16,7 @@ pub use MousePress = game_iterator::MousePress;
 pub use MouseRelease = game_iterator::MouseRelease;
 pub use MouseMove = game_iterator::MouseMove;
 pub use MouseRelativeMove = game_iterator::MouseRelativeMove;
+pub use MouseScroll = game_iterator::MouseScroll;
 
 pub use GameEvent = game_iterator::GameEvent;
 pub use GameIterator = game_iterator::GameIterator;
@@ -28,6 +29,7 @@ pub use MousePressArgs = game_iterator::MousePressArgs;
 pub use MouseReleaseArgs = game_iterator::MouseReleaseArgs;
 pub use MouseMoveArgs = game_iterator::MouseMoveArgs;
 pub use MouseRelativeMoveArgs = game_iterator::MouseRelativeMoveArgs;
+pub use MouseScrollArgs = game_iterator::MouseScrollArgs;
 
 pub use GameWindow = game_window::GameWindow;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
