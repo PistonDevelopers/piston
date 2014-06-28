@@ -7,7 +7,7 @@ use mouse;
 use event;
 
 /// Render argument.
-pub struct RenderArgs<'a> {
+pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
     /// The width of rendered area.
@@ -71,9 +71,9 @@ pub struct MouseScrollArgs {
 }
 
 /// Contains the different game events.
-pub enum GameEvent<'a> {
+pub enum GameEvent {
     /// Render graphics.
-    Render(RenderArgs<'a>),
+    Render(RenderArgs),
     /// Update physical state of the game.
     Update(UpdateArgs),
     /// Pressed a keyboard key.
@@ -92,11 +92,11 @@ pub enum GameEvent<'a> {
     MouseScroll(MouseScrollArgs)
 }
 
-impl<'a> GameEvent<'a> {
+impl GameEvent {
     /// Maps event to something that can be sent between tasks if possible.
     ///
     /// Render events are not sendable between tasks. 
-    pub fn to_sendable(&'a self) -> Option<GameEvent<'static>> {
+    pub fn to_sendable(&self) -> Option<GameEvent> {
         match *self {
             Render(_) => None,
             Update(args) => Some(Update(args)),
@@ -194,7 +194,7 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
     }
 
     /// Returns the next game event.
-    pub fn next<'a>(&'a mut self) -> Option<GameEvent<'a>> {
+    pub fn next(&mut self) -> Option<GameEvent> {
         match self.state {
             RenderState => {
                 if self.game_window.should_close() { return None; }
