@@ -6,7 +6,9 @@
 //! A user friendly graphics engine.
 
 extern crate time;
+extern crate sync;
 
+pub use ConcurrentGame = concurrent_game::ConcurrentGame;
 pub use Game = game::Game;
 
 pub use Render = game_iterator::Render;
@@ -44,6 +46,7 @@ pub mod keyboard;
 pub mod event;
 pub mod mouse;
 
+mod concurrent_game;
 mod concurrent_iterator;
 mod game;
 mod game_iterator;

@@ -11,7 +11,7 @@ use RenderWindow;
 
 use GameEvent;
 use GameIteratorSettings;
-use GameIterator;
+use ConcurrentIterator;
 use KeyPress;
 use KeyPressArgs;
 use KeyRelease;
@@ -30,7 +30,7 @@ use Update;
 use UpdateArgs;
 
 /// Implemented by game applications.
-pub trait Game<R>: Copy + Send {
+pub trait ConcurrentGame<R>: Copy + Send {
     /// Render graphics.
     fn render(&self, _resources: &mut R, _args: &RenderArgs) {}
 
@@ -63,17 +63,17 @@ pub trait Game<R>: Copy + Send {
     fn mouse_relative_move(&mut self, _args: &MouseRelativeMoveArgs) {}
 
     /// Executes a game loop.
-    fn run<W: ConcurrentWindow> (
+    fn run<RW: RenderWindow, GLW: GameLoopWindow, W: ConcurrentWindow<RW, GLW>> (
         mut self,
         combined_window: W,
-        game_iter_settings: &GameIteratorSettings,
+        game_iter_settings: GameIteratorSettings,
         mut render_resources: R
     ) {
 
         // Setup.
 
         self.load();
-        let (render_window, game_loop_window) = combined_window.split();
+        let (render_window, game_loop_window) = combined_window.get_windows();
         let mutex_self1 = Arc::new( Mutex::new( self ) );
         let mutex_self2 = mutex_self1.clone();
         let (tx, rx) = channel();
@@ -84,7 +84,7 @@ pub trait Game<R>: Copy + Send {
             let mut buf2 = self;
             let mut window = game_loop_window;
             
-            let mut game_iter = GameIterator::new(
+            let mut game_iter = ConcurrentIterator::new(
                 &mut window,
                 &game_iter_settings
              );
@@ -122,7 +122,7 @@ pub trait Game<R>: Copy + Send {
             {
                 let render_buf = mutex_guard.deref_mut();
                 render_buf.render( &mut render_resources, &mut args);
-                graphics_window.swap_buffers();
+                render_window.swap_buffers();
             }
             mutex_guard.cond.signal();
         }

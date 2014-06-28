@@ -10,7 +10,7 @@ pub trait RenderWindow {
 }
 
 /// Implemented by window back-end, required for concurrent rendering.
-pub trait GameLoopWindow {
+pub trait GameLoopWindow: Send {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a GameWindowSettings;
 
