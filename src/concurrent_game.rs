@@ -38,7 +38,7 @@ pub trait ConcurrentGame<R>: Copy + Send {
     fn update(&mut self, _args: &UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
-    fn load(&mut self) {}
+    fn load(&mut self, _resources: &mut R) {}
 
     /// User pressed a key.
     ///
@@ -76,7 +76,7 @@ pub trait ConcurrentGame<R>: Copy + Send {
 
         // Setup.
 
-        self.load();
+        self.load(&mut render_resources);
         let mutex_self1 = Arc::new( Mutex::new( self ) );
         let mutex_self2 = mutex_self1.clone();
         let (tx, rx) = channel();
