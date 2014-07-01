@@ -1,4 +1,4 @@
-Piston ![](https://travis-ci.org/PistonDevelopers/piston.svg)
+Piston [![Build Status](https://travis-ci.org/PistonDevelopers/piston.svg)](https://travis-ci.org/PistonDevelopers/piston)
 ======
 
 A user friendly game engine written in Rust
