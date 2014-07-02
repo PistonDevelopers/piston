@@ -47,17 +47,6 @@ If you don't have the 'target' folder, use the command `make target-dir`.
 
 You are now ready for making a game in Rust!
 
-## Piston documentation
-
-Online version of the documentation: http://pistondevelopers.github.io/docs/piston/piston/
-
-There are links to online version of the dependencies documentation in [README](https://github.com/PistonDevelopers/piston/blob/master/README.md)
-
-### How to generate documentation
-
-The README.md in https://github.com/PistonDevelopers/piston-workspace tells you how to generate documentation.  
-Follow these instructions to generate the documentation for all the projects in one go.  
-
 ## How to build the examples
 
 1. Open the Terminal and navigate to the 'piston' project.
