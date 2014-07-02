@@ -47,12 +47,9 @@ If you don't have the 'target' folder, use the command `make target-dir`.
 
 You are now ready for making a game in Rust!
 
-## How to build the examples
+## Examples
 
-1. Open the Terminal and navigate to the 'piston' project.
-2. Type `make examples`
-
-If you use tab out of habit, you will get `make examples/` which will not work.
+[Piston-Examples](https://github.com/pistondevelopers/piston-examples)
 
 ## Rendering with OpenGL
 
