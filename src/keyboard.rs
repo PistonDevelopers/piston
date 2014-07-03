@@ -8,7 +8,7 @@ use std::num::ToPrimitive;
 
 /// Represent a keyboard key.
 #[allow(missing_doc)]
-#[deriving(Clone, PartialEq, PartialOrd, Ord, Eq, Show)]
+#[deriving(Clone, Show)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
@@ -246,6 +246,30 @@ pub enum Key {
     KbdIllumUp              = 1073742104,
     Eject                   = 1073742105,
     Sleep                   = 1073742106,
+}
+
+
+//#[deriving(Clone, PartialEq, PartialOrd, Ord, Eq, Show)]
+impl PartialEq for Key {
+    fn eq(&self, other: &Key) -> bool {
+        return (*self as i32) == (*other as i32);
+    }
+}
+
+impl Eq for Key {}
+
+impl PartialOrd for Key {
+    fn partial_cmp(&self, other: &Key) -> Option<Ordering> {
+        let (s_id, o_id)  = (*self as i32, *other as i32);
+        s_id.partial_cmp(&o_id)
+    }
+}
+
+impl Ord for Key {
+    fn cmp(&self, other: &Key) -> Ordering {
+        let (s_id, o_id)  = (*self as i32, *other as i32);
+        s_id.cmp(&o_id)
+    }
 }
 
 impl Key {
