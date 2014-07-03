@@ -249,7 +249,6 @@ pub enum Key {
 }
 
 
-//#[deriving(Clone, PartialEq, PartialOrd, Ord, Eq, Show)]
 impl PartialEq for Key {
     fn eq(&self, other: &Key) -> bool {
         return (*self as i32) == (*other as i32);
