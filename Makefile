@@ -76,7 +76,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.6 004)"
+	$(Q)echo "--- rust-empty (0.6 005)"
 	$(Q)echo "make run               - Runs executable"
 	$(Q)echo "make exe               - Builds main executable"
 	$(Q)echo "make lib               - Both static and dynamic library"
@@ -354,7 +354,8 @@ $(LIB_ENTRY_FILE): | src/
 	$(Q)test -e $(LIB_ENTRY_FILE) \
 	|| \
 	( \
-		echo -e "#![crate_id = \"\"]\n#![deny(missing_doc)]\n\n//! Documentation goes here.\n" > $(LIB_ENTRY_FILE) \
+		name=$${PWD##/*/} ; \
+		echo -e "#![crate_name = \"$$name\"]\n#![deny(missing_doc)]\n\n//! Documentation goes here.\n" > $(LIB_ENTRY_FILE) \
 	)
 
 clean:
