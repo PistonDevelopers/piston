@@ -1,4 +1,4 @@
-# Rust-Empty: An Makefile to get started with Rust
+# Rust-Empty: A Makefile to get started with Rust
 # https://github.com/bvssvni/rust-empty
 # 
 # The MIT License (MIT)
@@ -63,6 +63,9 @@ RLIB = target/$(RLIB_FILE)
 DYLIB_FILE = $(shell (rustc --crate-type=dylib --crate-file-name "$(LIB_ENTRY_FILE)" 2> /dev/null) || (echo "dummy.dylib"))
 DYLIB = target/$(DYLIB_FILE)
 
+EXE_FILE = $(shell (rustc --crate-type=bin --print-file-name "$(EXE_ENTRY_FILE)" 2> /dev/null) || (echo "main"))
+EXE = bin/$(EXE_FILE)
+
 # Use 'VERBOSE=1' to echo all commands, for example 'make help VERBOSE=1'.
 ifdef VERBOSE
   Q :=
@@ -73,7 +76,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.6 003)"
+	$(Q)echo "--- rust-empty (0.6 004)"
 	$(Q)echo "make run               - Runs executable"
 	$(Q)echo "make exe               - Builds main executable"
 	$(Q)echo "make lib               - Both static and dynamic library"
@@ -240,14 +243,14 @@ doc: $(SOURCE_FILES) | src/
 
 run: exe
 	$(Q)cd bin/ \
-	&& ./main
+	&& ./$(EXE_FILE)
 
 target-dir: $(TARGET_LIB_DIR)
 
-exe: bin/main | $(TARGET_LIB_DIR)
+exe: $(EXE) | $(TARGET_LIB_DIR)
 
-bin/main: $(SOURCE_FILES) | bin/ $(EXE_ENTRY_FILE)
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) $(EXE_ENTRY_FILE) -o bin/main -L "$(TARGET_LIB_DIR)" -L "target" \
+$(EXE): $(SOURCE_FILES) | bin/ $(EXE_ENTRY_FILE)
+	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) $(EXE_ENTRY_FILE) -o $(EXE) -L "$(TARGET_LIB_DIR)" -L "target" \
 	&& echo "--- Built executable" \
 	&& echo "--- Type 'make run' to run executable"
 
@@ -322,7 +325,7 @@ git-ignore:
 	) \
 	|| \
 	( \
-		echo -e ".DS_Store\n*~\n*#\n*.o\n*.so\n*.swp\n*.dylib\n*.dSYM\n*.dll\n*.rlib\n*.dummy\n*.exe\n*-test\n/bin/main\n/bin/test-internal\n/bin/test-external\n/doc/\n/target/\n/build/\n/.rust/\nrusti.sh\nwatch.sh\n/examples/**\n!/examples/*.rs\n!/examples/assets/" > .gitignore \
+		echo -e ".DS_Store\n*~\n*#\n*.o\n*.so\n*.swp\n*.dylib\n*.dSYM\n*.dll\n*.rlib\n*.dummy\n*.exe\n*-test\n/$(EXE)\n/bin/test-internal\n/bin/test-external\n/doc/\n/target/\n/build/\n/.rust/\nrusti.sh\nwatch.sh\n/examples/**\n!/examples/*.rs\n!/examples/assets/" > .gitignore \
 		&& echo "--- Created '.gitignore' for git" \
 		&& cat .gitignore \
 	)
@@ -358,7 +361,7 @@ clean:
 	$(Q)rm -f "$(RLIB)"
 	$(Q)rm -f "$(DYLIB)"
 	$(Q)rm -rf "doc/"
-	$(Q)rm -f "bin/main"
+	$(Q)rm -f "$(EXE)"
 	$(Q)rm -f "bin/test-internal"
 	$(Q)rm -f "bin/test-external"
 	$(Q)echo "--- Deleted binaries and documentation"
