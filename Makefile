@@ -76,7 +76,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.6 005)"
+	$(Q)echo "--- rust-empty (0.7 000)"
 	$(Q)echo "make run               - Runs executable"
 	$(Q)echo "make exe               - Builds main executable"
 	$(Q)echo "make lib               - Both static and dynamic library"
@@ -91,8 +91,6 @@ help:
 	$(Q)echo "make doc               - Builds documentation for library"
 	$(Q)echo "make git-ignore        - Setup files to be ignored by Git"
 	$(Q)echo "make examples          - Builds examples"
-	$(Q)echo "make cargo-lite-exe    - Setup executable package"
-	$(Q)echo "make cargo-lite-lib    - Setup library package"
 	$(Q)echo "make cargo-exe         - Setup executable package"
 	$(Q)echo "make cargo-lib         - Setup library package"
 	$(Q)echo "make rust-ci-lib       - Setup Travis CI Rust library"
@@ -115,8 +113,6 @@ help:
 		bench-external \
 		cargo-lib \
 		cargo-exe \
-		cargo-lite-lib \
-		cargo-lite-exe \
 		clean \
 		clear-git \
 		clear-project \
@@ -161,30 +157,6 @@ nightly-uninstall:
 		fi \
 	)
 
-cargo-lite-exe: $(EXE_ENTRY_FILE)
-	$(Q)( \
-		test -e cargo-lite.conf \
-		&& echo "--- The file 'cargo-lite.conf' already exists" \
-	) \
-	|| \
-	( \
-		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"$(EXE_ENTRY_FILE)\"\nrustc_args = []\n" > cargo-lite.conf \
-		&& echo "--- Created 'cargo-lite.conf' for executable" \
-		&& cat cargo-lite.conf \
-	)
-
-cargo-lite-lib: $(LIB_ENTRY_FILE)
-	$(Q)( \
-		test -e cargo-lite.conf \
-		&& echo "--- The file 'cargo-lite.conf' already exists" \
-	) \
-	|| \
-	( \
-		echo -e "deps = [\n]\n\n[build]\ncrate_root = \"$(LIB_ENTRY_FILE)\"\ncrate_type = \"library\"\nrustc_args = []\n" > cargo-lite.conf \
-		&& echo "--- Created 'cargo-lite.conf' for library" \
-		&& cat cargo-lite.conf \
-	)
-
 cargo-exe: $(EXE_ENTRY_FILE)
 	$(Q)( \
 		test -e Cargo.toml \
@@ -209,7 +181,7 @@ cargo-lib: $(LIB_ENTRY_FILE)
 		name=$${PWD##/*/} ; \
 		readme=$$((test -e README.md && echo -e "readme = \"README.md\"") || ("")) ; \
 		echo -e "[package]\n\nname = \"$$name\"\nversion = \"0.0.0\"\n$$readme\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"$(LIB_ENTRY_FILE)\"\n" > Cargo.toml \
-		&& echo "--- Created 'Cargo.toml' for executable" \
+		&& echo "--- Created 'Cargo.toml' for library" \
 		&& cat Cargo.toml \
 	)
 
@@ -325,7 +297,7 @@ git-ignore:
 	) \
 	|| \
 	( \
-		echo -e ".DS_Store\n*~\n*#\n*.o\n*.so\n*.swp\n*.dylib\n*.dSYM\n*.dll\n*.rlib\n*.dummy\n*.exe\n*-test\n/$(EXE)\n/bin/test-internal\n/bin/test-external\n/doc/\n/target/\n/build/\n/.rust/\nrusti.sh\nwatch.sh\n/examples/**\n!/examples/*.rs\n!/examples/assets/" > .gitignore \
+		echo -e ".DS_Store\n*~\n*#\n*.o\n*.so\n*.swp\n*.old\n*.bak\n*.kate-swp\n*.dylib\n*.dSYM\n*.dll\n*.rlib\n*.dummy\n*.exe\n*-test\n/$(EXE)\n/bin/test-internal\n/bin/test-external\n/doc/\n/target/\n/build/\n/.rust/\nrusti.sh\nwatch.sh\n/examples/**\n!/examples/*.rs\n!/examples/assets/" > .gitignore \
 		&& echo "--- Created '.gitignore' for git" \
 		&& cat .gitignore \
 	)
@@ -369,7 +341,6 @@ clean:
 
 clear-project:
 	$(Q)rm -f ".symlink-info"
-	$(Q)rm -f "cargo-lite.conf"
 	$(Q)rm -f "Cargo.toml"
 	$(Q)rm -f ".travis.yml"
 	$(Q)rm -f "rusti.sh"
@@ -594,6 +565,8 @@ function build_deps {
 
         # Visit the symlinks and build the dependencies
         build_deps
+        
+		echo "--- Building $$current_git_dir" \
 
         # First check for a 'build.sh' script with default settings.
         # Check for additional 'rust-empty.mk' file. \
@@ -611,10 +584,19 @@ function build_deps {
         ) \
         || \
         ( \
-            echo "--- Building $$current_git_dir" \
+			test -e Makefile \
             && $$MAKE clean \
             && $$MAKE \
-        )
+        ) \
+		|| \
+		( \
+			test -e Cargo.toml \
+			&& cargo build \
+		) \
+		|| \
+		( \
+			echo "--- ERROR: Missing Makefile in $$current_git_dir" \
+		)
     done
     cd $$current
 }
