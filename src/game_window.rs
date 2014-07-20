@@ -32,4 +32,9 @@ pub trait GameWindow {
 pub trait RenderWindow {
     /// Swap buffers.
     fn swap_buffers(&self) {}
+
+    /// When the cursor is captured,
+    /// it is hidden and the cursor position does not change.
+    /// Only relative mouse motion is registered.
+    fn capture_cursor(&mut self, _enabled: bool) {}
 }
