@@ -16,8 +16,13 @@ pub trait GameWindow {
         (self.get_settings().size[0], self.get_settings().size[1])
     }
 
-    /// swap buffers.
+    /// Swap buffers.
     fn swap_buffers(&self) {}
+
+    /// When the cursor is captured,
+    /// it is hidden and the cursor position does not change.
+    /// Only relative mouse motion is registered.
+    fn capture_cursor(&mut self, _enabled: bool) {}
     
     /// Poll a event from window's event queue.
     fn poll_event(&mut self) -> event::Event { event::NoEvent }
