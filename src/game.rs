@@ -65,6 +65,7 @@ pub trait Game {
     /// When the cursor is captured, it is hidden from view
     /// and the cursor position does not change.
     /// Only relative mouse movements are registered.
+    #[inline(always)]
     fn should_capture_cursor(&mut self) -> bool { false }
 
     /// Handles a game event.
@@ -95,12 +96,19 @@ pub trait Game {
 
         self.load();
 
+        let mut should_capture_cursor = self.should_capture_cursor();
+        game_iter.game_window.capture_cursor(should_capture_cursor);
         loop {
             match game_iter.next() {
                 None => break,
                 Some(mut e) => self.event(&mut e)
             }
+            if  self.should_capture_cursor() != should_capture_cursor {
+                should_capture_cursor = !should_capture_cursor;
+                game_iter.game_window.capture_cursor(should_capture_cursor);
+            }
         }
+        game_iter.game_window.capture_cursor(false);
     }
 }
 
