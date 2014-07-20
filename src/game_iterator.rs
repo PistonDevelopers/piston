@@ -146,7 +146,8 @@ pub struct GameIteratorSettings {
 /// }
 /// ```
 pub struct GameIterator<'a, W> {
-    game_window: &'a mut W,
+    /// The game window used by iterator.
+    pub game_window: &'a mut W,
     state: GameIteratorState,
     last_update: u64,
     update_time_in_ns: u64,
