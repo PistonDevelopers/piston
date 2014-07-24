@@ -6,7 +6,7 @@ pub struct GameWindowSettings {
     /// The size of the window
     pub size: [u32, ..2],
     /// If true, the window is fullscreen.
-    pub fullscreen: bool,
+    pub full_screen: bool,
     /// If true, exit when pressing Esc.
     pub exit_on_esc: bool,
 }
@@ -20,8 +20,9 @@ impl GameWindowSettings {
         GameWindowSettings {
             title: "Piston".to_string(),
             size: [640, 480],
-            fullscreen: false,
+            full_screen: false,
             exit_on_esc: true,
         }
     }
 }
+
