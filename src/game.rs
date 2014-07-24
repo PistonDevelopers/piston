@@ -33,7 +33,7 @@ pub trait Game<W: GameWindow> {
     fn update(&mut self, _window: &mut W, _args: &UpdateArgs) {}
 
     /// Perform tasks for loading before showing anything.
-    fn load(&mut self) {}
+    fn load(&mut self, _window: &mut W) {}
 
     /// User pressed a key.
     ///
@@ -89,12 +89,12 @@ pub trait Game<W: GameWindow> {
         game_window: &mut W,
         game_iter_settings: &GameIteratorSettings
     ) {
+        self.load(game_window);
+
         let mut game_iter = GameIterator::new(
             game_window,
             game_iter_settings
         );
-
-        self.load();
 
         let mut should_capture_cursor = self.should_capture_cursor();
         game_iter.game_window.capture_cursor(should_capture_cursor);
