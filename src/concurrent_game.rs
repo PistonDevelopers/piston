@@ -30,9 +30,9 @@ use Update;
 use UpdateArgs;
 
 /// Implemented by game applications.
-pub trait ConcurrentGame<R>: Copy + Send {
+pub trait ConcurrentGame<R, RW: RenderWindow>: Copy + Send {
     /// Render graphics.
-    fn render(&self, _resources: &mut R, _args: &RenderArgs) {}
+    fn render(&self, _resources: &mut R, _render_window: &mut RW, _args: &RenderArgs) {}
 
     /// Update the physical state of the game.
     fn update(&mut self, _args: &UpdateArgs) {}
@@ -66,13 +66,13 @@ pub trait ConcurrentGame<R>: Copy + Send {
     fn mouse_scroll(&mut self, _args: &MouseScrollArgs) {}
 
     /// Executes a game loop.
-    fn run<W: GameWindow + Send, RW: RenderWindow> (
+    fn run<W: GameWindow + Send> (
         mut self,
         windows: (W, RW),
         game_iter_settings: GameIteratorSettings,
         mut render_resources: R
     ) {
-        let (game_window, render_window) = windows;
+        let (game_window, mut render_window) = windows;
 
         // Setup.
 
@@ -130,7 +130,7 @@ pub trait ConcurrentGame<R>: Copy + Send {
             let mut mutex_guard = mutex_self1.lock();
             {
                 let render_buf = mutex_guard.deref_mut();
-                render_buf.render( &mut render_resources, &mut args);
+                render_buf.render( &mut render_resources, &mut render_window, &mut args);
                 render_window.swap_buffers();
             }
             mutex_guard.cond.signal();
