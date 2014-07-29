@@ -60,14 +60,6 @@ pub trait Game<W: GameWindow> {
     /// Scrolled mouse.
     fn mouse_scroll(&mut self, _window: &mut W, _args: &MouseScrollArgs) {}
 
-    /// Whether the cursor should be captured.
-    ///
-    /// When the cursor is captured, it is hidden from view
-    /// and the cursor position does not change.
-    /// Only relative mouse movements are registered.
-    #[inline(always)]
-    fn should_capture_cursor(&mut self) -> bool { false }
-
     /// Handles a game event.
     fn event(&mut self, game_window: &mut W, event: &mut GameEvent) {
         match *event {
@@ -96,19 +88,12 @@ pub trait Game<W: GameWindow> {
             game_iter_settings
         );
 
-        let mut should_capture_cursor = self.should_capture_cursor();
-        game_iter.game_window.capture_cursor(should_capture_cursor);
         loop {
             match game_iter.next() {
                 None => break,
                 Some(mut e) => self.event(game_iter.game_window, &mut e)
             }
-            if  self.should_capture_cursor() != should_capture_cursor {
-                should_capture_cursor = !should_capture_cursor;
-                game_iter.game_window.capture_cursor(should_capture_cursor);
-            }
         }
-        game_iter.game_window.capture_cursor(false);
     }
 }
 
