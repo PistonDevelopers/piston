@@ -2,7 +2,7 @@ Git commands and the pull request process: https://github.com/bvssvni/rust-empty
 
 Post a message [here](https://github.com/PistonDevelopers/piston/issues/70) "I want to contribute to Rust-Graphics" and @Denommus or @bvssvni will add you as a collaborator. When you are a collaborator you can assign issues to yourself.
 
-This project uses the issue tracker heavily. We try to plan as much as possible up front and break the tasks down into 'Easy' tasks. You do not need to know a lot about Rust to work on the project. We use [Rust-Empty](https://github.com/bvssvni/rust-empty) which contains a lot of information in the issue tracker for those who knows little about Rust/Terminal/Vim/Github.
+This project uses the issue tracker heavily. We try to plan as much as possible up front and break the tasks down into 'Easy' tasks. You do not need to know a lot about Rust to work on the project. We use [Rust-Empty](https://github.com/pistondevelopers/rust-empty) which contains a lot of information in the issue tracker for those who knows little about Rust/Terminal/Vim/Github.
 
 Here is how you get started:
 
