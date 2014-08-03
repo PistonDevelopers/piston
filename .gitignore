@@ -36,3 +36,5 @@ examples/soundstream
 watch.sh
 
 examples/hgl_triangle
+
+Cargo.lock
