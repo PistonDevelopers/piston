@@ -13,3 +13,7 @@ tags = []
 name = "event"
 path = "src/lib.rs"
 
+[dependencies.piston]
+
+git = "https://github.com/pistondevelopers/piston/"
+
