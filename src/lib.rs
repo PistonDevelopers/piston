@@ -12,7 +12,7 @@
 //! into simple interacitons while needing complex combinations of those actions.
 
 #![crate_type = "lib"]
-#![crate_id = "event#event:0.1"]
+#![crate_name = "event"]
 #![deny(missing_doc)]
 
 pub use event::{
