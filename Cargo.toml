@@ -1,0 +1,15 @@
+[package]
+
+name = "event"
+version = "0.0.0"
+authors = [
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>"
+]
+tags = []
+
+[[lib]]
+
+name = "event"
+path = "src/lib.rs"
+

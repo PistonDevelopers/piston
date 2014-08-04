@@ -36,9 +36,9 @@ impl<A: StartState<S>, S> Event<A> {
             Wait(dt)
                 => WaitCursor(dt, 0.0),
             Sequence(ref seq)
-                => SequenceCursor(seq, 0, box seq.get(0).to_cursor()),
+                => SequenceCursor(seq, 0, box seq[0].to_cursor()),
             While(ref ev, ref rep)
-                => WhileCursor(box ev.to_cursor(), rep, 0, box rep.get(0).to_cursor()),
+                => WhileCursor(box ev.to_cursor(), rep, 0, box rep[0].to_cursor()),
             WhenAll(ref all)
                 => WhenAllCursor(all.iter().map(|ev| Some(ev.to_cursor())).collect()),
         }

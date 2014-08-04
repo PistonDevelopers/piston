@@ -70,7 +70,7 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     if *i >= seq.len() { return Some(dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = seq.get(*i).to_cursor();
+                    **cur = seq[*i].to_cursor();
                 }
                 None
             },
@@ -100,7 +100,7 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     if *i >= rep.len() { *i = 0; }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = rep.get(*i).to_cursor();
+                    **cur = rep[*i].to_cursor();
                 }
                 None
             },
