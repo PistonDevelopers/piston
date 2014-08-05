@@ -15,6 +15,14 @@
 #![crate_name = "event"]
 #![deny(missing_doc)]
 
+extern crate piston;
+
+pub use status::{
+    Status,
+    Success,
+    Failure,
+    Running,
+};
 pub use event::{
     Action,
     Event,
@@ -25,6 +33,7 @@ pub use event::{
 };
 pub use cursor::{
     Cursor,
+    KeyPressedCursor,
     SequenceCursor,
     State,
     WaitCursor,
@@ -36,4 +45,4 @@ pub use start_state::StartState;
 mod cursor;
 mod event;
 mod start_state;
-
+mod status;
