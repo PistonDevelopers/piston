@@ -1,6 +1,11 @@
 
+extern crate piston;
 extern crate event;
 
+use piston::{
+    Update,
+    UpdateArgs,
+};
 use event::{
     Action,
     Cursor,
@@ -25,10 +30,10 @@ impl StartState<()> for TestActions {
 
 // A test state machine that can increment and decrement.
 fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
-    cursor.update(dt, |action, _| {
+    cursor.update(&Update(UpdateArgs { dt: dt }), |action, _| {
         match *action {
-            Inc => { acc += 1; None },
-            Dec => { acc -= 1; None },
+            Inc => { acc += 1; event::Success },
+            Dec => { acc -= 1; event::Success },
         }
     });
     acc

@@ -54,17 +54,8 @@ TARGET = $(shell rustc --version verbose 2> /dev/null | awk "/host:/ { print \$$
 
 TARGET_LIB_DIR = target/deps/
 
-# Ask 'rustc' the file name of the library and use a dummy name if the source has not been created yet.
-# The dummy file name is used to trigger the creation of the source first time.
-# Next time 'rustc' will return the right file name.
-RLIB_FILE = $(shell (rustc --crate-type=rlib --crate-file-name "$(LIB_ENTRY_FILE)" 2> /dev/null) || (echo "dummy.rlib"))
-# You can't have quotes around paths because 'make' doesn't see it exists.
-RLIB = target/$(RLIB_FILE)
-DYLIB_FILE = $(shell (rustc --crate-type=dylib --crate-file-name "$(LIB_ENTRY_FILE)" 2> /dev/null) || (echo "dummy.dylib"))
-DYLIB = target/$(DYLIB_FILE)
-
 EXE_FILE = $(shell (rustc --crate-type=bin --print-file-name "$(EXE_ENTRY_FILE)" 2> /dev/null) || (echo "main"))
-EXE_DIR = target
+EXE_DIR = bin
 EXE = $(EXE_DIR)/$(EXE_FILE)
 
 # Use 'VERBOSE=1' to echo all commands, for example 'make help VERBOSE=1'.
@@ -77,12 +68,10 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.7 002)"
+	$(Q)echo "--- rust-empty (0.7 004)"
 	$(Q)echo "make run               - Runs executable"
 	$(Q)echo "make exe               - Builds main executable"
-	$(Q)echo "make lib               - Both static and dynamic library"
-	$(Q)echo "make rlib              - Static library"
-	$(Q)echo "make dylib             - Dynamic library"
+	$(Q)echo "make lib               - Builds library"
 	$(Q)echo "make test              - Tests library internally and externally"
 	$(Q)echo "make test-internal     - Tests library internally"
 	$(Q)echo "make test-external     - Tests library externally"
@@ -233,7 +222,7 @@ test-external: $(EXE_DIR)/test-external
 	$(Q)cd "$(EXE_DIR)/" \
 	&& ./test-external
 
-$(EXE_DIR)/test-external: $(SOURCE_FILES) | rlib $(EXE_DIR)/ src/test.rs
+$(EXE_DIR)/test-external: $(SOURCE_FILES) | lib $(EXE_DIR)/ src/test.rs
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --test src/test.rs -o "$(EXE_DIR)/test-external" -L "$(TARGET_LIB_DIR)" -L "target" \
 	&& echo "--- Built external test runner"
 
@@ -241,7 +230,7 @@ test-internal: $(EXE_DIR)/test-internal
 	$(Q)cd "$(EXE_DIR)/" \
 	&& ./test-internal
 
-$(EXE_DIR)/test-internal: $(SOURCE_FILES) | rlib src/ $(EXE_DIR)/
+$(EXE_DIR)/test-internal: $(SOURCE_FILES) | lib src/ $(EXE_DIR)/
 	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --test $(LIB_ENTRY_FILE) -o "$(EXE_DIR)/test-internal" -L "$(TARGET_LIB_DIR)" -L "target" \
 	&& echo "--- Built internal test runner"
 
@@ -253,20 +242,15 @@ bench-external: test-external
 bench-internal: test-internal
 	$(Q)$(EXE_DIR)/test-internal --bench
 
-lib: rlib dylib
-	$(Q)echo "--- Type 'make test' to test library"
-
-rlib: $(RLIB)
-
-$(RLIB): $(SOURCE_FILES) | $(LIB_ENTRY_FILE) $(TARGET_LIB_DIR)
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=rlib $(LIB_ENTRY_FILE) -L "$(TARGET_LIB_DIR)" --out-dir "target" \
-	&& echo "--- Built rlib"
-
-dylib: $(DYLIB)
-
-$(DYLIB): $(SOURCE_FILES) | $(LIB_ENTRY_FILE) $(TARGET_LIB_DIR)
-	$(Q)$(COMPILER) --target "$(TARGET)" $(COMPILER_FLAGS) --crate-type=dylib $(LIB_ENTRY_FILE) -L "$(TARGET_LIB_DIR)" --out-dir "target/" \
-	&& echo "--- Built dylib"
+lib:
+	$(Q)( \
+		cargo build \
+		&& echo "--- Type 'make test' to test library" \
+	) \
+	|| \
+	( \
+		echo "--- Type 'make cargo-lib' to create Cargo.toml" \
+	)
 
 $(EXE_DIR)/:
 	$(Q)mkdir -p $(EXE_DIR)
@@ -331,8 +315,7 @@ $(LIB_ENTRY_FILE): | src/
 	)
 
 clean:
-	$(Q)rm -f "$(RLIB)"
-	$(Q)rm -f "$(DYLIB)"
+	$(Q)cargo clean
 	$(Q)rm -rf "doc/"
 	$(Q)rm -f "$(EXE)"
 	$(Q)rm -f "$(EXE_DIR)/test-internal"
@@ -342,6 +325,7 @@ clean:
 clear-project:
 	$(Q)rm -f ".symlink-info"
 	$(Q)rm -f "Cargo.toml"
+	$(Q)rm -f "Cargo.lock"
 	$(Q)rm -f ".travis.yml"
 	$(Q)rm -f "rusti.sh"
 	$(Q)rm -f "watch.sh"

@@ -1,6 +1,10 @@
 
+use piston::{
+    keyboard,
+};
 use {
     Cursor,
+    KeyPressedCursor,
     SequenceCursor,
     StartState,
     State,
@@ -11,6 +15,8 @@ use {
 
 /// Describes an event.
 pub enum Event<A> {
+    /// A key was pressed.
+    KeyPressed(keyboard::Key),
     /// An event where some action is performed.
     Action(A),
     /// An event
@@ -31,6 +37,8 @@ impl<A: StartState<S>, S> Event<A> {
     /// to create more complex states.
     pub fn to_cursor<'a>(&'a self) -> Cursor<'a, A, S> {
         match *self {
+            KeyPressed(key)
+                => KeyPressedCursor(key),
             Action(ref action)
                 => State(action, action.start_state()),
             Wait(dt)
