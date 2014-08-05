@@ -23,6 +23,8 @@ pub enum Cursor<'a, A, S> {
     KeyPressedCursor(keyboard::Key),
     /// Keeps track of an event where you have a state of an action.
     State(&'a A, S),
+    /// Keeps track of `Success` <=> `Failure`.
+    InvertCursor(Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitCursor(f64, f64),
     /// Keeps track of an event where sub events happens sequentially.
@@ -51,6 +53,14 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
             (&Update(UpdateArgs { dt }), &State(action, ref mut state)) => {
                 // Call the function that updates the state.
                 (f(action, state), dt)
+            },
+            (_, &InvertCursor(ref mut cur)) => {
+                // Invert `Success` <=> `Failure`.
+                match cur.update(e, |action, state| f(action, state)) {
+                    (Running, dt) => (Running, dt),
+                    (Failure, dt) => (Success, dt),
+                    (Success, dt) => (Failure, dt),
+                }
             },
             (&Update(UpdateArgs { dt }), &WaitCursor(wait_t, ref mut t)) => {
                 if *t + dt >= wait_t {
