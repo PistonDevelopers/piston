@@ -36,8 +36,7 @@ pub enum Cursor<'a, A, S> {
 impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
     /// Updates the cursor that tracks an event.
     ///
-    /// Returns `Running` if the action did not terminate.
-    /// or `Success(dt)` or `Failure(dt)` that tells how much time is left of the update time.
+    /// Returns status and the remaining delta time.
     pub fn update(
         &mut self,
         e: &GameEvent,
