@@ -8,6 +8,7 @@ use {
     SequenceCursor,
     StartState,
     State,
+    InvertCursor,
     WaitCursor,
     WhenAllCursor,
     WhileCursor,
@@ -19,6 +20,8 @@ pub enum Event<A> {
     KeyPressed(keyboard::Key),
     /// An event where some action is performed.
     Action(A),
+    /// Returns `Success` <=> `Failure`.
+    Invert(Box<Event<A>>),
     /// An event
     Wait(f64),
     /// An event where sub events are happening sequentially.
@@ -41,6 +44,8 @@ impl<A: StartState<S>, S> Event<A> {
                 => KeyPressedCursor(key),
             Action(ref action)
                 => State(action, action.start_state()),
+            Invert(ref ev)
+                => InvertCursor(box ev.to_cursor()),
             Wait(dt)
                 => WaitCursor(dt, 0.0),
             Sequence(ref seq)
