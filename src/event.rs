@@ -5,6 +5,7 @@ use piston::{
 use {
     Cursor,
     KeyPressedCursor,
+    SelectCursor,
     SequenceCursor,
     StartState,
     State,
@@ -22,6 +23,10 @@ pub enum Event<A> {
     Action(A),
     /// Returns `Success` <=> `Failure`.
     Invert(Box<Event<A>>),
+    /// An event that succeeds if any sub event succeeds.
+    ///
+    /// If a sub event fails it will try the next one.
+    Select(Vec<Event<A>>),
     /// An event waiting for time in seconds to expire.
     ///
     /// This event never fails.
@@ -54,6 +59,8 @@ impl<A: StartState<S>, S> Event<A> {
                 => InvertCursor(box ev.to_cursor()),
             Wait(dt)
                 => WaitCursor(dt, 0.0),
+            Select(ref sel)
+                => SelectCursor(sel, 0, box sel[0].to_cursor()),
             Sequence(ref seq)
                 => SequenceCursor(seq, 0, box seq[0].to_cursor()),
             While(ref ev, ref rep)

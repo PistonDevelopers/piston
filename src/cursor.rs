@@ -27,6 +27,8 @@ pub enum Cursor<'a, A, S> {
     InvertCursor(Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitCursor(f64, f64),
+    /// Keeps track of a `Select` event.
+    SelectCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where sub events happens sequentially.
     SequenceCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
     /// Keeps track of an event where sub events are repeated sequentially.
@@ -73,6 +75,37 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     (Running, 0.0)
                 }
             },
+            (_, &SelectCursor(
+                seq,
+                ref mut i,
+                ref mut cursor
+            )) => {
+                let mut remaining_e = *e;
+                while *i < seq.len() {
+                    match cursor.update(&remaining_e, |dt, action, state| f(dt, action, state)) { 
+                        (Success, x) => return (Success, x),
+                        (Running, _) => { break },
+                        (Failure, new_dt) => {
+                            remaining_e = match *e {
+                                // Change update event with remaining delta time.
+                                Update(_) => Update(UpdateArgs { dt: new_dt }),
+                                x => x,
+                            }
+                        }
+                    };
+                    *i += 1;
+                    // If end of sequence,
+                    // return the 'dt' that is left.
+                    if *i >= seq.len() { return (Failure, match remaining_e {
+                            Update(UpdateArgs { dt }) => dt,
+                            _ => 0.0
+                        }); }
+                    // Create a new cursor for next event.
+                    // Use the same pointer to avoid allocation.
+                    **cursor = seq[*i].to_cursor();
+                }
+                (Running, 0.0)
+            },
             (_, &SequenceCursor(
                 seq, 
                 ref mut i, 
@@ -101,10 +134,9 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     *i += 1;
                     // If end of sequence,
                     // return the 'dt' that is left.
-                    // This has to be an update event, because all other cases return early.
                     if *i >= seq.len() { return (Success, match remaining_e {
                             Update(UpdateArgs { dt }) => dt,
-                            _ => unreachable!()
+                            _ => 0.0
                         }); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
