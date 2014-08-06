@@ -25,6 +25,10 @@ pub enum Event<A> {
     /// An event
     Wait(f64),
     /// An event where sub events are happening sequentially.
+    ///
+    /// The sequence fails if one of the sub events fails.
+    /// The sequence succeeds if all the sub events succeeds.
+    /// Can be used as a short-circuited logical AND block.
     Sequence(Vec<Event<A>>),
     /// While an event is executing, run a sequence of events in a loop..
     While(Box<Event<A>>, Vec<Event<A>>),
