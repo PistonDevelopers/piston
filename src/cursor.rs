@@ -38,11 +38,12 @@ pub enum Cursor<'a, A, S> {
 impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
     /// Updates the cursor that tracks an event.
     ///
+    /// The action need to return status and remaining delta time.
     /// Returns status and the remaining delta time.
     pub fn update(
         &mut self,
         e: &GameEvent,
-        f: |action: &'a A, state: &mut S| -> Status
+        f: |dt: f64, action: &'a A, state: &mut S| -> (Status, f64)
     ) -> (Status, f64) {
         match (e, self) {
             (&KeyPress(KeyPressArgs { key: key_pressed }), &KeyPressedCursor(key)) 
@@ -52,11 +53,11 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
             },
             (&Update(UpdateArgs { dt }), &State(action, ref mut state)) => {
                 // Call the function that updates the state.
-                (f(action, state), dt)
+                f(dt, action, state)
             },
             (_, &InvertCursor(ref mut cur)) => {
                 // Invert `Success` <=> `Failure`.
-                match cur.update(e, |action, state| f(action, state)) {
+                match cur.update(e, |dt, action, state| f(dt, action, state)) {
                     (Running, dt) => (Running, dt),
                     (Failure, dt) => (Success, dt),
                     (Success, dt) => (Failure, dt),
@@ -80,7 +81,7 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                 let cur = cursor;
                 let mut remaining_e = *e;
                 while *i < seq.len() {
-                    match cur.update(&remaining_e, |action, state| f(action, state)) {
+                    match cur.update(&remaining_e, |dt, action, state| f(dt, action, state)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -118,14 +119,14 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                 ref mut cursor
             )) => {
                 // If the event terminates, do not execute the loop.
-                match ev_cursor.update(e, |action, state| f(action, state)) {
+                match ev_cursor.update(e, |dt, action, state| f(dt, action, state)) {
                     (Running, _) => {}
                     x => return x,
                 };
                 let cur = cursor;
                 let mut remaining_e = *e;
                 loop {
-                    match cur.update(&remaining_e, |action, state| f(action, state)) {
+                    match cur.update(&remaining_e, |dt, action, state| f(dt, action, state)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -158,7 +159,7 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                         Some(ref mut cur) => {
                             match cur.update(
                                 e,
-                                |action, state| f(action, state)
+                                |dt, action, state| f(dt, action, state)
                             ) {
                                 (Running, _) => {},
                                 (Failure, new_dt) => return (Failure, new_dt),

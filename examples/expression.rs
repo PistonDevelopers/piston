@@ -30,10 +30,10 @@ impl StartState<()> for TestActions {
 
 // A test state machine that can increment and decrement.
 fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
-    cursor.update(&Update(UpdateArgs { dt: dt }), |action, _| {
+    cursor.update(&Update(UpdateArgs { dt: dt }), |dt, action, _| {
         match *action {
-            Inc => { acc += 1; event::Success },
-            Dec => { acc -= 1; event::Success },
+            Inc => { acc += 1; (event::Success, dt) },
+            Dec => { acc -= 1; (event::Success, dt) },
         }
     });
     acc
