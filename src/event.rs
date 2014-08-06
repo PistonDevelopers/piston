@@ -22,7 +22,9 @@ pub enum Event<A> {
     Action(A),
     /// Returns `Success` <=> `Failure`.
     Invert(Box<Event<A>>),
-    /// An event
+    /// An event waiting for time in seconds to expire.
+    ///
+    /// This event never fails.
     Wait(f64),
     /// An event where sub events are happening sequentially.
     ///
