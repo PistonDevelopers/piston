@@ -26,6 +26,7 @@ pub use status::{
 pub use event::{
     Action,
     Event,
+    Select,
     Sequence,
     Invert,
     Wait,
@@ -35,6 +36,7 @@ pub use event::{
 pub use cursor::{
     Cursor,
     KeyPressedCursor,
+    SelectCursor,
     SequenceCursor,
     State,
     InvertCursor,
