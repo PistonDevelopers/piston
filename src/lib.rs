@@ -37,7 +37,9 @@ pub struct Button {
     /// The key that identifies the button.
     pub key: &'static str,
     /// A non-zero id if device contains more than one.
-    pub id: uint,
+    pub axis_id: uint,
+    /// The user id.
+    pub user_id: uint,
 }
 
 /// A user input signal is a 3D data of some sort.
