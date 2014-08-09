@@ -1,7 +1,7 @@
 #![crate_name = "ui"]
 #![deny(missing_doc)]
 
-//! A flexible standard for user interactions
+//! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
 
 /// Time difference in seconds.
