@@ -42,21 +42,26 @@ pub struct Button {
     pub user_id: uint,
 }
 
-/// A user input signal is a 3D data of some sort.
+/// A device input motion.
 ///
-/// This can be absolute or relative depending on the usage.
-pub struct Signal {
-    /// The device where the signal came from.
+/// Coordinates can be absolute or relative depending on the usage.
+/// The coordinates depends on usage.
+pub struct Motion {
+    /// The device where the motion came from.
     pub device: Device,
-    /// The coordinates received from signal.
+    /// The coordinates describing the motion.
+    ///
+    /// For rotation the coordinates are usually yaw, pitch and roll.
     pub xyz: [f64, ..3],
     /// A non-zero id if device contains more than one.
-    pub id: uint,
+    pub axis_id: uint,
+    /// The user id.
+    pub user_id: uint,
 }
 
-impl Signal {
+impl Motion {
     /// Gets the `x` and `y` component.
-    pub fn xy(&self) -> (f64, f64) {
+    pub fn get_xy(&self) -> (f64, f64) {
         (self.xyz[0], self.xyz[1])
     }
 }
@@ -72,19 +77,19 @@ pub enum Input {
     /// The frequency of repeating is implementation dependent.
     Repeat(Button),
     /// Position input event from device.
-    Position(Device, [f64, ..3]),
+    Position(Motion),
     /// Move input event from device.
-    Move(Device, [f64, ..3]),
+    Move(Motion),
     /// Scroll input event from device.
-    Scroll(Device, [f64, ..3]),
+    Scroll(Motion),
     /// Resize input event from device.
-    Resize(Device, [f64, ..3]),
+    Resize(Motion),
     /// Orient input event from device.
-    Orient(Device, [f64, ..3]),
+    Orient(Motion),
     /// Rotate input event from device.
-    Rotate(Device, [f64, ..3]),
+    Rotate(Motion),
     /// Scale input event from device.
-    Scale(Device, [f64, ..3]),
+    Scale(Motion),
     /// Select all items.
     SelectAll,
     /// Deselect all items.
