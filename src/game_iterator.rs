@@ -150,13 +150,10 @@ pub struct GameIterator<'a, W> {
     pub game_window: &'a mut W,
     state: GameIteratorState,
     last_update: u64,
-    update_time_in_ns: u64,
+    last_frame: u64,
+    dt_update_in_ns: u64,
+    dt_frame_in_ns: u64,
     dt: f64,
-    min_updates_per_frame: u64,
-    min_ns_per_frame: u64,
-    start_render: u64,
-    next_render: u64,
-    updated: u64,
 }
 
 static billion: u64 = 1_000_000_000;
@@ -175,14 +172,10 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
             game_window: game_window,
             state: RenderState,
             last_update: start,
-            update_time_in_ns: billion / updates_per_second,
+            last_frame: start,
+            dt_update_in_ns: billion / updates_per_second,
+            dt_frame_in_ns: billion / max_frames_per_second,
             dt: 1.0 / updates_per_second as f64,
-            // You can make this lower if needed.
-            min_updates_per_frame: updates_per_second / max_frames_per_second,
-            min_ns_per_frame: billion / max_frames_per_second,
-            start_render: start,
-            next_render: start,
-            updated: 0,
         }
     }
 }
@@ -196,7 +189,8 @@ for GameIterator<'a, W> {
             RenderState => {
                 if self.game_window.should_close() { return None; }
 
-                self.start_render = time::precise_time_ns();
+                let start_render = time::precise_time_ns();
+                self.last_frame = start_render;
                 // Rendering code
                 let (w, h) = self.game_window.get_size();
                 if w != 0 && h != 0 {
@@ -204,14 +198,12 @@ for GameIterator<'a, W> {
                     self.state = SwapBuffersState;
                     return Some(Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            // 'start_render' is always bigger than 'last_update'.
-                            ext_dt: (self.start_render - self.last_update) as f64 / billion as f64,
+                            ext_dt: (start_render - self.last_frame) as f64 / billion as f64,
                             width: w,
                             height: h,
                         }
                     ));
                 }
-
 
                 self.state = PrepareUpdateLoopState;
                 return self.next();
@@ -222,30 +214,34 @@ for GameIterator<'a, W> {
                 return self.next();
             },
             PrepareUpdateLoopState => {
-                self.updated = 0;
-                self.next_render = self.start_render + self.min_ns_per_frame;
                 self.state = UpdateLoopState;
                 return self.next();
             },
             UpdateLoopState => {
-                let got_min_updates = self.updated < self.min_updates_per_frame;
-                let got_time_to_update = time::precise_time_ns() < self.next_render;
-                let before_next_frame = self.last_update + self.update_time_in_ns < self.next_render;
+                let current_time = time::precise_time_ns();
 
-                if ( got_time_to_update || got_min_updates ) && before_next_frame {
+                let updates_wanted =
+                    (current_time as f64 - self.last_update as f64) /
+                    self.dt_update_in_ns as f64;
+                let frames_wanted =
+                    (current_time as f64 - self.last_frame as f64) /
+                    self.dt_frame_in_ns as f64;
+
+                if updates_wanted >= 1.0 && updates_wanted > frames_wanted {
                     self.state = HandleEventsState;
                     return self.next();
                 }
 
-                // Wait if possible.
-                // Convert to ms because that is what the sleep function takes.
-                let t = (self.next_render - time::precise_time_ns() ) / 1_000_000;
-                if t > 1 && t < 1000000 { // The second half just checks if it overflowed,
-                                          // which tells us that t should have been negative
-                                          // and we are running slow and shouldn't sleep.
-                    sleep( t );
+                if frames_wanted >= 1.0 {
+                    self.state = RenderState;
+                    return self.next();
                 }
-                self.state = RenderState;
+
+                let next_frame = self.last_frame + self.dt_frame_in_ns;
+                assert!(next_frame > current_time);
+                // Convert to ms because that is what the sleep function takes.
+                // Divide by 2 so we don't overshoot the next frame.
+                sleep( (next_frame - current_time) / 1_000_000 / 2 );
                 return self.next();
             },
             HandleEventsState => {
@@ -302,9 +298,8 @@ for GameIterator<'a, W> {
                 }));
             },
             UpdateState => {
-                self.updated += 1;
                 self.state = UpdateLoopState;
-                self.last_update += self.update_time_in_ns;
+                self.last_update = time::precise_time_ns();
                 return Some(Update(UpdateArgs{
                     dt: self.dt,
                 }));
