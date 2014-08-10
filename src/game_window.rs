@@ -11,6 +11,9 @@ pub trait GameWindow {
     /// Returns ture if the window should close.
     fn should_close(&self) -> bool;
 
+    /// Inform the window that it should close.
+    fn close(&mut self);
+
     /// Get the window's size
     fn get_size(&self) -> (u32, u32) {
         (self.get_settings().size[0], self.get_settings().size[1])
