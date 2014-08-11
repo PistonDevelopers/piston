@@ -6,6 +6,8 @@ use keyboard;
 use mouse;
 use event;
 
+use std::cmp;
+
 /// Render argument.
 #[deriving(Clone)]
 pub struct RenderArgs {
@@ -238,10 +240,13 @@ for GameIterator<'a, W> {
                 }
 
                 let next_frame = self.last_frame + self.dt_frame_in_ns;
+                let next_update = self.last_update + self.dt_update_in_ns;
                 assert!(next_frame > current_time);
+                assert!(next_update > current_time);
+                let next_event = cmp::min(next_frame, next_update);
                 // Convert to ms because that is what the sleep function takes.
                 // Divide by 2 so we don't overshoot the next frame.
-                sleep( (next_frame - current_time) / 1_000_000 / 2 );
+                sleep( (next_event - current_time) / 1_000_000 / 2 );
                 return self.next();
             },
             HandleEventsState => {
