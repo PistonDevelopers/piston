@@ -104,6 +104,7 @@ pub enum GameEvent {
     MouseScroll(MouseScrollArgs)
 }
 
+#[deriving(Show)]
 enum GameIteratorState {
     RenderState,
     SwapBuffersState,
@@ -187,129 +188,141 @@ Iterator<GameEvent>
 for GameIterator<'a, W> {
     /// Returns the next game event.
     fn next(&mut self) -> Option<GameEvent> {
-        match self.state {
-            RenderState => {
-                if self.game_window.should_close() { return None; }
+        loop {
+            match self.state {
+                RenderState => {
+                    if self.game_window.should_close() { return None; }
 
-                let start_render = time::precise_time_ns();
-                self.last_frame = start_render;
-                // Rendering code
-                let (w, h) = self.game_window.get_size();
-                if w != 0 && h != 0 {
-                    // Swap buffers next time.
-                    self.state = SwapBuffersState;
-                    return Some(Render(RenderArgs {
-                            // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (start_render - self.last_frame) as f64 / billion as f64,
-                            width: w,
-                            height: h,
-                        }
-                    ));
-                }
+                    let start_render = time::precise_time_ns();
+                    self.last_frame = start_render;
+                    // Rendering code
+                    let (w, h) = self.game_window.get_size();
+                    if w != 0 && h != 0 {
+                        // Swap buffers next time.
+                        self.state = SwapBuffersState;
+                        return Some(Render(RenderArgs {
+                                // Extrapolate time forward to allow smooth motion.
+                                ext_dt: (start_render - self.last_frame) as f64 / billion as f64,
+                                width: w,
+                                height: h,
+                            }
+                        ));
+                    }
 
-                self.state = PrepareUpdateLoopState;
-                return self.next();
-            },
-            SwapBuffersState => {
-                self.game_window.swap_buffers();
-                self.state = PrepareUpdateLoopState;
-                return self.next();
-            },
-            PrepareUpdateLoopState => {
-                self.state = UpdateLoopState;
-                return self.next();
-            },
-            UpdateLoopState => {
-                let current_time = time::precise_time_ns();
+                    self.state = PrepareUpdateLoopState;
+                    continue;
+                },
+                SwapBuffersState => {
+                    self.game_window.swap_buffers();
+                    self.state = PrepareUpdateLoopState;
+                    continue;
+                },
+                PrepareUpdateLoopState => {
+                    self.state = UpdateLoopState;
+                    return self.next();
+                },
+                UpdateLoopState => {
+                    let current_time = time::precise_time_ns();
 
-                let updates_wanted =
-                    (current_time as f64 - self.last_update as f64) /
-                    self.dt_update_in_ns as f64;
-                let frames_wanted =
-                    (current_time as f64 - self.last_frame as f64) /
-                    self.dt_frame_in_ns as f64;
+                    let updates_wanted =
+                        (current_time as f64 - self.last_update as f64) /
+                        self.dt_update_in_ns as f64;
+                    let frames_wanted =
+                        (current_time as f64 - self.last_frame as f64) /
+                        self.dt_frame_in_ns as f64;
 
-                if updates_wanted >= 1.0 && updates_wanted > frames_wanted {
+                    if updates_wanted >= 1.0 && updates_wanted > frames_wanted {
+                        self.state = HandleEventsState;
+                        continue;
+                    }
+
+                    if frames_wanted >= 1.0 {
+                        self.state = RenderState;
+                        continue;
+                    }
+
+                    let next_frame = self.last_frame + self.dt_frame_in_ns;
+                    let next_update = self.last_update + self.dt_update_in_ns;
+                    assert!(next_frame > current_time);
+                    assert!(next_update > current_time);
+                    let next_event = cmp::min(next_frame, next_update);
+                    // Convert to ms because that is what the sleep function takes.
+                    // Divide by 2 so we don't overshoot the next frame.
+                    sleep( (next_event - current_time) / 1_000_000 / 2 );
+                    continue;
+                },
+                HandleEventsState => {
+                    // Handle all events before updating.
+                    return match self.game_window.poll_event() {
+                        event::KeyPressed(key) => {
+                            Some(KeyPress(KeyPressArgs {
+                                key: key,
+                            }))
+                        },
+                        event::KeyReleased(key) => {
+                            Some(KeyRelease(KeyReleaseArgs {
+                                key: key,
+                            }))
+                        },
+                        event::MouseButtonPressed(mouse_button) => {
+                            Some(MousePress(MousePressArgs {
+                                button: mouse_button,
+                            }))
+                        },
+                        event::MouseButtonReleased(mouse_button) => {
+                            Some(MouseRelease(MouseReleaseArgs {
+                                button: mouse_button,
+                            }))
+                        },
+                        event::MouseMoved(x, y, relative_move) => {
+                            match relative_move {
+                                Some((dx, dy)) =>
+                                    self.state = MouseRelativeMoveState(dx, dy),
+                                None => {},
+                            };
+                            Some(MouseMove(MouseMoveArgs {
+                                x: x,
+                                y: y,
+                            }))
+                        },
+                        event::MouseScrolled(x, y) => {
+                            Some(MouseScroll(MouseScrollArgs {
+                                x: x,
+                                y: y
+                            }))
+                        },
+                        event::NoEvent => {
+                            self.state = UpdateState;
+                            self.next()
+                        },
+                    }
+                },
+                MouseRelativeMoveState(dx, dy) => {
                     self.state = HandleEventsState;
-                    return self.next();
-                }
+                    return Some(MouseRelativeMove(MouseRelativeMoveArgs {
+                        dx: dx,
+                        dy: dy,
+                    }));
+                },
+                UpdateState => {
+                    self.state = UpdateLoopState;
+                    self.last_update = time::precise_time_ns();
+                    return Some(Update(UpdateArgs{
+                        dt: self.dt,
+                    }));
+                },
+            };
 
-                if frames_wanted >= 1.0 {
-                    self.state = RenderState;
-                    return self.next();
-                }
-
-                let next_frame = self.last_frame + self.dt_frame_in_ns;
-                let next_update = self.last_update + self.dt_update_in_ns;
-                assert!(next_frame > current_time);
-                assert!(next_update > current_time);
-                let next_event = cmp::min(next_frame, next_update);
-                // Convert to ms because that is what the sleep function takes.
-                // Divide by 2 so we don't overshoot the next frame.
-                sleep( (next_event - current_time) / 1_000_000 / 2 );
-                return self.next();
-            },
-            HandleEventsState => {
-                // Handle all events before updating.
-                return match self.game_window.poll_event() {
-                    event::KeyPressed(key) => {
-                        Some(KeyPress(KeyPressArgs {
-                            key: key,
-                        }))
-                    },
-                    event::KeyReleased(key) => {
-                        Some(KeyRelease(KeyReleaseArgs {
-                            key: key,
-                        }))
-                    },
-                    event::MouseButtonPressed(mouse_button) => {
-                        Some(MousePress(MousePressArgs {
-                            button: mouse_button,
-                        }))
-                    },
-                    event::MouseButtonReleased(mouse_button) => {
-                        Some(MouseRelease(MouseReleaseArgs {
-                            button: mouse_button,
-                        }))
-                    },
-                    event::MouseMoved(x, y, relative_move) => {
-                        match relative_move {
-                            Some((dx, dy)) =>
-                                self.state = MouseRelativeMoveState(dx, dy),
-                            None => {},
-                        };
-                        Some(MouseMove(MouseMoveArgs {
-                            x: x,
-                            y: y,
-                        }))
-                    },
-                    event::MouseScrolled(x, y) => {
-                        Some(MouseScroll(MouseScrollArgs { 
-                            x: x, 
-                            y: y
-                        }))
-                    },
-                    event::NoEvent => {
-                        self.state = UpdateState;
-                        self.next()
-                    },
-                }
-            },
-            MouseRelativeMoveState(dx, dy) => {
-                self.state = HandleEventsState;
-                return Some(MouseRelativeMove(MouseRelativeMoveArgs {
-                    dx: dx,
-                    dy: dy,
-                }));
-            },
-            UpdateState => {
-                self.state = UpdateLoopState;
-                self.last_update = time::precise_time_ns();
-                return Some(Update(UpdateArgs{
-                    dt: self.dt,
-                }));
-            },
-        };
+            // TODO: make this not generate a warning, or enforce this condition
+            // at compile-time.
+            fail!(
+                "{}{}{}{}",
+                "Every state should explicitly return or explicitly loop, to ",
+                "avoid accidentally looping forever. ",
+                self.state,
+                " did not."
+            );
+        }
 
         /*
         // copied.
