@@ -108,7 +108,6 @@ pub enum GameEvent {
 enum GameIteratorState {
     RenderState,
     SwapBuffersState,
-    PrepareUpdateLoopState,
     UpdateLoopState,
     HandleEventsState,
     MouseRelativeMoveState(f64, f64),
@@ -209,17 +208,13 @@ for GameIterator<'a, W> {
                         ));
                     }
 
-                    self.state = PrepareUpdateLoopState;
+                    self.state = UpdateLoopState;
                     continue;
                 },
                 SwapBuffersState => {
                     self.game_window.swap_buffers();
-                    self.state = PrepareUpdateLoopState;
-                    continue;
-                },
-                PrepareUpdateLoopState => {
                     self.state = UpdateLoopState;
-                    return self.next();
+                    continue;
                 },
                 UpdateLoopState => {
                     let current_time = time::precise_time_ns();
@@ -243,12 +238,12 @@ for GameIterator<'a, W> {
 
                     let next_frame = self.last_frame + self.dt_frame_in_ns;
                     let next_update = self.last_update + self.dt_update_in_ns;
-                    assert!(next_frame > current_time);
-                    assert!(next_update > current_time);
-                    let next_event = cmp::min(next_frame, next_update);
-                    // Convert to ms because that is what the sleep function takes.
-                    // Divide by 2 so we don't overshoot the next frame.
-                    sleep( (next_event - current_time) / 1_000_000 / 2 );
+                    if next_frame > current_time && next_update > current_time {
+                        let next_event = cmp::min(next_frame, next_update);
+                        // Convert to ms because that is what the sleep function
+                        // takes. Divide by 2 so we don't overshoot.
+                        sleep( (next_event - current_time) / 1_000_000 / 2 );
+                    }
                     continue;
                 },
                 HandleEventsState => {
