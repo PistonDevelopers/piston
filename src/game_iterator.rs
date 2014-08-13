@@ -210,12 +210,10 @@ for GameIterator<'a, W> {
                     }
 
                     self.state = UpdateLoopState;
-                    continue;
                 },
                 SwapBuffersState => {
                     self.game_window.swap_buffers();
                     self.state = UpdateLoopState;
-                    continue;
                 },
                 UpdateLoopState => {
                     let current_time = time::precise_time_ns();
@@ -229,7 +227,6 @@ for GameIterator<'a, W> {
                     } else {
                         self.state = HandleEventsState;
                     }
-                    continue;
                 },
                 HandleEventsState => {
                     // Handle all events before updating.
@@ -292,16 +289,6 @@ for GameIterator<'a, W> {
                     }));
                 },
             };
-
-            // TODO: make this not generate a warning, or enforce this condition
-            // at compile-time.
-            fail!(
-                "{}{}{}{}",
-                "Every state should explicitly return or explicitly loop, to ",
-                "avoid accidentally looping forever. ",
-                self.state,
-                " did not."
-            );
         }
     }
 }
