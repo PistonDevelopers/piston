@@ -1,5 +1,6 @@
 use time;
 use std::io::timer::sleep;
+use std::time::duration::Duration;
 
 use GameWindow;
 use keyboard;
@@ -218,7 +219,7 @@ for GameIterator<'a, W> {
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
                     if next_event > current_time {
-                        sleep( (next_event - current_time) / 1_000_000 );
+                        sleep( Duration::nanoseconds((next_event - current_time) as i32) );
                     } else if next_event == next_frame {
                         self.state = RenderState;
                     } else {
