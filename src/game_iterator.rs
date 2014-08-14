@@ -191,8 +191,7 @@ for GameIterator<'a, W> {
                     if self.game_window.should_close() { return None; }
 
                     let start_render = time::precise_time_ns();
-                    let jump_frames = cmp::max(1, (start_render - self.last_frame) / self.dt_frame_in_ns);
-                    self.last_frame += self.dt_frame_in_ns * jump_frames;
+                    self.last_frame = start_render;
 
                     let (w, h) = self.game_window.get_size();
                     if w != 0 && h != 0 {
