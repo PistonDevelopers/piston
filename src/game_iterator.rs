@@ -267,6 +267,8 @@ for GameIterator<'a, W> {
                         },
                         event::NoEvent => {
                             self.state = UpdateState;
+                            // Explicitly continue because otherwise the result
+                            // of this match is immediately returned.
                             continue;
                         },
                     }
