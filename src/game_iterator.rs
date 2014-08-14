@@ -192,17 +192,17 @@ for GameIterator<'a, W> {
                 RenderState => {
                     if self.game_window.should_close() { return None; }
 
-                    self.last_frame += self.dt_frame_in_ns;
-
                     let start_render = time::precise_time_ns();
-                    // Rendering code
+                    let jump_frames = cmp::max(1, (start_render - self.last_frame) / self.dt_frame_in_ns);
+                    self.last_frame += self.dt_frame_in_ns * jump_frames;
+
                     let (w, h) = self.game_window.get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
                         return Some(Render(RenderArgs {
                                 // Extrapolate time forward to allow smooth motion.
-                                ext_dt: (start_render - self.last_frame) as f64 / billion as f64,
+                                ext_dt: (start_render - self.last_update) as f64 / billion as f64,
                                 width: w,
                                 height: h,
                             }
