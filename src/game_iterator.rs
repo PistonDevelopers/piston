@@ -132,17 +132,15 @@ pub struct GameIteratorSettings {
 ///     updates_per_second: 120,
 ///     max_frames_per_second: 60,
 /// };
-/// let mut game_iter = GameIterator::new(&mut window, &game_iter_settings);
-/// loop {
-///     match game_iter.next() {
-///         None => break,
-///         Some(mut e) => match e {
-///             Render(ref mut args) => {
-///                 // Create graphics context with absolute coordinates.
-///                 let c = Context::abs(args.width as f64, args.height as f64);
-///                 // Do rendering here.
-///             },
-///             _ => {},       
+/// let ref mut gl = Gl::new();
+/// for e in GameIterator::new(&mut window, &game_iter_settings) {
+///     match e {
+///         Render(args) => {
+///             // Set the viewport in window to render graphics.
+///             gl.viewport(0, 0, args.width as i32, args.height as i32);
+///             // Create graphics context with absolute coordinates.
+///             let c = Context::abs(args.width as f64, args.height as f64);
+///             // Do rendering here.
 ///         },
 ///     }
 /// }
