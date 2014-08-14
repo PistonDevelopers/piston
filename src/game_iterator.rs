@@ -220,7 +220,7 @@ for GameIterator<'a, W> {
                     let next_frame = self.last_frame + self.dt_frame_in_ns;
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
-                    if next_frame > current_time && next_update > current_time {
+                    if next_event > current_time {
                         sleep( (next_event - current_time) / 1_000_000 );
                     } else if next_event == next_frame {
                         self.state = RenderState;
