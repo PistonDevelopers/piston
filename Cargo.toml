@@ -18,3 +18,8 @@ authors = [
 
 name = "piston"
 path = "./src/lib.rs"
+
+[dependencies.vecmath]
+
+git = "https://github.com/PistonDevelopers/vecmath"
+

@@ -1,15 +1,18 @@
 #![crate_name = "piston"]
 #![deny(missing_doc)]
 #![warn(dead_code)]
+#![feature(default_type_params)]
 
 //! A user friendly graphics engine.
 
 extern crate time;
 extern crate sync;
+extern crate vecmath;
 
 pub use ConcurrentGame = concurrent_game::ConcurrentGame;
 pub use Game = game::Game;
 
+pub use camera::{Camera, CameraPerspective};
 pub use GameWindow = game_window::GameWindow;
 pub use RenderWindow = game_window::RenderWindow;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
@@ -43,8 +46,10 @@ pub mod keyboard;
 pub mod event;
 pub mod mouse;
 
+mod camera;
 mod concurrent_game;
 mod game;
 mod game_iterator;
 mod game_window_settings;
 mod asset_store;
+
