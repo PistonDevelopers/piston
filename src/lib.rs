@@ -13,6 +13,7 @@ pub use ConcurrentGame = concurrent_game::ConcurrentGame;
 pub use Game = game::Game;
 
 pub use camera::{Camera, CameraPerspective};
+pub use fps_controller::{FPSController, FPSControllerSettings};
 pub use GameWindow = game_window::GameWindow;
 pub use RenderWindow = game_window::RenderWindow;
 pub use GameWindowSettings = game_window_settings::GameWindowSettings;
@@ -45,6 +46,7 @@ pub mod game_window;
 pub mod keyboard;
 pub mod event;
 pub mod mouse;
+pub mod fps_controller;
 
 mod camera;
 mod concurrent_game;
