@@ -19,6 +19,11 @@ pub trait GameWindow {
         (self.get_settings().size[0], self.get_settings().size[1])
     }
 
+    /// Get the size in drawing coordinates.
+    fn get_draw_size(&self) -> (u32, u32) {
+        self.get_size()
+    }
+
     /// Swap buffers.
     fn swap_buffers(&self) {}
 
