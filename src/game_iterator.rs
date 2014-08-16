@@ -58,19 +58,27 @@ pub struct MouseReleaseArgs {
 /// Mouse move arguments.
 #[deriving(Clone)]
 pub struct MouseMoveArgs {
-    /// x.
+    /// x in window coordinates.
     pub x: f64,
-    /// y.
+    /// y in window coordinates.
     pub y: f64,
+    /// x in drawing coordinates.
+    pub draw_x: f64,
+    /// y in drawing coordinates.
+    pub draw_y: f64,
 }
 
 /// Mouse relative move arguments.
 #[deriving(Clone)]
 pub struct MouseRelativeMoveArgs {
-    /// Delta x.
+    /// Delta x in window coordinates.
     pub dx: f64,
-    /// Delta y.
+    /// Delta y in window coordinates.
     pub dy: f64,
+    /// Delta x in drawing coordinates.
+    pub draw_dx: f64,
+    /// Delta y in drawing coordinates.
+    pub draw_dy: f64,
 }
 
 /// Mouse scroll arguments.
@@ -255,9 +263,18 @@ for GameIterator<'a, W> {
                                     self.state = MouseRelativeMoveState(dx, dy),
                                 None => {},
                             };
+                            // Compute mouse position in drawing coordinates.
+                            let (w, h) = self.game_window.get_size();
+                            let (draw_w, draw_h) = self.game_window.get_draw_size();
+                            let (draw_x, draw_y) = (
+                                x * draw_w as f64 / w as f64, 
+                                y * draw_h as f64 / h as f64
+                            );
                             Some(MouseMove(MouseMoveArgs {
                                 x: x,
                                 y: y,
+                                draw_x: x * draw_x,
+                                draw_y: y * draw_y
                             }))
                         },
                         event::MouseScrolled(x, y) => {
@@ -276,9 +293,18 @@ for GameIterator<'a, W> {
                 },
                 MouseRelativeMoveState(dx, dy) => {
                     self.state = HandleEventsState;
+                    // Compute mouse position in drawing coordinates.
+                    let (w, h) = self.game_window.get_size();
+                    let (draw_w, draw_h) = self.game_window.get_draw_size();
+                    let (draw_dx, draw_dy) = (
+                        dx * draw_w as f64 / w as f64, 
+                        dy * draw_h as f64 / h as f64
+                    );
                     return Some(MouseRelativeMove(MouseRelativeMoveArgs {
                         dx: dx,
                         dy: dy,
+                        draw_dx: draw_dx,
+                        draw_dy: draw_dy,
                     }));
                 },
                 UpdateState => {
