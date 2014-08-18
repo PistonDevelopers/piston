@@ -8,9 +8,9 @@
 
 extern crate time;
 extern crate sync;
-extern crate vecmath;
 
 // Crates used to reexport.
+extern crate vecmath_lib = "vecmath";
 extern crate shader_version_lib = "shader_version";
 extern crate image_lib = "image";
 extern crate graphics_lib = "graphics";
@@ -19,8 +19,13 @@ extern crate graphics_lib = "graphics";
 pub use shader_version = shader_version_lib;
 pub use image = image_lib;
 pub use graphics = graphics_lib;
+pub use vecmath = vecmath_lib;
 
-pub use camera::{Camera, CameraPerspective};
+pub use camera::{
+    Camera, 
+    CameraPerspective,
+    model_view_projection,
+};
 pub use fps_controller::{FPSController, FPSControllerSettings};
 pub use game_window::GameWindow;
 pub use game_window::GameWindowSettings;
