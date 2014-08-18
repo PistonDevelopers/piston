@@ -2,6 +2,7 @@
 #![deny(missing_doc)]
 #![warn(dead_code)]
 #![feature(default_type_params)]
+#![feature(globs)]
 
 //! A user friendly graphics engine.
 
@@ -9,15 +10,11 @@ extern crate time;
 extern crate sync;
 extern crate vecmath;
 
-pub use ConcurrentGame = concurrent_game::ConcurrentGame;
-pub use Game = game::Game;
-
 pub use camera::{Camera, CameraPerspective};
 pub use fps_controller::{FPSController, FPSControllerSettings};
-pub use GameWindow = game_window::GameWindow;
-pub use RenderWindow = game_window::RenderWindow;
-pub use GameWindowSettings = game_window_settings::GameWindowSettings;
-pub use AssetStore = asset_store::AssetStore;
+pub use game_window::GameWindow;
+pub use game_window_settings::GameWindowSettings;
+pub use asset_store::AssetStore;
 
 pub use game_iterator::Render;
 pub use game_iterator::Update;
@@ -49,8 +46,6 @@ pub mod mouse;
 pub mod fps_controller;
 
 mod camera;
-mod concurrent_game;
-mod game;
 mod game_iterator;
 mod game_window_settings;
 mod asset_store;
