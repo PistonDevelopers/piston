@@ -7,8 +7,18 @@ use vecmath::{
     Matrix4,
     vec3_normalized_sub,
     vec3_cross,
-    vec3_dot
+    vec3_dot,
 };
+use mul = vecmath::col_mat4_mul;
+
+/// Computes a model view projection matrix.
+pub fn model_view_projection<T: Float + Copy>(
+    model: Matrix4<T>,
+    view: Matrix4<T>,
+    projection: Matrix4<T>
+) -> Matrix4<T> {
+    mul(mul(projection, view), model)
+}
 
 /// Models a camera with position and directions.
 pub struct Camera<T=f32> {
