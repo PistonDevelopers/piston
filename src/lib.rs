@@ -9,6 +9,10 @@
 extern crate time;
 extern crate sync;
 extern crate vecmath;
+extern crate shader_version_lib = "shader_version";
+
+// Reexports.
+pub use shader_version = shader_version_lib;
 
 pub use camera::{Camera, CameraPerspective};
 pub use fps_controller::{FPSController, FPSControllerSettings};
