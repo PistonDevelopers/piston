@@ -23,3 +23,7 @@ path = "./src/lib.rs"
 
 git = "https://github.com/PistonDevelopers/vecmath"
 
+[dependencies.shader_version]
+
+git = "https://github.com/pistondevelopers/shader_version"
+
