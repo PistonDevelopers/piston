@@ -134,6 +134,10 @@ pub struct GameIteratorSettings {
 
 /// A game loop iterator.
 ///
+/// *Warning: Because the iterator polls events from the window back-end,
+/// it must be used on the same thread as the window back-end (usually main thread),
+/// unless the window back-end supports multi-thread event polling.*
+///
 /// Example:
 ///
 /// ```Rust
