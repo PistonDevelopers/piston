@@ -27,3 +27,7 @@ git = "https://github.com/PistonDevelopers/vecmath"
 
 git = "https://github.com/pistondevelopers/shader_version"
 
+[dependencies.image]
+
+git = "https://github.com/pistondevelopers/rust-image"
+
