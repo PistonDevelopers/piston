@@ -31,3 +31,7 @@ git = "https://github.com/pistondevelopers/shader_version"
 
 git = "https://github.com/pistondevelopers/rust-image"
 
+[dependencies.graphics]
+
+git = "https://github.com/pistondevelopers/rust-graphics"
+
