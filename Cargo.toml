@@ -14,7 +14,7 @@ authors = [
     "reem",
     "TyOverby <ty@pre-alpha.com>"]
 
-[[lib]]
+[lib]
 
 name = "piston"
 path = "./src/lib.rs"

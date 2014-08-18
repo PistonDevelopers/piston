@@ -68,7 +68,7 @@ endif
 all: $(DEFAULT)
 
 help:
-	$(Q)echo "--- rust-empty (0.7 004)"
+	$(Q)echo "--- rust-empty (0.7 005)"
 	$(Q)echo "make run               - Runs executable"
 	$(Q)echo "make exe               - Builds main executable"
 	$(Q)echo "make lib               - Builds library"
@@ -168,7 +168,7 @@ cargo-lib: $(LIB_ENTRY_FILE)
 	|| \
 	( \
 		name=$${PWD##/*/} ; \
-		echo -e "[package]\n\nname = \"$$name\"\nversion = \"0.0.0\"\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[[lib]]\n\nname = \"$$name\"\npath = \"$(LIB_ENTRY_FILE)\"\n" > Cargo.toml \
+		echo -e "[package]\n\nname = \"$$name\"\nversion = \"0.0.0\"\nauthors = [\"Your Name <your@email.com>\"]\ntags = []\n\n[lib]\n\nname = \"$$name\"\npath = \"$(LIB_ENTRY_FILE)\"\n" > Cargo.toml \
 		&& echo "--- Created 'Cargo.toml' for library" \
 		&& cat Cargo.toml \
 	)
