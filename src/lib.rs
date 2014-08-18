@@ -23,7 +23,7 @@ pub use graphics = graphics_lib;
 pub use camera::{Camera, CameraPerspective};
 pub use fps_controller::{FPSController, FPSControllerSettings};
 pub use game_window::GameWindow;
-pub use game_window_settings::GameWindowSettings;
+pub use game_window::GameWindowSettings;
 pub use asset_store::AssetStore;
 
 pub use game_iterator::Render;
@@ -51,12 +51,10 @@ pub use game_iterator::MouseScrollArgs;
 
 pub mod game_window;
 pub mod keyboard;
-pub mod event;
 pub mod mouse;
 pub mod fps_controller;
 
 mod camera;
 mod game_iterator;
-mod game_window_settings;
 mod asset_store;
 
