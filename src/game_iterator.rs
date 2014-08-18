@@ -5,7 +5,7 @@ use std::time::duration::Duration;
 use GameWindow;
 use keyboard;
 use mouse;
-use event;
+use game_window;
 
 use std::cmp;
 
@@ -241,27 +241,27 @@ for GameIterator<'a, W> {
                 HandleEventsState => {
                     // Handle all events before updating.
                     return match self.game_window.poll_event() {
-                        event::KeyPressed(key) => {
+                        game_window::KeyPressed(key) => {
                             Some(KeyPress(KeyPressArgs {
                                 key: key,
                             }))
                         },
-                        event::KeyReleased(key) => {
+                        game_window::KeyReleased(key) => {
                             Some(KeyRelease(KeyReleaseArgs {
                                 key: key,
                             }))
                         },
-                        event::MouseButtonPressed(mouse_button) => {
+                        game_window::MouseButtonPressed(mouse_button) => {
                             Some(MousePress(MousePressArgs {
                                 button: mouse_button,
                             }))
                         },
-                        event::MouseButtonReleased(mouse_button) => {
+                        game_window::MouseButtonReleased(mouse_button) => {
                             Some(MouseRelease(MouseReleaseArgs {
                                 button: mouse_button,
                             }))
                         },
-                        event::MouseMoved(x, y, relative_move) => {
+                        game_window::MouseMoved(x, y, relative_move) => {
                             match relative_move {
                                 Some((dx, dy)) =>
                                     self.state = MouseRelativeMoveState(dx, dy),
@@ -281,13 +281,13 @@ for GameIterator<'a, W> {
                                 draw_y: y * draw_y
                             }))
                         },
-                        event::MouseScrolled(x, y) => {
+                        game_window::MouseScrolled(x, y) => {
                             Some(MouseScroll(MouseScrollArgs {
                                 x: x,
                                 y: y
                             }))
                         },
-                        event::NoEvent => {
+                        game_window::NoEvent => {
                             self.state = UpdateState;
                             // Explicitly continue because otherwise the result
                             // of this match is immediately returned.
