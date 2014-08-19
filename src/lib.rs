@@ -22,10 +22,6 @@ pub use image_lib as image;
 pub use graphics_lib as graphics;
 pub use vecmath_lib as vecmath;
 pub use input_lib as input;
-pub use input_lib::{
-    keyboard,
-    mouse,
-};
 
 pub use camera::{
     Camera, 

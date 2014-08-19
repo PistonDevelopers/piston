@@ -1,6 +1,6 @@
 //! Game window operations.
-use mouse;
-use keyboard;
+use input::mouse;
+use input::keyboard;
 
 /// Used by window back-end to model window events.
 #[deriving(Clone, PartialEq, PartialOrd, Show)]
