@@ -16,10 +16,10 @@ extern crate image_lib = "image";
 extern crate graphics_lib = "graphics";
 
 // Reexports.
-pub use shader_version = shader_version_lib;
-pub use image = image_lib;
-pub use graphics = graphics_lib;
-pub use vecmath = vecmath_lib;
+pub use shader_version_lib as shader_version;
+pub use image_lib as image;
+pub use graphics_lib as graphics;
+pub use vecmath_lib as vecmath;
 
 pub use camera::{
     Camera, 
