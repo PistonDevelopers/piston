@@ -1,12 +1,12 @@
 [package]
 
-name = "ui"
+name = "input"
 version = "0.0.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
 tags = []
 
 [lib]
 
-name = "ui"
+name = "input"
 path = "src/lib.rs"
 

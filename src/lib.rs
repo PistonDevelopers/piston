@@ -1,4 +1,4 @@
-#![crate_name = "ui"]
+#![crate_name = "input"]
 #![deny(missing_doc)]
 
 //! A flexible structure for user interactions
