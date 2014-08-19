@@ -7,9 +7,6 @@ use input::keyboard;
 use {
     input,
     Camera,
-    GameEvent,
-    Input,
-    Update,
 };
 
 bitflags!(flags Keys: u8 {
@@ -84,8 +81,23 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
         }
     }
 
+    /// Updates camera.
+    pub fn update(&self, dt: f64, camera: &mut Camera<T>) {
+        let _3: T = FromPrimitive::from_int(3).unwrap();
+        let _4: T = FromPrimitive::from_int(4).unwrap();
+        let dt: T = FromPrimitive::from_f64(dt).unwrap();
+        let dh = dt * self.velocity * _3;
+        let [dx, dy, dz] = self.direction;
+        let (s, c) = (self.yaw.sin(), self.yaw.cos());
+        camera.position = [
+            camera.position[0] + (s * dx - c * dz) * dh,
+            camera.position[1] + dy * dt * _4,
+            camera.position[2] + (s * dz + c * dx) * dh
+        ];
+    }
+
     /// Handles game event and updates camera.
-    pub fn event(&mut self, e: &GameEvent, camera: &mut Camera<T>) {
+    pub fn input(&mut self, e: &input::InputEvent, camera: &mut Camera<T>) {
         let &FPSController {
             ref mut yaw,
             ref mut pitch,
@@ -104,18 +116,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
         let _4: T = FromPrimitive::from_int(4).unwrap();
         let _360: T = FromPrimitive::from_int(360).unwrap();
         match *e {
-            Update(args) => {
-                let dt: T = FromPrimitive::from_f64(args.dt).unwrap();
-                let dh = dt * *velocity * _3;
-                let [dx, dy, dz] = *direction;
-                let (s, c) = (yaw.sin(), yaw.cos());
-                camera.position = [
-                    camera.position[0] + (s * dx - c * dz) * dh,
-                    camera.position[1] + dy * dt * _4,
-                    camera.position[2] + (s * dz + c * dx) * dh
-                ];
-            },
-            Input(input::MouseRelativeMove(args)) => {
+            input::MouseRelativeMove(args) => {
                 let dx: T = FromPrimitive::from_f64(args.dx).unwrap();
                 let dy: T = FromPrimitive::from_f64(args.dy).unwrap();
                 *yaw = (*yaw - dx / _360 * pi / _4) % (_2 * pi);
@@ -123,7 +124,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                 *pitch = (*pitch).min(pi / _2).max(-pi / _2);
                 camera.set_yaw_pitch(*yaw, *pitch);
             },
-            Input(input::KeyPress(args)) => {
+            input::KeyPress(args) => {
                 let [dx, dy, dz] = *direction;
                 let sgn = |x: T| if x == _0 { _0 } else { x.signum() };
                 let set = |k, x: T, y: T, z: T| {
@@ -147,7 +148,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                     _ => {}
                 }
             },
-            Input(input::KeyRelease(args)) => {
+            input::KeyRelease(args) => {
                 let [dx, dy, dz] = *direction;
                 let sgn = |x: T| if x == _0 { _0 } else { x.signum() };
                 let set = |x: T, y: T, z: T| {
