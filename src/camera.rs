@@ -9,7 +9,7 @@ use vecmath::{
     vec3_cross,
     vec3_dot,
 };
-use mul = vecmath::col_mat4_mul;
+use vecmath::col_mat4_mul as mul;
 
 /// Computes a model view projection matrix.
 pub fn model_view_projection<T: Float + Copy>(
