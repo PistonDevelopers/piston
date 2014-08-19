@@ -2,9 +2,8 @@ use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
 
+use input;
 use GameWindow;
-use keyboard;
-use mouse;
 use game_window;
 
 use std::cmp;
@@ -27,69 +26,6 @@ pub struct UpdateArgs {
     pub dt: f64,
 }
 
-/// Key press arguments.
-#[deriving(Clone)]
-pub struct KeyPressArgs {
-    /// Keyboard key.
-    pub key: keyboard::Key,
-}
-
-/// Key release arguments.
-#[deriving(Clone)]
-pub struct KeyReleaseArgs {
-    /// Keyboard key.
-    pub key: keyboard::Key,
-}
-
-/// Mouse press arguments.
-#[deriving(Clone)]
-pub struct MousePressArgs {
-    /// Mouse button.
-    pub button: mouse::Button,
-}
-
-/// Mouse release arguments.
-#[deriving(Clone)]
-pub struct MouseReleaseArgs {
-    /// Mouse button.
-    pub button: mouse::Button,
-}
-
-/// Mouse move arguments.
-#[deriving(Clone)]
-pub struct MouseMoveArgs {
-    /// x in window coordinates.
-    pub x: f64,
-    /// y in window coordinates.
-    pub y: f64,
-    /// x in drawing coordinates.
-    pub draw_x: f64,
-    /// y in drawing coordinates.
-    pub draw_y: f64,
-}
-
-/// Mouse relative move arguments.
-#[deriving(Clone)]
-pub struct MouseRelativeMoveArgs {
-    /// Delta x in window coordinates.
-    pub dx: f64,
-    /// Delta y in window coordinates.
-    pub dy: f64,
-    /// Delta x in drawing coordinates.
-    pub draw_dx: f64,
-    /// Delta y in drawing coordinates.
-    pub draw_dy: f64,
-}
-
-/// Mouse scroll arguments.
-#[deriving(Clone)]
-pub struct MouseScrollArgs {
-    /// x.
-    pub x: f64,
-    /// y.
-    pub y: f64,
-}
-
 /// Contains the different game events.
 #[deriving(Clone)]
 pub enum GameEvent {
@@ -97,20 +33,8 @@ pub enum GameEvent {
     Render(RenderArgs),
     /// Update physical state of the game.
     Update(UpdateArgs),
-    /// Pressed a keyboard key.
-    KeyPress(KeyPressArgs),
-    /// Released a keyboard key.
-    KeyRelease(KeyReleaseArgs),
-    /// Pressed a mouse button.
-    MousePress(MousePressArgs),
-    /// Released a mouse button.
-    MouseRelease(MouseReleaseArgs),
-    /// Moved mouse cursor.
-    MouseMove(MouseMoveArgs),
-    /// Moved mouse relative, not bounded by cursor.
-    MouseRelativeMove(MouseRelativeMoveArgs),
-    /// Scrolled mouse.
-    MouseScroll(MouseScrollArgs)
+    /// Input event.
+    Input(input::InputEvent),
 }
 
 #[deriving(Show)]
@@ -242,24 +166,24 @@ for GameIterator<'a, W> {
                     // Handle all events before updating.
                     return match self.game_window.poll_event() {
                         game_window::KeyPressed(key) => {
-                            Some(KeyPress(KeyPressArgs {
+                            Some(Input(input::KeyPress(input::KeyPressArgs {
                                 key: key,
-                            }))
+                            })))
                         },
                         game_window::KeyReleased(key) => {
-                            Some(KeyRelease(KeyReleaseArgs {
+                            Some(Input(input::KeyRelease(input::KeyReleaseArgs {
                                 key: key,
-                            }))
+                            })))
                         },
                         game_window::MouseButtonPressed(mouse_button) => {
-                            Some(MousePress(MousePressArgs {
+                            Some(Input(input::MousePress(input::MousePressArgs {
                                 button: mouse_button,
-                            }))
+                            })))
                         },
                         game_window::MouseButtonReleased(mouse_button) => {
-                            Some(MouseRelease(MouseReleaseArgs {
+                            Some(Input(input::MouseRelease(input::MouseReleaseArgs {
                                 button: mouse_button,
-                            }))
+                            })))
                         },
                         game_window::MouseMoved(x, y, relative_move) => {
                             match relative_move {
@@ -274,18 +198,18 @@ for GameIterator<'a, W> {
                                 x * draw_w as f64 / w as f64, 
                                 y * draw_h as f64 / h as f64
                             );
-                            Some(MouseMove(MouseMoveArgs {
+                            Some(Input(input::MouseMove(input::MouseMoveArgs {
                                 x: x,
                                 y: y,
                                 draw_x: x * draw_x,
                                 draw_y: y * draw_y
-                            }))
+                            })))
                         },
                         game_window::MouseScrolled(x, y) => {
-                            Some(MouseScroll(MouseScrollArgs {
+                            Some(Input(input::MouseScroll(input::MouseScrollArgs {
                                 x: x,
                                 y: y
-                            }))
+                            })))
                         },
                         game_window::NoEvent => {
                             self.state = UpdateState;
@@ -304,12 +228,12 @@ for GameIterator<'a, W> {
                         dx * draw_w as f64 / w as f64, 
                         dy * draw_h as f64 / h as f64
                     );
-                    return Some(MouseRelativeMove(MouseRelativeMoveArgs {
+                    return Some(Input(input::MouseRelativeMove(input::MouseRelativeMoveArgs {
                         dx: dx,
                         dy: dy,
                         draw_dx: draw_dx,
                         draw_dy: draw_dy,
-                    }));
+                    })));
                 },
                 UpdateState => {
                     self.state = UpdateLoopState;
