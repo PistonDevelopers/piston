@@ -116,15 +116,15 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
         let _4: T = FromPrimitive::from_int(4).unwrap();
         let _360: T = FromPrimitive::from_int(360).unwrap();
         match *e {
-            input::MouseRelativeMove(args) => {
-                let dx: T = FromPrimitive::from_f64(args.dx).unwrap();
-                let dy: T = FromPrimitive::from_f64(args.dy).unwrap();
+            input::MouseRelativeMove { dx, dy, .. } => {
+                let dx: T = FromPrimitive::from_f64(dx).unwrap();
+                let dy: T = FromPrimitive::from_f64(dy).unwrap();
                 *yaw = (*yaw - dx / _360 * pi / _4) % (_2 * pi);
                 *pitch = *pitch + dy / _360 * pi / _4;
                 *pitch = (*pitch).min(pi / _2).max(-pi / _2);
                 camera.set_yaw_pitch(*yaw, *pitch);
             },
-            input::KeyPress(args) => {
+            input::KeyPress { key, .. } => {
                 let [dx, dy, dz] = *direction;
                 let sgn = |x: T| if x == _0 { _0 } else { x.signum() };
                 let set = |k, x: T, y: T, z: T| {
@@ -137,7 +137,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                     *direction = [x, y, z];
                     keys.insert(k);
                 };
-                match args.key {
+                match key {
                     x if x == settings.move_forward_key => set(MoveForward, -_1, dy, dz),
                     x if x == settings.move_backward_key => set(MoveBack, _1, dy, dz),
                     x if x == settings.strafe_left_key => set(StrafeLeft, dx, dy, _1),
@@ -148,7 +148,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                     _ => {}
                 }
             },
-            input::KeyRelease(args) => {
+            input::KeyRelease { key, .. } => {
                 let [dx, dy, dz] = *direction;
                 let sgn = |x: T| if x == _0 { _0 } else { x.signum() };
                 let set = |x: T, y: T, z: T| {
@@ -164,7 +164,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                     keys.remove(key);
                     if keys.contains(rev_key) { rev_val } else { _0 }
                 };
-                match args.key {
+                match key {
                     x if x == settings.move_forward_key => set(release(MoveForward, MoveBack, _1), dy, dz),
                     x if x == settings.move_backward_key => set(release(MoveBack, MoveForward, -_1), dy, dz),
                     x if x == settings.strafe_left_key => set(dx, dy, release(StrafeLeft, StrafeRight, -_1)),

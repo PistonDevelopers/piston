@@ -166,24 +166,24 @@ for GameIterator<'a, W> {
                     // Handle all events before updating.
                     return match self.game_window.poll_event() {
                         game_window::KeyPressed(key) => {
-                            Some(Input(input::KeyPress(input::KeyPressArgs {
+                            Some(Input(input::KeyPress {
                                 key: key,
-                            })))
+                            }))
                         },
                         game_window::KeyReleased(key) => {
-                            Some(Input(input::KeyRelease(input::KeyReleaseArgs {
+                            Some(Input(input::KeyRelease {
                                 key: key,
-                            })))
+                            }))
                         },
                         game_window::MouseButtonPressed(mouse_button) => {
-                            Some(Input(input::MousePress(input::MousePressArgs {
+                            Some(Input(input::MousePress {
                                 button: mouse_button,
-                            })))
+                            }))
                         },
                         game_window::MouseButtonReleased(mouse_button) => {
-                            Some(Input(input::MouseRelease(input::MouseReleaseArgs {
+                            Some(Input(input::MouseRelease {
                                 button: mouse_button,
-                            })))
+                            }))
                         },
                         game_window::MouseMoved(x, y, relative_move) => {
                             match relative_move {
@@ -198,18 +198,18 @@ for GameIterator<'a, W> {
                                 x * draw_w as f64 / w as f64, 
                                 y * draw_h as f64 / h as f64
                             );
-                            Some(Input(input::MouseMove(input::MouseMoveArgs {
+                            Some(Input(input::MouseMove {
                                 x: x,
                                 y: y,
                                 draw_x: x * draw_x,
                                 draw_y: y * draw_y
-                            })))
+                            }))
                         },
-                        game_window::MouseScrolled(x, y) => {
-                            Some(Input(input::MouseScroll(input::MouseScrollArgs {
-                                x: x,
-                                y: y
-                            })))
+                        game_window::MouseScrolled(dx, dy) => {
+                            Some(Input(input::MouseScroll {
+                                dx: dx,
+                                dy: dy
+                            }))
                         },
                         game_window::NoEvent => {
                             self.state = UpdateState;
@@ -228,12 +228,12 @@ for GameIterator<'a, W> {
                         dx * draw_w as f64 / w as f64, 
                         dy * draw_h as f64 / h as f64
                     );
-                    return Some(Input(input::MouseRelativeMove(input::MouseRelativeMoveArgs {
+                    return Some(Input(input::MouseRelativeMove {
                         dx: dx,
                         dy: dy,
                         draw_dx: draw_dx,
                         draw_dy: draw_dy,
-                    })));
+                    }));
                 },
                 UpdateState => {
                     self.state = UpdateLoopState;
