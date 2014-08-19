@@ -23,6 +23,10 @@ path = "./src/lib.rs"
 
 git = "https://github.com/PistonDevelopers/vecmath"
 
+[dependencies.input]
+
+git = "https://github.com/PistonDevelopers/input"
+
 [dependencies.shader_version]
 
 git = "https://github.com/pistondevelopers/shader_version"

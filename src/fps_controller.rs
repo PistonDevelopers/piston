@@ -4,12 +4,11 @@
 
 use std::num::{One, Zero};
 use {
+    input,
     keyboard,
     Camera,
     GameEvent,
-    KeyPress,
-    KeyRelease,
-    MouseRelativeMove,
+    Input,
     Update,
 };
 
@@ -116,7 +115,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                     camera.position[2] + (s * dz + c * dx) * dh
                 ];
             },
-            MouseRelativeMove(args) => {
+            Input(input::MouseRelativeMove(args)) => {
                 let dx: T = FromPrimitive::from_f64(args.dx).unwrap();
                 let dy: T = FromPrimitive::from_f64(args.dy).unwrap();
                 *yaw = (*yaw - dx / _360 * pi / _4) % (_2 * pi);
@@ -124,7 +123,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                 *pitch = (*pitch).min(pi / _2).max(-pi / _2);
                 camera.set_yaw_pitch(*yaw, *pitch);
             },
-            KeyPress(args) => {
+            Input(input::KeyPress(args)) => {
                 let [dx, dy, dz] = *direction;
                 let sgn = |x: T| if x == _0 { _0 } else { x.signum() };
                 let set = |k, x: T, y: T, z: T| {
@@ -148,7 +147,7 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
                     _ => {}
                 }
             },
-            KeyRelease(args) => {
+            Input(input::KeyRelease(args)) => {
                 let [dx, dy, dz] = *direction;
                 let sgn = |x: T| if x == _0 { _0 } else { x.signum() };
                 let set = |x: T, y: T, z: T| {
