@@ -3,9 +3,9 @@
 //! A First Person Shooter controller.
 
 use std::num::{One, Zero};
+use input::keyboard;
 use {
     input,
-    keyboard,
     Camera,
     GameEvent,
     Input,
