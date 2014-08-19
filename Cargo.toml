@@ -5,7 +5,7 @@ version = "0.0.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
 tags = []
 
-[[lib]]
+[lib]
 
 name = "ui"
 path = "src/lib.rs"
