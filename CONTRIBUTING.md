@@ -1,4 +1,4 @@
-Git commands and the pull request process: https://github.com/bvssvni/rust-empty/issues/31
+Git commands and the pull request process: https://github.com/PistonDevelopers/rust-empty/issues/31
 
 If you are not added as collaborator, post a message [here](https://github.com/PistonDevelopers/piston/issues/70) "I want to contribute to Piston" and @Denommus or @bvssvni will add you as a collaborator. When you are a collaborator you can assign issues to yourself. Just look around and see if there are unassigned issues. We label tasks according to the amount of thinking involved: "Easy", "Medium" or "Hard".
 
