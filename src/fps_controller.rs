@@ -87,12 +87,12 @@ impl<T: Float + FromPrimitive + Copy + FloatMath> FPSController<T> {
     /// Handles game event and updates camera.
     pub fn event(&mut self, e: &GameEvent, camera: &mut Camera<T>) {
         let &FPSController {
-            yaw: ref mut yaw,
-            pitch: ref mut pitch,
-            keys: ref mut keys,
-            direction: ref mut direction,
-            velocity: ref mut velocity,
-            settings: ref settings,
+            ref mut yaw,
+            ref mut pitch,
+            ref mut keys,
+            ref mut direction,
+            ref mut velocity,
+            ref settings,
         } = self;
 
         let pi: T = Float::pi();
