@@ -15,6 +15,7 @@ extern crate shader_version_lib = "shader_version";
 extern crate image_lib = "image";
 extern crate graphics_lib = "graphics";
 extern crate input_lib = "input";
+extern crate cam_lib = "cam";
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -22,13 +23,8 @@ pub use image_lib as image;
 pub use graphics_lib as graphics;
 pub use vecmath_lib as vecmath;
 pub use input_lib as input;
+pub use cam_lib as cam;
 
-pub use camera::{
-    Camera, 
-    CameraPerspective,
-    model_view_projection,
-};
-pub use fps_controller::{FPSController, FPSControllerSettings};
 pub use game_window::GameWindow;
 pub use game_window::GameWindowSettings;
 pub use asset_store::AssetStore;
@@ -44,9 +40,6 @@ pub use game_iterator::RenderArgs;
 pub use game_iterator::UpdateArgs;
 
 pub mod game_window;
-pub mod fps_controller;
-
-mod camera;
 mod game_iterator;
 mod asset_store;
 
