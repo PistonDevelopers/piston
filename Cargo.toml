@@ -31,6 +31,10 @@ git = "https://github.com/PistonDevelopers/input"
 
 git = "https://github.com/pistondevelopers/shader_version"
 
+[dependencies.cam]
+
+git = "https://github.com/pistondevelopers/cam"
+
 [dependencies.image]
 
 git = "https://github.com/pistondevelopers/rust-image"
