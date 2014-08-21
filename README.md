@@ -1,19 +1,15 @@
-
-rust-event
-==========
+# rust-event [![Build Status](https://travis-ci.org/PistonDevelopers/rust-event.svg)](https://travis-ci.org/PistonDevelopers/rust-event)
 
 An experimental library using context types for event logic
 
-Dependences
------------
+## Dependences
 `rust-event` is a pure rust library, but can be used with following library:
 
 | Library | Online Docs |
 |---------|------|------------|
 | [piston](https://github.com/PistonDevelopers/piston) | [piston docs](http://pistondevelopers.github.io/docs/piston/piston/) |
 
-How to integrate with Piston
-----------------------------
+## How to integrate with Piston
 ```
 impl EventGame for App {
     fn register_event(&mut self, ec: &mut EventCenter<App>) {
@@ -30,8 +26,7 @@ impl EventGame for App {
 }
 ```
 
-Examples
---------
+## Examples
 
 Here are some examples integrated with [piston](https://github.com/PistonDevelopers/piston):
 
@@ -91,4 +86,3 @@ e.press(&keyboard::S).after(&e.press(&keyboard::A)).call(ec, |_| {
     println!("You pressed keyboard::S AFTER you pressed keyboard::A.");
 });
 ```
-
