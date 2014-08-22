@@ -1,7 +1,6 @@
-input
-==
+# input [![Build Status](https://travis-ci.org/PistonDevelopers/input.svg)](https://travis-ci.org/PistonDevelopers/input)
 
-A flexible structure for user interactions to be used in window frameworks and widgets libraries
+A flexible structure for user interactions to be used in window frameworks and widgets libraries.
 
 ## Goals
 
