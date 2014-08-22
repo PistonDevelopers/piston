@@ -8,30 +8,30 @@ extern crate collections;
 extern crate time;
 extern crate piston;
 
-pub use EventType = event_type::EventType;
-pub use KeyType = event_type::KeyType;
+pub use event_type::EventType as EventType;
+pub use event_type::KeyType as KeyType;
 
-pub use AddAfter = add_after::AddAfter;
-pub use AddAll = add_all::AddAll;
-pub use AddAny = add_any::AddAny;
-pub use AddInterval = add_interval::AddInterval;
-pub use AddPress = add_press::AddPress;
-pub use AddRelease = add_release::AddRelease;
+pub use add_after::AddAfter as AddAfter;
+pub use add_all::AddAll as AddAll;
+pub use add_any::AddAny as AddAny;
+pub use add_interval::AddInterval as AddInterval;
+pub use add_press::AddPress as AddPress;
+pub use add_release::AddRelease as AddRelease;
 
-pub use AfterEvent = after_event::AfterEvent;
-pub use AllEvent = all_event::AllEvent;
-pub use AnyEvent = any_event::AnyEvent;
-pub use Event = event::Event;
-pub use IntervalEvent = interval_event::IntervalEvent;
-pub use PressEvent = press_event::PressEvent;
-pub use ReleasePressEvent = release_press_event::ReleasePressEvent;
+pub use after_event::AfterEvent as AfterEvent;
+pub use all_event::AllEvent as AllEvent;
+pub use any_event::AnyEvent as AnyEvent;
+pub use event::Event as Event;
+pub use interval_event::IntervalEvent as IntervalEvent;
+pub use press_event::PressEvent as PressEvent;
+pub use release_press_event::ReleasePressEvent as ReleasePressEvent;
 
-pub use Call = call::Call;
-pub use CallOnce = call_once::CallOnce;
-pub use Triggered = triggered::Triggered;
+pub use call::Call as Call;
+pub use call_once::CallOnce as CallOnce;
+pub use triggered::Triggered as Triggered;
 
-pub use EventCenter = event_center::EventCenter;
-pub use Observer = observer::Observer;
+pub use event_center::EventCenter as EventCenter;
+pub use observer::Observer as Observer;
 
 mod event_type;
 

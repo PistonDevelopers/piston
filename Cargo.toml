@@ -1,0 +1,14 @@
+[package]
+
+name = "rust-event"
+version = "0.0.0"
+authors = ["bvssvni <bvssvni@gmail.com>"]
+
+[lib]
+
+name = "rust-event"
+path = "src/lib.rs"
+
+[dependencies.piston]
+
+git = "https://github.com/PistonDevelopers/piston"
