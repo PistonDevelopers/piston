@@ -1,11 +1,8 @@
-Piston
-======
+# Piston [![Build Status](https://travis-ci.org/PistonDevelopers/piston.svg)](https://travis-ci.org/PistonDevelopers/piston)
 
 A user friendly game engine written in Rust
 
 Maintainers: @bvssvni, @Coeuvre
-
-[![Build Status](https://travis-ci.org/PistonDevelopers/piston.svg)](https://travis-ci.org/PistonDevelopers/piston)
 
 [Tutorial](https://github.com/PistonDevelopers/piston/blob/master/learning%20materials/tutorial.md)
 
