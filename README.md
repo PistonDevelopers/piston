@@ -1,4 +1,4 @@
-ui
+input
 ==
 
 A flexible structure for user interactions to be used in window frameworks and widgets libraries
