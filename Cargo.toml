@@ -47,3 +47,7 @@ git = "https://github.com/pistondevelopers/rust-graphics"
 
 git = "https://github.com/gfx-rs/gfx-rs"
 
+[dependencies.noise-rs]
+
+git = "https://github.com/bjz/noise-rs"
+
