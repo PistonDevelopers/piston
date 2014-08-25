@@ -51,3 +51,7 @@ git = "https://github.com/gfx-rs/gfx-rs"
 
 git = "https://github.com/bjz/noise-rs"
 
+[dependencies.genmesh]
+
+git = "https://github.com/csherratt/genmesh.git"
+
