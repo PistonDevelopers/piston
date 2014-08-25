@@ -16,6 +16,7 @@ extern crate image_lib = "image";
 extern crate graphics_lib = "graphics";
 extern crate input_lib = "input";
 extern crate cam_lib = "cam";
+extern crate gfx_lib = "gfx";
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -24,6 +25,7 @@ pub use graphics_lib as graphics;
 pub use vecmath_lib as vecmath;
 pub use input_lib as input;
 pub use cam_lib as cam;
+pub use gfx_lib as gfx;
 
 pub use game_window::GameWindow;
 pub use game_window::GameWindowSettings;
