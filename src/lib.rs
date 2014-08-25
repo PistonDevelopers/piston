@@ -18,6 +18,7 @@ extern crate input_lib = "input";
 extern crate cam_lib = "cam";
 extern crate gfx_lib = "gfx";
 extern crate noise_lib = "noise";
+extern crate genmesh_lib = "genmesh";
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -28,6 +29,7 @@ pub use input_lib as input;
 pub use cam_lib as cam;
 pub use gfx_lib as gfx;
 pub use noise_lib as noise;
+pub use genmesh_lib as genmesh;
 
 pub use game_window::GameWindow;
 pub use game_window::GameWindowSettings;
