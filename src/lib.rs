@@ -9,57 +9,36 @@
 pub mod keyboard;
 pub mod mouse;
 
+/// Models different kinds of buttons.
+#[deriving(Clone)]
+pub enum Button {
+    /// A keyboard button.
+    Keyboard(keyboard::Key),
+    /// A mouse button.
+    Mouse(mouse::Button),
+}
+
+/// Models different kinds of motion.
+#[deriving(Clone)]
+pub enum Motion {
+    /// x and y in window coordinates.
+    MouseCursor(f64, f64),
+    /// x and y in relative coordinates.
+    MouseRelative(f64, f64),
+    /// x and y in scroll ticks.
+    MouseScroll(f64, f64),
+}
+
 /// Models input events.
 #[deriving(Clone)]
 pub enum InputEvent {
-    /// Pressed a keyboard key.
-    KeyPress {
-        /// Keyboard key.
-        pub key: keyboard::Key,
-    },
-    /// Released a keyboard key.
-    KeyRelease {
-        /// Keyboard key.
-        pub key: keyboard::Key,
-    },
-    /// Pressed a mouse button.
-    MousePress {
-        /// Mouse button.
-        pub button: mouse::Button,
-    },
-    /// Released a mouse button.
-    MouseRelease {
-        /// Mouse button.
-        pub button: mouse::Button,
-    },
+    /// Pressed a button.
+    Press(Button),
+    /// Released a button.
+    Release(Button),
     /// Moved mouse cursor.
-    MouseMove {
-        /// x in window coordinates.
-        pub x: f64,
-        /// y in window coordinates.
-        pub y: f64,
-        /// x in drawing coordinates.
-        pub draw_x: f64,
-        /// y in drawing coordinates.
-        pub draw_y: f64,
-    },
-    /// Moved mouse relative, not bounded by cursor.
-    MouseRelativeMove {
-        /// Delta x in window coordinates.
-        pub dx: f64,
-        /// Delta y in window coordinates.
-        pub dy: f64,
-        /// Delta x in drawing coordinates.
-        pub draw_dx: f64,
-        /// Delta y in drawing coordinates.
-        pub draw_dy: f64,
-    },
-    /// Scrolled mouse.
-    MouseScroll {
-        /// Delta x in undefined coordinates.
-        pub dx: f64,
-        /// Delta y in undefined coordinates.
-        pub dy: f64,
-    },
+    Move(Motion),
+    /// Text (usually from keyboard).
+    Text(String),
 }
 
