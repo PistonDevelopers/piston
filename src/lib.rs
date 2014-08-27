@@ -10,7 +10,7 @@ pub mod keyboard;
 pub mod mouse;
 
 /// Models different kinds of buttons.
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq, Eq)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(keyboard::Key),
