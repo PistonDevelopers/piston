@@ -10,7 +10,7 @@ pub mod keyboard;
 pub mod mouse;
 
 /// Models different kinds of buttons.
-#[deriving(Clone, PartialEq, Eq)]
+#[deriving(Clone, PartialEq, Eq, Show)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(keyboard::Key),
@@ -19,7 +19,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[deriving(Clone)]
+#[deriving(Clone, Show)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),
@@ -30,7 +30,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[deriving(Clone)]
+#[deriving(Clone, Show)]
 pub enum InputEvent {
     /// Pressed a button.
     Press(Button),
