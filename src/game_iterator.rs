@@ -166,24 +166,16 @@ for GameIterator<'a, W> {
                     // Handle all events before updating.
                     return match self.game_window.poll_event() {
                         game_window::KeyPressed(key) => {
-                            Some(Input(input::KeyPress {
-                                key: key,
-                            }))
+                            Some(Input(input::Press(input::Keyboard(key))))
                         },
                         game_window::KeyReleased(key) => {
-                            Some(Input(input::KeyRelease {
-                                key: key,
-                            }))
+                            Some(Input(input::Release(input::Keyboard(key))))
                         },
                         game_window::MouseButtonPressed(mouse_button) => {
-                            Some(Input(input::MousePress {
-                                button: mouse_button,
-                            }))
+                            Some(Input(input::Press(input::Mouse(mouse_button))))
                         },
                         game_window::MouseButtonReleased(mouse_button) => {
-                            Some(Input(input::MouseRelease {
-                                button: mouse_button,
-                            }))
+                            Some(Input(input::Release(input::Mouse(mouse_button))))
                         },
                         game_window::MouseMoved(x, y, relative_move) => {
                             match relative_move {
@@ -191,25 +183,10 @@ for GameIterator<'a, W> {
                                     self.state = MouseRelativeMoveState(dx, dy),
                                 None => {},
                             };
-                            // Compute mouse position in drawing coordinates.
-                            let (w, h) = self.game_window.get_size();
-                            let (draw_w, draw_h) = self.game_window.get_draw_size();
-                            let (draw_x, draw_y) = (
-                                x * draw_w as f64 / w as f64, 
-                                y * draw_h as f64 / h as f64
-                            );
-                            Some(Input(input::MouseMove {
-                                x: x,
-                                y: y,
-                                draw_x: x * draw_x,
-                                draw_y: y * draw_y
-                            }))
+                            Some(Input(input::Move(input::MouseCursor(x, y))))
                         },
                         game_window::MouseScrolled(dx, dy) => {
-                            Some(Input(input::MouseScroll {
-                                dx: dx,
-                                dy: dy
-                            }))
+                            Some(Input(input::Move(input::MouseScroll(dx, dy))))
                         },
                         game_window::NoEvent => {
                             self.state = UpdateState;
@@ -221,19 +198,7 @@ for GameIterator<'a, W> {
                 },
                 MouseRelativeMoveState(dx, dy) => {
                     self.state = HandleEventsState;
-                    // Compute mouse position in drawing coordinates.
-                    let (w, h) = self.game_window.get_size();
-                    let (draw_w, draw_h) = self.game_window.get_draw_size();
-                    let (draw_dx, draw_dy) = (
-                        dx * draw_w as f64 / w as f64, 
-                        dy * draw_h as f64 / h as f64
-                    );
-                    return Some(Input(input::MouseRelativeMove {
-                        dx: dx,
-                        dy: dy,
-                        draw_dx: draw_dx,
-                        draw_dy: draw_dy,
-                    }));
+                    return Some(Input(input::Move(input::MouseRelative(dx, dy))));
                 },
                 UpdateState => {
                     self.state = UpdateLoopState;
