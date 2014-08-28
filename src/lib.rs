@@ -31,21 +31,24 @@ pub use gfx_lib as gfx;
 pub use noise_lib as noise;
 pub use genmesh_lib as genmesh;
 
-pub use game_window::GameWindow;
-pub use game_window::GameWindowSettings;
+pub use game_window::{
+    GameWindow,
+    GameWindowSettings,
+};
 pub use asset_store::AssetStore;
-
-pub use game_iterator::Render;
-pub use game_iterator::Update;
-pub use game_iterator::Input;
-
-pub use game_iterator::GameEvent;
-pub use game_iterator::GameIterator;
-pub use game_iterator::GameIteratorSettings;
-pub use game_iterator::RenderArgs;
-pub use game_iterator::UpdateArgs;
+pub use game_iterator::{
+    Render,
+    Update,
+    Input,
+    GameEvent,
+    GameIterator,
+    GameIteratorSettings,
+    RenderArgs,
+    UpdateArgs,
+};
+pub use fps_counter::FPSCounter;
 
 pub mod game_window;
 mod game_iterator;
 mod asset_store;
-
+mod fps_counter;

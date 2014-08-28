@@ -12,7 +12,9 @@ authors = [
     "Apointos",
     "ccgn",
     "reem",
-    "TyOverby <ty@pre-alpha.com>"]
+    "TyOverby <ty@pre-alpha.com>",
+    "eddyb"
+]
 
 [lib]
 
