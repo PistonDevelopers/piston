@@ -1,4 +1,4 @@
-# rust-event [![Build Status](https://travis-ci.org/PistonDevelopers/rust-event.svg)](https://travis-ci.org/PistonDevelopers/rust-event)
+# rust-event [![Build Status](https://travis-ci.org/PistonDevelopers/rust-event.svg?branch=master)](https://travis-ci.org/PistonDevelopers/rust-event)
 
 An experimental library using context types for event logic
 
