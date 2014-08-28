@@ -4,7 +4,6 @@ use std::time::duration::Duration;
 
 use input;
 use GameWindow;
-use game_window;
 
 use std::cmp;
 
@@ -43,7 +42,6 @@ enum GameIteratorState {
     SwapBuffersState,
     UpdateLoopState,
     HandleEventsState,
-    MouseRelativeMoveState(f64, f64),
     UpdateState,
 }
 
@@ -165,40 +163,14 @@ for GameIterator<'a, W> {
                 HandleEventsState => {
                     // Handle all events before updating.
                     return match self.game_window.poll_event() {
-                        game_window::KeyPressed(key) => {
-                            Some(Input(input::Press(input::Keyboard(key))))
-                        },
-                        game_window::KeyReleased(key) => {
-                            Some(Input(input::Release(input::Keyboard(key))))
-                        },
-                        game_window::MouseButtonPressed(mouse_button) => {
-                            Some(Input(input::Press(input::Mouse(mouse_button))))
-                        },
-                        game_window::MouseButtonReleased(mouse_button) => {
-                            Some(Input(input::Release(input::Mouse(mouse_button))))
-                        },
-                        game_window::MouseMoved(x, y, relative_move) => {
-                            match relative_move {
-                                Some((dx, dy)) =>
-                                    self.state = MouseRelativeMoveState(dx, dy),
-                                None => {},
-                            };
-                            Some(Input(input::Move(input::MouseCursor(x, y))))
-                        },
-                        game_window::MouseScrolled(dx, dy) => {
-                            Some(Input(input::Move(input::MouseScroll(dx, dy))))
-                        },
-                        game_window::NoEvent => {
+                        None => {
                             self.state = UpdateState;
                             // Explicitly continue because otherwise the result
                             // of this match is immediately returned.
                             continue;
                         },
+                        Some(x) => Some(Input(x)),
                     }
-                },
-                MouseRelativeMoveState(dx, dy) => {
-                    self.state = HandleEventsState;
-                    return Some(Input(input::Move(input::MouseRelative(dx, dy))));
                 },
                 UpdateState => {
                     self.state = UpdateLoopState;

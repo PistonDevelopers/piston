@@ -1,31 +1,6 @@
 //! Game window operations.
-use input::mouse;
-use input::keyboard;
 
-/// Used by window back-end to model window events.
-#[deriving(Clone, PartialEq, PartialOrd, Show)]
-pub enum Event {
-    /// No event occured.
-    NoEvent,
-    /// A key was released.
-    KeyReleased(keyboard::Key),
-    /// A key was pressed.
-    KeyPressed(keyboard::Key),
-    /// A mouse button was pressed.
-    MouseButtonPressed(mouse::Button),
-    /// A mouse button was released.
-    MouseButtonReleased(mouse::Button),
-    /// The mouse moved.
-    ///
-    /// (x, y, Some((dx, dy)))
-    /// The second part is relative motion which is not bounded.
-    /// Relative motion might not be supported by all window back-ends.
-    MouseMoved(f64, f64, Option<(f64, f64)>),
-    /// The mouse wheel.
-    ///
-    /// (x, y)
-    MouseScrolled(f64, f64),
-}
+use input::InputEvent;
 
 /// Settings for window behavior.
 pub struct GameWindowSettings {
@@ -85,6 +60,6 @@ pub trait GameWindow {
     fn capture_cursor(&mut self, _enabled: bool) {}
     
     /// Poll a event from window's event queue.
-    fn poll_event(&mut self) -> Event { NoEvent }
+    fn poll_event(&mut self) -> Option<InputEvent> { None }
 }
 
