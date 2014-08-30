@@ -45,10 +45,6 @@ git = "https://github.com/pistondevelopers/rust-image"
 
 git = "https://github.com/pistondevelopers/rust-graphics"
 
-[dependencies.gfx]
-
-git = "https://github.com/gfx-rs/gfx-rs"
-
 [dependencies.noise-rs]
 
 git = "https://github.com/bjz/noise-rs"
