@@ -32,6 +32,7 @@ pub use genmesh_lib as genmesh;
 pub use game_window::{
     GameWindow,
     GameWindowSettings,
+    NoGameWindow
 };
 pub use asset_store::AssetStore;
 pub use game_iterator::{
