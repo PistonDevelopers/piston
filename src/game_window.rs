@@ -35,7 +35,7 @@ pub trait GameWindow {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a GameWindowSettings;
 
-    /// Returns ture if the window should close.
+    /// Returns true if the window should close.
     fn should_close(&self) -> bool;
 
     /// Inform the window that it should close.
@@ -63,3 +63,35 @@ pub trait GameWindow {
     fn poll_event(&mut self) -> Option<InputEvent> { None }
 }
 
+/// An implementation of GameWindow that represents running without a window at all
+pub struct NoGameWindow {
+    settings: GameWindowSettings
+}
+
+impl NoGameWindow {
+    /// Create a new nonexistant game window
+    pub fn new(settings: GameWindowSettings) -> NoGameWindow {
+         NoGameWindow {
+             settings: settings
+         }
+    }
+}
+
+impl GameWindow for NoGameWindow {
+     fn get_settings<'a>(&'a self) -> &'a GameWindowSettings {
+        &self.settings
+     }
+
+    fn should_close(&self) -> bool {
+        false
+    }
+
+    fn close(&mut self) {
+        // One can't close a window that doesn't exist!
+        ()
+    }
+
+    fn get_size(&self) -> (u32, u32) {
+        (0, 0)
+    }
+}
