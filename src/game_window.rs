@@ -65,14 +65,16 @@ pub trait GameWindow {
 
 /// An implementation of GameWindow that represents running without a window at all
 pub struct NoGameWindow {
-    settings: GameWindowSettings
+    settings: GameWindowSettings,
+    should_close: bool
 }
 
 impl NoGameWindow {
     /// Create a new nonexistant game window
     pub fn new(settings: GameWindowSettings) -> NoGameWindow {
          NoGameWindow {
-             settings: settings
+             settings: settings,
+             should_close: false
          }
     }
 }
@@ -83,12 +85,11 @@ impl GameWindow for NoGameWindow {
      }
 
     fn should_close(&self) -> bool {
-        false
+        self.should_close
     }
 
     fn close(&mut self) {
-        // One can't close a window that doesn't exist!
-        ()
+        self.should_close = true
     }
 
     fn get_size(&self) -> (u32, u32) {
