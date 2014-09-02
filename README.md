@@ -4,25 +4,18 @@ A user friendly game engine written in Rust
 
 Maintainers: @bvssvni, @Coeuvre
 
-[Tutorial](https://github.com/PistonDevelopers/piston/blob/master/learning%20materials/tutorial.md)
+[Examples](https://github.com/pistondevelopers/piston-examples)
 
 [List of games made with Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
 
-[Piston online docs](http://www.piston.rs/docs/piston/piston)
+[Piston online docs](http://www.rust-ci.org/PistonDevelopers/piston/doc/piston/)
 
 [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 
-| Partner Project | Online Docs |
-|---------|------|------------|
-| [rust-graphics](https://github.com/PistonDevelopers/rust-graphics) | [rust-graphics docs](http://www.piston.rs/docs/rust-graphics/graphics) |
-| [rust-image](https://github.com/PistonDevelopers/rust-image) | [rust-image docs](http://www.piston.rs/docs/rust-image/image/)
-| [rust-sdl2](https://github.com/AngryLawyer/rust-sdl2) | [rust-sdl2 docs](http://www.piston.rs/docs/rust-sdl2/sdl2/) |
-| [rust-sdl2_mixer](https://github.com/andelf/rust-sdl2_mixer) | [rust-sdl2_mixer docs](http://www.piston.rs/docs/rust-sdl2_mixer/sdl2_mixer/) |
-| [rust-sdl2_ttf](https://github.com/andelf/rust-sdl2_ttf) | [rust-sdl2_ttf docs](http://www.piston.rs/docs/rust-sdl2_ttf/sdl2_ttf/) |
-| [glfw-rs](https://github.com/bjz/glfw-rs) | [glfw-rs docs](http://www.piston.rs/docs/glfw-rs/glfw/) |
-| [gl-rs](https://github.com/bjz/gl-rs) | [gl-rs docs](http://www.piston.rs/docs/gl-rs/gl/) |
-| [hgl-rs](https://github.com/cmr/hgl-rs) | [hgl-rs docs](http://www.piston.rs/docs/hgl-rs/hgl/) |
-| [cgmath-rs](https://github.com/bjz/cgmath-rs) | [cgmath-rs docs](http://www.piston.rs/docs/cgmath-rs/cgmath/) |
+| Back-ends |
+|--------------------|
+| [sdl2_game_window](https://github.com/pistondevelopers/sdl2_game_window) |
+| [glfw_game_window](https://github.com/pistondevelopers/glfw_game_window) |
 
 ## Start new project with Piston
 
