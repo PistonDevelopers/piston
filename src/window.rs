@@ -3,7 +3,7 @@
 use input::InputEvent;
 
 /// Settings for window behavior.
-pub struct GameWindowSettings {
+pub struct WindowSettings {
     /// Title of the window.
     pub title: String,
     /// The size of the window.
@@ -16,13 +16,13 @@ pub struct GameWindowSettings {
     pub exit_on_esc: bool,
 }
 
-impl GameWindowSettings {
+impl WindowSettings {
     /// Gets default settings.
     ///
     /// This exits the window when pressing `Esc`.
     /// The background color is set to black.
-    pub fn default() -> GameWindowSettings {
-        GameWindowSettings {
+    pub fn default() -> WindowSettings {
+        WindowSettings {
             title: "Piston".to_string(),
             size: [640, 480],
             samples: 0,
@@ -34,9 +34,9 @@ impl GameWindowSettings {
 
 
 /// Implemented by window back-end.
-pub trait GameWindow {
+pub trait Window {
     /// Get the window's settings.
-    fn get_settings<'a>(&'a self) -> &'a GameWindowSettings;
+    fn get_settings<'a>(&'a self) -> &'a WindowSettings;
 
     /// Returns true if the window should close.
     fn should_close(&self) -> bool;
@@ -67,23 +67,23 @@ pub trait GameWindow {
 }
 
 /// An implementation of GameWindow that represents running without a window at all
-pub struct NoGameWindow {
-    settings: GameWindowSettings,
+pub struct NoWindow {
+    settings: WindowSettings,
     should_close: bool
 }
 
-impl NoGameWindow {
+impl NoWindow {
     /// Create a new nonexistant game window
-    pub fn new(settings: GameWindowSettings) -> NoGameWindow {
-         NoGameWindow {
+    pub fn new(settings: WindowSettings) -> NoWindow {
+         NoWindow {
              settings: settings,
              should_close: false
          }
     }
 }
 
-impl GameWindow for NoGameWindow {
-     fn get_settings<'a>(&'a self) -> &'a GameWindowSettings {
+impl Window for NoWindow {
+     fn get_settings<'a>(&'a self) -> &'a WindowSettings {
         &self.settings
      }
 

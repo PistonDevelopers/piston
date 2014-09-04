@@ -3,7 +3,7 @@ use std::io::timer::sleep;
 use std::time::duration::Duration;
 
 use input;
-use GameWindow;
+use Window;
 
 use std::cmp;
 
@@ -27,7 +27,7 @@ pub struct UpdateArgs {
 
 /// Contains the different game events.
 #[deriving(Clone)]
-pub enum GameEvent {
+pub enum Event {
     /// Render graphics.
     Render(RenderArgs),
     /// Update physical state of the game.
@@ -37,7 +37,7 @@ pub enum GameEvent {
 }
 
 #[deriving(Show)]
-enum GameIteratorState {
+enum EventIteratorState {
     RenderState,
     SwapBuffersState,
     UpdateLoopState,
@@ -47,7 +47,7 @@ enum GameIteratorState {
 
 /// Settings for the game loop behavior.
 #[deriving(Clone)]
-pub struct GameIteratorSettings {
+pub struct EventSettings {
     /// The number of updates per second (UPS).
     pub updates_per_second: u64,
     /// The maximum number of frames per second (FPS target).
@@ -63,12 +63,12 @@ pub struct GameIteratorSettings {
 /// Example:
 ///
 /// ```Rust
-/// let game_iter_settings = GameIteratorSettings {
+/// let event_settings = EventSettings {
 ///     updates_per_second: 120,
 ///     max_frames_per_second: 60,
 /// };
 /// let ref mut gl = Gl::new();
-/// for e in GameIterator::new(&mut window, &game_iter_settings) {
+/// for e in EventIterator::new(&mut window, &event_settings) {
 ///     match e {
 ///         Render(args) => {
 ///             // Set the viewport in window to render graphics.
@@ -80,10 +80,10 @@ pub struct GameIteratorSettings {
 ///     }
 /// }
 /// ```
-pub struct GameIterator<'a, W: 'a> {
+pub struct EventIterator<'a, W: 'a> {
     /// The game window used by iterator.
-    pub game_window: &'a mut W,
-    state: GameIteratorState,
+    pub window: &'a mut W,
+    state: EventIteratorState,
     last_update: u64,
     last_frame: u64,
     dt_update_in_ns: u64,
@@ -93,18 +93,18 @@ pub struct GameIterator<'a, W: 'a> {
 
 static billion: u64 = 1_000_000_000;
 
-impl<'a, W: GameWindow> GameIterator<'a, W> {
+impl<'a, W: Window> EventIterator<'a, W> {
     /// Creates a new game iterator.
     pub fn new(
-        game_window: &'a mut W, 
-        settings: &GameIteratorSettings
-    ) -> GameIterator<'a, W> {
+        window: &'a mut W, 
+        settings: &EventSettings
+    ) -> EventIterator<'a, W> {
         let updates_per_second: u64 = settings.updates_per_second;
         let max_frames_per_second: u64 = settings.max_frames_per_second;
 
         let start = time::precise_time_ns();
-        GameIterator {
-            game_window: game_window,
+        EventIterator {
+            window: window,
             state: RenderState,
             last_update: start,
             last_frame: start,
@@ -115,20 +115,20 @@ impl<'a, W: GameWindow> GameIterator<'a, W> {
     }
 }
 
-impl<'a, W: GameWindow> 
-Iterator<GameEvent> 
-for GameIterator<'a, W> {
+impl<'a, W: Window> 
+Iterator<Event> 
+for EventIterator<'a, W> {
     /// Returns the next game event.
-    fn next(&mut self) -> Option<GameEvent> {
+    fn next(&mut self) -> Option<Event> {
         loop {
             self.state = match self.state {
                 RenderState => {
-                    if self.game_window.should_close() { return None; }
+                    if self.window.should_close() { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let (w, h) = self.game_window.get_size();
+                    let (w, h) = self.window.get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
@@ -143,7 +143,7 @@ for GameIterator<'a, W> {
                     UpdateLoopState
                 }
                 SwapBuffersState => {
-                    self.game_window.swap_buffers();
+                    self.window.swap_buffers();
                     UpdateLoopState
                 }
                 UpdateLoopState => {
@@ -162,7 +162,7 @@ for GameIterator<'a, W> {
                 }
                 HandleEventsState => {
                     // Handle all events before updating.
-                    match self.game_window.poll_event() {
+                    match self.window.poll_event() {
                         None => UpdateState,
                         Some(x) => { return Some(Input(x)); },
                     }
