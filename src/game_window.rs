@@ -6,8 +6,10 @@ use input::InputEvent;
 pub struct GameWindowSettings {
     /// Title of the window.
     pub title: String,
-    /// The size of the window
+    /// The size of the window.
     pub size: [u32, ..2],
+    /// Number samples per pixel (anti-aliasing).
+    pub samples: u8,
     /// If true, the window is fullscreen.
     pub fullscreen: bool,
     /// If true, exit when pressing Esc.
@@ -23,6 +25,7 @@ impl GameWindowSettings {
         GameWindowSettings {
             title: "Piston".to_string(),
             size: [640, 480],
+            samples: 0,
             fullscreen: false,
             exit_on_esc: true,
         }
@@ -58,7 +61,7 @@ pub trait GameWindow {
     /// it is hidden and the cursor position does not change.
     /// Only relative mouse motion is registered.
     fn capture_cursor(&mut self, _enabled: bool) {}
-    
+
     /// Poll a event from window's event queue.
     fn poll_event(&mut self) -> Option<InputEvent> { None }
 }
