@@ -29,25 +29,25 @@ pub use cam_lib as cam;
 pub use noise_lib as noise;
 pub use genmesh_lib as genmesh;
 
-pub use game_window::{
-    GameWindow,
-    GameWindowSettings,
-    NoGameWindow
+pub use window::{
+    Window,
+    WindowSettings,
+    NoWindow
 };
 pub use asset_store::AssetStore;
-pub use game_iterator::{
+pub use event_iterator::{
     Render,
     Update,
     Input,
-    GameEvent,
-    GameIterator,
-    GameIteratorSettings,
+    Event,
+    EventIterator,
+    EventSettings,
     RenderArgs,
     UpdateArgs,
 };
 pub use fps_counter::FPSCounter;
 
-pub mod game_window;
-mod game_iterator;
+pub mod window;
+mod event_iterator;
 mod asset_store;
 mod fps_counter;
