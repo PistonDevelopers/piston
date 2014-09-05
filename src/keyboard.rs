@@ -1,10 +1,77 @@
-
 //! Back-end agnostic keyboard keys.
 
 use std::hash::Hash;
 use std::hash::sip::SipState;
 use std::num::FromPrimitive;
 use std::num::ToPrimitive;
+use std::default::Default;
+use {
+    InputEvent,
+    Keyboard,
+    Press,
+    Release,
+};
+
+// Defining every combination to allow assignment in static expressions.
+bitflags!(
+    #[deriving(Show)]
+    #[allow(missing_doc)]
+    flags ModifierKey: u8 {
+        static NoModifier       = 0b00000000,
+        static Ctrl             = 0b00000001,
+        static Shift            = 0b00000010,
+        static Alt              = 0b00000100,
+        static Gui              = 0b00001000,
+        static CtrlShift        = Ctrl.bits 
+                                | Shift.bits,
+        static CtrlAlt          = Ctrl.bits
+                                | Alt.bits,
+        static CtrlGui          = Ctrl.bits
+                                | Gui.bits,
+        static CtrlShiftAlt     = Ctrl.bits
+                                | Shift.bits
+                                | Alt.bits,
+        static CtrlShiftGui     = Ctrl.bits
+                                | Shift.bits
+                                | Gui.bits,
+        static CtrlShiftAltGui  = Ctrl.bits
+                                | Shift.bits
+                                | Alt.bits
+                                | Gui.bits,
+        static ShiftAlt         = Shift.bits
+                                | Alt.bits,
+        static ShiftGui         = Shift.bits
+                                | Gui.bits,
+        static ShiftAltGui      = Shift.bits
+                                | Alt.bits
+                                | Gui.bits,
+        static AltGui           = Alt.bits
+                                | Gui.bits
+    }
+)
+
+impl ModifierKey {
+    /// Change modifier key state depending on input.
+    ///
+    /// If the left or side button is released, it counts as a release.
+    pub fn handle_input(&mut self, input: &InputEvent) {
+        match *input {
+            Press(Keyboard(LCtrl)) | Press(Keyboard(RCtrl)) => self.insert(Ctrl),
+            Release(Keyboard(LCtrl)) | Release(Keyboard(RCtrl)) => self.remove(Ctrl),
+            Press(Keyboard(LShift)) | Press(Keyboard(RShift)) => self.insert(Shift),
+            Release(Keyboard(LShift)) | Release(Keyboard(RShift)) => self.remove(Shift),
+            Press(Keyboard(LAlt)) | Press(Keyboard(RAlt)) => self.insert(Alt),
+            Release(Keyboard(LAlt)) | Release(Keyboard(RAlt)) => self.remove(Alt),
+            Press(Keyboard(LGui)) | Press(Keyboard(RGui)) => self.insert(Gui),
+            Release(Keyboard(LGui)) | Release(Keyboard(RGui)) => self.remove(Gui),
+            _ => {}
+        }
+    }
+}
+
+impl Default for ModifierKey {
+    fn default() -> ModifierKey { NoModifier }
+}
 
 /// Represent a keyboard key.
 #[allow(missing_doc)]
