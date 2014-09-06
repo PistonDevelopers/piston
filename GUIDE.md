@@ -16,7 +16,7 @@ Piston is a game engine focusing on user-friendliness, back-end agnostic interfa
 
 With Piston you should be able get something up on the screen quickly, make a prototype, load images and sounds, polish it to look like a real game and port it to other platforms.
 
-Our goal is to provide the tools for creative game development, build the best 2D graphics API for Rust and make it easy to use with other libraries for game development in the Rust community. 3D can be achieved through OpenGL.
+Our goal is to provide the tools for creative game development, build the best 2D graphics API for Rust and make it easy to use with other libraries for game development in the Rust community. 3D can be achieved through OpenGL and [Gfx](https://github.com/gfx-rs/gfx-rs).
 
 ### Why Rust?
 
