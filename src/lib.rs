@@ -40,5 +40,7 @@ pub enum InputEvent {
     Move(Motion),
     /// Text (usually from keyboard).
     Text(String),
+    /// Window got resized.
+    Resize(u32, u32),
 }
 
