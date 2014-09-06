@@ -8,8 +8,6 @@ If you experience problems with content covered in this tutorial, or would like 
 
 ## Introduction
 
-#### [RFC]
-    Someone more familiar with project would be able to give a more accurate explanation for Why Piston
 ### Why Piston?
 
 Piston is a game engine focusing on user-friendliness, back-end agnostic interface and game development research using the Rust language.
