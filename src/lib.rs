@@ -42,5 +42,7 @@ pub enum InputEvent {
     Text(String),
     /// Window got resized.
     Resize(u32, u32),
+    /// Window gained or lost focus.
+    Focus(bool),
 }
 
