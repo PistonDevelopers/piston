@@ -38,8 +38,8 @@ Some of the things that make Rust suitable for game development:
 
 To install Rust and Cargo (Rust's package manager) on your machine visit these pages and install the appropriate nightlies for your platform.
 
-[Rust Nightlies](http://www.rust-lang.org/install.html)
-[Cargo Nightlies](https://github.com/rust-lang/cargo#installing-cargo-from-nightlies)
+* [Rust Nightlies](http://www.rust-lang.org/install.html)
+* [Cargo Nightlies](https://github.com/rust-lang/cargo#installing-cargo-from-nightlies)
 
 Once you're done, try these commands to confirm that each have been installed correctly.
 
