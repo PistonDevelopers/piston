@@ -38,43 +38,34 @@ Some of the things that make Rust suitable for game development:
 
 ## Installing Rust and Cargo
 
-### Linux or Mac OSX (with developer tools)
+To install Rust and Cargo (Rust's package manager) on your machine visit these pages and install the appropriate nightlies for your platform.
 
-First you have to set up a new Rust project for executable:
+[Rust Nightlies](http://www.rust-lang.org/install.html)
+[Cargo Nightlies](https://github.com/rust-lang/cargo#installing-cargo-from-nightlies)
 
-1. Create a new folder for your game project
-2. Copy 'Makefile' from https://github.com/bvssvni/rust-empty
-3. If `rustc --version` gives an error, type `make nightly-install` to install Rust nightly
-4. In the Terminal window, type `make exe` and `make git-ignore`
+Once you're done, try these commands to confirm that each have been installed correctly.
 
-You are now ready for writing Rust programs!
-Before you can start coding, you need to build Piston:
+`rustc --version`
+`cargo --version`
 
-#### [FIXME]
-   Replace piston-workspace with instructions for installing cargo
-
-1. Clone https://github.com/PistonDevelopers/piston-workspace and follow the instructions to build Piston
-2. Copy symlinks from the 'piston-symlinks' folder in piston-workspace to your project's 'target/cpu-vendor-os/lib' folder
-
-If you don't have the 'target' folder, use the command `make target-dir`.
-
-You are now ready to make a game in Rust!
-
-### Windows
-#### [TODO]
+Things are moving fast in Rust-land, so be sure to keep your machine up to date.
 
 ## Hello World
 
-Now that you have Rust and Cargo installed, check out the [Getting Started](https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/getting-started) tutorial.
-It will take you through creating your first Piston project and rendering to a window, all in Rust!
+[Getting Started](https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/getting-started)
 
-## Examples
-
-Here are some examples showing Piston in action.
-
-[Piston-Examples](https://github.com/pistondevelopers/piston-examples)
+Now that you have Rust and Cargo installed, check out the Getting Started tutorial above.
+It will take you through creating your first Piston project, rendering a box to a window, all in Rust!
 
 ## Next Steps
+
+### More of Piston in Action
+
+[Piston-Examples](https://github.com/pistondevelopers/piston-examples)
+To see small samples of Piston's features, check out the Piston Examples repo.
+
+[Piston-Tutorials](https://github.com/PistonDevelopers/Piston-Tutorials)
+You're already familiar with our Tutorials repo. Check it out for more in-depth guides to creating projects.
 
 ### Piston Community
 
