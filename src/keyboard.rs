@@ -6,6 +6,7 @@ use std::num::FromPrimitive;
 use std::num::ToPrimitive;
 use std::default::Default;
 use {
+    Focus,
     InputEvent,
     Keyboard,
     Press,
@@ -56,14 +57,23 @@ impl ModifierKey {
     /// If the left or side button is released, it counts as a release.
     pub fn handle_input(&mut self, input: &InputEvent) {
         match *input {
-            Press(Keyboard(LCtrl)) | Press(Keyboard(RCtrl)) => self.insert(Ctrl),
-            Release(Keyboard(LCtrl)) | Release(Keyboard(RCtrl)) => self.remove(Ctrl),
-            Press(Keyboard(LShift)) | Press(Keyboard(RShift)) => self.insert(Shift),
-            Release(Keyboard(LShift)) | Release(Keyboard(RShift)) => self.remove(Shift),
-            Press(Keyboard(LAlt)) | Press(Keyboard(RAlt)) => self.insert(Alt),
-            Release(Keyboard(LAlt)) | Release(Keyboard(RAlt)) => self.remove(Alt),
-            Press(Keyboard(LGui)) | Press(Keyboard(RGui)) => self.insert(Gui),
-            Release(Keyboard(LGui)) | Release(Keyboard(RGui)) => self.remove(Gui),
+            Press(Keyboard(LCtrl)) 
+          | Press(Keyboard(RCtrl)) => self.insert(Ctrl),
+            Release(Keyboard(LCtrl)) 
+          | Release(Keyboard(RCtrl)) => self.remove(Ctrl),
+            Press(Keyboard(LShift)) 
+          | Press(Keyboard(RShift)) => self.insert(Shift),
+            Release(Keyboard(LShift)) 
+          | Release(Keyboard(RShift)) => self.remove(Shift),
+            Press(Keyboard(LAlt)) 
+          | Press(Keyboard(RAlt)) => self.insert(Alt),
+            Release(Keyboard(LAlt)) 
+          | Release(Keyboard(RAlt)) => self.remove(Alt),
+            Press(Keyboard(LGui)) 
+          | Press(Keyboard(RGui)) => self.insert(Gui),
+            Release(Keyboard(LGui)) 
+          | Release(Keyboard(RGui)) => self.remove(Gui),
+            Focus(false) => *self = NoModifier,
             _ => {}
         }
     }
