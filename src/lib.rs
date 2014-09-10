@@ -8,6 +8,7 @@
 
 extern crate time;
 extern crate sync;
+extern crate uuid;
 
 // Crates used to reexport.
 extern crate vecmath_lib = "vecmath";
@@ -46,8 +47,10 @@ pub use event_iterator::{
     UpdateArgs,
 };
 pub use fps_counter::FPSCounter;
+pub use sprite::Sprite;
 
 pub mod window;
 mod event_iterator;
 mod asset_store;
 mod fps_counter;
+mod sprite;
