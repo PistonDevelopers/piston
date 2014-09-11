@@ -8,7 +8,7 @@ authors = [
 ]
 tags = []
 
-[[lib]]
+[lib]
 
 name = "event"
 path = "src/lib.rs"

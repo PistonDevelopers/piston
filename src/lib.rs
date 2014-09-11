@@ -23,9 +23,9 @@ pub use status::{
     Failure,
     Running,
 };
-pub use event::{
+pub use behavior::{
     Action,
-    Event,
+    Behavior,
     Select,
     Sequence,
     Invert,
@@ -33,20 +33,20 @@ pub use event::{
     WhenAll,
     While,
 };
-pub use cursor::{
-    Cursor,
-    KeyPressedCursor,
-    SelectCursor,
-    SequenceCursor,
+pub use state::{
+    ActionState,
+    PressedState,
+    SelectState,
+    SequenceState,
     State,
-    InvertCursor,
-    WaitCursor,
-    WhenAllCursor,
-    WhileCursor,
+    InvertState,
+    WaitState,
+    WhenAllState,
+    WhileState,
 };
 pub use start_state::StartState;
 
-mod cursor;
-mod event;
+mod state;
+mod behavior;
 mod start_state;
 mod status;

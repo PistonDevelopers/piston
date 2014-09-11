@@ -8,7 +8,7 @@ use piston::{
 };
 use event::{
     Action,
-    Cursor,
+    State,
     Sequence,
     StartState,
     Wait,
@@ -29,8 +29,8 @@ impl StartState<()> for TestActions {
 }
 
 // A test state machine that can increment and decrement.
-fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
-    cursor.update(&Update(UpdateArgs { dt: dt }), |dt, action, _| {
+fn exec(mut acc: u32, dt: f64, state: &mut State<TestActions, ()>) -> u32 {
+    state.update(&Update(UpdateArgs { dt: dt }), |dt, action, _| {
         match *action {
             Inc => { acc += 1; (event::Success, dt) },
             Dec => { acc -= 1; (event::Success, dt) },
@@ -46,8 +46,8 @@ fn exec(mut acc: u32, dt: f64, cursor: &mut Cursor<TestActions, ()>) -> u32 {
 fn print_2() {
     let a: u32 = 0;
     let seq = Sequence(vec![Action(Inc), Action(Inc)]);
-    let mut cursor = seq.to_cursor();
-    let a = exec(a, 0.0, &mut cursor);
+    let mut state = seq.to_state();
+    let a = exec(a, 0.0, &mut state);
     assert_eq!(a, 2);
 }
 
@@ -57,8 +57,8 @@ fn print_2() {
 fn wait_sec() {
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(1.0), Action(Inc)]);
-    let mut cursor = seq.to_cursor();
-    let a = exec(a, 1.0, &mut cursor);
+    let mut state = seq.to_state();
+    let a = exec(a, 1.0, &mut state);
     assert_eq!(a, 1);
 }
 
@@ -67,10 +67,10 @@ fn wait_sec() {
 fn wait_half_sec() {
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(1.0), Action(Inc)]);
-    let mut cursor = seq.to_cursor();
-    let a = exec(a, 0.5, &mut cursor);
+    let mut state = seq.to_state();
+    let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 0);
-    let a = exec(a, 0.5, &mut cursor);
+    let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 1);
 }
 
@@ -78,8 +78,8 @@ fn wait_half_sec() {
 fn wait_two_waits() {
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(0.5), Wait(0.5), Action(Inc)]);
-    let mut cursor = seq.to_cursor();
-    let a = exec(a, 1.0, &mut cursor);
+    let mut state = seq.to_state();
+    let a = exec(a, 1.0, &mut state);
     assert_eq!(a, 1);
 }
 
@@ -87,8 +87,8 @@ fn wait_two_waits() {
 fn loop_ten_times() {
     let a: u32 = 0;
     let rep = While(box Wait(50.0), vec![Wait(0.5), Action(Inc), Wait(0.5)]);
-    let mut cursor = rep.to_cursor();
-    let a = exec(a, 10.0, &mut cursor);
+    let mut state = rep.to_state();
+    let a = exec(a, 10.0, &mut state);
     assert_eq!(a, 10);
 }
 
@@ -99,10 +99,10 @@ fn when_all_wait() {
             WhenAll(vec![Wait(0.5), Wait(1.0)]),
             Action(Inc)
         ]);
-    let mut cursor = all.to_cursor();
-    let a = exec(a, 0.5, &mut cursor);
+    let mut state = all.to_state();
+    let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 0);
-    let a = exec(a, 0.5, &mut cursor);
+    let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 1);
 }
 
@@ -114,5 +114,3 @@ fn main() {
     loop_ten_times();
     when_all_wait();
 }
-
-

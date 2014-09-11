@@ -1,32 +1,30 @@
 
-use piston::{
-    keyboard,
-};
+use piston::input;
 use {
-    Cursor,
-    KeyPressedCursor,
-    SelectCursor,
-    SequenceCursor,
-    StartState,
     State,
-    InvertCursor,
-    WaitCursor,
-    WhenAllCursor,
-    WhileCursor,
+    PressedState,
+    SelectState,
+    SequenceState,
+    StartState,
+    ActionState,
+    InvertState,
+    WaitState,
+    WhenAllState,
+    WhileState,
 };
 
-/// Describes an event.
-pub enum Event<A> {
-    /// A key was pressed.
-    KeyPressed(keyboard::Key),
+/// Describes a behavior.
+pub enum Behavior<A> {
+    /// A button was pressed.
+    Pressed(input::Button),
     /// An event where some action is performed.
     Action(A),
     /// Returns `Success` <=> `Failure`.
-    Invert(Box<Event<A>>),
+    Invert(Box<Behavior<A>>),
     /// An event that succeeds if any sub event succeeds.
     ///
     /// If a sub event fails it will try the next one.
-    Select(Vec<Event<A>>),
+    Select(Vec<Behavior<A>>),
     /// An event waiting for time in seconds to expire.
     ///
     /// This event never fails.
@@ -36,38 +34,37 @@ pub enum Event<A> {
     /// The sequence fails if one of the sub events fails.
     /// The sequence succeeds if all the sub events succeeds.
     /// Can be used as a short-circuited logical AND block.
-    Sequence(Vec<Event<A>>),
+    Sequence(Vec<Behavior<A>>),
     /// While an event is executing, run a sequence of events in a loop..
-    While(Box<Event<A>>, Vec<Event<A>>),
+    While(Box<Behavior<A>>, Vec<Behavior<A>>),
     /// An event where all sub events happen.
-    WhenAll(Vec<Event<A>>),
+    WhenAll(Vec<Behavior<A>>),
 }
 
-impl<A: StartState<S>, S> Event<A> {
+impl<A: StartState<S>, S> Behavior<A> {
     /// Creates a cursor structure from an event structure.
     ///
     /// The cursor structure keeps track of the state.
     /// You can define your own actions and use the combinations
     /// to create more complex states.
-    pub fn to_cursor<'a>(&'a self) -> Cursor<'a, A, S> {
+    pub fn to_state<'a>(&'a self) -> State<'a, A, S> {
         match *self {
-            KeyPressed(key)
-                => KeyPressedCursor(key),
+            Pressed(button)
+                => PressedState(button),
             Action(ref action)
-                => State(action, action.start_state()),
+                => ActionState(action, action.start_state()),
             Invert(ref ev)
-                => InvertCursor(box ev.to_cursor()),
+                => InvertState(box ev.to_state()),
             Wait(dt)
-                => WaitCursor(dt, 0.0),
+                => WaitState(dt, 0.0),
             Select(ref sel)
-                => SelectCursor(sel, 0, box sel[0].to_cursor()),
+                => SelectState(sel, 0, box sel[0].to_state()),
             Sequence(ref seq)
-                => SequenceCursor(seq, 0, box seq[0].to_cursor()),
+                => SequenceState(seq, 0, box seq[0].to_state()),
             While(ref ev, ref rep)
-                => WhileCursor(box ev.to_cursor(), rep, 0, box rep[0].to_cursor()),
+                => WhileState(box ev.to_state(), rep, 0, box rep[0].to_state()),
             WhenAll(ref all)
-                => WhenAllCursor(all.iter().map(|ev| Some(ev.to_cursor())).collect()),
+                => WhenAllState(all.iter().map(|ev| Some(ev.to_state())).collect()),
         }
     }
 }
-

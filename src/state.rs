@@ -1,15 +1,14 @@
 
 use std;
 use piston::{
-    GameEvent,
-    KeyPress,
-    KeyPressArgs,
-    keyboard,
+    Event,
+    Input,
     Update,
     UpdateArgs,
 };
+use piston::input;
 use {
-    Event,
+    Behavior,
     StartState,
     Status,
     Failure,
@@ -18,46 +17,46 @@ use {
 };
 
 /// Keeps track of an event.
-pub enum Cursor<'a, A, S> {
-    /// Keeps track of whether a key was pressed.
-    KeyPressedCursor(keyboard::Key),
+pub enum State<'a, A: 'a, S> {
+    /// Keeps track of whether a button was pressed.
+    PressedState(input::Button),
     /// Keeps track of an event where you have a state of an action.
-    State(&'a A, S),
+    ActionState(&'a A, S),
     /// Keeps track of `Success` <=> `Failure`.
-    InvertCursor(Box<Cursor<'a, A, S>>),
+    InvertState(Box<State<'a, A, S>>),
     /// Keeps track of an event where you wait and do nothing.
-    WaitCursor(f64, f64),
+    WaitState(f64, f64),
     /// Keeps track of a `Select` event.
-    SelectCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
+    SelectState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A, S>>),
     /// Keeps track of an event where sub events happens sequentially.
-    SequenceCursor(&'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
+    SequenceState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A, S>>),
     /// Keeps track of an event where sub events are repeated sequentially.
-    WhileCursor(Box<Cursor<'a, A, S>>, &'a Vec<Event<A>>, uint, Box<Cursor<'a, A, S>>),
+    WhileState(Box<State<'a, A, S>>, &'a Vec<Behavior<A>>, uint, Box<State<'a, A, S>>),
     /// Keeps track of an event where all sub events must happen.
-    WhenAllCursor(Vec<Option<Cursor<'a, A, S>>>),
+    WhenAllState(Vec<Option<State<'a, A, S>>>),
 }
 
-impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
+impl<'a, A: StartState<S>, S> State<'a, A, S> {
     /// Updates the cursor that tracks an event.
     ///
     /// The action need to return status and remaining delta time.
     /// Returns status and the remaining delta time.
     pub fn update(
         &mut self,
-        e: &GameEvent,
+        e: &Event,
         f: |dt: f64, action: &'a A, state: &mut S| -> (Status, f64)
     ) -> (Status, f64) {
         match (e, self) {
-            (&KeyPress(KeyPressArgs { key: key_pressed }), &KeyPressedCursor(key)) 
-            if key_pressed == key => {
-                // Key press is considered to happen instantly.
+            (&Input(input::Press(button_pressed)), &PressedState(button))
+            if button_pressed == button => {
+                // Button press is considered to happen instantly.
                 (Success, 0.0)
             },
-            (&Update(UpdateArgs { dt }), &State(action, ref mut state)) => {
+            (&Update(UpdateArgs { dt }), &ActionState(action, ref mut state)) => {
                 // Call the function that updates the state.
                 f(dt, action, state)
             },
-            (_, &InvertCursor(ref mut cur)) => {
+            (_, &InvertState(ref mut cur)) => {
                 // Invert `Success` <=> `Failure`.
                 match cur.update(e, |dt, action, state| f(dt, action, state)) {
                     (Running, dt) => (Running, dt),
@@ -65,7 +64,7 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     (Success, dt) => (Failure, dt),
                 }
             },
-            (&Update(UpdateArgs { dt }), &WaitCursor(wait_t, ref mut t)) => {
+            (&Update(UpdateArgs { dt }), &WaitState(wait_t, ref mut t)) => {
                 if *t + dt >= wait_t {
                     let remaining_dt = *t + dt - wait_t;
                     *t = wait_t;
@@ -75,56 +74,70 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     (Running, 0.0)
                 }
             },
-            (_, &SelectCursor(
+            (_, &SelectState(
                 seq,
                 ref mut i,
                 ref mut cursor
             )) => {
-                let mut remaining_e = *e;
+                let mut remaining_dt = match *e {
+                        Update(UpdateArgs { dt }) => dt,
+                        _ => 0.0,
+                    };
+                let mut remaining_e;
                 while *i < seq.len() {
-                    match cursor.update(&remaining_e, |dt, action, state| f(dt, action, state)) { 
-                        (Success, x) => return (Success, x),
-                        (Running, _) => { break },
-                        (Failure, new_dt) => {
-                            remaining_e = match *e {
-                                // Change update event with remaining delta time.
-                                Update(_) => Update(UpdateArgs { dt: new_dt }),
-                                x => x,
+                    match cursor.update(
+                        match *e {
+                            Update(_) => {
+                                remaining_e = Update(UpdateArgs { dt: remaining_dt });
+                                &remaining_e
                             }
-                        }
+                            _ => e
+                        },
+                        |dt, action, state| f(dt, action, state)) {
+                        (Success, x) => { return (Success, x) }
+                        (Running, _) => { break }
+                        (Failure, new_dt) => { remaining_dt = new_dt }
                     };
                     *i += 1;
                     // If end of sequence,
                     // return the 'dt' that is left.
-                    if *i >= seq.len() { return (Failure, match remaining_e {
-                            Update(UpdateArgs { dt }) => dt,
-                            _ => 0.0
-                        }); }
+                    if *i >= seq.len() { return (Failure, remaining_dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cursor = seq[*i].to_cursor();
+                    **cursor = seq[*i].to_state();
                 }
                 (Running, 0.0)
             },
-            (_, &SequenceCursor(
-                seq, 
-                ref mut i, 
+            (_, &SequenceState(
+                seq,
+                ref mut i,
                 ref mut cursor
             )) => {
                 let cur = cursor;
-                let mut remaining_e = *e;
+                let mut remaining_dt = match *e {
+                        Update(UpdateArgs { dt }) => dt,
+                        _ => 0.0,
+                    };
+                let mut remaining_e;
                 while *i < seq.len() {
-                    match cur.update(&remaining_e, |dt, action, state| f(dt, action, state)) {
+                    match cur.update(match *e {
+                            Update(_) => {
+                                remaining_e = Update(UpdateArgs { dt: remaining_dt });
+                                &remaining_e
+                            }
+                            _ => e
+                        },
+                        |dt, action, state| f(dt, action, state)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
-                            remaining_e = match *e {
+                            remaining_dt = match *e {
                                 // Change update event with remaining delta time.
-                                Update(_) => Update(UpdateArgs { dt: new_dt }),
+                                Update(_) => new_dt,
                                 // Other events are 'consumed' and not passed to next.
                                 // If this is the last event, then the sequence succeeded.
                                 _ => if *i == seq.len() - 1 {
-                                        return (Success, new_dt) 
+                                        return (Success, new_dt)
                                     } else {
                                         return (Running, 0.0)
                                     }
@@ -134,17 +147,14 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     *i += 1;
                     // If end of sequence,
                     // return the 'dt' that is left.
-                    if *i >= seq.len() { return (Success, match remaining_e {
-                            Update(UpdateArgs { dt }) => dt,
-                            _ => 0.0
-                        }); }
+                    if *i >= seq.len() { return (Success, remaining_dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = seq[*i].to_cursor();
+                    **cur = seq[*i].to_state();
                 }
                 (Running, 0.0)
             },
-            (_, &WhileCursor(
+            (_, &WhileState(
                 ref mut ev_cursor,
                 rep,
                 ref mut i,
@@ -156,15 +166,26 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     x => return x,
                 };
                 let cur = cursor;
-                let mut remaining_e = *e;
+                let mut remaining_dt = match *e {
+                        Update(UpdateArgs { dt }) => dt,
+                        _ => 0.0,
+                    };
+                let mut remaining_e;
                 loop {
-                    match cur.update(&remaining_e, |dt, action, state| f(dt, action, state)) {
+                    match cur.update(match *e {
+                            Update(_) => {
+                                remaining_e = Update(UpdateArgs { dt: remaining_dt });
+                                &remaining_e
+                            }
+                            _ => e
+                        },
+                        |dt, action, state| f(dt, action, state)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
-                            remaining_e = match *e {
+                            remaining_dt = match *e {
                                 // Change update event with remaining delta time.
-                                Update(_) => Update(UpdateArgs { dt: new_dt }),
+                                Update(_) => new_dt,
                                 // Other events are 'consumed' and not passed to next.
                                 _ => return (Running, 0.0)
                             }
@@ -176,11 +197,11 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
                     if *i >= rep.len() { *i = 0; }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = rep[*i].to_cursor();
+                    **cur = rep[*i].to_state();
                 }
                 (Running, 0.0)
             },
-            (_, &WhenAllCursor(ref mut cursors)) => {
+            (_, &WhenAllState(ref mut cursors)) => {
                 // Get the least delta time left over.
                 let mut min_dt = std::f64::MAX_VALUE;
                 // Count number of terminated events.
@@ -219,4 +240,3 @@ impl<'a, A: StartState<S>, S> Cursor<'a, A, S> {
         }
     }
 }
-
