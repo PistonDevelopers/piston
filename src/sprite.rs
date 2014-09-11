@@ -193,7 +193,7 @@ impl<I: ImageSize> Sprite<I> {
         }
     }
 
-    /// Draw this sprite and it's children
+    /// Draw this sprite and its children
     pub fn draw<B: BackEnd<I>>(&self, c: &Context, b: &mut B) {
         let (w, h) = self.texture.get_size();
         let w = w as f64;
