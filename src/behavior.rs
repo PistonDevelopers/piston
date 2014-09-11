@@ -17,27 +17,26 @@ use {
 pub enum Behavior<A> {
     /// A button was pressed.
     Pressed(input::Button),
-    /// An event where some action is performed.
+    /// A high level description of an action.
     Action(A),
-    /// Returns `Success` <=> `Failure`.
+    /// Converts `Success` into `Failure` and vice versa.
     Invert(Box<Behavior<A>>),
-    /// An event that succeeds if any sub event succeeds.
+    /// Succeeds if any sub behavior succeeds.
     ///
-    /// If a sub event fails it will try the next one.
+    /// If a sub behavior fails it will try the next one.
+    /// Can be thought of a short-circuited logical OR gate.
     Select(Vec<Behavior<A>>),
-    /// An event waiting for time in seconds to expire.
-    ///
-    /// This event never fails.
+    /// Waits the number of seconds to expire.
     Wait(f64),
-    /// An event where sub events are happening sequentially.
+    /// Runs sub behaviors in sequence.
     ///
-    /// The sequence fails if one of the sub events fails.
-    /// The sequence succeeds if all the sub events succeeds.
-    /// Can be used as a short-circuited logical AND block.
+    /// The sequence fails if a sub behavior fails.
+    /// The sequence succeeds if all the sub behavior succeeds.
+    /// Can be thought of as a short-circuited logical AND gate.
     Sequence(Vec<Behavior<A>>),
-    /// While an event is executing, run a sequence of events in a loop..
+    /// Loops while conditional behavior is running.
     While(Box<Behavior<A>>, Vec<Behavior<A>>),
-    /// An event where all sub events happen.
+    /// Runs all behaviors in parallel.
     WhenAll(Vec<Behavior<A>>),
 }
 

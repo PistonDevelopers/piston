@@ -1,15 +1,11 @@
-//! An experimental library using expression for event logic
+//! A Behavior Tree implementation for event logic and game AI
 //!
-//! The idea is to use combinators of events to describe more complex events.
-//! An 'Action' is a variant of an event that spans across time.
-//! You program the actions like a state machine, controlling how they interact with the world.
+//! Each action returns either `Success`, `Failure` or `Running`.
+//! Actions are combined with behaviors such as `Wait` and `Select`.
+//! The combined behavior is stored in a `Behavior` object.
 //!
-//! Assume you have a complete list of the actions.
-//! Any event you can construct from these actions has a corresponding `Cursor`.
-//! The cursor keeps track of the combinatorial state.
-//!
-//! This design is useful in environments where all actions can be broken down
-//! into simple interacitons while needing complex combinations of those actions.
+//! For each `Behavior` there is a `State`.
+//! The state tracks the behavior over time.
 
 #![crate_type = "lib"]
 #![crate_name = "event"]
