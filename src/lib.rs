@@ -11,14 +11,14 @@ extern crate sync;
 extern crate uuid;
 
 // Crates used to reexport.
-extern crate vecmath_lib = "vecmath";
-extern crate shader_version_lib = "shader_version";
-extern crate image_lib = "image";
-extern crate graphics_lib = "graphics";
-extern crate input_lib = "input";
-extern crate cam_lib = "cam";
-extern crate noise_lib = "noise";
-extern crate genmesh_lib = "genmesh";
+extern crate "vecmath" as vecmath_lib;
+extern crate "shader_version" as shader_version_lib;
+extern crate "image" as image_lib;
+extern crate "graphics" as graphics_lib;
+extern crate "input" as input_lib;
+extern crate "cam" as cam_lib;
+extern crate "noise" as noise_lib;
+extern crate "genmesh" as genmesh_lib;
 
 // Reexports.
 pub use shader_version_lib as shader_version;
