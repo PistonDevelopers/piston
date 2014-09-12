@@ -9,7 +9,6 @@ use piston::{
 use piston::input;
 use {
     Behavior,
-    StartState,
     Status,
     Failure,
     Success,
@@ -26,37 +25,37 @@ use {
 };
 
 /// Keeps track of an event.
-pub enum State<'a, A: 'a, S> {
+pub enum State<'a, A: 'a> {
     /// Keeps track of whether a button was pressed.
     PressedState(input::Button),
     /// Keeps track of whether a button was released.
     ReleasedState(input::Button),
     /// Keeps track of an event where you have a state of an action.
-    ActionState(&'a A, S),
+    ActionState(&'a A),
     /// Keeps track of `Success` <=> `Failure`.
-    InvertState(Box<State<'a, A, S>>),
+    InvertState(Box<State<'a, A>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitState(f64, f64),
     /// Keeps track of a `Select` event.
-    SelectState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A, S>>),
+    SelectState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A>>),
     /// Keeps track of an event where sub events happens sequentially.
-    SequenceState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A, S>>),
+    SequenceState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A>>),
     /// Keeps track of an event where sub events are repeated sequentially.
-    WhileState(Box<State<'a, A, S>>, &'a Vec<Behavior<A>>, uint, Box<State<'a, A, S>>),
+    WhileState(Box<State<'a, A>>, &'a Vec<Behavior<A>>, uint, Box<State<'a, A>>),
     /// Keeps track of an event where all sub events must happen.
-    WhenAllState(Vec<Option<State<'a, A, S>>>),
+    WhenAllState(Vec<Option<State<'a, A>>>),
 }
 
-impl<'a, A: StartState<S>, S> State<'a, A, S> {
+impl<'a, A> State<'a, A> {
     /// Creates a state from a behavior.
-    pub fn new(behavior: &'a Behavior<A>) -> State<'a, A, S> {
+    pub fn new(behavior: &'a Behavior<A>) -> State<'a, A> {
         match *behavior {
             Pressed(button)
                 => PressedState(button),
             Released(button)
                 => ReleasedState(button),
             Action(ref action)
-                => ActionState(action, action.start_state()),
+                => ActionState(action),
             Invert(ref ev)
                 => InvertState(box State::new(&**ev)),
             Wait(dt)
@@ -80,7 +79,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
     pub fn update(
         &mut self,
         e: &Event,
-        f: |dt: f64, action: &'a A, state: &mut S| -> (Status, f64)
+        f: |dt: f64, action: &'a A| -> (Status, f64)
     ) -> (Status, f64) {
         match (e, self) {
             (&Input(input::Press(button_pressed)), &PressedState(button))
@@ -95,13 +94,13 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                 // There is no remaining delta time because this is input event.
                 (Success, 0.0)
             },
-            (&Update(UpdateArgs { dt }), &ActionState(action, ref mut state)) => {
-                // Call the function that updates the state.
-                f(dt, action, state)
+            (&Update(UpdateArgs { dt }), &ActionState(action)) => {
+                // Execute action.
+                f(dt, action)
             },
             (_, &InvertState(ref mut cur)) => {
                 // Invert `Success` <=> `Failure`.
-                match cur.update(e, |dt, action, state| f(dt, action, state)) {
+                match cur.update(e, f) {
                     (Running, dt) => (Running, dt),
                     (Failure, dt) => (Success, dt),
                     (Success, dt) => (Failure, dt),
@@ -136,7 +135,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                             }
                             _ => e
                         },
-                        |dt, action, state| f(dt, action, state)) {
+                        |dt, a| f(dt, a)) {
                         (Success, x) => { return (Success, x) }
                         (Running, _) => { break }
                         (Failure, new_dt) => { remaining_dt = new_dt }
@@ -170,7 +169,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                             }
                             _ => e
                         },
-                        |dt, action, state| f(dt, action, state)) {
+                        |dt, a| f(dt, a)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -204,7 +203,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                 ref mut cursor
             )) => {
                 // If the event terminates, do not execute the loop.
-                match ev_cursor.update(e, |dt, action, state| f(dt, action, state)) {
+                match ev_cursor.update(e, |dt, a| f(dt, a)) {
                     (Running, _) => {}
                     x => return x,
                 };
@@ -222,7 +221,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                             }
                             _ => e
                         },
-                        |dt, action, state| f(dt, action, state)) {
+                        |dt, a| f(dt, a)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -253,10 +252,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                     match *cur {
                         None => terminated += 1,
                         Some(ref mut cur) => {
-                            match cur.update(
-                                e,
-                                |dt, action, state| f(dt, action, state)
-                            ) {
+                            match cur.update(e, |dt, a| f(dt, a)) {
                                 (Running, _) => {},
                                 (Failure, new_dt) => return (Failure, new_dt),
                                 (Success, new_dt) => {

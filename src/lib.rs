@@ -43,9 +43,7 @@ pub use state::{
     WhenAllState,
     WhileState,
 };
-pub use start_state::StartState;
 
 mod state;
 mod behavior;
-mod start_state;
 mod status;
