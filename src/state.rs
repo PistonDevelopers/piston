@@ -25,49 +25,56 @@ use {
 };
 
 /// Keeps track of an event.
-pub enum State<'a, A: 'a> {
+#[deriving(Clone)]
+pub enum State<A> {
     /// Keeps track of whether a button was pressed.
     PressedState(input::Button),
     /// Keeps track of whether a button was released.
     ReleasedState(input::Button),
     /// Keeps track of an event where you have a state of an action.
-    ActionState(&'a A),
+    ActionState(A),
     /// Keeps track of `Success` <=> `Failure`.
-    NotState(Box<State<'a, A>>),
+    NotState(Box<State<A>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitState(f64, f64),
     /// Keeps track of a `Select` event.
-    SelectState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A>>),
+    SelectState(Vec<Behavior<A>>, uint, Box<State<A>>),
     /// Keeps track of an event where sub events happens sequentially.
-    SequenceState(&'a Vec<Behavior<A>>, uint, Box<State<'a, A>>),
+    SequenceState(Vec<Behavior<A>>, uint, Box<State<A>>),
     /// Keeps track of an event where sub events are repeated sequentially.
-    WhileState(Box<State<'a, A>>, &'a Vec<Behavior<A>>, uint, Box<State<'a, A>>),
+    WhileState(Box<State<A>>, Vec<Behavior<A>>, uint, Box<State<A>>),
     /// Keeps track of an event where all sub events must happen.
-    WhenAllState(Vec<Option<State<'a, A>>>),
+    WhenAllState(Vec<Option<State<A>>>),
 }
 
-impl<'a, A> State<'a, A> {
+impl<A: Clone> State<A> {
     /// Creates a state from a behavior.
-    pub fn new(behavior: &'a Behavior<A>) -> State<'a, A> {
-        match *behavior {
+    pub fn new(behavior: Behavior<A>) -> State<A> {
+        match behavior {
             Pressed(button)
                 => PressedState(button),
             Released(button)
                 => ReleasedState(button),
-            Action(ref action)
+            Action(action)
                 => ActionState(action),
-            Not(ref ev)
-                => NotState(box State::new(&**ev)),
+            Not(ev)
+                => NotState(box State::new(*ev)),
             Wait(dt)
                 => WaitState(dt, 0.0),
-            Select(ref sel)
-                => SelectState(sel, 0, box State::new(&sel[0])),
-            Sequence(ref seq)
-                => SequenceState(seq, 0, box State::new(&seq[0])),
-            While(ref ev, ref rep)
-                => WhileState(box State::new(&**ev), rep, 0, box State::new(&rep[0])),
-            WhenAll(ref all)
-                => WhenAllState(all.iter().map(
+            Select(sel) => {
+                let state = State::new(sel[0].clone());
+                SelectState(sel, 0, box state)
+            }
+            Sequence(seq) => {
+                let state = State::new(seq[0].clone());
+                SequenceState(seq, 0, box state)
+            }
+            While(ev, rep) => {
+                let state = State::new(rep[0].clone());
+                WhileState(box State::new(*ev), rep, 0, box state)
+            }
+            WhenAll(all)
+                => WhenAllState(all.move_iter().map(
                     |ev| Some(State::new(ev))).collect()),
         }
     }
@@ -79,7 +86,7 @@ impl<'a, A> State<'a, A> {
     pub fn update(
         &mut self,
         e: &Event,
-        f: |dt: f64, action: &'a A| -> (Status, f64)
+        f: |dt: f64, action: &A| -> (Status, f64)
     ) -> (Status, f64) {
         match (e, self) {
             (&Input(input::Press(button_pressed)), &PressedState(button))
@@ -94,7 +101,7 @@ impl<'a, A> State<'a, A> {
                 // There is no remaining delta time because this is input event.
                 (Success, 0.0)
             },
-            (&Update(UpdateArgs { dt }), &ActionState(action)) => {
+            (&Update(UpdateArgs { dt }), &ActionState(ref action)) => {
                 // Execute action.
                 f(dt, action)
             },
@@ -117,7 +124,7 @@ impl<'a, A> State<'a, A> {
                 }
             },
             (_, &SelectState(
-                seq,
+                ref seq,
                 ref mut i,
                 ref mut cursor
             )) => {
@@ -146,12 +153,12 @@ impl<'a, A> State<'a, A> {
                     if *i >= seq.len() { return (Failure, remaining_dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cursor = State::new(&seq[*i]);
+                    **cursor = State::new(seq[*i].clone());
                 }
                 (Running, 0.0)
             },
             (_, &SequenceState(
-                seq,
+                ref seq,
                 ref mut i,
                 ref mut cursor
             )) => {
@@ -192,13 +199,13 @@ impl<'a, A> State<'a, A> {
                     if *i >= seq.len() { return (Success, remaining_dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = State::new(&seq[*i]);
+                    **cur = State::new(seq[*i].clone());
                 }
                 (Running, 0.0)
             },
             (_, &WhileState(
                 ref mut ev_cursor,
-                rep,
+                ref rep,
                 ref mut i,
                 ref mut cursor
             )) => {
@@ -239,7 +246,7 @@ impl<'a, A> State<'a, A> {
                     if *i >= rep.len() { *i = 0; }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = State::new(&rep[*i]);
+                    **cur = State::new(rep[*i].clone());
                 }
                 (Running, 0.0)
             },

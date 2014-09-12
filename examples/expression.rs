@@ -16,6 +16,7 @@ use event::{
 };
 
 /// Some test actions.
+#[deriving(Clone)]
 pub enum TestActions {
     /// Increment accumulator.
     Inc,
@@ -41,7 +42,7 @@ fn exec(mut acc: u32, dt: f64, state: &mut State<TestActions>) -> u32 {
 fn print_2() {
     let a: u32 = 0;
     let seq = Sequence(vec![Action(Inc), Action(Inc)]);
-    let mut state = State::new(&seq);
+    let mut state = State::new(seq);
     let a = exec(a, 0.0, &mut state);
     assert_eq!(a, 2);
 }
@@ -52,7 +53,7 @@ fn print_2() {
 fn wait_sec() {
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(1.0), Action(Inc)]);
-    let mut state = State::new(&seq);
+    let mut state = State::new(seq);
     let a = exec(a, 1.0, &mut state);
     assert_eq!(a, 1);
 }
@@ -62,7 +63,7 @@ fn wait_sec() {
 fn wait_half_sec() {
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(1.0), Action(Inc)]);
-    let mut state = State::new(&seq);
+    let mut state = State::new(seq);
     let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 0);
     let a = exec(a, 0.5, &mut state);
@@ -73,7 +74,7 @@ fn wait_half_sec() {
 fn wait_two_waits() {
     let a: u32 = 0;
     let seq = Sequence(vec![Wait(0.5), Wait(0.5), Action(Inc)]);
-    let mut state = State::new(&seq);
+    let mut state = State::new(seq);
     let a = exec(a, 1.0, &mut state);
     assert_eq!(a, 1);
 }
@@ -82,7 +83,7 @@ fn wait_two_waits() {
 fn loop_ten_times() {
     let a: u32 = 0;
     let rep = While(box Wait(50.0), vec![Wait(0.5), Action(Inc), Wait(0.5)]);
-    let mut state = State::new(&rep);
+    let mut state = State::new(rep);
     let a = exec(a, 10.0, &mut state);
     assert_eq!(a, 10);
 }
@@ -94,7 +95,7 @@ fn when_all_wait() {
             WhenAll(vec![Wait(0.5), Wait(1.0)]),
             Action(Inc)
         ]);
-    let mut state = State::new(&all);
+    let mut state = State::new(all);
     let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 0);
     let a = exec(a, 0.5, &mut state);

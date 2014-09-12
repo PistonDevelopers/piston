@@ -2,6 +2,7 @@
 use piston::input;
 
 /// Describes a behavior.
+#[deriving(Clone)]
 pub enum Behavior<A> {
     /// A button was pressed.
     Pressed(input::Button),
