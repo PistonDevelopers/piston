@@ -14,36 +14,36 @@
 extern crate piston;
 
 pub use status::{
-    Status,
-    Success,
     Failure,
     Running,
+    Status,
+    Success,
 };
 pub use behavior::{
     Action,
+    AlwaysSucceed,
     Behavior,
     If,
-    Select,
-    Sequence,
     Not,
-    AlwaysSucceed,
     Pressed,
     Released,
+    Select,
+    Sequence,
     Wait,
     WaitForever,
     WhenAll,
     While,
 };
 pub use state::{
+    AlwaysSucceedState,
     ActionState,
     IfState,
+    NotState,
     PressedState,
     ReleasedState,
     SelectState,
     SequenceState,
     State,
-    NotState,
-    AlwaysSucceedState,
     WaitState,
     WaitForeverState,
     WhenAllState,
