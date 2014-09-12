@@ -20,7 +20,7 @@ use {
     Sequence,
     Select,
     Wait,
-    Invert,
+    Not,
     Action,
 };
 
@@ -33,7 +33,7 @@ pub enum State<'a, A: 'a> {
     /// Keeps track of an event where you have a state of an action.
     ActionState(&'a A),
     /// Keeps track of `Success` <=> `Failure`.
-    InvertState(Box<State<'a, A>>),
+    NotState(Box<State<'a, A>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitState(f64, f64),
     /// Keeps track of a `Select` event.
@@ -56,8 +56,8 @@ impl<'a, A> State<'a, A> {
                 => ReleasedState(button),
             Action(ref action)
                 => ActionState(action),
-            Invert(ref ev)
-                => InvertState(box State::new(&**ev)),
+            Not(ref ev)
+                => NotState(box State::new(&**ev)),
             Wait(dt)
                 => WaitState(dt, 0.0),
             Select(ref sel)
@@ -98,7 +98,7 @@ impl<'a, A> State<'a, A> {
                 // Execute action.
                 f(dt, action)
             },
-            (_, &InvertState(ref mut cur)) => {
+            (_, &NotState(ref mut cur)) => {
                 // Invert `Success` <=> `Failure`.
                 match cur.update(e, f) {
                     (Running, dt) => (Running, dt),

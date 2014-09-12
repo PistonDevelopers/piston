@@ -10,7 +10,7 @@ pub enum Behavior<A> {
     /// A high level description of an action.
     Action(A),
     /// Converts `Success` into `Failure` and vice versa.
-    Invert(Box<Behavior<A>>),
+    Not(Box<Behavior<A>>),
     /// Succeeds if any sub behavior succeeds.
     ///
     /// If a sub behavior fails it will try the next one.
