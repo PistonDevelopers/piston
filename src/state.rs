@@ -20,6 +20,7 @@ use {
     Sequence,
     Select,
     Wait,
+    WaitForever,
     Not,
     AlwaysSucceed,
     Action,
@@ -40,6 +41,8 @@ pub enum State<A> {
     AlwaysSucceedState(Box<State<A>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitState(f64, f64),
+    /// Keeps track of a behavior that waits forever.
+    WaitForeverState,
     /// Keeps track of a `Select` event.
     SelectState(Vec<Behavior<A>>, uint, Box<State<A>>),
     /// Keeps track of an event where sub events happens sequentially.
@@ -60,6 +63,7 @@ impl<A: Clone> State<A> {
             Not(ev) => NotState(box State::new(*ev)),
             AlwaysSucceed(ev) => AlwaysSucceedState(box State::new(*ev)),
             Wait(dt) => WaitState(dt, 0.0),
+            WaitForever => WaitForeverState,
             Select(sel) => {
                 let state = State::new(sel[0].clone());
                 SelectState(sel, 0, box state)

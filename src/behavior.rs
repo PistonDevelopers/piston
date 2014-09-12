@@ -21,6 +21,8 @@ pub enum Behavior<A> {
     Select(Vec<Behavior<A>>),
     /// Waits the number of seconds to expire.
     Wait(f64),
+    /// Wait forever.
+    WaitForever,
     /// Runs sub behaviors in sequence.
     ///
     /// The sequence fails if a sub behavior fails.

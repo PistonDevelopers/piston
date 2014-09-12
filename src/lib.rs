@@ -29,6 +29,7 @@ pub use behavior::{
     Pressed,
     Released,
     Wait,
+    WaitForever,
     WhenAll,
     While,
 };
@@ -42,6 +43,7 @@ pub use state::{
     NotState,
     AlwaysSucceedState,
     WaitState,
+    WaitForeverState,
     WhenAllState,
     WhileState,
 };
