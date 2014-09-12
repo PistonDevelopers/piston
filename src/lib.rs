@@ -26,6 +26,7 @@ pub use behavior::{
     Sequence,
     Invert,
     Pressed,
+    Released,
     Wait,
     WhenAll,
     While,
@@ -33,6 +34,7 @@ pub use behavior::{
 pub use state::{
     ActionState,
     PressedState,
+    ReleasedState,
     SelectState,
     SequenceState,
     State,

@@ -15,6 +15,7 @@ use {
     Success,
     Running,
     Pressed,
+    Released,
     WhenAll,
     While,
     Sequence,
@@ -28,6 +29,8 @@ use {
 pub enum State<'a, A: 'a, S> {
     /// Keeps track of whether a button was pressed.
     PressedState(input::Button),
+    /// Keeps track of whether a button was released.
+    ReleasedState(input::Button),
     /// Keeps track of an event where you have a state of an action.
     ActionState(&'a A, S),
     /// Keeps track of `Success` <=> `Failure`.
@@ -50,6 +53,8 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
         match *behavior {
             Pressed(button)
                 => PressedState(button),
+            Released(button)
+                => ReleasedState(button),
             Action(ref action)
                 => ActionState(action, action.start_state()),
             Invert(ref ev)
@@ -81,6 +86,13 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
             (&Input(input::Press(button_pressed)), &PressedState(button))
             if button_pressed == button => {
                 // Button press is considered to happen instantly.
+                // There is no remaining delta time because this is input event.
+                (Success, 0.0)
+            },
+            (&Input(input::Release(button_released)), &ReleasedState(button))
+            if button_released == button => {
+                // Button release is considered to happen instantly.
+                // There is no remaining delta time because this is input event.
                 (Success, 0.0)
             },
             (&Update(UpdateArgs { dt }), &ActionState(action, ref mut state)) => {

@@ -5,6 +5,8 @@ use piston::input;
 pub enum Behavior<A> {
     /// A button was pressed.
     Pressed(input::Button),
+    /// A button was released.
+    Released(input::Button),
     /// A high level description of an action.
     Action(A),
     /// Converts `Success` into `Failure` and vice versa.
