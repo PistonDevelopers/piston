@@ -22,6 +22,7 @@ pub use status::{
 pub use behavior::{
     Action,
     Behavior,
+    If,
     Select,
     Sequence,
     Not,
@@ -35,6 +36,7 @@ pub use behavior::{
 };
 pub use state::{
     ActionState,
+    IfState,
     PressedState,
     ReleasedState,
     SelectState,

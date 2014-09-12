@@ -23,6 +23,8 @@ pub enum Behavior<A> {
     Wait(f64),
     /// Wait forever.
     WaitForever,
+    /// `If(condition, success, failure)`
+    If(Box<Behavior<A>>, Box<Behavior<A>>, Box<Behavior<A>>),
     /// Runs sub behaviors in sequence.
     ///
     /// The sequence fails if a sub behavior fails.

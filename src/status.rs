@@ -1,5 +1,6 @@
 
 /// The result of a behavior or action.
+#[deriving(Clone)]
 pub enum Status {
     /// The behavior or action succeeded.
     Success,

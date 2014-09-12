@@ -12,6 +12,7 @@ use {
     AlwaysSucceed,
     Behavior,
     Failure,
+    If,
     Not,
     Pressed,
     Released,
@@ -43,6 +44,11 @@ pub enum State<A> {
     WaitState(f64, f64),
     /// Waits forever.
     WaitForeverState,
+    /// Keeps track of an `If` behavior.
+    /// If status is `Running`, then it evaluates the condition.
+    /// If status is `Success`, then it evaluates the success behavior.
+    /// If status is `Failure`, then it evaluates the failure behavior.
+    IfState(Box<Behavior<A>>, Box<Behavior<A>>, Status, Box<State<A>>),
     /// Keeps track of a `Select` behavior.
     SelectState(Vec<Behavior<A>>, uint, Box<State<A>>),
     /// Keeps track of an `Sequence` behavior.
@@ -64,6 +70,10 @@ impl<A: Clone> State<A> {
             AlwaysSucceed(ev) => AlwaysSucceedState(box State::new(*ev)),
             Wait(dt) => WaitState(dt, 0.0),
             WaitForever => WaitForeverState,
+            If(condition, success, failure) => {
+                let state = State::new(*condition);
+                IfState(success, failure, Running, box state)
+            }
             Select(sel) => {
                 let state = State::new(sel[0].clone());
                 SelectState(sel, 0, box state)
@@ -131,6 +141,46 @@ impl<A: Clone> State<A> {
                     (Running, 0.0)
                 }
             }
+            (_, &IfState(ref success, ref failure,
+                         ref mut status, ref mut state)) => {
+                let mut remaining_dt = match *e {
+                        Update(UpdateArgs { dt }) => dt,
+                        _ => 0.0,
+                    };
+                let mut remaining_e;
+                // Run in a loop to evaluate success or failure with
+                // remaining delta time after condition.
+                loop {
+                    *status = match *status {
+                        Running => {
+                            match state.update(e, |dt, a| f(dt, a)) {
+                                (Running, dt) => { return (Running, dt); },
+                                (Success, dt) => {
+                                    **state = State::new((**success).clone());
+                                    remaining_dt = dt;
+                                    Success
+                                }
+                                (Failure, dt) => {
+                                    **state = State::new((**failure).clone());
+                                    remaining_dt = dt;
+                                    Failure
+                                }
+                            }
+                        }
+                        _ => {
+                            return state.update(match *e {
+                                Update(_) => {
+                                    remaining_e = Update(UpdateArgs {
+                                            dt: remaining_dt
+                                        });
+                                    &remaining_e
+                                }
+                                _ => e
+                            }, |dt, a| f(dt, a));
+                        }
+                    }
+                }
+            }
             (_, &SelectState(
                 ref seq,
                 ref mut i,
@@ -145,7 +195,9 @@ impl<A: Clone> State<A> {
                     match cursor.update(
                         match *e {
                             Update(_) => {
-                                remaining_e = Update(UpdateArgs { dt: remaining_dt });
+                                remaining_e = Update(UpdateArgs {
+                                        dt: remaining_dt
+                                    });
                                 &remaining_e
                             }
                             _ => e
@@ -179,7 +231,9 @@ impl<A: Clone> State<A> {
                 while *i < seq.len() {
                     match cur.update(match *e {
                             Update(_) => {
-                                remaining_e = Update(UpdateArgs { dt: remaining_dt });
+                                remaining_e = Update(UpdateArgs {
+                                        dt: remaining_dt
+                                    });
                                 &remaining_e
                             }
                             _ => e
@@ -231,7 +285,9 @@ impl<A: Clone> State<A> {
                 loop {
                     match cur.update(match *e {
                             Update(_) => {
-                                remaining_e = Update(UpdateArgs { dt: remaining_dt });
+                                remaining_e = Update(UpdateArgs {
+                                        dt: remaining_dt
+                                    });
                                 &remaining_e
                             }
                             _ => e
