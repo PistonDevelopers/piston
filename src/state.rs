@@ -26,30 +26,30 @@ use {
     While,
 };
 
-/// Keeps track of an event.
+/// Keeps track of a behavior.
 #[deriving(Clone)]
 pub enum State<A> {
-    /// Keeps track of whether a button was pressed.
+    /// Returns `Success` when button is pressed.
     PressedState(input::Button),
-    /// Keeps track of whether a button was released.
+    /// Returns `Success` when button is released.
     ReleasedState(input::Button),
-    /// Keeps track of an event where you have a state of an action.
+    /// Executes an action.
     ActionState(A),
-    /// Keeps track of converting `Success` into `Failure` and vice versa.
+    /// Converts `Success` into `Failure` and vice versa.
     NotState(Box<State<A>>),
-    /// Keeps track of a behavior that ignore failures.
+    /// Ignores failures and always return `Success`.
     AlwaysSucceedState(Box<State<A>>),
-    /// Keeps track of an event where you wait and do nothing.
+    /// Number of seconds we should wait and seconds we have waited.
     WaitState(f64, f64),
-    /// Keeps track of a behavior that waits forever.
+    /// Waits forever.
     WaitForeverState,
-    /// Keeps track of a `Select` event.
+    /// Keeps track of a `Select` behavior.
     SelectState(Vec<Behavior<A>>, uint, Box<State<A>>),
-    /// Keeps track of an event where sub events happens sequentially.
+    /// Keeps track of an `Sequence` behavior.
     SequenceState(Vec<Behavior<A>>, uint, Box<State<A>>),
-    /// Keeps track of an event where sub events are repeated sequentially.
+    /// Keeps track of a `While` behavior.
     WhileState(Box<State<A>>, Vec<Behavior<A>>, uint, Box<State<A>>),
-    /// Keeps track of an event where all sub events must happen.
+    /// Keeps track of an `WhenAll` behavior.
     WhenAllState(Vec<Option<State<A>>>),
 }
 
