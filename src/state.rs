@@ -14,6 +14,14 @@ use {
     Failure,
     Success,
     Running,
+    Pressed,
+    WhenAll,
+    While,
+    Sequence,
+    Select,
+    Wait,
+    Invert,
+    Action,
 };
 
 /// Keeps track of an event.
@@ -37,6 +45,29 @@ pub enum State<'a, A: 'a, S> {
 }
 
 impl<'a, A: StartState<S>, S> State<'a, A, S> {
+    /// Creates a state from a behavior.
+    pub fn new(behavior: &'a Behavior<A>) -> State<'a, A, S> {
+        match *behavior {
+            Pressed(button)
+                => PressedState(button),
+            Action(ref action)
+                => ActionState(action, action.start_state()),
+            Invert(ref ev)
+                => InvertState(box State::new(&**ev)),
+            Wait(dt)
+                => WaitState(dt, 0.0),
+            Select(ref sel)
+                => SelectState(sel, 0, box State::new(&sel[0])),
+            Sequence(ref seq)
+                => SequenceState(seq, 0, box State::new(&seq[0])),
+            While(ref ev, ref rep)
+                => WhileState(box State::new(&**ev), rep, 0, box State::new(&rep[0])),
+            WhenAll(ref all)
+                => WhenAllState(all.iter().map(
+                    |ev| Some(State::new(ev))).collect()),
+        }
+    }
+
     /// Updates the cursor that tracks an event.
     ///
     /// The action need to return status and remaining delta time.
@@ -104,7 +135,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                     if *i >= seq.len() { return (Failure, remaining_dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cursor = seq[*i].to_state();
+                    **cursor = State::new(&seq[*i]);
                 }
                 (Running, 0.0)
             },
@@ -150,7 +181,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                     if *i >= seq.len() { return (Success, remaining_dt); }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = seq[*i].to_state();
+                    **cur = State::new(&seq[*i]);
                 }
                 (Running, 0.0)
             },
@@ -197,7 +228,7 @@ impl<'a, A: StartState<S>, S> State<'a, A, S> {
                     if *i >= rep.len() { *i = 0; }
                     // Create a new cursor for next event.
                     // Use the same pointer to avoid allocation.
-                    **cur = rep[*i].to_state();
+                    **cur = State::new(&rep[*i]);
                 }
                 (Running, 0.0)
             },

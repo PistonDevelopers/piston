@@ -25,6 +25,7 @@ pub use behavior::{
     Select,
     Sequence,
     Invert,
+    Pressed,
     Wait,
     WhenAll,
     While,
