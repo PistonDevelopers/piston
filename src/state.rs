@@ -8,22 +8,22 @@ use piston::{
 };
 use piston::input;
 use {
+    Action,
+    AlwaysSucceed,
     Behavior,
-    Status,
     Failure,
-    Success,
-    Running,
+    Not,
     Pressed,
     Released,
-    WhenAll,
-    While,
-    Sequence,
+    Running,
     Select,
+    Sequence,
+    Status,
+    Success,
     Wait,
     WaitForever,
-    Not,
-    AlwaysSucceed,
-    Action,
+    WhenAll,
+    While,
 };
 
 /// Keeps track of an event.
