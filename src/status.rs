@@ -1,11 +1,10 @@
 
-/// The result of an action.
+/// The result of a behavior or action.
 pub enum Status {
-    /// The action succeeded.
+    /// The behavior or action succeeded.
     Success,
-    /// The action failed..
+    /// The behavior or action failed.
     Failure,
-    /// The action is still running.
+    /// The behavior or action is still running.
     Running,
 }
-
