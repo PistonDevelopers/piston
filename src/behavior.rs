@@ -12,6 +12,8 @@ pub enum Behavior<A> {
     Action(A),
     /// Converts `Success` into `Failure` and vice versa.
     Not(Box<Behavior<A>>),
+    /// Ignores failures and returns `Success`.
+    AlwaysSucceed(Box<Behavior<A>>),
     /// Succeeds if any sub behavior succeeds.
     ///
     /// If a sub behavior fails it will try the next one.

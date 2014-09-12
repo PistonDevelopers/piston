@@ -21,6 +21,7 @@ use {
     Select,
     Wait,
     Not,
+    AlwaysSucceed,
     Action,
 };
 
@@ -33,8 +34,10 @@ pub enum State<A> {
     ReleasedState(input::Button),
     /// Keeps track of an event where you have a state of an action.
     ActionState(A),
-    /// Keeps track of `Success` <=> `Failure`.
+    /// Keeps track of converting `Success` into `Failure` and vice versa.
     NotState(Box<State<A>>),
+    /// Keeps track of a behavior that ignore failures.
+    AlwaysSucceedState(Box<State<A>>),
     /// Keeps track of an event where you wait and do nothing.
     WaitState(f64, f64),
     /// Keeps track of a `Select` event.
@@ -51,16 +54,12 @@ impl<A: Clone> State<A> {
     /// Creates a state from a behavior.
     pub fn new(behavior: Behavior<A>) -> State<A> {
         match behavior {
-            Pressed(button)
-                => PressedState(button),
-            Released(button)
-                => ReleasedState(button),
-            Action(action)
-                => ActionState(action),
-            Not(ev)
-                => NotState(box State::new(*ev)),
-            Wait(dt)
-                => WaitState(dt, 0.0),
+            Pressed(button) => PressedState(button),
+            Released(button) => ReleasedState(button),
+            Action(action) => ActionState(action),
+            Not(ev) => NotState(box State::new(*ev)),
+            AlwaysSucceed(ev) => AlwaysSucceedState(box State::new(*ev)),
+            Wait(dt) => WaitState(dt, 0.0),
             Select(sel) => {
                 let state = State::new(sel[0].clone());
                 SelectState(sel, 0, box state)
@@ -94,25 +93,30 @@ impl<A: Clone> State<A> {
                 // Button press is considered to happen instantly.
                 // There is no remaining delta time because this is input event.
                 (Success, 0.0)
-            },
+            }
             (&Input(input::Release(button_released)), &ReleasedState(button))
             if button_released == button => {
                 // Button release is considered to happen instantly.
                 // There is no remaining delta time because this is input event.
                 (Success, 0.0)
-            },
+            }
             (&Update(UpdateArgs { dt }), &ActionState(ref action)) => {
                 // Execute action.
                 f(dt, action)
-            },
+            }
             (_, &NotState(ref mut cur)) => {
-                // Invert `Success` <=> `Failure`.
                 match cur.update(e, f) {
                     (Running, dt) => (Running, dt),
                     (Failure, dt) => (Success, dt),
                     (Success, dt) => (Failure, dt),
                 }
-            },
+            }
+            (_, &AlwaysSucceedState(ref mut cur)) => {
+                match cur.update(e, f) {
+                    (Running, dt) => (Running, dt),
+                    (_, dt) => (Success, dt),
+                }
+            }
             (&Update(UpdateArgs { dt }), &WaitState(wait_t, ref mut t)) => {
                 if *t + dt >= wait_t {
                     let remaining_dt = *t + dt - wait_t;
@@ -122,7 +126,7 @@ impl<A: Clone> State<A> {
                     *t += dt;
                     (Running, 0.0)
                 }
-            },
+            }
             (_, &SelectState(
                 ref seq,
                 ref mut i,
@@ -156,7 +160,7 @@ impl<A: Clone> State<A> {
                     **cursor = State::new(seq[*i].clone());
                 }
                 (Running, 0.0)
-            },
+            }
             (_, &SequenceState(
                 ref seq,
                 ref mut i,
@@ -202,7 +206,7 @@ impl<A: Clone> State<A> {
                     **cur = State::new(seq[*i].clone());
                 }
                 (Running, 0.0)
-            },
+            }
             (_, &WhileState(
                 ref mut ev_cursor,
                 ref rep,
@@ -249,7 +253,7 @@ impl<A: Clone> State<A> {
                     **cur = State::new(rep[*i].clone());
                 }
                 (Running, 0.0)
-            },
+            }
             (_, &WhenAllState(ref mut cursors)) => {
                 // Get the least delta time left over.
                 let mut min_dt = std::f64::MAX_VALUE;
@@ -281,7 +285,7 @@ impl<A: Clone> State<A> {
                     n if cursors.len() == n => (Success, min_dt),
                     _ => (Running, 0.0)
                 }
-            },
+            }
             _ => (Running, 0.0)
         }
     }
