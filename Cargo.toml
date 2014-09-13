@@ -12,7 +12,7 @@ authors = [
 name = "event"
 path = "src/lib.rs"
 
-[dependencies.piston]
+[dependencies.input]
 
-git = "https://github.com/PistonDevelopers/piston"
+git = "https://github.com/PistonDevelopers/input"
 

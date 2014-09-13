@@ -1,5 +1,5 @@
 
-use piston::input;
+use input;
 
 /// Describes a behavior.
 #[deriving(Clone)]

@@ -1,18 +1,14 @@
 
 use std;
-use piston::{
-    Event,
-    Input,
-    Update,
-    UpdateArgs,
-};
-use piston::input;
+use input;
 use {
     Action,
     AlwaysSucceed,
     Behavior,
+    Event,
     Failure,
     If,
+    Input,
     Not,
     Pressed,
     Released,
@@ -21,6 +17,8 @@ use {
     Sequence,
     Status,
     Success,
+    Update,
+    UpdateArgs,
     Wait,
     WaitForever,
     WhenAll,
