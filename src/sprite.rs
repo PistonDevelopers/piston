@@ -1,18 +1,21 @@
 
 use std::rc::Rc;
 use std::collections::hashmap::HashMap;
+
 use uuid::Uuid;
 
 use graphics::*;
 use graphics::internal::{
-    Vec2d,
     Rectangle,
+    Vec2d,
 };
 use graphics::vecmath::Scalar;
 
 /// A sprite is a texture with some properties.
 pub struct Sprite<I: ImageSize> {
     id: Uuid,
+
+    visible: bool,
 
     anchor: Vec2d,
 
@@ -35,6 +38,8 @@ impl<I: ImageSize> Sprite<I> {
         Sprite {
             id: Uuid::new_v4(),
 
+            visible: true,
+
             anchor: [0.5, 0.5],
 
             position: [0.0, 0.0],
@@ -55,6 +60,16 @@ impl<I: ImageSize> Sprite<I> {
     #[inline(always)]
     pub fn id(&self) -> Uuid {
         self.id
+    }
+
+    /// Whether or not the sprite is visible
+    pub fn visible(&self) -> bool {
+        self.visible
+    }
+
+    /// Set the sprite's visibility
+    pub fn set_visible(&mut self, visible: bool) {
+        self.visible = visible;
     }
 
     /// Get the sprite's anchor point
@@ -155,6 +170,34 @@ impl<I: ImageSize> Sprite<I> {
         id
     }
 
+    /// Remove the child by `id` from this sprite's children or grandchild
+    pub fn remove_child(&mut self, id: Uuid) -> Option<Sprite<I>> {
+        match self.children_index.pop(&id) {
+            Some(i) => {
+                let removed = self.children.remove(i).unwrap();
+                // Removing a element of vector will alter the index,
+                // update the mapping from uuid to index.
+                for index in range(i, self.children.len()) {
+                    let uuid = self.children[index].id();
+                    self.children_index.insert(uuid, index);
+                }
+                Some(removed)
+            },
+            None => {
+                for child in self.children.mut_iter() {
+                    match child.remove_child(id) {
+                        Some(c) => {
+                            return Some(c);
+                        }
+                        _ => {}
+                    }
+                }
+
+                None
+            }
+        }
+    }
+
     /// Find the child by `id` from this sprite's children or grandchild
     pub fn child(&self, id: Uuid) -> Option<&Sprite<I>> {
         match self.children_index.find(&id) {
@@ -195,6 +238,10 @@ impl<I: ImageSize> Sprite<I> {
 
     /// Draw this sprite and its children
     pub fn draw<B: BackEnd<I>>(&self, c: &Context, b: &mut B) {
+        if !self.visible {
+            return;
+        }
+
         let (w, h) = self.texture.get_size();
         let w = w as f64;
         let h = h as f64;
