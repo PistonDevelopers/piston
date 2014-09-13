@@ -217,11 +217,7 @@ impl<A: Clone> State<A> {
                 }
                 (Running, 0.0)
             }
-            (_, &SequenceState(
-                ref seq,
-                ref mut i,
-                ref mut cursor
-            )) => {
+            (_, &SequenceState(ref seq, ref mut i, ref mut cursor)) => {
                 let cur = cursor;
                 let mut remaining_dt = match *e {
                         Update(UpdateArgs { dt }) => dt,
@@ -265,12 +261,8 @@ impl<A: Clone> State<A> {
                 }
                 (Running, 0.0)
             }
-            (_, &WhileState(
-                ref mut ev_cursor,
-                ref rep,
-                ref mut i,
-                ref mut cursor
-            )) => {
+            (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
+                            ref mut cursor)) => {
                 // If the event terminates, do not execute the loop.
                 match ev_cursor.update(e, |dt, a| f(dt, a)) {
                     (Running, _) => {}
