@@ -11,8 +11,24 @@
 #![crate_name = "event"]
 #![deny(missing_doc)]
 
-extern crate piston;
+extern crate time;
+extern crate input;
 
+pub use window::{
+    Window,
+    WindowSettings,
+    NoWindow
+};
+pub use event_iterator::{
+    Render,
+    Update,
+    Input,
+    Event,
+    EventIterator,
+    EventSettings,
+    RenderArgs,
+    UpdateArgs,
+};
 pub use status::{
     Failure,
     Running,
@@ -53,3 +69,5 @@ pub use state::{
 mod state;
 mod behavior;
 mod status;
+mod window;
+mod event_iterator;
