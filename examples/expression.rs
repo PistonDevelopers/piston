@@ -1,15 +1,12 @@
 
-extern crate piston;
 extern crate event;
 
-use piston::{
-    Update,
-    UpdateArgs,
-};
 use event::{
     Action,
     State,
     Sequence,
+    Update,
+    UpdateArgs,
     Wait,
     WhenAll,
     While,
