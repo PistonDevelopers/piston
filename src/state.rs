@@ -38,7 +38,11 @@ pub enum State<A> {
     NotState(Box<State<A>>),
     /// Ignores failures and always return `Success`.
     AlwaysSucceedState(Box<State<A>>),
-    /// Number of seconds we should wait and seconds we have waited.
+    /// Keeps track of waiting for a period of time before continuing.
+    ///
+    /// f64: Total time in seconds to wait
+    ///
+    /// f64: Time elapsed in seconds
     WaitState(f64, f64),
     /// Waits forever.
     WaitForeverState,

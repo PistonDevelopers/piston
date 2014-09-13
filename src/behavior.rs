@@ -19,7 +19,9 @@ pub enum Behavior<A> {
     /// If a sub behavior fails it will try the next one.
     /// Can be thought of a short-circuited logical OR gate.
     Select(Vec<Behavior<A>>),
-    /// Waits the number of seconds to expire.
+    /// Waits an amount of time before continuing.
+    ///
+    /// f64: Time in seconds
     Wait(f64),
     /// Wait forever.
     WaitForever,
