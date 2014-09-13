@@ -33,6 +33,10 @@ git = "https://github.com/PistonDevelopers/vecmath"
 
 git = "https://github.com/PistonDevelopers/input"
 
+[dependencies.event]
+
+git = "https://github.com/PistonDevelopers/rust-event"
+
 [dependencies.shader_version]
 
 git = "https://github.com/pistondevelopers/shader_version"
