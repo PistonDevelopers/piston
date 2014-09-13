@@ -47,8 +47,15 @@ pub use event::{
     WindowSettings,
 };
 pub use fps_counter::FPSCounter;
+pub use action::{
+    Action,
+    ActionState,
+};
+pub use scene::Scene;
 pub use sprite::Sprite;
 
 mod asset_store;
 mod fps_counter;
+mod action;
+mod scene;
 mod sprite;

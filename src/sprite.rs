@@ -110,6 +110,18 @@ impl<I: ImageSize> Sprite<I> {
         self.rotation = deg;
     }
 
+    /// Get the sprite's scale
+    #[inline(always)]
+    pub fn scale(&self) -> (Scalar, Scalar) {
+        (self.scale[0], self.scale[1])
+    }
+
+    /// Set the sprite's scale
+    #[inline(always)]
+    pub fn set_scale(&mut self, sx: Scalar, sy: Scalar) {
+        self.scale = [sx, sy];
+    }
+
     /// Whether or not the sprite is flipped horizontally.
     ///
     /// It only flips the texture of the sprite,
