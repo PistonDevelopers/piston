@@ -61,6 +61,8 @@ pub enum Action {
     ///
     /// Set the sprite's opacity to specified value in `dt` seconds
     FadeTo(f64, f64),
+    /// A empty action
+    EmptyAction,
 }
 
 impl Action {
@@ -112,6 +114,18 @@ impl Action {
             Blink(dur, times) => {
                 BlinkState(0.0, dur, 0, 2 * times)
             },
+            FadeIn(dur) => {
+                let from = sprite.opacity() as f64;
+                FadeState(0.0, dur, from, 1.0)
+            },
+            FadeOut(dur) => {
+                let from = sprite.opacity() as f64;
+                FadeState(0.0, dur, from, 0.0)
+            },
+            FadeTo(dur, to) => {
+                let from = sprite.opacity() as f64;
+                FadeState(0.0, dur, from, to)
+            },
             _ => {
                 EmptyState
             },
@@ -134,6 +148,8 @@ pub enum ActionState {
     VisibilityState(bool),
     /// past_time, duration, blinked_times, total_times
     BlinkState(f64, f64, uint, uint),
+    /// past_time, duration, from, to
+    FadeState(f64, f64, f64, f64),
     /// An empty state
     EmptyState,
 }
@@ -197,6 +213,17 @@ impl ActionState {
                     }
                 } else {
                     (BlinkState(past + dt, dur, cur, total),
+                     Running, 0.0)
+                }
+            },
+            FadeState(past, dur, from, to) => {
+                if past + dt >= dur {
+                    sprite.set_opacity(to as f32);
+                    (EmptyState, Success, past + dt - dur)
+                } else {
+                    let factor = (past + dt) / dur;
+                    sprite.set_opacity((from + (to - from) * factor) as f32);
+                    (FadeState(past + dt, dur, from, to),
                      Running, 0.0)
                 }
             },

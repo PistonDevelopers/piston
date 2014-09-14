@@ -54,8 +54,9 @@ pub use action::{
 pub use scene::Scene;
 pub use sprite::Sprite;
 
+/// Define several actions
+pub mod action;
 mod asset_store;
 mod fps_counter;
-mod action;
 mod scene;
 mod sprite;
