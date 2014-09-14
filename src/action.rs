@@ -1,4 +1,6 @@
 
+use std::num::pow;
+
 use graphics::ImageSize;
 use graphics::vecmath::Scalar;
 
@@ -61,6 +63,32 @@ pub enum Action {
     ///
     /// Set the sprite's opacity to specified value in `dt` seconds
     FadeTo(f64, f64),
+    /// action
+    ///
+    /// Tweening the action with Quadratic Easing
+    EaseIn(Box<Action>),
+    /// action
+    ///
+    /// Tweening the action with Quadratic Easing
+    EaseOut(Box<Action>),
+    /// action
+    ///
+    /// Tweening the action with Quadratic Easing
+    EaseInOut(Box<Action>),
+    /// rate, action
+    ///
+    /// Tweening the action with specified rate
+    EaseRateIn(uint, Box<Action>),
+    /// rate, action
+    ///
+    /// Tweening the action with specified rate
+    EaseRateOut(uint, Box<Action>),
+    /// rate, action
+    ///
+    /// Tweening the action with specified rate
+    EaseRateInOut(uint, Box<Action>),
+    /// A empty action
+    EmptyAction,
 }
 
 impl Action {
@@ -68,28 +96,28 @@ impl Action {
     pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> ActionState {
         match *self {
             MoveTo(dur, dx, dy) => {
-                let (sx, sy) = sprite.position();
-                MoveState(0.0, dur, sx, sy, dx, dy)
+                let (bx, by) = sprite.position();
+                MoveState(0.0, bx, by, dx - bx, dy - by, dur)
             },
-            MoveBy(dur, dx, dy) => {
-                let (sx, sy) = sprite.position();
-                MoveState(0.0, dur, sx, sy, sx + dx, sy + dy)
+            MoveBy(dur, cx, cy) => {
+                let (bx, by) = sprite.position();
+                MoveState(0.0, bx, by, cx, cy, dur)
             },
-            RotateTo(dur, dd) => {
-                let sd = sprite.rotation();
-                RotateState(0.0, dur, sd, dd)
+            RotateTo(dur, d) => {
+                let b = sprite.rotation();
+                RotateState(0.0, b, d - b, dur)
             },
-            RotateBy(dur, dd) => {
-                let sd = sprite.rotation();
-                RotateState(0.0, dur, sd, sd + dd)
+            RotateBy(dur, c) => {
+                let b = sprite.rotation();
+                RotateState(0.0, b, c, dur)
             },
-            ScaleTo(dur, dsx, dsy) => {
-                let (ssx, ssy) = sprite.scale();
-                ScaleState(0.0, dur, ssx, ssy, dsx, dsy)
+            ScaleTo(dur, dx, dy) => {
+                let (bx, by) = sprite.scale();
+                ScaleState(0.0, bx, by, dx - bx, dy - by, dur)
             },
-            ScaleBy(dur, dsx, dsy) => {
-                let (ssx, ssy) = sprite.scale();
-                ScaleState(0.0, dur, ssx, ssy, ssx + dsx, ssy + dsy)
+            ScaleBy(dur, cx, cy) => {
+                let (bx, by) = sprite.scale();
+                ScaleState(0.0, bx, by, cx, cy, dur)
             },
             FlipX(flip_x) => {
                 let flip_y = sprite.flip_y();
@@ -112,6 +140,36 @@ impl Action {
             Blink(dur, times) => {
                 BlinkState(0.0, dur, 0, 2 * times)
             },
+            FadeIn(dur) => {
+                let b = sprite.opacity() as f64;
+                FadeState(0.0, b, 1.0 - b, dur)
+            },
+            FadeOut(dur) => {
+                let b = sprite.opacity() as f64;
+                FadeState(0.0, b, 0.0 - b, dur)
+            },
+            FadeTo(dur, d) => {
+                let b = sprite.opacity() as f64;
+                FadeState(0.0, b, d - b, dur)
+            },
+            EaseIn(ref action) => {
+                EaseRateState(true, false, 2, box action.to_state(sprite))
+            },
+            EaseOut(ref action) => {
+                EaseRateState(false, true, 2, box action.to_state(sprite))
+            },
+            EaseInOut(ref action) => {
+                EaseRateState(true, true, 2, box action.to_state(sprite))
+            },
+            EaseRateIn(rate, ref action) => {
+                EaseRateState(true, false, rate, box action.to_state(sprite))
+            },
+            EaseRateOut(rate, ref action) => {
+                EaseRateState(false, true, rate, box action.to_state(sprite))
+            },
+            EaseRateInOut(rate, ref action) => {
+                EaseRateState(true, true, rate, box action.to_state(sprite))
+            },
             _ => {
                 EmptyState
             },
@@ -122,18 +180,22 @@ impl Action {
 /// The state of action
 #[deriving(Clone)]
 pub enum ActionState {
-    /// past_time, duration, sx, sy, dx, dy
-    MoveState(f64, f64, Scalar, Scalar, Scalar, Scalar),
-    /// past_time, duration, sd, dd
-    RotateState(f64, f64, Scalar, Scalar),
-    /// past_time, duration, ssx, ssy, dsx, dsy
-    ScaleState(f64, f64, Scalar, Scalar, Scalar, Scalar),
+    /// time, begin_x, begin_y, change_x, change_y, duration
+    MoveState(f64, Scalar, Scalar, Scalar, Scalar, f64),
+    /// time, begin, change, duration
+    RotateState(f64, Scalar, Scalar, f64),
+    /// time, begin_x, begin_y, change_x, change_y, duration
+    ScaleState(f64, Scalar, Scalar, Scalar, Scalar, f64),
     /// flip_x, flip_y
     FlipState(bool, bool),
     /// visible
     VisibilityState(bool),
     /// past_time, duration, blinked_times, total_times
     BlinkState(f64, f64, uint, uint),
+    /// time, begin, change, duration
+    FadeState(f64, f64, f64, f64),
+    /// in, out, rate, state
+    EaseRateState(bool, bool, uint, Box<ActionState>),
     /// An empty state
     EmptyState,
 }
@@ -142,38 +204,17 @@ impl ActionState {
     /// Update the state and change the sprite's properties
     pub fn update<I: ImageSize>(&self, sprite: &mut Sprite<I>, dt: f64) -> (ActionState, Status, f64) {
         match *self {
-            MoveState(past, dur, sx, sy, dx, dy) => {
-                if past + dt >= dur {
-                    sprite.set_position(dx, dy);
-                    (EmptyState, Success, past + dt - dur)
-                } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_position(sx + (dx - sx) * factor, sy + (dy - sy) * factor);
-                    (MoveState(past + dt, dur, sx, sy, dx, dy),
-                     Running, 0.0)
-                }
+            MoveState(t, bx, by, cx, cy, d) => {
+                let factor = (t + dt) / d;
+                update_position(sprite, factor, t + dt, bx, by, cx, cy, d)
             },
-            RotateState(past, dur, sd, dd) => {
-                if past + dt >= dur {
-                    sprite.set_rotation(dd);
-                    (EmptyState, Success, past + dt - dur)
-                } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_rotation(sd + (dd - sd) * factor);
-                    (RotateState(past + dt, dur, sd, dd),
-                     Running, 0.0)
-                }
+            RotateState(t, b, c, d) => {
+                let factor = (t + dt) / d;
+                update_rotation(sprite, factor, t + dt, b, c, d)
             },
-            ScaleState(past, dur, ssx, ssy, dsx, dsy) => {
-                if past + dt >= dur {
-                    sprite.set_scale(dsx, dsy);
-                    (EmptyState, Success, past + dt - dur)
-                } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_scale(ssx + (dsx - ssx) * factor, ssy + (dsy - ssy) * factor);
-                    (ScaleState(past + dt, dur, ssx, ssy, dsx, dsy),
-                     Running, 0.0)
-                }
+            ScaleState(t, bx, by, cx, cy, d) => {
+                let factor = (t + dt) / d;
+                update_scale(sprite, factor, t + dt, bx, by, cx, cy, d)
             },
             FlipState(flip_x, flip_y) => {
                 sprite.set_flip_x(flip_x);
@@ -200,9 +241,111 @@ impl ActionState {
                      Running, 0.0)
                 }
             },
-            // TODO:
-            // match more actions
+            FadeState(t, b, c, d) => {
+                let factor = (t + dt) / d;
+                update_opacity(sprite, factor, t + dt, b, c, d)
+            },
+            EaseRateState(ease_in, ease_out, rate, ref state) => {
+                let mut support_ease = true;
+                let (state, status, remain) = match *state {
+                    box MoveState(t, bx, by, cx, cy, d) => {
+                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        update_position(sprite, factor, t + dt, bx, by, cx, cy, d)
+                    },
+                    box RotateState(t, b, c, d) => {
+                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        update_rotation(sprite, factor, t + dt, b, c, d)
+                    },
+                    box ScaleState(t, bx, by, cx, cy, d) => {
+                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        update_scale(sprite, factor, t + dt, bx, by, cx, cy, d)
+                    },
+                    box FadeState(t, b, c, d) => {
+                        let factor = calc_factor_for_ease_rate(ease_in, ease_out, rate, t, d);
+                        update_opacity(sprite, factor, t + dt, b, c, d)
+                    },
+                    _ => {
+                        support_ease = false;
+                        state.update(sprite, dt)
+                    }
+                };
+
+                if !support_ease {
+                    return (state, status, remain);
+                }
+
+                match state {
+                    EmptyState => {
+                        (EmptyState, status, remain)
+                    },
+                    _ => {
+                        (EaseRateState(ease_in, ease_out, rate, box state),
+                         status, remain)
+                    },
+                }
+            },
             _ => { (EmptyState, Success, dt) },
+        }
+    }
+}
+
+fn update_position<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (ActionState, Status, f64) {
+    if t >= d {
+        sprite.set_position(bx + cx, by + cy);
+        (EmptyState, Success, t - d)
+    } else {
+        sprite.set_position(bx + cx * factor, by + cy * factor);
+        (MoveState(t, bx, by, cx, cy, d),
+         Running, 0.0)
+    }
+}
+
+fn update_rotation<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (ActionState, Status, f64) {
+    if t >= d {
+        sprite.set_rotation(b + c);
+        (EmptyState, Success, t - d)
+    } else {
+        sprite.set_rotation(b + c * factor);
+        (RotateState(t, b, c, d),
+         Running, 0.0)
+    }
+}
+
+fn update_scale<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, bx: f64, by: f64, cx: f64, cy: f64, d: f64) -> (ActionState, Status, f64) {
+    if t >= d {
+        sprite.set_scale(bx + cx, by + cy);
+        (EmptyState, Success, t - d)
+    } else {
+        sprite.set_scale(bx + cx * factor, by + cy * factor);
+        (ScaleState(t, bx, by, cx, cy, d),
+         Running, 0.0)
+    }
+}
+
+fn update_opacity<I: ImageSize>(sprite: &mut Sprite<I>, factor: f64, t: f64, b: f64, c: f64, d: f64) -> (ActionState, Status, f64) {
+    if t >= d {
+        sprite.set_opacity((b + c) as f32);
+        (EmptyState, Success, t - d)
+    } else {
+        sprite.set_opacity((b + c * factor) as f32);
+        (FadeState(t, b, c, d),
+         Running, 0.0)
+    }
+}
+
+fn calc_factor_for_ease_rate(ease_in: bool, ease_out: bool, rate: uint, t: f64, d: f64) -> f64 {
+    if ease_in && !ease_out{
+        // ease in
+        pow(t / d, rate)
+    } else if !ease_in && ease_out {
+        // ease out
+        1.0 - pow(1.0 - t / d, rate)
+    } else {
+        // ease in out
+        if t / d <= 0.5 {
+            calc_factor_for_ease_rate(true, false, rate, t, d / 2.0) / 2.0
+        } else {
+            0.5 + calc_factor_for_ease_rate(false, true, rate, t - d / 2.0, d / 2.0) / 2.0
         }
     }
 }

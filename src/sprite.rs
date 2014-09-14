@@ -26,6 +26,8 @@ pub struct Sprite<I: ImageSize> {
     flip_x: bool,
     flip_y: bool,
 
+    opacity: f32,
+
     children: Vec<Sprite<I>>,
     children_index: HashMap<Uuid, uint>,
 
@@ -48,6 +50,8 @@ impl<I: ImageSize> Sprite<I> {
 
             flip_x: false,
             flip_y: false,
+
+            opacity: 1.0,
 
             texture: texture,
 
@@ -160,6 +164,18 @@ impl<I: ImageSize> Sprite<I> {
     #[inline(always)]
     pub fn set_flip_y(&mut self, flip_y: bool) {
         self.flip_y = flip_y;
+    }
+
+    /// Get the sprite's opacity
+    #[inline(always)]
+    pub fn opacity(&self) -> f32 {
+        self.opacity
+    }
+
+    /// Set the sprite's opacity
+    #[inline(always)]
+    pub fn set_opacity(&mut self, opacity: f32) {
+        self.opacity = opacity;
     }
 
     /// Get the sprite's texture
@@ -279,7 +295,7 @@ impl<I: ImageSize> Sprite<I> {
         // for debug: bounding_box
         //model.rgb(1.0, 0.0, 0.0).draw(b);
 
-        model.image(&*self.texture).draw(b);
+        model.rgba(1.0, 1.0, 1.0, self.opacity).image(&*self.texture).draw(b);
 
         // for debug: anchor point
         //c.trans(self.position[0], self.position[1]).rect(-5.0, -5.0, 10.0, 10.0).rgb(0.0, 0.0, 1.0).draw(b);

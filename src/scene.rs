@@ -40,7 +40,7 @@ impl<I: ImageSize> Scene<I> {
     pub fn update(&mut self, e: &Event) {
         // regenerate the actions and their states
         let running = self.running.clone();
-        self.running = HashMap::new();
+        self.running.clear();
 
         for (id, actions) in running.move_iter() {
             let mut new_actions = Vec::new();
@@ -48,11 +48,11 @@ impl<I: ImageSize> Scene<I> {
             for (mut a, mut s) in actions.move_iter() {
                 let sprite = self.child_mut(id).unwrap();
                 let (status, _) = a.update(e, |dt, action| {
-                    let state = match s {
-                        EmptyState => action.to_state(sprite),
-                        _ => s,
+                    match s {
+                        EmptyState => { s = action.to_state(sprite) },
+                        _ => {},
                     };
-                    let (state, status, remain) = state.update(sprite, dt);
+                    let (state, status, remain) = s.update(sprite, dt);
                     s = state;
                     (status, remain)
                 });
