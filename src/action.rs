@@ -61,6 +61,12 @@ pub enum Action {
     ///
     /// Set the sprite's opacity to specified value in `dt` seconds
     FadeTo(f64, f64),
+    /// Tweening the action with Quadratic Easing
+    EaseIn(Box<Action>),
+    /// Tweening the action with Quadratic Easing
+    EaseOut(Box<Action>),
+    /// Tweening the action with Quadratic Easing
+    EaseInOut(Box<Action>),
     /// A empty action
     EmptyAction,
 }
@@ -70,28 +76,28 @@ impl Action {
     pub fn to_state<I: ImageSize>(&self, sprite: &Sprite<I>) -> ActionState {
         match *self {
             MoveTo(dur, dx, dy) => {
-                let (sx, sy) = sprite.position();
-                MoveState(0.0, dur, sx, sy, dx, dy)
+                let (bx, by) = sprite.position();
+                MoveState(0.0, bx, by, dx - bx, dy - by, dur)
             },
-            MoveBy(dur, dx, dy) => {
-                let (sx, sy) = sprite.position();
-                MoveState(0.0, dur, sx, sy, sx + dx, sy + dy)
+            MoveBy(dur, cx, cy) => {
+                let (bx, by) = sprite.position();
+                MoveState(0.0, bx, by, cx, cy, dur)
             },
-            RotateTo(dur, dd) => {
-                let sd = sprite.rotation();
-                RotateState(0.0, dur, sd, dd)
+            RotateTo(dur, d) => {
+                let b = sprite.rotation();
+                RotateState(0.0, b, d - b, dur)
             },
-            RotateBy(dur, dd) => {
-                let sd = sprite.rotation();
-                RotateState(0.0, dur, sd, sd + dd)
+            RotateBy(dur, c) => {
+                let b = sprite.rotation();
+                RotateState(0.0, b, c, dur)
             },
-            ScaleTo(dur, dsx, dsy) => {
-                let (ssx, ssy) = sprite.scale();
-                ScaleState(0.0, dur, ssx, ssy, dsx, dsy)
+            ScaleTo(dur, dx, dy) => {
+                let (bx, by) = sprite.scale();
+                ScaleState(0.0, bx, by, dx - bx, dy - by, dur)
             },
-            ScaleBy(dur, dsx, dsy) => {
-                let (ssx, ssy) = sprite.scale();
-                ScaleState(0.0, dur, ssx, ssy, ssx + dsx, ssy + dsy)
+            ScaleBy(dur, cx, cy) => {
+                let (bx, by) = sprite.scale();
+                ScaleState(0.0, bx, by, cx, cy, dur)
             },
             FlipX(flip_x) => {
                 let flip_y = sprite.flip_y();
@@ -115,16 +121,16 @@ impl Action {
                 BlinkState(0.0, dur, 0, 2 * times)
             },
             FadeIn(dur) => {
-                let from = sprite.opacity() as f64;
-                FadeState(0.0, dur, from, 1.0)
+                let b = sprite.opacity() as f64;
+                FadeState(0.0, b, 1.0 - b, dur)
             },
             FadeOut(dur) => {
-                let from = sprite.opacity() as f64;
-                FadeState(0.0, dur, from, 0.0)
+                let b = sprite.opacity() as f64;
+                FadeState(0.0, b, 0.0 - b, dur)
             },
-            FadeTo(dur, to) => {
-                let from = sprite.opacity() as f64;
-                FadeState(0.0, dur, from, to)
+            FadeTo(dur, d) => {
+                let b = sprite.opacity() as f64;
+                FadeState(0.0, b, d - b, dur)
             },
             _ => {
                 EmptyState
@@ -136,20 +142,22 @@ impl Action {
 /// The state of action
 #[deriving(Clone)]
 pub enum ActionState {
-    /// past_time, duration, sx, sy, dx, dy
-    MoveState(f64, f64, Scalar, Scalar, Scalar, Scalar),
-    /// past_time, duration, sd, dd
-    RotateState(f64, f64, Scalar, Scalar),
-    /// past_time, duration, ssx, ssy, dsx, dsy
-    ScaleState(f64, f64, Scalar, Scalar, Scalar, Scalar),
+    /// time, begin_x, begin_y, change_x, change_y, duration
+    MoveState(f64, Scalar, Scalar, Scalar, Scalar, f64),
+    /// time, begin, change, duration
+    RotateState(f64, Scalar, Scalar, f64),
+    /// time, begin_x, begin_y, change_x, change_y, duration
+    ScaleState(f64, Scalar, Scalar, Scalar, Scalar, f64),
     /// flip_x, flip_y
     FlipState(bool, bool),
     /// visible
     VisibilityState(bool),
     /// past_time, duration, blinked_times, total_times
     BlinkState(f64, f64, uint, uint),
-    /// past_time, duration, from, to
+    /// time, begin, change, duration
     FadeState(f64, f64, f64, f64),
+    /// in, out, state
+    EaseState(bool, bool, Box<ActionState>),
     /// An empty state
     EmptyState,
 }
@@ -158,36 +166,36 @@ impl ActionState {
     /// Update the state and change the sprite's properties
     pub fn update<I: ImageSize>(&self, sprite: &mut Sprite<I>, dt: f64) -> (ActionState, Status, f64) {
         match *self {
-            MoveState(past, dur, sx, sy, dx, dy) => {
-                if past + dt >= dur {
-                    sprite.set_position(dx, dy);
-                    (EmptyState, Success, past + dt - dur)
+            MoveState(t, bx, by, cx, cy, d) => {
+                if t + dt >= d {
+                    sprite.set_position(bx + cx, by + cy);
+                    (EmptyState, Success, t + dt - d)
                 } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_position(sx + (dx - sx) * factor, sy + (dy - sy) * factor);
-                    (MoveState(past + dt, dur, sx, sy, dx, dy),
+                    let factor = (t + dt) / d;
+                    sprite.set_position(bx + cx * factor, by + cy * factor);
+                    (MoveState(t + dt, bx, by, cx, cy, d),
                      Running, 0.0)
                 }
             },
-            RotateState(past, dur, sd, dd) => {
-                if past + dt >= dur {
-                    sprite.set_rotation(dd);
-                    (EmptyState, Success, past + dt - dur)
+            RotateState(t, b, c, d) => {
+                if t + dt >= d {
+                    sprite.set_rotation(b + c);
+                    (EmptyState, Success, t + dt - d)
                 } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_rotation(sd + (dd - sd) * factor);
-                    (RotateState(past + dt, dur, sd, dd),
+                    let factor = (t + dt) / d;
+                    sprite.set_rotation(b + c * factor);
+                    (RotateState(t + dt, b, c, d),
                      Running, 0.0)
                 }
             },
-            ScaleState(past, dur, ssx, ssy, dsx, dsy) => {
-                if past + dt >= dur {
-                    sprite.set_scale(dsx, dsy);
-                    (EmptyState, Success, past + dt - dur)
+            ScaleState(t, bx, by, cx, cy, d) => {
+                if t + dt >= d {
+                    sprite.set_scale(bx + cx, by + cy);
+                    (EmptyState, Success, t + dt - d)
                 } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_scale(ssx + (dsx - ssx) * factor, ssy + (dsy - ssy) * factor);
-                    (ScaleState(past + dt, dur, ssx, ssy, dsx, dsy),
+                    let factor = (t + dt) / d;
+                    sprite.set_scale(bx + cx * factor, by + cy * factor);
+                    (ScaleState(t + dt, bx, by, cx, cy, d),
                      Running, 0.0)
                 }
             },
@@ -216,14 +224,14 @@ impl ActionState {
                      Running, 0.0)
                 }
             },
-            FadeState(past, dur, from, to) => {
-                if past + dt >= dur {
-                    sprite.set_opacity(to as f32);
-                    (EmptyState, Success, past + dt - dur)
+            FadeState(t, b, c, d) => {
+                if t + dt >= d {
+                    sprite.set_opacity((b + c) as f32);
+                    (EmptyState, Success, t + dt - d)
                 } else {
-                    let factor = (past + dt) / dur;
-                    sprite.set_opacity((from + (to - from) * factor) as f32);
-                    (FadeState(past + dt, dur, from, to),
+                    let factor = (t + dt) / d;
+                    sprite.set_opacity((b + c * factor) as f32);
+                    (FadeState(t + dt, b, c, d),
                      Running, 0.0)
                 }
             },
