@@ -227,8 +227,6 @@ impl ActionState {
                      Running, 0.0)
                 }
             },
-            // TODO:
-            // match more actions
             _ => { (EmptyState, Success, dt) },
         }
     }

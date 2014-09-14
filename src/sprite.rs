@@ -172,7 +172,7 @@ impl<I: ImageSize> Sprite<I> {
         self.opacity
     }
 
-    /// Get the sprite's opacity
+    /// Set the sprite's opacity
     #[inline(always)]
     pub fn set_opacity(&mut self, opacity: f32) {
         self.opacity = opacity;
