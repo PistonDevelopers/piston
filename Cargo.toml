@@ -21,10 +21,6 @@ authors = [
 name = "piston"
 path = "./src/lib.rs"
 
-[dependencies.uuid]
-
-git = "https://github.com/rust-lang/uuid"
-
 [dependencies.vecmath]
 
 git = "https://github.com/PistonDevelopers/vecmath"
@@ -52,6 +48,10 @@ git = "https://github.com/pistondevelopers/rust-image"
 [dependencies.graphics]
 
 git = "https://github.com/pistondevelopers/rust-graphics"
+
+[dependencies.sprite]
+
+git = "https://github.com/pistondevelopers/sprite"
 
 [dependencies.noise-rs]
 

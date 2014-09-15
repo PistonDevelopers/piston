@@ -8,7 +8,6 @@
 
 extern crate time;
 extern crate sync;
-extern crate uuid;
 
 // Crates used to reexport.
 extern crate "vecmath" as vecmath_lib;
@@ -20,6 +19,7 @@ extern crate "event" as event_lib;
 extern crate "cam" as cam_lib;
 extern crate "noise" as noise_lib;
 extern crate "genmesh" as genmesh_lib;
+extern crate "sprite" as sprite_lib;
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -31,6 +31,7 @@ pub use event_lib as event;
 pub use cam_lib as cam;
 pub use noise_lib as noise;
 pub use genmesh_lib as genmesh;
+pub use sprite_lib as sprite;
 
 pub use asset_store::AssetStore;
 pub use event::{
@@ -47,16 +48,7 @@ pub use event::{
     WindowSettings,
 };
 pub use fps_counter::FPSCounter;
-pub use action::{
-    Action,
-    ActionState,
-};
-pub use scene::Scene;
-pub use sprite::Sprite;
 
-/// Define several actions
-pub mod action;
 mod asset_store;
 mod fps_counter;
-mod scene;
-mod sprite;
+
