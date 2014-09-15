@@ -2,7 +2,7 @@
 use input;
 
 /// Describes a behavior.
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq)]
 pub enum Behavior<A> {
     /// A button was pressed.
     Pressed(input::Button),

@@ -26,7 +26,7 @@ use {
 };
 
 /// Keeps track of a behavior.
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq)]
 pub enum State<A> {
     /// Returns `Success` when button is pressed.
     PressedState(input::Button),
