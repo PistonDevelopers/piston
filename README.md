@@ -1,4 +1,4 @@
-# rust-event [![Build Status](https://travis-ci.org/PistonDevelopers/event.svg?branch=master)](https://travis-ci.org/PistonDevelopers/rust-event)
+# rust-event [![Build Status](https://travis-ci.org/PistonDevelopers/event.svg?branch=master)](https://travis-ci.org/PistonDevelopers/event)
 
 A library for window abstraction and event logic
 
