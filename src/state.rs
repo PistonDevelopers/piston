@@ -9,7 +9,6 @@ use {
     Failure,
     If,
     Input,
-    IntoState,
     Not,
     Pressed,
     Released,
@@ -26,16 +25,9 @@ use {
     While,
 };
 
-impl<A: IntoState<S> + Clone, S: Clone>
-IntoState<State<A, S>> for Behavior<A, S> {
-    fn into_state(self) -> State<A, S> {
-        State::new(self)
-    }
-}
-
 /// Keeps track of a behavior.
 #[deriving(Clone, PartialEq)]
-pub enum State<A: IntoState<S>, S> {
+pub enum State<A, S> {
     /// Returns `Success` when button is pressed.
     PressedState(input::Button),
     /// Returns `Success` when button is released.
@@ -58,20 +50,20 @@ pub enum State<A: IntoState<S>, S> {
     /// If status is `Running`, then it evaluates the condition.
     /// If status is `Success`, then it evaluates the success behavior.
     /// If status is `Failure`, then it evaluates the failure behavior.
-    IfState(Box<Behavior<A, S>>, Box<Behavior<A, S>>, Status, Box<State<A, S>>),
+    IfState(Box<Behavior<A>>, Box<Behavior<A>>, Status, Box<State<A, S>>),
     /// Keeps track of a `Select` behavior.
-    SelectState(Vec<Behavior<A, S>>, uint, Box<State<A, S>>),
+    SelectState(Vec<Behavior<A>>, uint, Box<State<A, S>>),
     /// Keeps track of an `Sequence` behavior.
-    SequenceState(Vec<Behavior<A, S>>, uint, Box<State<A, S>>),
+    SequenceState(Vec<Behavior<A>>, uint, Box<State<A, S>>),
     /// Keeps track of a `While` behavior.
-    WhileState(Box<State<A, S>>, Vec<Behavior<A, S>>, uint, Box<State<A, S>>),
+    WhileState(Box<State<A, S>>, Vec<Behavior<A>>, uint, Box<State<A, S>>),
     /// Keeps track of an `WhenAll` behavior.
     WhenAllState(Vec<Option<State<A, S>>>),
 }
 
-impl<A: Clone + IntoState<S>, S: Clone> State<A, S> {
+impl<A: Clone, S> State<A, S> {
     /// Creates a state from a behavior.
-    pub fn new(behavior: Behavior<A, S>) -> State<A, S> {
+    pub fn new(behavior: Behavior<A>) -> State<A, S> {
         match behavior {
             Pressed(button) => PressedState(button),
             Released(button) => ReleasedState(button),
