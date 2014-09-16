@@ -3,7 +3,6 @@ extern crate event;
 
 use event::{
     Action,
-    IntoState,
     State,
     Sequence,
     Update,
@@ -20,10 +19,6 @@ pub enum TestActions {
     Inc,
     /// Decrement accumulator.
     Dec,
-}
-
-impl IntoState<()> for TestActions {
-    fn into_state(self) {}
 }
 
 // A test state machine that can increment and decrement.
