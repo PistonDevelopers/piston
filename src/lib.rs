@@ -65,9 +65,11 @@ pub use state::{
     WhenAllState,
     WhileState,
 };
+pub use into_state::IntoState;
 
 mod state;
 mod behavior;
 mod status;
 mod window;
 mod event_iterator;
+mod into_state;

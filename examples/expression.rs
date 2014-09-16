@@ -3,6 +3,7 @@ extern crate event;
 
 use event::{
     Action,
+    IntoState,
     State,
     Sequence,
     Update,
@@ -21,9 +22,13 @@ pub enum TestActions {
     Dec,
 }
 
+impl IntoState<()> for TestActions {
+    fn into_state(self) {}
+}
+
 // A test state machine that can increment and decrement.
 fn exec(mut acc: u32, dt: f64, state: &mut State<TestActions>) -> u32 {
-    state.update(&Update(UpdateArgs { dt: dt }), |dt, action| {
+    state.update(&Update(UpdateArgs { dt: dt }), |dt, action, _| {
         match *action {
             Inc => { acc += 1; (event::Success, dt) },
             Dec => { acc -= 1; (event::Success, dt) },

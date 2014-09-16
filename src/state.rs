@@ -9,6 +9,7 @@ use {
     Failure,
     If,
     Input,
+    IntoState,
     Not,
     Pressed,
     Released,
@@ -25,19 +26,26 @@ use {
     While,
 };
 
+impl<A: IntoState<S> + Clone, S: Clone>
+IntoState<State<A, S>> for Behavior<A, S> {
+    fn into_state(self) -> State<A, S> {
+        State::new(self)
+    }
+}
+
 /// Keeps track of a behavior.
 #[deriving(Clone, PartialEq)]
-pub enum State<A> {
+pub enum State<A: IntoState<S>, S> {
     /// Returns `Success` when button is pressed.
     PressedState(input::Button),
     /// Returns `Success` when button is released.
     ReleasedState(input::Button),
     /// Executes an action.
-    ActionState(A),
+    ActionState(A, Option<S>),
     /// Converts `Success` into `Failure` and vice versa.
-    NotState(Box<State<A>>),
+    NotState(Box<State<A, S>>),
     /// Ignores failures and always return `Success`.
-    AlwaysSucceedState(Box<State<A>>),
+    AlwaysSucceedState(Box<State<A, S>>),
     /// Keeps track of waiting for a period of time before continuing.
     ///
     /// f64: Total time in seconds to wait
@@ -50,24 +58,24 @@ pub enum State<A> {
     /// If status is `Running`, then it evaluates the condition.
     /// If status is `Success`, then it evaluates the success behavior.
     /// If status is `Failure`, then it evaluates the failure behavior.
-    IfState(Box<Behavior<A>>, Box<Behavior<A>>, Status, Box<State<A>>),
+    IfState(Box<Behavior<A, S>>, Box<Behavior<A, S>>, Status, Box<State<A, S>>),
     /// Keeps track of a `Select` behavior.
-    SelectState(Vec<Behavior<A>>, uint, Box<State<A>>),
+    SelectState(Vec<Behavior<A, S>>, uint, Box<State<A, S>>),
     /// Keeps track of an `Sequence` behavior.
-    SequenceState(Vec<Behavior<A>>, uint, Box<State<A>>),
+    SequenceState(Vec<Behavior<A, S>>, uint, Box<State<A, S>>),
     /// Keeps track of a `While` behavior.
-    WhileState(Box<State<A>>, Vec<Behavior<A>>, uint, Box<State<A>>),
+    WhileState(Box<State<A, S>>, Vec<Behavior<A, S>>, uint, Box<State<A, S>>),
     /// Keeps track of an `WhenAll` behavior.
-    WhenAllState(Vec<Option<State<A>>>),
+    WhenAllState(Vec<Option<State<A, S>>>),
 }
 
-impl<A: Clone> State<A> {
+impl<A: Clone + IntoState<S>, S: Clone> State<A, S> {
     /// Creates a state from a behavior.
-    pub fn new(behavior: Behavior<A>) -> State<A> {
+    pub fn new(behavior: Behavior<A, S>) -> State<A, S> {
         match behavior {
             Pressed(button) => PressedState(button),
             Released(button) => ReleasedState(button),
-            Action(action) => ActionState(action),
+            Action(action) => ActionState(action, None),
             Not(ev) => NotState(box State::new(*ev)),
             AlwaysSucceed(ev) => AlwaysSucceedState(box State::new(*ev)),
             Wait(dt) => WaitState(dt, 0.0),
@@ -101,7 +109,7 @@ impl<A: Clone> State<A> {
     pub fn update(
         &mut self,
         e: &Event,
-        f: |dt: f64, action: &A| -> (Status, f64)
+        f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
     ) -> (Status, f64) {
         match (e, self) {
             (&Input(input::Press(button_pressed)), &PressedState(button))
@@ -116,9 +124,10 @@ impl<A: Clone> State<A> {
                 // There is no remaining delta time because this is input event.
                 (Success, 0.0)
             }
-            (&Update(UpdateArgs { dt }), &ActionState(ref action)) => {
+            (&Update(UpdateArgs { dt }),
+             &ActionState(ref action, ref mut state)) => {
                 // Execute action.
-                f(dt, action)
+                f(dt, action, state)
             }
             (_, &NotState(ref mut cur)) => {
                 match cur.update(e, f) {
@@ -155,7 +164,7 @@ impl<A: Clone> State<A> {
                 loop {
                     *status = match *status {
                         Running => {
-                            match state.update(e, |dt, a| f(dt, a)) {
+                            match state.update(e, |dt, a, s| f(dt, a, s)) {
                                 (Running, dt) => { return (Running, dt); },
                                 (Success, dt) => {
                                     **state = State::new((**success).clone());
@@ -178,7 +187,7 @@ impl<A: Clone> State<A> {
                                     &remaining_e
                                 }
                                 _ => e
-                            }, |dt, a| f(dt, a));
+                            }, |dt, a, s| f(dt, a, s));
                         }
                     }
                 }
@@ -204,7 +213,7 @@ impl<A: Clone> State<A> {
                             }
                             _ => e
                         },
-                        |dt, a| f(dt, a)) {
+                        |dt, a, s| f(dt, a, s)) {
                         (Success, x) => { return (Success, x) }
                         (Running, _) => { break }
                         (Failure, new_dt) => { remaining_dt = new_dt }
@@ -236,7 +245,7 @@ impl<A: Clone> State<A> {
                             }
                             _ => e
                         },
-                        |dt, a| f(dt, a)) {
+                        |dt, a, s| f(dt, a, s)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -266,7 +275,7 @@ impl<A: Clone> State<A> {
             (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
                             ref mut cursor)) => {
                 // If the event terminates, do not execute the loop.
-                match ev_cursor.update(e, |dt, a| f(dt, a)) {
+                match ev_cursor.update(e, |dt, a, s| f(dt, a, s)) {
                     (Running, _) => {}
                     x => return x,
                 };
@@ -286,7 +295,7 @@ impl<A: Clone> State<A> {
                             }
                             _ => e
                         },
-                        |dt, a| f(dt, a)) {
+                        |dt, a, s| f(dt, a, s)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -317,7 +326,7 @@ impl<A: Clone> State<A> {
                     match *cur {
                         None => terminated += 1,
                         Some(ref mut cur) => {
-                            match cur.update(e, |dt, a| f(dt, a)) {
+                            match cur.update(e, |dt, a, s| f(dt, a, s)) {
                                 (Running, _) => {},
                                 (Failure, new_dt) => return (Failure, new_dt),
                                 (Success, new_dt) => {
