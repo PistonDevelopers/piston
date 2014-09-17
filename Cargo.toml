@@ -23,15 +23,15 @@ path = "./src/lib.rs"
 
 [dependencies.vecmath]
 
-git = "https://github.com/PistonDevelopers/vecmath"
+git = "https://github.com/pistondevelopers/vecmath"
 
 [dependencies.input]
 
-git = "https://github.com/PistonDevelopers/input"
+git = "https://github.com/pistondevelopers/input"
 
 [dependencies.event]
 
-git = "https://github.com/PistonDevelopers/rust-event"
+git = "https://github.com/pistondevelopers/event"
 
 [dependencies.shader_version]
 
@@ -43,11 +43,11 @@ git = "https://github.com/pistondevelopers/cam"
 
 [dependencies.image]
 
-git = "https://github.com/pistondevelopers/rust-image"
+git = "https://github.com/pistondevelopers/image"
 
 [dependencies.graphics]
 
-git = "https://github.com/pistondevelopers/rust-graphics"
+git = "https://github.com/pistondevelopers/graphics"
 
 [dependencies.sprite]
 
