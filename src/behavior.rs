@@ -34,6 +34,9 @@ pub enum Behavior<A> {
     /// Can be thought of as a short-circuited logical AND gate.
     Sequence(Vec<Behavior<A>>),
     /// Loops while conditional behavior is running.
+    /// Succeeds if the conditional behavior succeeds.
+    /// Fails if the conditional behavior fails,
+    /// or if any behavior in the loop body fails.
     While(Box<Behavior<A>>, Vec<Behavior<A>>),
     /// Runs all behaviors in parallel.
     WhenAll(Vec<Behavior<A>>),
