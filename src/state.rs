@@ -89,7 +89,7 @@ impl<A: Clone, S> State<A, S> {
                 WhileState(box State::new(*ev), rep, 0, box state)
             }
             WhenAll(all)
-                => WhenAllState(all.move_iter().map(
+                => WhenAllState(all.into_iter().map(
                     |ev| Some(State::new(ev))).collect()),
         }
     }
@@ -314,7 +314,7 @@ impl<A: Clone, S> State<A, S> {
                 let mut min_dt = std::f64::MAX_VALUE;
                 // Count number of terminated events.
                 let mut terminated = 0;
-                for cur in cursors.mut_iter() {
+                for cur in cursors.iter_mut() {
                     match *cur {
                         None => terminated += 1,
                         Some(ref mut cur) => {
