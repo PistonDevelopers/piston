@@ -9,7 +9,7 @@ use {
     Failure,
     If,
     Input,
-    Not,
+    Fail,
     Pressed,
     Released,
     Running,
@@ -35,7 +35,7 @@ pub enum State<A, S> {
     /// Executes an action.
     ActionState(A, Option<S>),
     /// Converts `Success` into `Failure` and vice versa.
-    NotState(Box<State<A, S>>),
+    FailState(Box<State<A, S>>),
     /// Ignores failures and always return `Success`.
     AlwaysSucceedState(Box<State<A, S>>),
     /// Keeps track of waiting for a period of time before continuing.
@@ -68,7 +68,7 @@ impl<A: Clone, S> State<A, S> {
             Pressed(button) => PressedState(button),
             Released(button) => ReleasedState(button),
             Action(action) => ActionState(action, None),
-            Not(ev) => NotState(box State::new(*ev)),
+            Fail(ev) => FailState(box State::new(*ev)),
             AlwaysSucceed(ev) => AlwaysSucceedState(box State::new(*ev)),
             Wait(dt) => WaitState(dt, 0.0),
             WaitForever => WaitForeverState,
@@ -121,7 +121,7 @@ impl<A: Clone, S> State<A, S> {
                 // Execute action.
                 f(dt, action, state)
             }
-            (_, &NotState(ref mut cur)) => {
+            (_, &FailState(ref mut cur)) => {
                 match cur.update(e, f) {
                     (Running, dt) => (Running, dt),
                     (Failure, dt) => (Success, dt),
