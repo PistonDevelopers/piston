@@ -1,6 +1,6 @@
 //! Back-end agnostic keyboard keys.
 
-use std::hash::Hash;
+use std::hash;
 use std::hash::sip::SipState;
 use std::num::FromPrimitive;
 use std::num::ToPrimitive;
@@ -356,7 +356,7 @@ impl Key {
     }
 }
 
-impl Hash for Key {
+impl hash::Hash for Key {
     #[inline(always)]
     fn hash(&self, state: &mut SipState) {
         self.code().hash(state);
