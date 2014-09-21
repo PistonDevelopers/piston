@@ -45,10 +45,7 @@ pub trait Window {
     fn close(&mut self);
 
     /// Get the window's size
-    fn get_size(&self) -> (u32, u32) {
-        let settings = self.get_settings();
-        (settings.size[0], settings.size[1])
-    }
+    fn get_size(&self) -> (u32, u32);
 
     /// Get the size in drawing coordinates.
     fn get_draw_size(&self) -> (u32, u32) {
