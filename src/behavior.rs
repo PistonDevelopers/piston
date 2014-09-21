@@ -43,7 +43,7 @@ pub enum Behavior<A> {
     /// Fails if the conditional behavior fails,
     /// or if any behavior in the loop body fails.
     While(Box<Behavior<A>>, Vec<Behavior<A>>),
-    /// Runs all behaviors in parallel.
+    /// Runs all behaviors in parallel until all succeeded.
     ///
     /// Succeeds if all behavior succeeds.
     /// Fails is any behavior fails.
