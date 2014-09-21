@@ -2,6 +2,9 @@
 use input;
 
 /// Describes a behavior.
+///
+/// This is used for more complex event logic.
+/// Can also be used for game AI.
 #[deriving(Clone, PartialEq)]
 pub enum Behavior<A> {
     /// A button was pressed.
@@ -14,10 +17,11 @@ pub enum Behavior<A> {
     Fail(Box<Behavior<A>>),
     /// Ignores failures and returns `Success`.
     AlwaysSucceed(Box<Behavior<A>>),
-    /// Succeeds if any sub behavior succeeds.
+    /// Runs behaviors one by one until a behavior succeeds.
     ///
-    /// If a sub behavior fails it will try the next one.
-    /// Can be thought of a short-circuited logical OR gate.
+    /// If a behavior fails it will try the next one.
+    /// Fails if the last behavior fails.
+    /// Can be thought of as a short-circuited logical OR gate.
     Select(Vec<Behavior<A>>),
     /// Waits an amount of time before continuing.
     ///
@@ -27,17 +31,21 @@ pub enum Behavior<A> {
     WaitForever,
     /// `If(condition, success, failure)`
     If(Box<Behavior<A>>, Box<Behavior<A>>, Box<Behavior<A>>),
-    /// Runs sub behaviors in sequence.
+    /// Runs behaviors one by one until all succeeded.
     ///
-    /// The sequence fails if a sub behavior fails.
-    /// The sequence succeeds if all the sub behavior succeeds.
+    /// The sequence fails if a behavior fails.
+    /// The sequence succeeds if all the behavior succeeds.
     /// Can be thought of as a short-circuited logical AND gate.
     Sequence(Vec<Behavior<A>>),
     /// Loops while conditional behavior is running.
+    ///
     /// Succeeds if the conditional behavior succeeds.
     /// Fails if the conditional behavior fails,
     /// or if any behavior in the loop body fails.
     While(Box<Behavior<A>>, Vec<Behavior<A>>),
     /// Runs all behaviors in parallel.
+    ///
+    /// Succeeds if all behavior succeeds.
+    /// Fails is any behavior fails.
     WhenAll(Vec<Behavior<A>>),
 }
