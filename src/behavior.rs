@@ -48,4 +48,9 @@ pub enum Behavior<A> {
     /// Succeeds if all behavior succeeds.
     /// Fails is any behavior fails.
     WhenAll(Vec<Behavior<A>>),
+    /// Runs all behaviors in parallel until one succeeds.
+    ///
+    /// Succeeds if one behavior succeeds.
+    /// Fails if all behaviors failed.
+    WhenAny(Vec<Behavior<A>>),
 }

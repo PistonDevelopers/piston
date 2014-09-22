@@ -48,6 +48,7 @@ pub use behavior::{
     Wait,
     WaitForever,
     WhenAll,
+    WhenAny,
     While,
 };
 pub use state::{
@@ -63,6 +64,7 @@ pub use state::{
     WaitState,
     WaitForeverState,
     WhenAllState,
+    WhenAnyState,
     WhileState,
 };
 
