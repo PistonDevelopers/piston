@@ -3,6 +3,7 @@ use std;
 use input;
 use {
     Action,
+    After,
     AlwaysSucceed,
     Behavior,
     Event,
@@ -62,6 +63,8 @@ pub enum State<A, S> {
     WhenAllState(Vec<Option<State<A, S>>>),
     /// Keeps track of a `WhenAny` behavior.
     WhenAnyState(Vec<Option<State<A, S>>>),
+    /// Keeps track of an `After` behavior.
+    AfterState(uint, Vec<State<A, S>>),
 }
 
 // `Sequence` and `Select` share same algorithm.
@@ -221,6 +224,9 @@ impl<A: Clone, S> State<A, S> {
             WhenAny(all)
                 => WhenAnyState(all.into_iter().map(
                     |ev| Some(State::new(ev))).collect()),
+            After(seq)
+                => AfterState(0, seq.into_iter().map(
+                    |ev| State::new(ev)).collect()),
         }
     }
 
@@ -374,6 +380,34 @@ impl<A: Clone, S> State<A, S> {
             (_, &WhenAnyState(ref mut cursors)) => {
                 let any = true;
                 when_all(any, cursors, e, f)
+            }
+            (_, &AfterState(ref mut i, ref mut cursors)) => {
+                // Get the least delta time left over.
+                let mut min_dt = std::f64::MAX_VALUE;
+                for j in range(*i, cursors.len()) {
+                    match cursors.get_mut(j).update(e, |dt, a, s| f(dt, a, s)) {
+                        (Running, _) => { min_dt = 0.0; }
+                        (Success, new_dt) => {
+                            // Remaining delta time must be less to succeed.
+                            if *i == j && new_dt < min_dt {
+                                *i += 1;
+                                min_dt = new_dt;
+                            } else {
+                                // Return least delta time because
+                                // that is when failure is detected.
+                                return (Failure, min_dt.min(new_dt));
+                            }
+                        }
+                        (Failure, new_dt) => {
+                            return (Failure, new_dt);
+                        }
+                    };
+                }
+                if *i == cursors.len() {
+                    (Success, min_dt)
+                } else {
+                    (Running, 0.0)
+                }
             }
             _ => (Running, 0.0)
         }
