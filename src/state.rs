@@ -64,6 +64,74 @@ pub enum State<A, S> {
     WhenAnyState(Vec<Option<State<A, S>>>),
 }
 
+// `Sequence` and `Select` share same algorithm.
+//
+// `Sequence` fails if any fails and succeeds when all succeeds.
+// `Select` succeeds if any succeeds and fails when all fails.
+fn sequence<A: Clone, S>(
+    select: bool,
+    seq: &Vec<Behavior<A>>,
+    i: &mut uint,
+    cursor: &mut Box<State<A, S>>,
+    e: &Event,
+    f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
+) -> (Status, f64) {
+    let (status, inv_status) = if select {
+        // `Select`
+        (Failure, Success)
+    } else {
+        // `Sequence`
+        (Success, Failure)
+    };
+    let mut remaining_dt = match *e {
+            Update(UpdateArgs { dt }) => dt,
+            _ => 0.0,
+        };
+    let mut remaining_e;
+    while *i < seq.len() {
+        match cursor.update(
+            match *e {
+                Update(_) => {
+                    remaining_e = Update(
+                        UpdateArgs {
+                            dt: remaining_dt
+                        }
+                    );
+                    &remaining_e
+                }
+                _ => e
+            },
+            |dt, a, s| f(dt, a, s)) {
+            (Running, _) => { break; },
+            (s, new_dt) if s == inv_status => {
+                return (inv_status, new_dt);
+            }
+            (s, new_dt) if s == status => {
+                remaining_dt = match *e {
+                    // Change update event with remaining delta time.
+                    Update(_) => new_dt,
+                    // Other events are 'consumed' and not passed to next.
+                    // If this is the last event, then the sequence succeeded.
+                    _ => if *i == seq.len() - 1 {
+                            return (status, new_dt)
+                        } else {
+                            return (Running, 0.0)
+                        }
+                }
+            }
+            _ => unreachable!()
+        };
+        *i += 1;
+        // If end of sequence,
+        // return the 'dt' that is left.
+        if *i >= seq.len() { return (status, remaining_dt); }
+        // Create a new cursor for next event.
+        // Use the same pointer to avoid allocation.
+        **cursor  = State::new(seq[*i].clone());
+    }
+    (Running, 0.0)
+}
+
 // `WhenAll` and `WhenAny` share same algorithm.
 //
 // `WhenAll` fails if any fails and succeeds when all succeeds.
@@ -246,85 +314,13 @@ impl<A: Clone, S> State<A, S> {
                     }
                 }
             }
-            (_, &SelectState(
-                ref seq,
-                ref mut i,
-                ref mut cursor
-            )) => {
-                let mut remaining_dt = match *e {
-                        Update(UpdateArgs { dt }) => dt,
-                        _ => 0.0,
-                    };
-                let mut remaining_e;
-                while *i < seq.len() {
-                    match cursor.update(
-                        match *e {
-                            Update(_) => {
-                                remaining_e = Update(UpdateArgs {
-                                        dt: remaining_dt
-                                    });
-                                &remaining_e
-                            }
-                            _ => e
-                        },
-                        |dt, a, s| f(dt, a, s)) {
-                        (Success, x) => { return (Success, x) }
-                        (Running, _) => { break }
-                        (Failure, new_dt) => { remaining_dt = new_dt }
-                    };
-                    *i += 1;
-                    // If end of sequence,
-                    // return the 'dt' that is left.
-                    if *i >= seq.len() { return (Failure, remaining_dt); }
-                    // Create a new cursor for next event.
-                    // Use the same pointer to avoid allocation.
-                    **cursor = State::new(seq[*i].clone());
-                }
-                (Running, 0.0)
+            (_, &SelectState(ref seq, ref mut i, ref mut cursor)) => {
+                let select = false;
+                sequence(select, seq, i, cursor, e, f)
             }
             (_, &SequenceState(ref seq, ref mut i, ref mut cursor)) => {
-                let cur = cursor;
-                let mut remaining_dt = match *e {
-                        Update(UpdateArgs { dt }) => dt,
-                        _ => 0.0,
-                    };
-                let mut remaining_e;
-                while *i < seq.len() {
-                    match cur.update(match *e {
-                            Update(_) => {
-                                remaining_e = Update(UpdateArgs {
-                                        dt: remaining_dt
-                                    });
-                                &remaining_e
-                            }
-                            _ => e
-                        },
-                        |dt, a, s| f(dt, a, s)) {
-                        (Failure, x) => return (Failure, x),
-                        (Running, _) => { break },
-                        (Success, new_dt) => {
-                            remaining_dt = match *e {
-                                // Change update event with remaining delta time.
-                                Update(_) => new_dt,
-                                // Other events are 'consumed' and not passed to next.
-                                // If this is the last event, then the sequence succeeded.
-                                _ => if *i == seq.len() - 1 {
-                                        return (Success, new_dt)
-                                    } else {
-                                        return (Running, 0.0)
-                                    }
-                            }
-                        }
-                    };
-                    *i += 1;
-                    // If end of sequence,
-                    // return the 'dt' that is left.
-                    if *i >= seq.len() { return (Success, remaining_dt); }
-                    // Create a new cursor for next event.
-                    // Use the same pointer to avoid allocation.
-                    **cur = State::new(seq[*i].clone());
-                }
-                (Running, 0.0)
+                let select = true;
+                sequence(select, seq, i, cursor, e, f)
             }
             (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
                             ref mut cursor)) => {
