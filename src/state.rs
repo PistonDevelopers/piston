@@ -22,6 +22,7 @@ use {
     Wait,
     WaitForever,
     WhenAll,
+    WhenAny,
     While,
 };
 
@@ -57,8 +58,66 @@ pub enum State<A, S> {
     SequenceState(Vec<Behavior<A>>, uint, Box<State<A, S>>),
     /// Keeps track of a `While` behavior.
     WhileState(Box<State<A, S>>, Vec<Behavior<A>>, uint, Box<State<A, S>>),
-    /// Keeps track of an `WhenAll` behavior.
+    /// Keeps track of a `WhenAll` behavior.
     WhenAllState(Vec<Option<State<A, S>>>),
+    /// Keeps track of a `WhenAny` behavior.
+    WhenAnyState(Vec<Option<State<A, S>>>),
+}
+
+// `WhenAll` and `WhenAny` share same algorithm.
+//
+// `WhenAll` fails if any fails and succeeds when all succeeds.
+// `WhenAny` succeeds if any succeeds and fails when all fails.
+fn when_all<A: Clone, S>(
+    any: bool,
+    cursors: &mut Vec<Option<State<A, S>>>,
+    e: &Event,
+    f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
+) -> (Status, f64) {
+    let (status, inv_status) = if any {
+        // `WhenAny`
+        (Failure, Success)
+    } else {
+        // `WhenAll`
+        (Success, Failure)
+    };
+    // Get the least delta time left over.
+    let mut min_dt = std::f64::MAX_VALUE;
+    // Count number of terminated events.
+    let mut terminated = 0;
+    for cur in cursors.iter_mut() {
+        match *cur {
+            None => {}
+            Some(ref mut cur) => {
+                match cur.update(e, |dt, a, s| f(dt, a, s)) {
+                    (Running, _) => { continue; },
+                    (s, new_dt) if s == inv_status => {
+                        // Fail for `WhenAll`.
+                        // Succeed for `WhenAny`.
+                        return (inv_status, new_dt);
+                    }
+                    (s, new_dt) if s == status => {
+                        min_dt = min_dt.min(new_dt);
+                    }
+                    _ => unreachable!()
+                }
+            }
+        }
+
+        terminated += 1;
+        *cur = None;
+    }
+    match terminated {
+        // If there are no events, there is a whole 'dt' left.
+        0 if cursors.len() == 0 => (status, match *e {
+                Update(UpdateArgs { dt }) => dt,
+                // Other kind of events happen instantly.
+                _ => 0.0
+            }),
+        // If all events terminated, the least delta time is left.
+        n if cursors.len() == n => (status, min_dt),
+        _ => (Running, 0.0)
+    }
 }
 
 impl<A: Clone, S> State<A, S> {
@@ -90,6 +149,9 @@ impl<A: Clone, S> State<A, S> {
             }
             WhenAll(all)
                 => WhenAllState(all.into_iter().map(
+                    |ev| Some(State::new(ev))).collect()),
+            WhenAny(all)
+                => WhenAnyState(all.into_iter().map(
                     |ev| Some(State::new(ev))).collect()),
         }
     }
@@ -310,36 +372,12 @@ impl<A: Clone, S> State<A, S> {
                 (Running, 0.0)
             }
             (_, &WhenAllState(ref mut cursors)) => {
-                // Get the least delta time left over.
-                let mut min_dt = std::f64::MAX_VALUE;
-                // Count number of terminated events.
-                let mut terminated = 0;
-                for cur in cursors.iter_mut() {
-                    match *cur {
-                        None => terminated += 1,
-                        Some(ref mut cur) => {
-                            match cur.update(e, |dt, a, s| f(dt, a, s)) {
-                                (Running, _) => {},
-                                (Failure, new_dt) => return (Failure, new_dt),
-                                (Success, new_dt) => {
-                                    min_dt = min_dt.min(new_dt);
-                                    terminated += 1;
-                                }
-                            }
-                        }
-                    }
-                }
-                match terminated {
-                    // If there are no events, there is a whole 'dt' left.
-                    0 if cursors.len() == 0 => (Success, match *e {
-                            Update(UpdateArgs { dt }) => dt,
-                            // Other kind of events happen instantly.
-                            _ => 0.0
-                        }),
-                    // If all events terminated, the least delta time is left.
-                    n if cursors.len() == n => (Success, min_dt),
-                    _ => (Running, 0.0)
-                }
+                let any = false;
+                when_all(any, cursors, e, f)
+            }
+            (_, &WhenAnyState(ref mut cursors)) => {
+                let any = true;
+                when_all(any, cursors, e, f)
             }
             _ => (Running, 0.0)
         }
