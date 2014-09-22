@@ -48,20 +48,18 @@ pub trait Window {
     fn get_size(&self) -> (u32, u32);
 
     /// Get the size in drawing coordinates.
-    fn get_draw_size(&self) -> (u32, u32) {
-        self.get_size()
-    }
+    fn get_draw_size(&self) -> (u32, u32);
 
     /// Swap buffers.
-    fn swap_buffers(&self) {}
+    fn swap_buffers(&self);
 
     /// When the cursor is captured,
     /// it is hidden and the cursor position does not change.
     /// Only relative mouse motion is registered.
-    fn capture_cursor(&mut self, _enabled: bool) {}
+    fn capture_cursor(&mut self, _enabled: bool);
 
     /// Poll a event from window's event queue.
-    fn poll_event(&mut self) -> Option<InputEvent> { None }
+    fn poll_event(&mut self) -> Option<InputEvent>;
 }
 
 /// An implementation of GameWindow that represents running without a window at all
@@ -96,4 +94,14 @@ impl Window for NoWindow {
     fn get_size(&self) -> (u32, u32) {
         (0, 0)
     }
+
+    fn get_draw_size(&self) -> (u32, u32) {
+        self.get_size()
+    }
+
+    fn swap_buffers(&self) {}
+
+    fn capture_cursor(&mut self, _enabled: bool) {}
+
+    fn poll_event(&mut self) -> Option<InputEvent> { None }
 }
