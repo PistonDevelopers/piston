@@ -37,6 +37,7 @@ pub use status::{
 };
 pub use behavior::{
     Action,
+    After,
     AlwaysSucceed,
     Behavior,
     If,
@@ -52,8 +53,9 @@ pub use behavior::{
     While,
 };
 pub use state::{
-    AlwaysSucceedState,
     ActionState,
+    AfterState,
+    AlwaysSucceedState,
     IfState,
     FailState,
     PressedState,

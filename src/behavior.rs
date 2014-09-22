@@ -45,7 +45,7 @@ pub enum Behavior<A> {
     While(Box<Behavior<A>>, Vec<Behavior<A>>),
     /// Runs all behaviors in parallel until all succeeded.
     ///
-    /// Succeeds if all behavior succeeds.
+    /// Succeeds if all behaviors succeed.
     /// Fails is any behavior fails.
     WhenAll(Vec<Behavior<A>>),
     /// Runs all behaviors in parallel until one succeeds.
@@ -53,4 +53,9 @@ pub enum Behavior<A> {
     /// Succeeds if one behavior succeeds.
     /// Fails if all behaviors failed.
     WhenAny(Vec<Behavior<A>>),
+    /// Runs all behaviors in parallel until all succeeds in sequence.
+    ///
+    /// Succeeds if all behaviors succeed, but only if succeeding in sequence.
+    /// Fails if one behavior fails.
+    After(Vec<Behavior<A>>),
 }
