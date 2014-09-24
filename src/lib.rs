@@ -19,7 +19,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[deriving(Clone, Show)]
+#[deriving(Clone, PartialEq, Show)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),
@@ -30,7 +30,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[deriving(Clone, Show)]
+#[deriving(Clone, PartialEq, Show)]
 pub enum InputEvent {
     /// Pressed a button.
     Press(Button),
