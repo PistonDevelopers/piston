@@ -69,9 +69,11 @@ pub use state::{
     WhenAnyState,
     WhileState,
 };
+pub use generic_event::GenericEvent;
 
 mod state;
 mod behavior;
 mod status;
 mod window;
 mod event_iterator;
+mod generic_event;
