@@ -20,10 +20,6 @@ pub use window::{
     NoWindow
 };
 pub use event_iterator::{
-    Render,
-    Update,
-    Input,
-    Event,
     EventIterator,
     EventSettings,
 };
@@ -70,6 +66,7 @@ pub use state::{
 pub use generic_event::{ assert_event_trait, GenericEvent };
 pub use update::{ UpdateArgs, UpdateEvent };
 pub use render::{ RenderArgs, RenderEvent };
+pub use event::{ Event, Render, Update, Input };
 
 mod state;
 mod behavior;
@@ -79,3 +76,4 @@ mod event_iterator;
 mod generic_event;
 mod update;
 mod render;
+mod event;

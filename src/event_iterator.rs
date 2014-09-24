@@ -2,25 +2,17 @@ use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
 
-use input;
 use {
+    Event,
+    Input,
+    Render,
     RenderArgs,
+    Update,
     UpdateArgs,
     Window,
 };
 
 use std::cmp;
-
-/// Contains the different game events.
-#[deriving(Clone)]
-pub enum Event {
-    /// Render graphics.
-    Render(RenderArgs),
-    /// Update physical state of the game.
-    Update(UpdateArgs),
-    /// Input event.
-    Input(input::InputEvent),
-}
 
 #[deriving(Show)]
 enum EventIteratorState {

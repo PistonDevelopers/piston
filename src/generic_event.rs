@@ -19,8 +19,10 @@ pub trait GenericEvent {
 /// Asserts that an event is supported correctly and is that event.
 ///
 /// Example: `assert_event_trait::<Event, Box<Render>>(&e);`
-pub fn assert_event_trait<E: GenericEvent + PartialEq + Show,
-                      T: 'static>(e: &E) {
+pub fn assert_event_trait<
+    E: GenericEvent + PartialEq + Show,
+    T: 'static
+>(e: &E) {
     let name = unsafe { (*get_tydesc::<T>()).name };
     let id = TypeId::of::<T>();
 
