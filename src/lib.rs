@@ -70,6 +70,7 @@ pub use state::{
     WhileState,
 };
 pub use generic_event::GenericEvent;
+pub use event_trait::EventTrait;
 
 mod state;
 mod behavior;
@@ -77,3 +78,4 @@ mod status;
 mod window;
 mod event_iterator;
 mod generic_event;
+mod event_trait;
