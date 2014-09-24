@@ -5,7 +5,7 @@ use std::any::Any;
 ///
 /// Methods should not be called directly.
 ///
-/// An `event_trait_id` is created from `TypeId::of::<EventTrait<Trait>>()`.
+/// An `event_trait_id` is created from `TypeId::of::<Box<Trait>>()`.
 /// The implementation need to know the argument type for all event traits.
 /// Implementations of `GenericEvent` should be unit tested.
 pub trait GenericEvent {

@@ -3,7 +3,10 @@ use std::io::timer::sleep;
 use std::time::duration::Duration;
 
 use input;
-use Window;
+use {
+    UpdateArgs,
+    Window,
+};
 
 use std::cmp;
 
@@ -16,13 +19,6 @@ pub struct RenderArgs {
     pub width: u32,
     /// The height of rendered area.
     pub height: u32,
-}
-
-/// Update argument.
-#[deriving(Clone)]
-pub struct UpdateArgs {
-    /// Delta time in seconds.
-    pub dt: f64,
 }
 
 /// Contains the different game events.
@@ -96,7 +92,7 @@ static billion: u64 = 1_000_000_000;
 impl<'a, W: Window> EventIterator<'a, W> {
     /// Creates a new game iterator.
     pub fn new(
-        window: &'a mut W, 
+        window: &'a mut W,
         settings: &EventSettings
     ) -> EventIterator<'a, W> {
         let updates_per_second: u64 = settings.updates_per_second;
@@ -115,8 +111,8 @@ impl<'a, W: Window> EventIterator<'a, W> {
     }
 }
 
-impl<'a, W: Window> 
-Iterator<Event> 
+impl<'a, W: Window>
+Iterator<Event>
 for EventIterator<'a, W> {
     /// Returns the next game event.
     fn next(&mut self) -> Option<Event> {
@@ -176,4 +172,3 @@ for EventIterator<'a, W> {
         }
     }
 }
-
