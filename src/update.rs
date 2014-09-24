@@ -4,7 +4,7 @@ use std::any::{ Any, AnyRefExt };
 use GenericEvent;
 
 /// Update argument.
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq, Show)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
@@ -22,7 +22,7 @@ impl<T: GenericEvent> UpdateEvent for T {
     #[inline(always)]
     fn from_update_args(args: &UpdateArgs) -> Option<T> {
         let id = TypeId::of::<Box<UpdateEvent>>();
-        GenericEvent::from_event(id, &args as &Any)
+        GenericEvent::from_event(id, args as &Any)
     }
     #[inline(always)]
     fn update(&self, f: |&UpdateArgs|) {

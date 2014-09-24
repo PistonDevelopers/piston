@@ -4,7 +4,7 @@ use std::any::{ Any, AnyRefExt };
 use GenericEvent;
 
 /// Render argument.
-#[deriving(Clone)]
+#[deriving(Clone, PartialEq, Show)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
@@ -26,7 +26,7 @@ impl<T: GenericEvent> RenderEvent for T {
     #[inline(always)]
     fn from_render_args(args: &RenderArgs) -> Option<T> {
         let id = TypeId::of::<Box<RenderEvent>>();
-        GenericEvent::from_event(id, &args as &Any)
+        GenericEvent::from_event(id, args as &Any)
     }
     #[inline(always)]
     fn update(&self, f: |&RenderArgs|) {
