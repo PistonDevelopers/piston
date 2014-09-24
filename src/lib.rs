@@ -26,7 +26,6 @@ pub use event_iterator::{
     Event,
     EventIterator,
     EventSettings,
-    RenderArgs,
 };
 pub use status::{
     Failure,
@@ -70,6 +69,7 @@ pub use state::{
 };
 pub use generic_event::GenericEvent;
 pub use update::{ UpdateArgs, UpdateEvent };
+pub use render::{ RenderArgs, RenderEvent };
 
 mod state;
 mod behavior;
@@ -78,3 +78,4 @@ mod window;
 mod event_iterator;
 mod generic_event;
 mod update;
+mod render;
