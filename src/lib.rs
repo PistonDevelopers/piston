@@ -67,7 +67,7 @@ pub use state::{
     WhenAnyState,
     WhileState,
 };
-pub use generic_event::GenericEvent;
+pub use generic_event::{ assert_event_trait, GenericEvent };
 pub use update::{ UpdateArgs, UpdateEvent };
 pub use render::{ RenderArgs, RenderEvent };
 
