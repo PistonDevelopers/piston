@@ -19,7 +19,7 @@ pub trait RenderEvent {
     /// Creates a render event.
     fn from_render_args(args: &RenderArgs) -> Option<Self>;
     /// Calls closure if this is a render event.
-    fn update(&self, f: |&RenderArgs|);
+    fn render(&self, f: |&RenderArgs|);
 }
 
 impl<T: GenericEvent> RenderEvent for T {
@@ -29,7 +29,7 @@ impl<T: GenericEvent> RenderEvent for T {
         GenericEvent::from_event(id, args as &Any)
     }
     #[inline(always)]
-    fn update(&self, f: |&RenderArgs|) {
+    fn render(&self, f: |&RenderArgs|) {
         let id = TypeId::of::<Box<RenderEvent>>();
         self.with_event(id, |any| {
             match any.downcast_ref::<RenderArgs>() {
