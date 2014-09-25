@@ -10,6 +10,7 @@ use input::{
     MouseCursor,
     MouseRelative,
     MouseScroll,
+    Text,
 };
 
 use {
@@ -18,6 +19,7 @@ use {
     MouseScrollEvent,
     PressEvent,
     ReleaseEvent,
+    TextEvent,
 };
 
 /// Used as generic constraint for events.
@@ -68,35 +70,42 @@ impl GenericEvent for InputEvent {
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
         let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
         let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
+        let text = TypeId::of::<Box<TextEvent>>();
         match event_trait_id {
             x if x == press => {
                 match args.downcast_ref::<Button>() {
                     Some(&button) => Some(Press(button)),
-                    _ => fail!("Expected `Button`")
+                    None => fail!("Expected `Button`")
                 }
             }
             x if x == release => {
                 match args.downcast_ref::<Button>() {
                     Some(&button) => Some(Release(button)),
-                    _ => fail!("Expected `Button`")
+                    None => fail!("Expected `Button`")
                 }
             }
             x if x == mouse_cursor => {
                 match args.downcast_ref::<(f64, f64)>() {
                     Some(&(x, y)) => Some(Move(MouseCursor(x, y))),
-                    _ => fail!("Expected `(f64, f64)`")
+                    None => fail!("Expected `(f64, f64)`")
                 }
             }
             x if x == mouse_relative => {
                 match args.downcast_ref::<(f64, f64)>() {
                     Some(&(x, y)) => Some(Move(MouseRelative(x, y))),
-                    _ => fail!("Expected `(f64, f64)`")
+                    None => fail!("Expected `(f64, f64)`")
                 }
             }
             x if x == mouse_scroll => {
                 match args.downcast_ref::<(f64, f64)>() {
                     Some(&(x, y)) => Some(Move(MouseScroll(x, y))),
-                    _ => fail!("Expected `(f64, f64)`")
+                    None => fail!("Expected `(f64, f64)`")
+                }
+            }
+            x if x == text => {
+                match args.downcast_ref::<&str>() {
+                    Some(&text) => Some(Text(text.to_string())),
+                    None => fail!("Expected `&str`")
                 }
             }
             _ => None
@@ -110,34 +119,41 @@ impl GenericEvent for InputEvent {
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
         let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
         let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
+        let text = TypeId::of::<Box<TextEvent>>();
         match event_trait_id {
             x if x == press => {
                 match *self {
-                    Press(ref button) => f(button),
+                    Press(ref button) => f(button as &Any),
                     _ => {}
                 }
             }
             x if x == release => {
                 match *self {
-                    Release(ref button) => f(button),
+                    Release(ref button) => f(button as &Any),
                     _ => {}
                 }
             }
             x if x == mouse_cursor => {
                 match *self {
-                    Move(MouseCursor(x, y)) => f(&(x, y)),
+                    Move(MouseCursor(x, y)) => f(&(x, y) as &Any),
                     _ => {}
                 }
             }
             x if x == mouse_relative => {
                 match *self {
-                    Move(MouseRelative(x, y)) => f(&(x, y)),
+                    Move(MouseRelative(x, y)) => f(&(x, y) as &Any),
                     _ => {}
                 }
             }
             x if x == mouse_scroll => {
                 match *self {
-                    Move(MouseScroll(x, y)) => f(&(x, y)),
+                    Move(MouseScroll(x, y)) => f(&(x, y) as &Any),
+                    _ => {}
+                }
+            }
+            x if x == text => {
+                match *self {
+                    Text(ref text) => f(&text.as_slice() as &Any),
                     _ => {}
                 }
             }
@@ -165,4 +181,7 @@ fn test_input_event() {
 
     let ref e = MouseScrollEvent::from_xy(-1.0, 0.0).unwrap();
     assert_event_trait::<InputEvent, Box<MouseScrollEvent>>(e);
+
+    let ref e = TextEvent::from_text("hello").unwrap();
+    assert_event_trait::<InputEvent, Box<TextEvent>>(e);
 }

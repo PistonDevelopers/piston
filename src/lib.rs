@@ -70,6 +70,7 @@ pub use event::{ Event, Render, Update, Input };
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
 pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
+pub use text::TextEvent;
 
 mod state;
 mod behavior;
@@ -83,3 +84,4 @@ mod event;
 mod press;
 mod release;
 mod mouse;
+mod text;
