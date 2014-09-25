@@ -68,6 +68,7 @@ pub use update::{ UpdateArgs, UpdateEvent };
 pub use render::{ RenderArgs, RenderEvent };
 pub use event::{ Event, Render, Update, Input };
 pub use press::PressEvent;
+pub use release::ReleaseEvent;
 
 mod state;
 mod behavior;
@@ -79,3 +80,4 @@ mod update;
 mod render;
 mod event;
 mod press;
+mod release;
