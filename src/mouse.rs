@@ -56,3 +56,30 @@ impl<T: GenericEvent> MouseRelativeEvent for T {
         });
     }
 }
+
+/// Implemented by event structures that support mouse scroll event.
+pub trait MouseScrollEvent {
+    /// Creates a mouse scroll event.
+    fn from_xy(x: f64, y: f64) -> Option<Self>;
+    /// Calls a closure if this is a mouse scroll event.
+    fn mouse_scroll(&self, f: |f64, f64|);
+}
+
+impl<T: GenericEvent> MouseScrollEvent for T {
+    #[inline(always)]
+    fn from_xy(x: f64, y: f64) -> Option<T> {
+        let id = TypeId::of::<Box<MouseScrollEvent>>();
+        GenericEvent::from_event(id, &(x, y) as &Any)
+    }
+
+    #[inline(always)]
+    fn mouse_scroll(&self, f: |f64, f64|) {
+        let id = TypeId::of::<Box<MouseScrollEvent>>();
+        self.with_event(id, |any| {
+            match any.downcast_ref::<(f64, f64)>() {
+                Some(&(x, y)) => f(x, y),
+                None => fail!("Expected `(f64, f64)`")
+            }
+        });
+    }
+}

@@ -9,11 +9,13 @@ use input::{
     Move,
     MouseCursor,
     MouseRelative,
+    MouseScroll,
 };
 
 use {
     MouseCursorEvent,
     MouseRelativeEvent,
+    MouseScrollEvent,
     PressEvent,
     ReleaseEvent,
 };
@@ -65,6 +67,7 @@ impl GenericEvent for InputEvent {
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
         let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
+        let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
         match event_trait_id {
             x if x == press => {
                 match args.downcast_ref::<Button>() {
@@ -90,6 +93,12 @@ impl GenericEvent for InputEvent {
                     _ => fail!("Expected `(f64, f64)`")
                 }
             }
+            x if x == mouse_scroll => {
+                match args.downcast_ref::<(f64, f64)>() {
+                    Some(&(x, y)) => Some(Move(MouseScroll(x, y))),
+                    _ => fail!("Expected `(f64, f64)`")
+                }
+            }
             _ => None
         }
     }
@@ -100,6 +109,7 @@ impl GenericEvent for InputEvent {
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
         let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
+        let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
         match event_trait_id {
             x if x == press => {
                 match *self {
@@ -125,6 +135,12 @@ impl GenericEvent for InputEvent {
                     _ => {}
                 }
             }
+            x if x == mouse_scroll => {
+                match *self {
+                    Move(MouseScroll(x, y)) => f(&(x, y)),
+                    _ => {}
+                }
+            }
             _ => {}
         }
     }
@@ -146,4 +162,7 @@ fn test_input_event() {
 
     let ref e = MouseRelativeEvent::from_xy(0.0, 1.0).unwrap();
     assert_event_trait::<InputEvent, Box<MouseRelativeEvent>>(e);
+
+    let ref e = MouseScrollEvent::from_xy(-1.0, 0.0).unwrap();
+    assert_event_trait::<InputEvent, Box<MouseScrollEvent>>(e);
 }
