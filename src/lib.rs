@@ -72,6 +72,7 @@ pub use release::ReleaseEvent;
 pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
 pub use text::TextEvent;
 pub use resize::ResizeEvent;
+pub use focus::FocusEvent;
 
 mod state;
 mod behavior;
@@ -87,3 +88,4 @@ mod release;
 mod mouse;
 mod text;
 mod resize;
+mod focus;

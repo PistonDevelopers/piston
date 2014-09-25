@@ -4,6 +4,7 @@ use std::fmt::Show;
 use input::{
     Button,
     InputEvent,
+    Focus,
     Move,
     MouseCursor,
     MouseRelative,
@@ -15,6 +16,7 @@ use input::{
 };
 
 use {
+    FocusEvent,
     MouseCursorEvent,
     MouseRelativeEvent,
     MouseScrollEvent,
@@ -74,6 +76,7 @@ impl GenericEvent for InputEvent {
         let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
         let text = TypeId::of::<Box<TextEvent>>();
         let resize = TypeId::of::<Box<ResizeEvent>>();
+        let focus = TypeId::of::<Box<FocusEvent>>();
         match event_trait_id {
             x if x == press => {
                 match args.downcast_ref::<Button>() {
@@ -117,6 +120,12 @@ impl GenericEvent for InputEvent {
                     None => fail!("Expected `(u32, u32)`")
                 }
             }
+            x if x == focus => {
+                match args.downcast_ref::<bool>() {
+                    Some(&focused) => Some(Focus(focused)),
+                    None => fail!("Expected `bool`")
+                }
+            }
             _ => None
         }
     }
@@ -130,6 +139,7 @@ impl GenericEvent for InputEvent {
         let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
         let text = TypeId::of::<Box<TextEvent>>();
         let resize = TypeId::of::<Box<ResizeEvent>>();
+        let focus = TypeId::of::<Box<FocusEvent>>();
         match event_trait_id {
             x if x == press => {
                 match *self {
@@ -173,6 +183,12 @@ impl GenericEvent for InputEvent {
                     _ => {}
                 }
             }
+            x if x == focus => {
+                match *self {
+                    Focus(focused) => f(&focused as &Any),
+                    _ => {}
+                }
+            }
             _ => {}
         }
     }
@@ -203,4 +219,7 @@ fn test_input_event() {
 
     let ref e = ResizeEvent::from_width_height(30, 33).unwrap();
     assert_event_trait::<InputEvent, Box<ResizeEvent>>(e);
+
+    let ref e = FocusEvent::from_focused(true).unwrap();
+    assert_event_trait::<InputEvent, Box<FocusEvent>>(e);
 }
