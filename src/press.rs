@@ -18,6 +18,7 @@ impl<T: GenericEvent> PressEvent for T {
         let id = TypeId::of::<Box<PressEvent>>();
         GenericEvent::from_event(id, &button as &Any)
     }
+    
     #[inline(always)]
     fn press(&self, f: |Button|) {
         let id = TypeId::of::<Box<PressEvent>>();

@@ -1,9 +1,10 @@
 use std::intrinsics::{ get_tydesc, TypeId };
 use std::any::{ Any, AnyRefExt };
 use std::fmt::Show;
-use input::{ Button, InputEvent, Press, Release };
+use input::{ Button, InputEvent, Press, Release, Move, MouseCursor };
 
 use {
+    MouseCursorEvent,
     PressEvent,
     ReleaseEvent,
 };
@@ -53,6 +54,7 @@ impl GenericEvent for InputEvent {
     fn from_event(event_trait_id: TypeId, args: &Any) -> Option<InputEvent> {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
+        let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
         match event_trait_id {
             x if x == press => {
                 match args.downcast_ref::<Button>() {
@@ -66,6 +68,12 @@ impl GenericEvent for InputEvent {
                     _ => fail!("Expected `Button`")
                 }
             }
+            x if x == mouse_cursor => {
+                match args.downcast_ref::<(f64, f64)>() {
+                    Some(&(x, y)) => Some(Move(MouseCursor(x, y))),
+                    _ => fail!("Expected `(f64, f64)`")
+                }
+            }
             _ => None
         }
     }
@@ -74,6 +82,7 @@ impl GenericEvent for InputEvent {
     fn with_event(&self, event_trait_id: TypeId, f: |&Any|) {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
+        let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
         match event_trait_id {
             x if x == press => {
                 match *self {
@@ -84,6 +93,12 @@ impl GenericEvent for InputEvent {
             x if x == release => {
                 match *self {
                     Release(ref button) => f(button),
+                    _ => {}
+                }
+            }
+            x if x == mouse_cursor => {
+                match *self {
+                    Move(MouseCursor(x, y)) => f(&(x, y)),
                     _ => {}
                 }
             }
@@ -102,4 +117,7 @@ fn test_input_event() {
 
     let ref e = ReleaseEvent::from_button(Keyboard(input::keyboard::B)).unwrap();
     assert_event_trait::<InputEvent, Box<ReleaseEvent>>(e);
+
+    let ref e = MouseCursorEvent::from_xy(1.0, 0.0).unwrap();
+    assert_event_trait::<InputEvent, Box<MouseCursorEvent>>(e);
 }
