@@ -4,12 +4,13 @@ use std::fmt::Show;
 use input::{
     Button,
     InputEvent,
-    Press,
-    Release,
     Move,
     MouseCursor,
     MouseRelative,
     MouseScroll,
+    Press,
+    Release,
+    Resize,
     Text,
 };
 
@@ -19,6 +20,7 @@ use {
     MouseScrollEvent,
     PressEvent,
     ReleaseEvent,
+    ResizeEvent,
     TextEvent,
 };
 
@@ -71,6 +73,7 @@ impl GenericEvent for InputEvent {
         let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
         let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
         let text = TypeId::of::<Box<TextEvent>>();
+        let resize = TypeId::of::<Box<ResizeEvent>>();
         match event_trait_id {
             x if x == press => {
                 match args.downcast_ref::<Button>() {
@@ -108,6 +111,12 @@ impl GenericEvent for InputEvent {
                     None => fail!("Expected `&str`")
                 }
             }
+            x if x == resize => {
+                match args.downcast_ref::<(u32, u32)>() {
+                    Some(&(w, h)) => Some(Resize(w, h)),
+                    None => fail!("Expected `(u32, u32)`")
+                }
+            }
             _ => None
         }
     }
@@ -120,6 +129,7 @@ impl GenericEvent for InputEvent {
         let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
         let mouse_scroll = TypeId::of::<Box<MouseScrollEvent>>();
         let text = TypeId::of::<Box<TextEvent>>();
+        let resize = TypeId::of::<Box<ResizeEvent>>();
         match event_trait_id {
             x if x == press => {
                 match *self {
@@ -157,6 +167,12 @@ impl GenericEvent for InputEvent {
                     _ => {}
                 }
             }
+            x if x == resize => {
+                match *self {
+                    Resize(w, h) => f(&(w, h) as &Any),
+                    _ => {}
+                }
+            }
             _ => {}
         }
     }
@@ -184,4 +200,7 @@ fn test_input_event() {
 
     let ref e = TextEvent::from_text("hello").unwrap();
     assert_event_trait::<InputEvent, Box<TextEvent>>(e);
+
+    let ref e = ResizeEvent::from_width_height(30, 33).unwrap();
+    assert_event_trait::<InputEvent, Box<ResizeEvent>>(e);
 }
