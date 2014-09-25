@@ -4,6 +4,7 @@ use std::time::duration::Duration;
 
 use {
     Event,
+    GenericEvent,
     Input,
     Render,
     RenderArgs,
@@ -71,7 +72,7 @@ pub struct EventIterator<'a, W: 'a> {
 
 static billion: u64 = 1_000_000_000;
 
-impl<'a, W: Window> EventIterator<'a, W> {
+impl<'a, W: Window<I>, I: GenericEvent> EventIterator<'a, W> {
     /// Creates a new game iterator.
     pub fn new(
         window: &'a mut W,
@@ -93,11 +94,11 @@ impl<'a, W: Window> EventIterator<'a, W> {
     }
 }
 
-impl<'a, W: Window>
-Iterator<Event>
+impl<'a, W: Window<I>, I: GenericEvent>
+Iterator<Event<I>>
 for EventIterator<'a, W> {
     /// Returns the next game event.
-    fn next(&mut self) -> Option<Event> {
+    fn next(&mut self) -> Option<Event<I>> {
         loop {
             self.state = match self.state {
                 RenderState => {

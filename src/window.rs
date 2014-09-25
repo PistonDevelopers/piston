@@ -2,6 +2,8 @@
 
 use input::InputEvent;
 
+use GenericEvent;
+
 /// Settings for window behavior.
 pub struct WindowSettings {
     /// Title of the window.
@@ -34,7 +36,7 @@ impl WindowSettings {
 
 
 /// Implemented by window back-end.
-pub trait Window {
+pub trait Window<E: GenericEvent = InputEvent> {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a WindowSettings;
 
@@ -59,7 +61,7 @@ pub trait Window {
     fn capture_cursor(&mut self, _enabled: bool);
 
     /// Poll a event from window's event queue.
-    fn poll_event(&mut self) -> Option<InputEvent>;
+    fn poll_event(&mut self) -> Option<E>;
 }
 
 /// An implementation of GameWindow that represents running without a window at all
@@ -78,7 +80,7 @@ impl NoWindow {
     }
 }
 
-impl Window for NoWindow {
+impl Window<InputEvent> for NoWindow {
      fn get_settings<'a>(&'a self) -> &'a WindowSettings {
         &self.settings
      }
