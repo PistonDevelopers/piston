@@ -67,6 +67,7 @@ pub use generic_event::{ assert_event_trait, GenericEvent };
 pub use update::{ UpdateArgs, UpdateEvent };
 pub use render::{ RenderArgs, RenderEvent };
 pub use event::{ Event, Render, Update, Input };
+pub use press::PressEvent;
 
 mod state;
 mod behavior;
@@ -77,3 +78,4 @@ mod generic_event;
 mod update;
 mod render;
 mod event;
+mod press;
