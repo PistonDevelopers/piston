@@ -1,10 +1,19 @@
 use std::intrinsics::{ get_tydesc, TypeId };
 use std::any::{ Any, AnyRefExt };
 use std::fmt::Show;
-use input::{ Button, InputEvent, Press, Release, Move, MouseCursor };
+use input::{
+    Button,
+    InputEvent,
+    Press,
+    Release,
+    Move,
+    MouseCursor,
+    MouseRelative,
+};
 
 use {
     MouseCursorEvent,
+    MouseRelativeEvent,
     PressEvent,
     ReleaseEvent,
 };
@@ -55,6 +64,7 @@ impl GenericEvent for InputEvent {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
+        let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
         match event_trait_id {
             x if x == press => {
                 match args.downcast_ref::<Button>() {
@@ -74,6 +84,12 @@ impl GenericEvent for InputEvent {
                     _ => fail!("Expected `(f64, f64)`")
                 }
             }
+            x if x == mouse_relative => {
+                match args.downcast_ref::<(f64, f64)>() {
+                    Some(&(x, y)) => Some(Move(MouseRelative(x, y))),
+                    _ => fail!("Expected `(f64, f64)`")
+                }
+            }
             _ => None
         }
     }
@@ -83,6 +99,7 @@ impl GenericEvent for InputEvent {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
+        let mouse_relative = TypeId::of::<Box<MouseRelativeEvent>>();
         match event_trait_id {
             x if x == press => {
                 match *self {
@@ -99,6 +116,12 @@ impl GenericEvent for InputEvent {
             x if x == mouse_cursor => {
                 match *self {
                     Move(MouseCursor(x, y)) => f(&(x, y)),
+                    _ => {}
+                }
+            }
+            x if x == mouse_relative => {
+                match *self {
+                    Move(MouseRelative(x, y)) => f(&(x, y)),
                     _ => {}
                 }
             }
@@ -120,4 +143,7 @@ fn test_input_event() {
 
     let ref e = MouseCursorEvent::from_xy(1.0, 0.0).unwrap();
     assert_event_trait::<InputEvent, Box<MouseCursorEvent>>(e);
+
+    let ref e = MouseRelativeEvent::from_xy(0.0, 1.0).unwrap();
+    assert_event_trait::<InputEvent, Box<MouseRelativeEvent>>(e);
 }
