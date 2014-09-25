@@ -13,18 +13,18 @@ use {
 
 /// Contains the different game events.
 #[deriving(Clone, PartialEq, Show)]
-pub enum Event {
+pub enum Event<I = input::InputEvent> {
     /// Render graphics.
     Render(RenderArgs),
     /// Update physical state of the game.
     Update(UpdateArgs),
     /// Input event.
-    Input(input::InputEvent),
+    Input(I),
 }
 
-impl GenericEvent for Event {
+impl<I: GenericEvent> GenericEvent for Event<I> {
     #[inline(always)]
-    fn from_event(event_trait_id: TypeId, ev: &Any) -> Option<Event> {
+    fn from_event(event_trait_id: TypeId, ev: &Any) -> Option<Event<I>> {
         let update = TypeId::of::<Box<UpdateEvent>>();
         let render = TypeId::of::<Box<RenderEvent>>();
         match event_trait_id {
@@ -40,7 +40,15 @@ impl GenericEvent for Event {
                     None => fail!("Expected no argument")
                 }
             }
-            _ => None
+            _ => {
+                let input: Option<I> = GenericEvent::from_event(
+                    event_trait_id, ev
+                );
+                match input {
+                    Some(input) => Some(Input(input)),
+                    None => None
+                }
+            }
         }
     }
 
@@ -61,7 +69,12 @@ impl GenericEvent for Event {
                     _ => {}
                 }
             }
-            _ => {}
+            _ => {
+                match *self {
+                    Input(ref input) => input.with_event(event_trait_id, f),
+                    _ => {}
+                }
+            }
         }
     }
 }
@@ -69,6 +82,7 @@ impl GenericEvent for Event {
 #[test]
 fn test_event() {
     use assert_event_trait;
+    use MouseCursorEvent;
 
     // Update.
     let ref e = UpdateEvent::from_update_args(&UpdateArgs { dt: 1.0 }).unwrap();
@@ -79,4 +93,7 @@ fn test_event() {
         &RenderArgs { ext_dt: 1.0, width: 0, height: 0 }
     ).unwrap();
     assert_event_trait::<Event, Box<RenderEvent>>(e);
+
+    let ref e = MouseCursorEvent::from_xy(1.0, 0.0).unwrap();
+    assert_event_trait::<Event, Box<MouseCursorEvent>>(e);
 }
