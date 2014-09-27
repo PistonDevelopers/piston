@@ -37,7 +37,7 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
             x if x == render => {
                 match ev.downcast_ref::<RenderArgs>() {
                     Some(args) => Some(Render(args.clone())),
-                    None => fail!("Expected no argument")
+                    None => fail!("Expected `RenderArgs`")
                 }
             }
             _ => {
