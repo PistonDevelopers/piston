@@ -1,5 +1,7 @@
 # How to contribute to Piston
 
+<a href="#donate_money">How to donate money</a>
+
 Git commands and the pull request process: https://github.com/PistonDevelopers/rust-empty/issues/31
 
 If you are not added as collaborator, post a message [here](https://github.com/PistonDevelopers/piston/issues/70) "I want to contribute to Piston" and @Denommus or @bvssvni will add you as a collaborator. When you are a collaborator you can assign issues to yourself. Just look around and see if there are unassigned issues. We label tasks according to the amount of thinking involved: "Easy", "Medium" or "Hard".
@@ -19,3 +21,12 @@ You work against the fork as you would do with personal projects. When you want 
 Feel free to open issues, post comments about progress, questions, new ideas, brain storming etc. The label "Information" is used to collect relevant information. You can remove and edit comments as a way of refining ideas in the issue tracker. This is very helpful because many concerns in this project are very complex. Many issues needs to be broken down into new issues before they can be implemented. Please add comments like "can copy code from X" that tells other people how you do it efficiently.
 
 If you have an idea how to make collaboration better, open an issue.
+
+<a name="donate_money" />
+### How to donate money
+
+If you feel charitable, these fine people accept donations:
+
+| nick name | first name | last name | Transfer Options | comment |
+|---------------|---------------|---------------|-------------------|--------------|
+| bvssvni | Sven | Nilsen | PayPal: post@cutoutpro.com | I work on the core engine of Piston, general graphics, various smaller libraries and help administering repos and the Rust gamedev subreddit |
