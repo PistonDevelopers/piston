@@ -14,6 +14,11 @@ pub struct UpdateArgs {
 pub trait UpdateEvent {
     /// Creates an update event.
     fn from_update_args(args: &UpdateArgs) -> Option<Self>;
+    /// Creates an update event with delta time.
+    #[inline(always)]
+    fn from_dt(dt: f64) -> Option<Self> {
+        UpdateEvent::from_update_args(&UpdateArgs { dt: dt })
+    }
     /// Calls closure if this is an update event.
     fn update(&self, f: |&UpdateArgs|);
 }
@@ -24,6 +29,7 @@ impl<T: GenericEvent> UpdateEvent for T {
         let id = TypeId::of::<Box<UpdateEvent>>();
         GenericEvent::from_event(id, args as &Any)
     }
+
     #[inline(always)]
     fn update(&self, f: |&UpdateArgs|) {
         let id = TypeId::of::<Box<UpdateEvent>>();
