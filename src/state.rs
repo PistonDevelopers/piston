@@ -20,6 +20,7 @@ use {
     Success,
     Update,
     UpdateArgs,
+    UpdateEvent,
     Wait,
     WaitForever,
     WhenAll,
@@ -95,11 +96,7 @@ fn sequence<A: Clone, S>(
         match cursor.update(
             match *e {
                 Update(_) => {
-                    remaining_e = Update(
-                        UpdateArgs {
-                            dt: remaining_dt
-                        }
-                    );
+                    remaining_e = UpdateEvent::from_dt(remaining_dt).unwrap();
                     &remaining_e
                 }
                 _ => e
@@ -309,9 +306,8 @@ impl<A: Clone, S> State<A, S> {
                         _ => {
                             return state.update(match *e {
                                 Update(_) => {
-                                    remaining_e = Update(UpdateArgs {
-                                            dt: remaining_dt
-                                        });
+                                    remaining_e = UpdateEvent::from_dt(
+                                        remaining_dt).unwrap();
                                     &remaining_e
                                 }
                                 _ => e
