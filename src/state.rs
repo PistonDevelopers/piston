@@ -93,7 +93,7 @@ fn sequence<A: Clone, S>(
         };
     let mut remaining_e;
     while *i < seq.len() {
-        match cursor.update(
+        match cursor.event(
             match *e {
                 Update(_) => {
                     remaining_e = UpdateEvent::from_dt(remaining_dt).unwrap();
@@ -157,7 +157,7 @@ fn when_all<A: Clone, S>(
         match *cur {
             None => {}
             Some(ref mut cur) => {
-                match cur.update(e, |dt, a, s| f(dt, a, s)) {
+                match cur.event(e, |dt, a, s| f(dt, a, s)) {
                     (Running, _) => { continue; },
                     (s, new_dt) if s == inv_status => {
                         // Fail for `WhenAll`.
@@ -231,7 +231,7 @@ impl<A: Clone, S> State<A, S> {
     ///
     /// The action need to return status and remaining delta time.
     /// Returns status and the remaining delta time.
-    pub fn update(
+    pub fn event(
         &mut self,
         e: &Event,
         f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
@@ -255,14 +255,14 @@ impl<A: Clone, S> State<A, S> {
                 f(dt, action, state)
             }
             (_, &FailState(ref mut cur)) => {
-                match cur.update(e, f) {
+                match cur.event(e, f) {
                     (Running, dt) => (Running, dt),
                     (Failure, dt) => (Success, dt),
                     (Success, dt) => (Failure, dt),
                 }
             }
             (_, &AlwaysSucceedState(ref mut cur)) => {
-                match cur.update(e, f) {
+                match cur.event(e, f) {
                     (Running, dt) => (Running, dt),
                     (_, dt) => (Success, dt),
                 }
@@ -289,7 +289,7 @@ impl<A: Clone, S> State<A, S> {
                 loop {
                     *status = match *status {
                         Running => {
-                            match state.update(e, |dt, a, s| f(dt, a, s)) {
+                            match state.event(e, |dt, a, s| f(dt, a, s)) {
                                 (Running, dt) => { return (Running, dt); },
                                 (Success, dt) => {
                                     **state = State::new((**success).clone());
@@ -304,7 +304,7 @@ impl<A: Clone, S> State<A, S> {
                             }
                         }
                         _ => {
-                            return state.update(match *e {
+                            return state.event(match *e {
                                 Update(_) => {
                                     remaining_e = UpdateEvent::from_dt(
                                         remaining_dt).unwrap();
@@ -327,7 +327,7 @@ impl<A: Clone, S> State<A, S> {
             (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
                             ref mut cursor)) => {
                 // If the event terminates, do not execute the loop.
-                match ev_cursor.update(e, |dt, a, s| f(dt, a, s)) {
+                match ev_cursor.event(e, |dt, a, s| f(dt, a, s)) {
                     (Running, _) => {}
                     x => return x,
                 };
@@ -338,11 +338,10 @@ impl<A: Clone, S> State<A, S> {
                     };
                 let mut remaining_e;
                 loop {
-                    match cur.update(match *e {
+                    match cur.event(match *e {
                             Update(_) => {
-                                remaining_e = Update(UpdateArgs {
-                                        dt: remaining_dt
-                                    });
+                                remaining_e = UpdateEvent::from_dt(
+                                    remaining_dt).unwrap();
                                 &remaining_e
                             }
                             _ => e
@@ -381,7 +380,7 @@ impl<A: Clone, S> State<A, S> {
                 // Get the least delta time left over.
                 let mut min_dt = std::f64::MAX_VALUE;
                 for j in range(*i, cursors.len()) {
-                    match cursors.get_mut(j).update(e, |dt, a, s| f(dt, a, s)) {
+                    match cursors.get_mut(j).event(e, |dt, a, s| f(dt, a, s)) {
                         (Running, _) => { min_dt = 0.0; }
                         (Success, new_dt) => {
                             // Remaining delta time must be less to succeed.
