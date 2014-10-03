@@ -1,5 +1,4 @@
 use std::intrinsics::{ get_tydesc, TypeId };
-use std::any::{ Any, AnyRefExt };
 use std::fmt::Show;
 use input::{
     Button,
@@ -25,6 +24,7 @@ use {
     ResizeEvent,
     TextEvent,
 };
+use ptr::Ptr;
 
 /// Used as generic constraint for events.
 ///
@@ -35,9 +35,9 @@ use {
 /// Implementations of `GenericEvent` should be unit tested.
 pub trait GenericEvent {
     /// Creates a new event.
-    fn from_event(event_trait_id: TypeId, args: &Any) -> Option<Self>;
+    fn from_event(event_trait_id: TypeId, args: &Ptr) -> Option<Self>;
     /// When correct event type, calls closure with argument.
-    fn with_event(&self, event_trait_id: TypeId, f: |&Any|);
+    fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U>;
 }
 
 /// Asserts that an event is supported correctly and is that event.
@@ -68,7 +68,7 @@ pub fn assert_event_trait<
 
 impl GenericEvent for InputEvent {
     #[inline(always)]
-    fn from_event(event_trait_id: TypeId, args: &Any) -> Option<InputEvent> {
+    fn from_event(event_trait_id: TypeId, args: &Ptr) -> Option<InputEvent> {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
@@ -79,59 +79,40 @@ impl GenericEvent for InputEvent {
         let focus = TypeId::of::<Box<FocusEvent>>();
         match event_trait_id {
             x if x == press => {
-                match args.downcast_ref::<Button>() {
-                    Some(&button) => Some(Press(button)),
-                    None => fail!("Expected `Button`")
-                }
+                Some(Press(*args.expect::<Button>()))
             }
             x if x == release => {
-                match args.downcast_ref::<Button>() {
-                    Some(&button) => Some(Release(button)),
-                    None => fail!("Expected `Button`")
-                }
+                Some(Release(*args.expect::<Button>()))
             }
             x if x == mouse_cursor => {
-                match args.downcast_ref::<(f64, f64)>() {
-                    Some(&(x, y)) => Some(Move(MouseCursor(x, y))),
-                    None => fail!("Expected `(f64, f64)`")
-                }
+                let &(x, y) = args.expect::<(f64, f64)>();
+                Some(Move(MouseCursor(x, y)))
             }
             x if x == mouse_relative => {
-                match args.downcast_ref::<(f64, f64)>() {
-                    Some(&(x, y)) => Some(Move(MouseRelative(x, y))),
-                    None => fail!("Expected `(f64, f64)`")
-                }
+                let &(x, y) = args.expect::<(f64, f64)>();
+                Some(Move(MouseRelative(x, y)))
             }
             x if x == mouse_scroll => {
-                match args.downcast_ref::<(f64, f64)>() {
-                    Some(&(x, y)) => Some(Move(MouseScroll(x, y))),
-                    None => fail!("Expected `(f64, f64)`")
-                }
+                let &(x, y) = args.expect::<(f64, f64)>();
+                Some(Move(MouseScroll(x, y)))
             }
             x if x == text => {
-                match args.downcast_ref::<&str>() {
-                    Some(&text) => Some(Text(text.to_string())),
-                    None => fail!("Expected `&str`")
-                }
+                let text = args.expect_str();
+                Some(Text(text.to_string()))
             }
             x if x == resize => {
-                match args.downcast_ref::<(u32, u32)>() {
-                    Some(&(w, h)) => Some(Resize(w, h)),
-                    None => fail!("Expected `(u32, u32)`")
-                }
+                let &(w, h) = args.expect::<(u32, u32)>();
+                Some(Resize(w, h))
             }
             x if x == focus => {
-                match args.downcast_ref::<bool>() {
-                    Some(&focused) => Some(Focus(focused)),
-                    None => fail!("Expected `bool`")
-                }
+                Some(Focus(*args.expect::<bool>()))
             }
             _ => None
         }
     }
 
     #[inline(always)]
-    fn with_event(&self, event_trait_id: TypeId, f: |&Any|) {
+    fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U> {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
@@ -143,53 +124,53 @@ impl GenericEvent for InputEvent {
         match event_trait_id {
             x if x == press => {
                 match *self {
-                    Press(ref button) => f(button as &Any),
-                    _ => {}
+                    Press(ref button) => Some(Ptr::with_ref(button, f)),
+                    _ => None
                 }
             }
             x if x == release => {
                 match *self {
-                    Release(ref button) => f(button as &Any),
-                    _ => {}
+                    Release(ref button) => Some(Ptr::with_ref(button, f)),
+                    _ => None
                 }
             }
             x if x == mouse_cursor => {
                 match *self {
-                    Move(MouseCursor(x, y)) => f(&(x, y) as &Any),
-                    _ => {}
+                    Move(MouseCursor(x, y)) => Some(Ptr::with_ref(&(x, y), f)),
+                    _ => None
                 }
             }
             x if x == mouse_relative => {
                 match *self {
-                    Move(MouseRelative(x, y)) => f(&(x, y) as &Any),
-                    _ => {}
+                    Move(MouseRelative(x, y)) => Some(Ptr::with_ref(&(x, y), f)),
+                    _ => None
                 }
             }
             x if x == mouse_scroll => {
                 match *self {
-                    Move(MouseScroll(x, y)) => f(&(x, y) as &Any),
-                    _ => {}
+                    Move(MouseScroll(x, y)) => Some(Ptr::with_ref(&(x, y), f)),
+                    _ => None
                 }
             }
             x if x == text => {
                 match *self {
-                    Text(ref text) => f(&text.as_slice() as &Any),
-                    _ => {}
+                    Text(ref text) => Some(Ptr::with_str(text[], f)),
+                    _ => None
                 }
             }
             x if x == resize => {
                 match *self {
-                    Resize(w, h) => f(&(w, h) as &Any),
-                    _ => {}
+                    Resize(w, h) => Some(Ptr::with_ref(&(w, h), f)),
+                    _ => None
                 }
             }
             x if x == focus => {
                 match *self {
-                    Focus(focused) => f(&focused as &Any),
-                    _ => {}
+                    Focus(focused) => Some(Ptr::with_ref(&focused, f)),
+                    _ => None
                 }
             }
-            _ => {}
+            _ => None
         }
     }
 }
