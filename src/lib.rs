@@ -75,6 +75,8 @@ pub use text::TextEvent;
 pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
 
+pub mod ptr;
+
 mod state;
 mod behavior;
 mod status;

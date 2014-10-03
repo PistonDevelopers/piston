@@ -1,5 +1,4 @@
 use std::intrinsics::TypeId;
-use std::any::{ Any, AnyRefExt };
 
 use input;
 
@@ -10,6 +9,7 @@ use {
     UpdateEvent,
     GenericEvent,
 };
+use ptr::Ptr;
 
 /// Contains the different game events.
 #[deriving(Clone, PartialEq, Show)]
@@ -24,21 +24,15 @@ pub enum Event<I = input::InputEvent> {
 
 impl<I: GenericEvent> GenericEvent for Event<I> {
     #[inline(always)]
-    fn from_event(event_trait_id: TypeId, ev: &Any) -> Option<Event<I>> {
+    fn from_event(event_trait_id: TypeId, ev: &Ptr) -> Option<Event<I>> {
         let update = TypeId::of::<Box<UpdateEvent>>();
         let render = TypeId::of::<Box<RenderEvent>>();
         match event_trait_id {
             x if x == update => {
-                match ev.downcast_ref::<UpdateArgs>() {
-                    Some(args) => Some(Update(args.clone())),
-                    None => fail!("Expected `UpdateArgs`")
-                }
+                Some(Update(ev.expect::<UpdateArgs>().clone()))
             }
             x if x == render => {
-                match ev.downcast_ref::<RenderArgs>() {
-                    Some(args) => Some(Render(args.clone())),
-                    None => fail!("Expected `RenderArgs`")
-                }
+                Some(Render(ev.expect::<RenderArgs>().clone()))
             }
             _ => {
                 let input: Option<I> = GenericEvent::from_event(
@@ -53,26 +47,26 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
     }
 
     #[inline(always)]
-    fn with_event(&self, event_trait_id: TypeId, f: |&Any|) {
+    fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U> {
         let update = TypeId::of::<Box<UpdateEvent>>();
         let render = TypeId::of::<Box<RenderEvent>>();
         match event_trait_id {
             x if x == update => {
                 match *self {
-                    Update(ref args) => f(args as &Any),
-                    _ => {}
+                    Update(ref args) => Some(Ptr::with_ref(args, |ptr| f(ptr))),
+                    _ => None
                 }
             }
             x if x == render => {
                 match *self {
-                    Render(ref args) => f(args as &Any),
-                    _ => {}
+                    Render(ref args) => Some(Ptr::with_ref(args, |ptr| f(ptr))),
+                    _ => None
                 }
             }
             _ => {
                 match *self {
                     Input(ref input) => input.with_event(event_trait_id, f),
-                    _ => {}
+                    _ => None
                 }
             }
         }
