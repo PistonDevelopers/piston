@@ -65,6 +65,10 @@ impl DragController {
                 _ => {}
             }
         });
+       
+        // Rest of the event are only handled when dragging. 
+        if !self.drag { return; }
+
         e.release(|button| {
             match button {
                 Mouse(mouse::Left) => {
