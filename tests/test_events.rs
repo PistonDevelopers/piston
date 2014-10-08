@@ -1,5 +1,6 @@
 use event::{
     Action,
+    Event,
     State,
     Sequence,
     Success,
@@ -21,7 +22,8 @@ pub enum TestActions {
 
 // A test state machine that can increment and decrement.
 fn exec(mut acc: u32, dt: f64, state: &mut State<TestActions, ()>) -> u32 {
-    state.event(&Update(UpdateArgs { dt: dt }), |dt, action, _| {
+    let e: Event = Update(UpdateArgs { dt: dt });
+    state.event(&e, |dt, action, _| {
         match *action {
             Inc => { acc += 1; (Success, dt) },
             Dec => { acc -= 1; (Success, dt) },
@@ -112,4 +114,3 @@ fn when_all_wait() {
     let a = exec(a, 0.5, &mut state);
     assert_eq!(a, 1);
 }
-
