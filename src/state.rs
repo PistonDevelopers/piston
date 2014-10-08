@@ -239,8 +239,9 @@ impl<A: Clone, S> State<A, S> {
         e: &Event,
         f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
     ) -> (Status, f64) {
-        match (e, self) {
-            (_, &PressedState(button)) => {
+        let upd = e.update(|args| Some(args.dt)).unwrap_or(None);
+        match (upd, self) {
+            (None, &PressedState(button)) => {
                 e.press(|button_pressed| {
                     if button_pressed != button { return RUNNING; }
 
@@ -250,7 +251,7 @@ impl<A: Clone, S> State<A, S> {
                     (Success, 0.0)
                 }).unwrap_or(RUNNING)
             }
-            (_, &ReleasedState(button)) => {
+            (None, &ReleasedState(button)) => {
                 e.release(|button_released| {
                     if button_released != button { return RUNNING; }
 
@@ -260,7 +261,7 @@ impl<A: Clone, S> State<A, S> {
                     (Success, 0.0)
                 }).unwrap_or(RUNNING)
             }
-            (&Update(UpdateArgs { dt }),
+            (Some(dt),
              &ActionState(ref action, ref mut state)) => {
                 // Execute action.
                 f(dt, action, state)
@@ -278,7 +279,7 @@ impl<A: Clone, S> State<A, S> {
                     (_, dt) => (Success, dt),
                 }
             }
-            (&Update(UpdateArgs { dt }), &WaitState(wait_t, ref mut t)) => {
+            (Some(dt), &WaitState(wait_t, ref mut t)) => {
                 if *t + dt >= wait_t {
                     let remaining_dt = *t + dt - wait_t;
                     *t = wait_t;
