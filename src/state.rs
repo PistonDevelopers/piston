@@ -317,11 +317,11 @@ impl<A: Clone, S> State<A, S> {
                 }
             }
             (_, &SelectState(ref seq, ref mut i, ref mut cursor)) => {
-                let select = false;
+                let select = true;
                 sequence(select, seq, i, cursor, e, f)
             }
             (_, &SequenceState(ref seq, ref mut i, ref mut cursor)) => {
-                let select = true;
+                let select = false;
                 sequence(select, seq, i, cursor, e, f)
             }
             (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
