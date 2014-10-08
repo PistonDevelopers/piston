@@ -6,8 +6,8 @@ use {
     After,
     AlwaysSucceed,
     Behavior,
-    Event,
     Failure,
+    GenericEvent,
     If,
     Fail,
     Pressed,
@@ -73,13 +73,13 @@ pub enum State<A, S> {
 //
 // `Sequence` fails if any fails and succeeds when all succeeds.
 // `Select` succeeds if any succeeds and fails when all fails.
-fn sequence<A: Clone, S>(
+fn sequence<A: Clone, S, E: GenericEvent>(
     select: bool,
     upd: Option<f64>,
     seq: &Vec<Behavior<A>>,
     i: &mut uint,
     cursor: &mut Box<State<A, S>>,
-    e: &Event,
+    e: &E,
     f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
 ) -> (Status, f64) {
     let (status, inv_status) = if select {
@@ -135,11 +135,11 @@ fn sequence<A: Clone, S>(
 //
 // `WhenAll` fails if any fails and succeeds when all succeeds.
 // `WhenAny` succeeds if any succeeds and fails when all fails.
-fn when_all<A: Clone, S>(
+fn when_all<A: Clone, S, E: GenericEvent>(
     any: bool,
     upd: Option<f64>,
     cursors: &mut Vec<Option<State<A, S>>>,
-    e: &Event,
+    e: &E,
     f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
 ) -> (Status, f64) {
     let (status, inv_status) = if any {
@@ -231,9 +231,9 @@ impl<A: Clone, S> State<A, S> {
     ///
     /// The action need to return status and remaining delta time.
     /// Returns status and the remaining delta time.
-    pub fn event(
+    pub fn event<E: GenericEvent>(
         &mut self,
-        e: &Event,
+        e: &E,
         f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
     ) -> (Status, f64) {
         let upd = e.update(|args| Some(args.dt)).unwrap_or(None);
