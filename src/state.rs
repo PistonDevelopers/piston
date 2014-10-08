@@ -9,10 +9,11 @@ use {
     Event,
     Failure,
     If,
-    Input,
     Fail,
     Pressed,
+    PressEvent,
     Released,
+    ReleaseEvent,
     Running,
     Select,
     Sequence,
@@ -27,6 +28,8 @@ use {
     WhenAny,
     While,
 };
+
+pub static RUNNING: (Status, f64) = (Running, 0.0);
 
 /// Keeps track of a behavior.
 #[deriving(Clone, PartialEq)]
@@ -115,7 +118,7 @@ fn sequence<A: Clone, S>(
                     _ => if *i == seq.len() - 1 {
                             return (status, new_dt)
                         } else {
-                            return (Running, 0.0)
+                            return RUNNING
                         }
                 }
             }
@@ -129,7 +132,7 @@ fn sequence<A: Clone, S>(
         // Use the same pointer to avoid allocation.
         **cursor  = State::new(seq[*i].clone());
     }
-    (Running, 0.0)
+    RUNNING
 }
 
 // `WhenAll` and `WhenAny` share same algorithm.
@@ -184,7 +187,7 @@ fn when_all<A: Clone, S>(
             }),
         // If all events terminated, the least delta time is left.
         n if cursors.len() == n => (status, min_dt),
-        _ => (Running, 0.0)
+        _ => RUNNING
     }
 }
 
@@ -237,17 +240,25 @@ impl<A: Clone, S> State<A, S> {
         f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
     ) -> (Status, f64) {
         match (e, self) {
-            (&Input(input::Press(button_pressed)), &PressedState(button))
-            if button_pressed == button => {
-                // Button press is considered to happen instantly.
-                // There is no remaining delta time because this is input event.
-                (Success, 0.0)
+            (_, &PressedState(button)) => {
+                e.press(|button_pressed| {
+                    if button_pressed != button { return RUNNING; }
+
+                    // Button press is considered to happen instantly.
+                    // There is no remaining delta time because
+                    // this is input event.
+                    (Success, 0.0)
+                }).unwrap_or(RUNNING)
             }
-            (&Input(input::Release(button_released)), &ReleasedState(button))
-            if button_released == button => {
-                // Button release is considered to happen instantly.
-                // There is no remaining delta time because this is input event.
-                (Success, 0.0)
+            (_, &ReleasedState(button)) => {
+                e.release(|button_released| {
+                    if button_released != button { return RUNNING; }
+
+                    // Button release is considered to happen instantly.
+                    // There is no remaining delta time because
+                    // this is input event.
+                    (Success, 0.0)
+                }).unwrap_or(RUNNING)
             }
             (&Update(UpdateArgs { dt }),
              &ActionState(ref action, ref mut state)) => {
@@ -274,7 +285,7 @@ impl<A: Clone, S> State<A, S> {
                     (Success, remaining_dt)
                 } else {
                     *t += dt;
-                    (Running, 0.0)
+                    RUNNING
                 }
             }
             (_, &IfState(ref success, ref failure,
@@ -354,7 +365,7 @@ impl<A: Clone, S> State<A, S> {
                                 // Change update event with remaining delta time.
                                 Update(_) => new_dt,
                                 // Other events are 'consumed' and not passed to next.
-                                _ => return (Running, 0.0)
+                                _ => return RUNNING
                             }
                         }
                     };
@@ -366,7 +377,7 @@ impl<A: Clone, S> State<A, S> {
                     // Use the same pointer to avoid allocation.
                     **cur = State::new(rep[*i].clone());
                 }
-                (Running, 0.0)
+                RUNNING
             }
             (_, &WhenAllState(ref mut cursors)) => {
                 let any = false;
@@ -401,10 +412,10 @@ impl<A: Clone, S> State<A, S> {
                 if *i == cursors.len() {
                     (Success, min_dt)
                 } else {
-                    (Running, 0.0)
+                    RUNNING
                 }
             }
-            _ => (Running, 0.0)
+            _ => RUNNING
         }
     }
 }
