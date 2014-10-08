@@ -19,8 +19,6 @@ use {
     Sequence,
     Status,
     Success,
-    Update,
-    UpdateArgs,
     UpdateEvent,
     Wait,
     WaitForever,
@@ -77,6 +75,7 @@ pub enum State<A, S> {
 // `Select` succeeds if any succeeds and fails when all fails.
 fn sequence<A: Clone, S>(
     select: bool,
+    upd: Option<f64>,
     seq: &Vec<Behavior<A>>,
     i: &mut uint,
     cursor: &mut Box<State<A, S>>,
@@ -90,15 +89,12 @@ fn sequence<A: Clone, S>(
         // `Sequence`
         (Success, Failure)
     };
-    let mut remaining_dt = match *e {
-            Update(UpdateArgs { dt }) => dt,
-            _ => 0.0,
-        };
+    let mut remaining_dt = upd.unwrap_or(0.0);
     let mut remaining_e;
     while *i < seq.len() {
         match cursor.event(
-            match *e {
-                Update(_) => {
+            match upd {
+                Some(_) => {
                     remaining_e = UpdateEvent::from_dt(remaining_dt).unwrap();
                     &remaining_e
                 }
@@ -110,9 +106,9 @@ fn sequence<A: Clone, S>(
                 return (inv_status, new_dt);
             }
             (s, new_dt) if s == status => {
-                remaining_dt = match *e {
+                remaining_dt = match upd {
                     // Change update event with remaining delta time.
-                    Update(_) => new_dt,
+                    Some(_) => new_dt,
                     // Other events are 'consumed' and not passed to next.
                     // If this is the last event, then the sequence succeeded.
                     _ => if *i == seq.len() - 1 {
@@ -141,6 +137,7 @@ fn sequence<A: Clone, S>(
 // `WhenAny` succeeds if any succeeds and fails when all fails.
 fn when_all<A: Clone, S>(
     any: bool,
+    upd: Option<f64>,
     cursors: &mut Vec<Option<State<A, S>>>,
     e: &Event,
     f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
@@ -180,8 +177,8 @@ fn when_all<A: Clone, S>(
     }
     match terminated {
         // If there are no events, there is a whole 'dt' left.
-        0 if cursors.len() == 0 => (status, match *e {
-                Update(UpdateArgs { dt }) => dt,
+        0 if cursors.len() == 0 => (status, match upd {
+                Some(dt) => dt,
                 // Other kind of events happen instantly.
                 _ => 0.0
             }),
@@ -291,10 +288,7 @@ impl<A: Clone, S> State<A, S> {
             }
             (_, &IfState(ref success, ref failure,
                          ref mut status, ref mut state)) => {
-                let mut remaining_dt = match *e {
-                        Update(UpdateArgs { dt }) => dt,
-                        _ => 0.0,
-                    };
+                let mut remaining_dt = upd.unwrap_or(0.0);
                 let mut remaining_e;
                 // Run in a loop to evaluate success or failure with
                 // remaining delta time after condition.
@@ -316,8 +310,8 @@ impl<A: Clone, S> State<A, S> {
                             }
                         }
                         _ => {
-                            return state.event(match *e {
-                                Update(_) => {
+                            return state.event(match upd {
+                                Some(_) => {
                                     remaining_e = UpdateEvent::from_dt(
                                         remaining_dt).unwrap();
                                     &remaining_e
@@ -330,11 +324,11 @@ impl<A: Clone, S> State<A, S> {
             }
             (_, &SelectState(ref seq, ref mut i, ref mut cursor)) => {
                 let select = true;
-                sequence(select, seq, i, cursor, e, f)
+                sequence(select, upd, seq, i, cursor, e, f)
             }
             (_, &SequenceState(ref seq, ref mut i, ref mut cursor)) => {
                 let select = false;
-                sequence(select, seq, i, cursor, e, f)
+                sequence(select, upd, seq, i, cursor, e, f)
             }
             (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
                             ref mut cursor)) => {
@@ -344,14 +338,11 @@ impl<A: Clone, S> State<A, S> {
                     x => return x,
                 };
                 let cur = cursor;
-                let mut remaining_dt = match *e {
-                        Update(UpdateArgs { dt }) => dt,
-                        _ => 0.0,
-                    };
+                let mut remaining_dt = upd.unwrap_or(0.0);
                 let mut remaining_e;
                 loop {
-                    match cur.event(match *e {
-                            Update(_) => {
+                    match cur.event(match upd {
+                            Some(_) => {
                                 remaining_e = UpdateEvent::from_dt(
                                     remaining_dt).unwrap();
                                 &remaining_e
@@ -362,9 +353,9 @@ impl<A: Clone, S> State<A, S> {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
-                            remaining_dt = match *e {
+                            remaining_dt = match upd {
                                 // Change update event with remaining delta time.
-                                Update(_) => new_dt,
+                                Some(_) => new_dt,
                                 // Other events are 'consumed' and not passed to next.
                                 _ => return RUNNING
                             }
@@ -382,11 +373,11 @@ impl<A: Clone, S> State<A, S> {
             }
             (_, &WhenAllState(ref mut cursors)) => {
                 let any = false;
-                when_all(any, cursors, e, f)
+                when_all(any, upd, cursors, e, f)
             }
             (_, &WhenAnyState(ref mut cursors)) => {
                 let any = true;
-                when_all(any, cursors, e, f)
+                when_all(any, upd, cursors, e, f)
             }
             (_, &AfterState(ref mut i, ref mut cursors)) => {
                 // Get the least delta time left over.
