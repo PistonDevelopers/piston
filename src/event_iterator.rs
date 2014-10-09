@@ -70,7 +70,7 @@ pub struct EventIterator<'a, W: 'a> {
     dt: f64,
 }
 
-static billion: u64 = 1_000_000_000;
+static BILLION: u64 = 1_000_000_000;
 
 impl<'a, W: Window<I>, I: GenericEvent> EventIterator<'a, W> {
     /// Creates a new game iterator.
@@ -87,8 +87,8 @@ impl<'a, W: Window<I>, I: GenericEvent> EventIterator<'a, W> {
             state: RenderState,
             last_update: start,
             last_frame: start,
-            dt_update_in_ns: billion / updates_per_second,
-            dt_frame_in_ns: billion / max_frames_per_second,
+            dt_update_in_ns: BILLION / updates_per_second,
+            dt_frame_in_ns: BILLION / max_frames_per_second,
             dt: 1.0 / updates_per_second as f64,
         }
     }
@@ -113,7 +113,8 @@ for EventIterator<'a, W> {
                         self.state = SwapBuffersState;
                         return Some(Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (start_render - self.last_update) as f64 / billion as f64,
+                            ext_dt: (start_render - self.last_update) as f64 
+                                    / BILLION as f64,
                             width: w,
                             height: h,
                         }));
