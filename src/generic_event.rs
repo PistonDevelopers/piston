@@ -154,7 +154,7 @@ impl GenericEvent for InputEvent {
             }
             x if x == text => {
                 match *self {
-                    Text(ref text) => Some(Ptr::with_str(text[], f)),
+                    Text(ref text) => Some(Ptr::with_str(text.as_slice(), f)),
                     _ => None
                 }
             }
