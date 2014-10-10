@@ -19,35 +19,35 @@ bitflags!(
     #[allow(missing_doc)]
     #[deriving(Decodable, Encodable)]
     flags ModifierKey: u8 {
-        static NO_MODIFIER          = 0b00000000,
-        static CTRL                 = 0b00000001,
-        static SHIFT                = 0b00000010,
-        static ALT                  = 0b00000100,
-        static GUI                  = 0b00001000,
-        static CTRL_SHIFT           = CTRL.bits
+        const NO_MODIFIER           = 0b00000000,
+        const CTRL                  = 0b00000001,
+        const SHIFT                 = 0b00000010,
+        const ALT                   = 0b00000100,
+        const GUI                   = 0b00001000,
+        const CTRL_SHIFT            = CTRL.bits
                                     | SHIFT.bits,
-        static CTRL_ALT             = CTRL.bits
+        const CTRL_ALT              = CTRL.bits
                                     | ALT.bits,
-        static CTRL_GUI             = CTRL.bits
+        const CTRL_GUI              = CTRL.bits
                                     | GUI.bits,
-        static CTRL_SHIFT_ALT       = CTRL.bits
+        const CTRL_SHIFT_ALT        = CTRL.bits
                                     | SHIFT.bits
                                     | ALT.bits,
-        static CTRL_SHIFT_GUI       = CTRL.bits
+        const CTRL_SHIFT_GUI        = CTRL.bits
                                     | SHIFT.bits
                                     | GUI.bits,
-        static CTRL_SHIFT_ALT_GUI   = CTRL.bits
+        const CTRL_SHIFT_ALT_GUI    = CTRL.bits
                                     | SHIFT.bits
                                     | ALT.bits
                                     | GUI.bits,
-        static SHIFT_ALT            = SHIFT.bits
+        const SHIFT_ALT             = SHIFT.bits
                                     | ALT.bits,
-        static SHIFT_GUI            = SHIFT.bits
+        const SHIFT_GUI             = SHIFT.bits
                                     | GUI.bits,
-        static SHIFT_ALT_GUI        = SHIFT.bits
+        const SHIFT_ALT_GUI         = SHIFT.bits
                                     | ALT.bits
                                     | GUI.bits,
-        static ALT_GUI              = ALT.bits
+        const ALT_GUI               = ALT.bits
                                     | GUI.bits
     }
 )
