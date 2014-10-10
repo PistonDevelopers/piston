@@ -18,36 +18,36 @@ bitflags!(
     #[deriving(Show)]
     #[allow(missing_doc)]
     flags ModifierKey: u8 {
-        static NoModifier       = 0b00000000,
-        static Ctrl             = 0b00000001,
-        static Shift            = 0b00000010,
-        static Alt              = 0b00000100,
-        static Gui              = 0b00001000,
-        static CtrlShift        = Ctrl.bits 
-                                | Shift.bits,
-        static CtrlAlt          = Ctrl.bits
-                                | Alt.bits,
-        static CtrlGui          = Ctrl.bits
-                                | Gui.bits,
-        static CtrlShiftAlt     = Ctrl.bits
-                                | Shift.bits
-                                | Alt.bits,
-        static CtrlShiftGui     = Ctrl.bits
-                                | Shift.bits
-                                | Gui.bits,
-        static CtrlShiftAltGui  = Ctrl.bits
-                                | Shift.bits
-                                | Alt.bits
-                                | Gui.bits,
-        static ShiftAlt         = Shift.bits
-                                | Alt.bits,
-        static ShiftGui         = Shift.bits
-                                | Gui.bits,
-        static ShiftAltGui      = Shift.bits
-                                | Alt.bits
-                                | Gui.bits,
-        static AltGui           = Alt.bits
-                                | Gui.bits
+        static NO_MODIFIER          = 0b00000000,
+        static CTRL                 = 0b00000001,
+        static SHIFT                = 0b00000010,
+        static ALT                  = 0b00000100,
+        static GUI                  = 0b00001000,
+        static CTRL_SHIFT           = CTRL.bits
+                                    | SHIFT.bits,
+        static CTRL_ALT             = CTRL.bits
+                                    | ALT.bits,
+        static CTRL_GUI             = CTRL.bits
+                                    | GUI.bits,
+        static CTRL_SHIFT_ALT       = CTRL.bits
+                                    | SHIFT.bits
+                                    | ALT.bits,
+        static CTRL_SHIFT_GUI       = CTRL.bits
+                                    | SHIFT.bits
+                                    | GUI.bits,
+        static CTRL_SHIFT_ALT_GUI   = CTRL.bits
+                                    | SHIFT.bits
+                                    | ALT.bits
+                                    | GUI.bits,
+        static SHIFT_ALT            = SHIFT.bits
+                                    | ALT.bits,
+        static SHIFT_GUI            = SHIFT.bits
+                                    | GUI.bits,
+        static SHIFT_ALT_GUI        = SHIFT.bits
+                                    | ALT.bits
+                                    | GUI.bits,
+        static ALT_GUI              = ALT.bits
+                                    | GUI.bits
     }
 )
 
@@ -57,30 +57,30 @@ impl ModifierKey {
     /// If the left or side button is released, it counts as a release.
     pub fn handle_input(&mut self, input: &InputEvent) {
         match *input {
-            Press(Keyboard(LCtrl)) 
-          | Press(Keyboard(RCtrl)) => self.insert(Ctrl),
-            Release(Keyboard(LCtrl)) 
-          | Release(Keyboard(RCtrl)) => self.remove(Ctrl),
-            Press(Keyboard(LShift)) 
-          | Press(Keyboard(RShift)) => self.insert(Shift),
-            Release(Keyboard(LShift)) 
-          | Release(Keyboard(RShift)) => self.remove(Shift),
-            Press(Keyboard(LAlt)) 
-          | Press(Keyboard(RAlt)) => self.insert(Alt),
-            Release(Keyboard(LAlt)) 
-          | Release(Keyboard(RAlt)) => self.remove(Alt),
-            Press(Keyboard(LGui)) 
-          | Press(Keyboard(RGui)) => self.insert(Gui),
-            Release(Keyboard(LGui)) 
-          | Release(Keyboard(RGui)) => self.remove(Gui),
-            Focus(false) => *self = NoModifier,
+            Press(Keyboard(LCtrl))
+          | Press(Keyboard(RCtrl)) => self.insert(CTRL),
+            Release(Keyboard(LCtrl))
+          | Release(Keyboard(RCtrl)) => self.remove(CTRL),
+            Press(Keyboard(LShift))
+          | Press(Keyboard(RShift)) => self.insert(SHIFT),
+            Release(Keyboard(LShift))
+          | Release(Keyboard(RShift)) => self.remove(SHIFT),
+            Press(Keyboard(LAlt))
+          | Press(Keyboard(RAlt)) => self.insert(ALT),
+            Release(Keyboard(LAlt))
+          | Release(Keyboard(RAlt)) => self.remove(ALT),
+            Press(Keyboard(LGui))
+          | Press(Keyboard(RGui)) => self.insert(GUI),
+            Release(Keyboard(LGui))
+          | Release(Keyboard(RGui)) => self.remove(GUI),
+            Focus(false) => *self = NO_MODIFIER,
             _ => {}
         }
     }
 }
 
 impl Default for ModifierKey {
-    fn default() -> ModifierKey { NoModifier }
+    fn default() -> ModifierKey { NO_MODIFIER }
 }
 
 /// Represent a keyboard key.
@@ -634,5 +634,3 @@ impl FromPrimitive for Key {
         FromPrimitive::from_u64(n as u64)
     }
 }
-
-
