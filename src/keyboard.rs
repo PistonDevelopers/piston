@@ -17,6 +17,7 @@ use {
 bitflags!(
     #[deriving(Show)]
     #[allow(missing_doc)]
+    #[deriving(Decodable, Encodable)]
     flags ModifierKey: u8 {
         static NO_MODIFIER          = 0b00000000,
         static CTRL                 = 0b00000001,
@@ -85,7 +86,7 @@ impl Default for ModifierKey {
 
 /// Represent a keyboard key.
 #[allow(missing_doc)]
-#[deriving(Clone, Show)]
+#[deriving(Clone, Decodable, Encodable, Show)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,

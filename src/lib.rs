@@ -6,11 +6,13 @@
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
 
+extern crate serialize;
+
 pub mod keyboard;
 pub mod mouse;
 
 /// Models different kinds of buttons.
-#[deriving(Clone, PartialEq, Eq, Show)]
+#[deriving(Clone, Decodable, Encodable, PartialEq, Eq, Show)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(keyboard::Key),
@@ -19,7 +21,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[deriving(Clone, PartialEq, Show)]
+#[deriving(Clone, Decodable, Encodable, PartialEq, Show)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),
@@ -30,7 +32,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[deriving(Clone, PartialEq, Show)]
+#[deriving(Clone, Decodable, Encodable, PartialEq, Show)]
 pub enum InputEvent {
     /// Pressed a button.
     Press(Button),
@@ -45,4 +47,3 @@ pub enum InputEvent {
     /// Window gained or lost focus.
     Focus(bool),
 }
-
