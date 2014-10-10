@@ -80,7 +80,7 @@ fn sequence<A: Clone, S, E: GenericEvent>(
     i: &mut uint,
     cursor: &mut Box<State<A, S>>,
     e: &E,
-    f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
+    f: |e: &E, dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
 ) -> (Status, f64) {
     let (status, inv_status) = if select {
         // `Select`
@@ -100,7 +100,7 @@ fn sequence<A: Clone, S, E: GenericEvent>(
                 }
                 _ => e
             },
-            |dt, a, s| f(dt, a, s)) {
+            |e, dt, a, s| f(e, dt, a, s)) {
             (Running, _) => { break; },
             (s, new_dt) if s == inv_status => {
                 return (inv_status, new_dt);
@@ -140,7 +140,7 @@ fn when_all<A: Clone, S, E: GenericEvent>(
     upd: Option<f64>,
     cursors: &mut Vec<Option<State<A, S>>>,
     e: &E,
-    f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
+    f: |e: &E, dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
 ) -> (Status, f64) {
     let (status, inv_status) = if any {
         // `WhenAny`
@@ -157,7 +157,7 @@ fn when_all<A: Clone, S, E: GenericEvent>(
         match *cur {
             None => {}
             Some(ref mut cur) => {
-                match cur.event(e, |dt, a, s| f(dt, a, s)) {
+                match cur.event(e, |e, dt, a, s| f(e, dt, a, s)) {
                     (Running, _) => { continue; },
                     (s, new_dt) if s == inv_status => {
                         // Fail for `WhenAll`.
@@ -234,7 +234,7 @@ impl<A: Clone, S> State<A, S> {
     pub fn event<E: GenericEvent>(
         &mut self,
         e: &E,
-        f: |dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
+        f: |e: &E, dt: f64, action: &A, state: &mut Option<S>| -> (Status, f64)
     ) -> (Status, f64) {
         let upd = e.update(|args| Some(args.dt)).unwrap_or(None);
         match (upd, self) {
@@ -258,10 +258,9 @@ impl<A: Clone, S> State<A, S> {
                     (Success, 0.0)
                 }).unwrap_or(RUNNING)
             }
-            (Some(dt),
-             &ActionState(ref action, ref mut state)) => {
+            (_, &ActionState(ref action, ref mut state)) => {
                 // Execute action.
-                f(dt, action, state)
+                f(e, upd.unwrap_or(0.0), action, state)
             }
             (_, &FailState(ref mut cur)) => {
                 match cur.event(e, f) {
@@ -295,7 +294,7 @@ impl<A: Clone, S> State<A, S> {
                 loop {
                     *status = match *status {
                         Running => {
-                            match state.event(e, |dt, a, s| f(dt, a, s)) {
+                            match state.event(e, |e, dt, a, s| f(e, dt, a, s)) {
                                 (Running, dt) => { return (Running, dt); },
                                 (Success, dt) => {
                                     **state = State::new((**success).clone());
@@ -317,7 +316,7 @@ impl<A: Clone, S> State<A, S> {
                                     &remaining_e
                                 }
                                 _ => e
-                            }, |dt, a, s| f(dt, a, s));
+                            }, |e, dt, a, s| f(e, dt, a, s));
                         }
                     }
                 }
@@ -333,7 +332,7 @@ impl<A: Clone, S> State<A, S> {
             (_, &WhileState(ref mut ev_cursor, ref rep, ref mut i,
                             ref mut cursor)) => {
                 // If the event terminates, do not execute the loop.
-                match ev_cursor.event(e, |dt, a, s| f(dt, a, s)) {
+                match ev_cursor.event(e, |e, dt, a, s| f(e, dt, a, s)) {
                     (Running, _) => {}
                     x => return x,
                 };
@@ -349,7 +348,7 @@ impl<A: Clone, S> State<A, S> {
                             }
                             _ => e
                         },
-                        |dt, a, s| f(dt, a, s)) {
+                        |e, dt, a, s| f(e, dt, a, s)) {
                         (Failure, x) => return (Failure, x),
                         (Running, _) => { break },
                         (Success, new_dt) => {
@@ -383,7 +382,9 @@ impl<A: Clone, S> State<A, S> {
                 // Get the least delta time left over.
                 let mut min_dt = std::f64::MAX_VALUE;
                 for j in range(*i, cursors.len()) {
-                    match cursors.get_mut(j).event(e, |dt, a, s| f(dt, a, s)) {
+                    match cursors.get_mut(j).event(
+                        e, |e, dt, a, s| f(e, dt, a, s)
+                    ) {
                         (Running, _) => { min_dt = 0.0; }
                         (Success, new_dt) => {
                             // Remaining delta time must be less to succeed.
