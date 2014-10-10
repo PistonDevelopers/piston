@@ -30,7 +30,7 @@ use {
 pub static RUNNING: (Status, f64) = (Running, 0.0);
 
 /// Keeps track of a behavior.
-#[deriving(Clone, PartialEq)]
+#[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub enum State<A, S> {
     /// Returns `Success` when button is pressed.
     PressedState(input::Button),
