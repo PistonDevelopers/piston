@@ -1,6 +1,6 @@
 
 /// The result of a behavior or action.
-#[deriving(Clone, PartialEq, Eq, Show)]
+#[deriving(Clone, Decodable, Encodable, PartialEq, Eq, Show)]
 pub enum Status {
     /// The behavior or action succeeded.
     Success,
