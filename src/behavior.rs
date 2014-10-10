@@ -5,7 +5,7 @@ use input;
 ///
 /// This is used for more complex event logic.
 /// Can also be used for game AI.
-#[deriving(Clone, PartialEq)]
+#[deriving(Clone, Decodable, Encodable, PartialEq)]
 pub enum Behavior<A> {
     /// A button was pressed.
     Pressed(input::Button),

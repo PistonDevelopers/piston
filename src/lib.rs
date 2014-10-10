@@ -14,6 +14,7 @@
 
 extern crate time;
 extern crate input;
+extern crate serialize;
 
 pub use window::{
     Window,
