@@ -11,3 +11,8 @@ This library is reexported under [Piston](https://github.com/pistondevelopers/pi
 Install [Rust](http://www.rust-lang.org/)
 
 `cargo build`
+
+### Dependency graph
+
+![event](./Cargo.png)
+
