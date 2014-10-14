@@ -2,6 +2,11 @@
 
 A library for window abstraction and event logic
 
+* Game loop
+* Window trait
+* Generic event handling
+* AI behavior trees
+
 This library is reexported under [Piston](https://github.com/pistondevelopers/piston)
 
 [Online docs](http://www.rust-ci.org/PistonDevelopers/piston/doc/piston/event/index.html)
