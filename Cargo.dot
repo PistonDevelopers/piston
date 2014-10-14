@@ -1,0 +1,5 @@
+digraph example3 {
+    N0[label="event"];
+    N1[label="input"];
+    N0 -> N1[label=""];
+}
