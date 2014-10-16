@@ -47,10 +47,5 @@ pub use event::{
     Window,
     WindowSettings,
 };
-pub use fps_counter::FPSCounter;
-
-pub mod drag_controller;
 
 mod asset_store;
-mod fps_counter;
-
