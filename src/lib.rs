@@ -77,6 +77,8 @@ pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
 
 pub mod ptr;
+pub mod fps_counter;
+pub mod drag_controller;
 
 mod state;
 mod behavior;
