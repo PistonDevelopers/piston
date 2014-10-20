@@ -15,10 +15,7 @@ pub trait UpdateEvent {
     /// Creates an update event.
     fn from_update_args(args: &UpdateArgs) -> Option<Self>;
     /// Creates an update event with delta time.
-    #[inline(always)]
-    fn from_dt(dt: f64) -> Option<Self> {
-        UpdateEvent::from_update_args(&UpdateArgs { dt: dt })
-    }
+    fn from_dt(dt: f64) -> Option<Self>;
     /// Calls closure if this is an update event.
     fn update<U>(&self, f: |&UpdateArgs| -> U) -> Option<U>;
 }
@@ -30,6 +27,11 @@ impl<T: GenericEvent> UpdateEvent for T {
         Ptr::with_ref::<UpdateArgs, Option<T>>(args, |ptr| {
             GenericEvent::from_event(id, ptr)
         })
+    }
+
+    #[inline(always)]
+    fn from_dt(dt: f64) -> Option<T> {
+        UpdateEvent::from_update_args(&UpdateArgs { dt: dt })
     }
 
     #[inline(always)]
