@@ -8,6 +8,7 @@ use std::os::self_exe_path;
 ///
 /// The idea is to have one object which the app can use
 /// to load assets for the game with a simple interface.
+#[deprecated = "See https://github.com/PistonDevelopers/piston/issues/665"]
 pub struct AssetStore {
     // The folder to load assets from.
     assets_folder: Option<String>,
