@@ -25,46 +25,6 @@ pub use event_iterator::{
     EventIterator,
     EventSettings,
 };
-pub use status::{
-    Failure,
-    Running,
-    Status,
-    Success,
-};
-pub use behavior::{
-    Action,
-    After,
-    AlwaysSucceed,
-    Behavior,
-    If,
-    Fail,
-    Pressed,
-    Released,
-    Select,
-    Sequence,
-    Wait,
-    WaitForever,
-    WhenAll,
-    WhenAny,
-    While,
-};
-pub use state::{
-    ActionState,
-    AfterState,
-    AlwaysSucceedState,
-    IfState,
-    FailState,
-    PressedState,
-    ReleasedState,
-    SelectState,
-    SequenceState,
-    State,
-    WaitState,
-    WaitForeverState,
-    WhenAllState,
-    WhenAnyState,
-    WhileState,
-};
 pub use generic_event::{ assert_event_trait, GenericEvent };
 pub use update::{ UpdateArgs, UpdateEvent };
 pub use render::{ RenderArgs, RenderEvent };
@@ -79,9 +39,6 @@ pub use focus::FocusEvent;
 pub mod ptr;
 pub mod drag_controller;
 
-mod state;
-mod behavior;
-mod status;
 mod window;
 mod event_iterator;
 mod generic_event;
