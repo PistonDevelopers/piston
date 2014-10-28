@@ -14,8 +14,8 @@ Maintainers: @bvssvni, @Coeuvre
 
 | Back-ends |
 |--------------------|
-| [sdl2_game_window](https://github.com/pistondevelopers/sdl2_game_window) |
-| [glfw_game_window](https://github.com/pistondevelopers/glfw_game_window) |
+| [sdl2_window](https://github.com/pistondevelopers/sdl2_window) |
+| [glfw_window](https://github.com/pistondevelopers/glfw_window) |
 
 ## Start new project with Piston
 
