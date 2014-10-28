@@ -19,11 +19,44 @@ Maintainers: @bvssvni, @Coeuvre
 
 ## Start new project with Piston
 
-If you are starting a new project, [Rust-Empty](https://github.com/bvssvni/rust-empty) will automate the setup of directories for you.
+*Notice! We recommend using the Piston libraries directly instead of this repo.*
 
-When you have set up your project, you can build Piston.
-Piston can either be compiled as a static or dynamic library (or both).
-One way to simplify working with multiple projects on the same machine is to symlink the '.rlib' directly into the next project with the command `ln -s <from> <to>`.
+Use one of the [examples](https://github.com/pistondevelopers/piston-examples) as guide.
+
+Almost all projects written in Rust uses the Cargo package manager.
+
+1. Install [Cargo](https://github.com/rust-lang/cargo)
+2. Open the Terminal window and type:
+
+```
+cargo new --git --bin "mygame"
+```
+
+This will create a new folder "mygame" that contains a `Cargo.toml` and a folder `src`.
+Inside the `src` folder where you put the source code.
+For binaries, the default entry file is `src/main.rs` and for libraries `src/lib.rs`.
+
+When you type `cargo run` it will print "Hello, world!".
+
+The `Cargo.toml` file is where you put the library dependencies.
+
+*TIP: Copy links from the sidebar at [/r/rust_gamedev](http://www.reddit.com/r/rust_gamedev/).*
+
+For example, to use the SDL2 back-end, add the following to `Cargo.toml`:
+
+```
+[dependencies.sdl2_window]
+
+git = "https://github.com/pistondevelopers/sdl2_window"
+```
+
+Then add `extern crate sdl2_window;` to the `main.rs` file.
+
+* To compile, use `cargo build`
+* To run, use `cargo run`
+* To generate docs, use `cargo doc`
+
+You will find more documentation about Cargo [here](http://doc.crates.io/).
 
 ## How to build Piston
 
@@ -36,19 +69,26 @@ cd piston
 cargo build
 ```
 
-## Add libraries to your project
-
-After building Piston, you need to add the '.rlib' files to your '/target/cpu-vendor-os/lib/' folder.
-
-The folder is created first time you build. If you do not see the folder, type `make exe`.
-
 ## Goals
 
-2D will be first priority, but we encourage people to experiment with 3D as well.
+The Piston project is a large collaboration among many developers.
+There are libraries for 2D, 3D, event programming, AI, image processing etc.
+By sharing the maintenance, we get more time to build new stuff.
 
-* Test the design and performance of Rust-Graphics
-* Experiment with Rust-ish game design and collect feedback
-* Experiment with actor/events AI modelling
-* Experiment with multiplayer architectures
-* Make more people use Rust for game development
-* Multi-platform game development
+Piston is as much a community project as it is a collection of libraries.
+Writing and maintaining code is expensive, and by sharing this cost we reach our goals faster.
+We believe that seeking personal goals and ambitions, while helping each other, results in higher quality.
+
+* Our main goal is to free up time for maintainers and the people involved
+* ... such that we can create new amazing stuff and reach our personal goals
+* ... by making more people use Rust for game development and become engaged in open source
+
+In addition we do research or plan to in the following areas:
+
+* Graphics, 2D and 3D
+* Idiomatic Rust game design
+* Interactive applications
+* AI programming
+* Animation
+* Sound and music
+* Network
