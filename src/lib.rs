@@ -4,7 +4,7 @@
 #![feature(default_type_params)]
 #![feature(globs)]
 
-//! A user friendly graphics engine.
+//! A user friendly game engine written in Rust.
 
 extern crate time;
 extern crate sync;
