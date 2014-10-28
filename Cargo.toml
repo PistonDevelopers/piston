@@ -16,6 +16,3 @@ path = "src/lib.rs"
 
 git = "https://github.com/PistonDevelopers/input"
 
-[[test]]
-name = "tests"
-
