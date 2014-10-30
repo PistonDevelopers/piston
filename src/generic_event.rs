@@ -62,7 +62,7 @@ pub fn assert_event_trait<
         tested_equal = true;
     });
     if !tested_equal {
-        fail!("Expected event trait '{}', found '{}'", name, e);
+        panic!("Expected event trait '{}', found '{}'", name, e);
     }
 }
 
