@@ -6,6 +6,8 @@ Maintainers: @bvssvni, @Coeuvre
 
 [Examples](https://github.com/pistondevelopers/piston-examples)
 
+[List of features](https://github.com/PistonDevelopers/piston/issues/668)
+
 [List of games made with Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
 
 [Piston online docs](http://www.rust-ci.org/PistonDevelopers/piston/doc/piston/)
