@@ -1,5 +1,5 @@
 #![crate_name = "input"]
-#![deny(missing_doc)]
+#![deny(missing_docs)]
 #![feature(globs)]
 #![feature(struct_variant)]
 

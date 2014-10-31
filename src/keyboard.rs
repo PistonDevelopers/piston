@@ -16,7 +16,7 @@ use {
 // Defining every combination to allow assignment in static expressions.
 bitflags!(
     #[deriving(Show)]
-    #[allow(missing_doc)]
+    #[allow(missing_docs)]
     #[deriving(Decodable, Encodable)]
     flags ModifierKey: u8 {
         const NO_MODIFIER           = 0b00000000,
@@ -85,7 +85,7 @@ impl Default for ModifierKey {
 }
 
 /// Represent a keyboard key.
-#[allow(missing_doc)]
+#[allow(missing_docs)]
 #[deriving(Clone, Decodable, Encodable, Show)]
 pub enum Key {
     Unknown                 = 0,
