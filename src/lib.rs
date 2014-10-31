@@ -9,7 +9,7 @@
 
 #![crate_type = "lib"]
 #![crate_name = "event"]
-#![deny(missing_doc)]
+#![deny(missing_docs)]
 #![feature(default_type_params)]
 
 extern crate time;
