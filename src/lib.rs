@@ -1,5 +1,5 @@
 #![crate_name = "piston"]
-#![deny(missing_doc)]
+#![deny(missing_docs)]
 #![warn(dead_code)]
 #![feature(default_type_params)]
 #![feature(globs)]
