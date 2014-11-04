@@ -25,7 +25,7 @@ Maintainers: @bvssvni, @Coeuvre
 
 Use one of the [examples](https://github.com/pistondevelopers/piston-examples) as guide.
 
-Almost all projects written in Rust uses the Cargo package manager.
+Almost all projects written in Rust use the Cargo package manager.
 
 1. Install [Cargo](https://github.com/rust-lang/cargo)
 2. Open the Terminal window and type:
