@@ -2,6 +2,7 @@ use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
 use std::cell::RefCell;
+use current::{ Modifier };
 
 use {
     Event,
@@ -25,13 +26,26 @@ enum EventsState {
     UpdateState,
 }
 
-/// Settings for the game loop behavior.
-#[deriving(Clone)]
-pub struct EventSettings {
-    /// The number of updates per second (UPS).
-    pub updates_per_second: u64,
-    /// The maximum number of frames per second (FPS target).
-    pub max_frames_per_second: u64,
+/// The number of updates per second.
+/// If the event loop lags, it will try to catch up.
+pub struct Ups(pub u64);
+
+impl<'a, E> Modifier<Events<'a, E>> for Ups {
+    fn modify(self, events: &mut Events<'a, E>) {
+        let Ups(frames) = self;
+        events.dt_update_in_ns = BILLION / frames;
+    }
+}
+
+/// The maximum number of frames per second.
+/// Next frame is always scheduled from the previous frame.
+pub struct MaxFps(pub u64);
+
+impl<'a, E> Modifier<Events<'a, E>> for MaxFps {
+    fn modify(self, events: &mut Events<'a, E>) {
+        let MaxFps(frames) = self;
+        events.dt_frame_in_ns = BILLION / frames;
+    }
 }
 
 /// A game loop iterator.
@@ -43,13 +57,11 @@ pub struct EventSettings {
 /// Example:
 ///
 /// ```Rust
-/// let event_settings = EventSettings {
-///     updates_per_second: 120,
-///     max_frames_per_second: 60,
-/// };
 /// let ref mut gl = Gl::new();
 /// let window = RefCell::new(window);
-/// for e in Events::new(&window, &event_settings) {
+/// for e in Events::new(&window)
+///     .set(Ups(120))
+///     .set(MaxFps(60)) {
 ///     use event::RenderEvent;
 ///     e.render(|args| {
 ///         // Set the viewport in window to render graphics.
@@ -73,18 +85,19 @@ pub struct Events<'a, W: 'a> {
 
 static BILLION: u64 = 1_000_000_000;
 
+/// The default updates per second.
+pub const DEFAULT_UPS: Ups = Ups(120);
+/// The default maximum frames per second.
+pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
+
 impl<'a, W: Window<I>, I: GenericEvent> Events<'a, W> {
-    /// Creates a new game iterator.
+    /// Creates a new event iterator with default UPS and FPS settings.
     /// Uses a `RefCell` reference to the window,
     /// because it is likely to be access elsewhere while polling events.
-    pub fn new(
-        window: &'a RefCell<W>,
-        settings: &EventSettings
-    ) -> Events<'a, W> {
-        let updates_per_second: u64 = settings.updates_per_second;
-        let max_frames_per_second: u64 = settings.max_frames_per_second;
-
+    pub fn new(window: &'a RefCell<W>) -> Events<'a, W> {
         let start = time::precise_time_ns();
+        let Ups(updates_per_second) = DEFAULT_UPS;
+        let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
         Events {
             window: window,
             state: RenderState,

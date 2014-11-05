@@ -16,3 +16,7 @@ path = "src/lib.rs"
 
 git = "https://github.com/PistonDevelopers/input"
 
+[dependencies.current]
+
+git = "https://github.com/PistonDevelopers/current"
+
