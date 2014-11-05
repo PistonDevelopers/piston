@@ -21,8 +21,8 @@ pub use window::{
     WindowSettings,
     NoWindow
 };
-pub use event_iterator::{
-    EventIterator,
+pub use events::{
+    Events,
     EventSettings,
 };
 pub use generic_event::{ assert_event_trait, GenericEvent };
@@ -40,7 +40,7 @@ pub mod ptr;
 pub mod drag_controller;
 
 mod window;
-mod event_iterator;
+mod events;
 mod generic_event;
 mod update;
 mod render;
