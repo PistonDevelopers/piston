@@ -1,6 +1,7 @@
 use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
+use std::cell::RefCell;
 
 use {
     Event,
@@ -61,7 +62,7 @@ pub struct EventSettings {
 /// ```
 pub struct EventIterator<'a, W: 'a> {
     /// The game window used by iterator.
-    pub window: &'a mut W,
+    pub window: &'a RefCell<W>,
     state: EventIteratorState,
     last_update: u64,
     last_frame: u64,
@@ -74,8 +75,10 @@ static BILLION: u64 = 1_000_000_000;
 
 impl<'a, W: Window<I>, I: GenericEvent> EventIterator<'a, W> {
     /// Creates a new game iterator.
+    /// Uses a `RefCell` reference to the window,
+    /// because it is likely to be access elsewhere while polling events.
     pub fn new(
-        window: &'a mut W,
+        window: &'a RefCell<W>,
         settings: &EventSettings
     ) -> EventIterator<'a, W> {
         let updates_per_second: u64 = settings.updates_per_second;
@@ -99,15 +102,16 @@ Iterator<Event<I>>
 for EventIterator<'a, W> {
     /// Returns the next game event.
     fn next(&mut self) -> Option<Event<I>> {
+        let mut window = self.window.borrow_mut();
         loop {
             self.state = match self.state {
                 RenderState => {
-                    if self.window.should_close() { return None; }
+                    if window.should_close() { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let (w, h) = self.window.get_size();
+                    let (w, h) = window.get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
@@ -123,7 +127,7 @@ for EventIterator<'a, W> {
                     UpdateLoopState
                 }
                 SwapBuffersState => {
-                    self.window.swap_buffers();
+                    window.swap_buffers();
                     UpdateLoopState
                 }
                 UpdateLoopState => {
@@ -142,7 +146,7 @@ for EventIterator<'a, W> {
                 }
                 HandleEventsState => {
                     // Handle all events before updating.
-                    match self.window.poll_event() {
+                    match window.poll_event() {
                         None => UpdateState,
                         Some(x) => { return Some(Input(x)); },
                     }
