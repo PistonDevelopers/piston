@@ -39,7 +39,7 @@ pub use event::{
     Update,
     Input,
     Event,
-    EventIterator,
+    Events,
     EventSettings,
     NoWindow,
     RenderArgs,
