@@ -17,7 +17,7 @@ use {
 use std::cmp;
 
 #[deriving(Show)]
-enum EventIteratorState {
+enum EventsState {
     RenderState,
     SwapBuffersState,
     UpdateLoopState,
@@ -48,22 +48,22 @@ pub struct EventSettings {
 ///     max_frames_per_second: 60,
 /// };
 /// let ref mut gl = Gl::new();
-/// for e in EventIterator::new(&mut window, &event_settings) {
-///     match e {
-///         Render(args) => {
-///             // Set the viewport in window to render graphics.
-///             gl.viewport(0, 0, args.width as i32, args.height as i32);
-///             // Create graphics context with absolute coordinates.
-///             let c = Context::abs(args.width as f64, args.height as f64);
-///             // Do rendering here.
-///         },
-///     }
+/// let window = RefCell::new(window);
+/// for e in Events::new(&window, &event_settings) {
+///     use event::RenderEvent;
+///     e.render(|args| {
+///         // Set the viewport in window to render graphics.
+///         gl.viewport(0, 0, args.width as i32, args.height as i32);
+///         // Create graphics context with absolute coordinates.
+///         let c = Context::abs(args.width as f64, args.height as f64);
+///         // Do rendering here.
+///     });
 /// }
 /// ```
-pub struct EventIterator<'a, W: 'a> {
+pub struct Events<'a, W: 'a> {
     /// The game window used by iterator.
     pub window: &'a RefCell<W>,
-    state: EventIteratorState,
+    state: EventsState,
     last_update: u64,
     last_frame: u64,
     dt_update_in_ns: u64,
@@ -73,19 +73,19 @@ pub struct EventIterator<'a, W: 'a> {
 
 static BILLION: u64 = 1_000_000_000;
 
-impl<'a, W: Window<I>, I: GenericEvent> EventIterator<'a, W> {
+impl<'a, W: Window<I>, I: GenericEvent> Events<'a, W> {
     /// Creates a new game iterator.
     /// Uses a `RefCell` reference to the window,
     /// because it is likely to be access elsewhere while polling events.
     pub fn new(
         window: &'a RefCell<W>,
         settings: &EventSettings
-    ) -> EventIterator<'a, W> {
+    ) -> Events<'a, W> {
         let updates_per_second: u64 = settings.updates_per_second;
         let max_frames_per_second: u64 = settings.max_frames_per_second;
 
         let start = time::precise_time_ns();
-        EventIterator {
+        Events {
             window: window,
             state: RenderState,
             last_update: start,
@@ -99,7 +99,7 @@ impl<'a, W: Window<I>, I: GenericEvent> EventIterator<'a, W> {
 
 impl<'a, W: Window<I>, I: GenericEvent>
 Iterator<Event<I>>
-for EventIterator<'a, W> {
+for Events<'a, W> {
     /// Returns the next game event.
     fn next(&mut self) -> Option<Event<I>> {
         let mut window = self.window.borrow_mut();
