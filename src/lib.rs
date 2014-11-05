@@ -15,6 +15,7 @@
 extern crate time;
 extern crate input;
 extern crate serialize;
+extern crate current;
 
 pub use window::{
     Window,
@@ -23,7 +24,8 @@ pub use window::{
 };
 pub use events::{
     Events,
-    EventSettings,
+    MaxFps,
+    Ups,
 };
 pub use generic_event::{ assert_event_trait, GenericEvent };
 pub use update::{ UpdateArgs, UpdateEvent };
