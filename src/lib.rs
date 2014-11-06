@@ -40,7 +40,6 @@ pub use event::{
     Input,
     Event,
     Events,
-    EventSettings,
     NoWindow,
     RenderArgs,
     UpdateArgs,
