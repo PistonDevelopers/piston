@@ -40,8 +40,8 @@ pub use focus::FocusEvent;
 
 pub mod ptr;
 pub mod drag_controller;
+pub mod window;
 
-mod window;
 mod events;
 mod generic_event;
 mod update;

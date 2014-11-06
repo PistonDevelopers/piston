@@ -2,7 +2,14 @@ use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
 use std::cell::RefCell;
-use current::{ Modifier };
+use current::{ Get, Modifier };
+use window::{
+    PollEvent, 
+    ShouldClose,
+    Size,
+    SwapBuffers,
+    Window,
+};
 
 use {
     Event,
@@ -12,7 +19,6 @@ use {
     RenderArgs,
     Update,
     UpdateArgs,
-    Window,
 };
 
 use std::cmp;
@@ -90,7 +96,7 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<'a, W: Window<I>, I: GenericEvent> Events<'a, W> {
+impl<'a, W> Events<'a, W> {
     /// Creates a new event iterator with default UPS and FPS settings.
     /// Uses a `RefCell` reference to the window,
     /// because it is likely to be access elsewhere while polling events.
@@ -110,21 +116,40 @@ impl<'a, W: Window<I>, I: GenericEvent> Events<'a, W> {
     }
 }
 
-impl<'a, W: Window<I>, I: GenericEvent>
+/// Wrapper for `Get<ShouldClose>`
+trait GetShouldClose: Get<ShouldClose> {
+    /// wraps method.
+    fn get_should_close(&self) -> ShouldClose { self.get() }
+}
+
+impl<T: Get<ShouldClose>> GetShouldClose for T {}
+
+/// Wrapper for `Get<Size>`
+trait GetSize: Get<Size> {
+    /// wraps method.
+    fn get_size(&self) -> Size { self.get() }
+}
+
+impl<T: Get<Size>> GetSize for T {}
+
+impl<'a, W: PollEvent<I> + GetShouldClose + GetSize
+          + SwapBuffers, I: GenericEvent>
 Iterator<Event<I>>
 for Events<'a, W> {
     /// Returns the next game event.
     fn next(&mut self) -> Option<Event<I>> {
         let mut window = self.window.borrow_mut();
+        let window = window.deref_mut();
         loop {
             self.state = match self.state {
                 RenderState => {
-                    if window.should_close() { return None; }
+                    let ShouldClose(should_close) = (*window).get_should_close();
+                    if should_close { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let (w, h) = window.get_size();
+                    let Size([w, h]) = (*window).get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
