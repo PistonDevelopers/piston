@@ -132,8 +132,8 @@ trait GetSize: Get<Size> {
 
 impl<T: Get<Size>> GetSize for T {}
 
-impl<'a, W: PollEvent<I> + GetShouldClose + GetSize
-          + SwapBuffers, I: GenericEvent>
+impl<'a, W: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers,
+    I: GenericEvent>
 Iterator<Event<I>>
 for Events<'a, W> {
     /// Returns the next game event.
