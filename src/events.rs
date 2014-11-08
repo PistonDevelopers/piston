@@ -1,7 +1,6 @@
 use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use std::cell::RefCell;
 use current::{ Modifier };
 use window::{
     PollEvent, 
@@ -35,8 +34,8 @@ enum EventsState {
 /// If the event loop lags, it will try to catch up.
 pub struct Ups(pub u64);
 
-impl<'a, E> Modifier<Events<'a, E>> for Ups {
-    fn modify(self, events: &mut Events<'a, E>) {
+impl<W> Modifier<Events<W>> for Ups {
+    fn modify(self, events: &mut Events<W>) {
         let Ups(frames) = self;
         events.dt_update_in_ns = BILLION / frames;
     }
@@ -46,12 +45,19 @@ impl<'a, E> Modifier<Events<'a, E>> for Ups {
 /// Next frame is always scheduled from the previous frame.
 pub struct MaxFps(pub u64);
 
-impl<'a, E> Modifier<Events<'a, E>> for MaxFps {
-    fn modify(self, events: &mut Events<'a, E>) {
+impl<W> Modifier<Events<W>> for MaxFps {
+    fn modify(self, events: &mut Events<W>) {
         let MaxFps(frames) = self;
         events.dt_frame_in_ns = BILLION / frames;
     }
 }
+
+/// Defines generic constraints for event loop.
+/// This is auto implemented by all types that satisfy the constraints.
+pub trait EventWindow<I: GenericEvent>: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers {}
+
+impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I: GenericEvent>
+EventWindow<I> for T {}
 
 /// A game loop iterator.
 ///
@@ -77,9 +83,9 @@ impl<'a, E> Modifier<Events<'a, E>> for MaxFps {
 ///     });
 /// }
 /// ```
-pub struct Events<'a, W: 'a> {
+pub struct Events<W> {
     /// The game window used by iterator.
-    pub window: &'a RefCell<W>,
+    pub window: W,
     state: EventsState,
     last_update: u64,
     last_frame: u64,
@@ -95,11 +101,9 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<'a, W> Events<'a, W> {
+impl<W: EventWindow<I>, I: GenericEvent> Events<W> {
     /// Creates a new event iterator with default UPS and FPS settings.
-    /// Uses a `RefCell` reference to the window,
-    /// because it is likely to be access elsewhere while polling events.
-    pub fn new(window: &'a RefCell<W>) -> Events<'a, W> {
+    pub fn new(window: W) -> Events<W> {
         let start = time::precise_time_ns();
         let Ups(updates_per_second) = DEFAULT_UPS;
         let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
@@ -115,24 +119,21 @@ impl<'a, W> Events<'a, W> {
     }
 }
 
-impl<'a, W: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers,
-    I: GenericEvent>
+impl<W: EventWindow<I>, I: GenericEvent>
 Iterator<Event<I>>
-for Events<'a, W> {
+for Events<W> {
     /// Returns the next game event.
     fn next(&mut self) -> Option<Event<I>> {
-        let mut window = self.window.borrow_mut();
-        let window = window.deref_mut();
         loop {
             self.state = match self.state {
                 RenderState => {
-                    let ShouldClose(should_close) = (*window).get_should_close();
+                    let ShouldClose(should_close) = self.window.get_should_close();
                     if should_close { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let Size([w, h]) = (*window).get_size();
+                    let Size([w, h]) = self.window.get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
@@ -148,7 +149,7 @@ for Events<'a, W> {
                     UpdateLoopState
                 }
                 SwapBuffersState => {
-                    window.swap_buffers();
+                    self.window.swap_buffers();
                     UpdateLoopState
                 }
                 UpdateLoopState => {
@@ -167,7 +168,7 @@ for Events<'a, W> {
                 }
                 HandleEventsState => {
                     // Handle all events before updating.
-                    match window.poll_event() {
+                    match self.window.poll_event() {
                         None => UpdateState,
                         Some(x) => { return Some(Input(x)); },
                     }
