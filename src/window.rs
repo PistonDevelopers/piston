@@ -1,7 +1,8 @@
 //! Game window operations.
 
+use std::cell::RefCell;
 use input::InputEvent;
-use current::Get;
+use current::{ Get, Usage };
 
 use GenericEvent;
 
@@ -17,10 +18,42 @@ pub trait SwapBuffers {
     fn swap_buffers(&mut self);
 }
 
+impl<'a, W: 'a + SwapBuffers> SwapBuffers for Usage<'a, W> {
+    #[inline(always)]
+    fn swap_buffers(&mut self) {
+        self.with_unwrap(|window: &RefCell<W>| {
+            window.borrow_mut().deref_mut().swap_buffers()
+        })
+    }
+}
+
+impl<'a, W: 'a + SwapBuffers> SwapBuffers for &'a RefCell<W> {
+    #[inline(always)]
+    fn swap_buffers(&mut self) {
+        self.borrow_mut().deref_mut().swap_buffers()
+    }
+}
+
 /// Implemented by windows that can pull events.
 pub trait PollEvent<E: GenericEvent> {
     /// Polls event from window.
     fn poll_event(&mut self) -> Option<E>;
+}
+
+impl<'a, W: 'a + PollEvent<I>, I: GenericEvent> PollEvent<I> for Usage<'a, W> {
+    #[inline(always)]
+    fn poll_event(&mut self) -> Option<I> {
+        self.with_unwrap(|window: &RefCell<W>| {
+            window.borrow_mut().deref_mut().poll_event()
+        })
+    }
+}
+
+impl<'a, W: 'a + PollEvent<I>, I: GenericEvent> PollEvent<I> for &'a RefCell<W> {
+    #[inline(always)]
+    fn poll_event(&mut self) -> Option<I> {
+        self.borrow_mut().deref_mut().poll_event()
+    }
 }
 
 /// Settings for window behavior.
