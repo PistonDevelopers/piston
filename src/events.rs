@@ -2,13 +2,12 @@ use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
 use std::cell::RefCell;
-use current::{ Get, Modifier };
+use current::{ Modifier };
 use window::{
     PollEvent, 
-    ShouldClose,
-    Size,
+    ShouldClose, GetShouldClose,
+    Size, GetSize,
     SwapBuffers,
-    Window,
 };
 
 use {
@@ -115,22 +114,6 @@ impl<'a, W> Events<'a, W> {
         }
     }
 }
-
-/// Wrapper for `Get<ShouldClose>`
-trait GetShouldClose: Get<ShouldClose> {
-    /// wraps method.
-    fn get_should_close(&self) -> ShouldClose { self.get() }
-}
-
-impl<T: Get<ShouldClose>> GetShouldClose for T {}
-
-/// Wrapper for `Get<Size>`
-trait GetSize: Get<Size> {
-    /// wraps method.
-    fn get_size(&self) -> Size { self.get() }
-}
-
-impl<T: Get<Size>> GetSize for T {}
 
 impl<'a, W: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers,
     I: GenericEvent>

@@ -8,23 +8,8 @@ use GenericEvent;
 /// Whether window should close or not.
 pub struct ShouldClose(pub bool);
 
-impl<T: Window<E>, E: GenericEvent>
-Get<ShouldClose> for T {
-    fn get(&self) -> ShouldClose {
-        ShouldClose(self.should_close())
-    }
-}
-
 /// The size of the window.
 pub struct Size(pub [u32, ..2]);
-
-impl<T: Window<E>, E: GenericEvent>
-Get<Size> for T {
-    fn get(&self) -> Size {
-        let (w, h) = self.get_size();
-        Size([w, h])
-    }
-}
 
 /// Implemented by windows that can swap buffers.
 pub trait SwapBuffers {
@@ -68,22 +53,39 @@ impl WindowSettings {
     }
 }
 
+/// Work-around trait for `Get<ShouldClose>`.
+/// Used to support generic constraints.
+pub trait GetShouldClose: Get<ShouldClose> {
+    /// Returns whether window should close.
+    fn get_should_close(&self) -> ShouldClose {
+        self.get()
+    }
+}
+
+impl<T: Get<ShouldClose>> GetShouldClose for T {}
+
+/// Work-around trait for `Get<Size>`.
+/// Used to support generic constraints.
+pub trait GetSize: Get<Size> {
+    /// Returns the size of window.
+    fn get_size(&self) -> Size {
+        self.get()
+    }
+}
+
+impl<T: Get<Size>> GetSize for T {}
 
 /// Implemented by window back-end.
 pub trait Window<E: GenericEvent = InputEvent>:
     SwapBuffers
-  + PollEvent<E> {
+  + PollEvent<E>
+  + GetShouldClose
+  + GetSize {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a WindowSettings;
 
-    /// Returns true if the window should close.
-    fn should_close(&self) -> bool;
-
     /// Inform the window that it should close.
     fn close(&mut self);
-
-    /// Get the window's size
-    fn get_size(&self) -> (u32, u32);
 
     /// Get the size in drawing coordinates.
     fn get_draw_size(&self) -> (u32, u32);
@@ -94,14 +96,14 @@ pub trait Window<E: GenericEvent = InputEvent>:
     fn capture_cursor(&mut self, _enabled: bool);
 }
 
-/// An implementation of GameWindow that represents running without a window at all
+/// An implementation of Window that runs without a window at all.
 pub struct NoWindow {
     settings: WindowSettings,
     should_close: bool
 }
 
 impl NoWindow {
-    /// Create a new nonexistant game window
+    /// Returns a new `NoWindow`.
     pub fn new(settings: WindowSettings) -> NoWindow {
          NoWindow {
              settings: settings,
@@ -118,25 +120,30 @@ impl PollEvent<InputEvent> for NoWindow {
     fn poll_event(&mut self) -> Option<InputEvent> { None }
 }
 
+impl Get<ShouldClose> for NoWindow {
+    fn get(&self) -> ShouldClose {
+        ShouldClose(self.should_close)
+    }
+}
+
+impl Get<Size> for NoWindow {
+    fn get(&self) -> Size {
+        Size([0, 0])
+    }
+}
+
 impl Window<InputEvent> for NoWindow {
      fn get_settings<'a>(&'a self) -> &'a WindowSettings {
         &self.settings
      }
 
-    fn should_close(&self) -> bool {
-        self.should_close
-    }
-
     fn close(&mut self) {
         self.should_close = true
     }
 
-    fn get_size(&self) -> (u32, u32) {
-        (0, 0)
-    }
-
     fn get_draw_size(&self) -> (u32, u32) {
-        self.get_size()
+        let Size([w, h]) = self.get_size();
+        (w, h)
     }
 
     fn capture_cursor(&mut self, _enabled: bool) {}
