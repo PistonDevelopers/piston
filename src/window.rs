@@ -390,13 +390,12 @@ impl WindowSettings {
 pub trait Window<E: GenericEvent = InputEvent>:
     SwapBuffers
   + PollEvent<E>
-  + GetShouldClose
-  + SetShouldClose
+  + GetShouldClose + SetShouldClose
   + GetSize
   + SetCaptureCursor
   + GetDrawSize
-  + GetTitle
-  + SetTitle {}
+  + GetTitle + SetTitle
+  + GetExitOnEsc + SetExitOnEsc {}
 
 /// An implementation of Window that runs without a window at all.
 pub struct NoWindow {
@@ -484,5 +483,22 @@ impl SetTitle for NoWindow {
     fn set_title(&mut self, val: Title) {
         self.set_mut(val);
     }
+}
+
+impl Get<ExitOnEsc> for NoWindow {
+    fn get(&self) -> ExitOnEsc {
+        ExitOnEsc(false)
+    }
+}
+
+impl Modifier<NoWindow> for ExitOnEsc {
+    // Ignore attempt to exit by pressing Esc.
+    fn modify(self, _window: &mut NoWindow) {}
+}
+
+impl SetExitOnEsc for NoWindow {
+    fn set_exit_on_esc(&mut self, val: ExitOnEsc) {
+        self.set_mut(val);
+    }    
 }
 
