@@ -391,13 +391,11 @@ pub trait Window<E: GenericEvent = InputEvent>:
     SwapBuffers
   + PollEvent<E>
   + GetShouldClose
+  + SetShouldClose
   + GetSize
   + SetCaptureCursor {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a WindowSettings;
-
-    /// Inform the window that it should close.
-    fn close(&mut self);
 
     /// Get the size in drawing coordinates.
     fn get_draw_size(&self) -> (u32, u32);
@@ -449,14 +447,23 @@ impl SetCaptureCursor for NoWindow {
     }
 }
 
+impl Modifier<NoWindow> for ShouldClose {
+    fn modify(self, window: &mut NoWindow) {
+        let ShouldClose(val) = self;
+        window.should_close = val;
+    }
+}
+
+impl SetShouldClose for NoWindow {
+    fn set_should_close(&mut self, val: ShouldClose) {
+        self.set_mut(val);
+    }
+}
+
 impl Window<InputEvent> for NoWindow {
      fn get_settings<'a>(&'a self) -> &'a WindowSettings {
         &self.settings
      }
-
-    fn close(&mut self) {
-        self.should_close = true
-    }
 
     fn get_draw_size(&self) -> (u32, u32) {
         let Size([w, h]) = self.get_size();
