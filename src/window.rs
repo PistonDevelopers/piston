@@ -2,15 +2,95 @@
 
 use std::cell::RefCell;
 use input::InputEvent;
-use current::{ Get, Usage };
+use current::{ Get, Set, Usage };
 
 use GenericEvent;
 
 /// Whether window should close or not.
 pub struct ShouldClose(pub bool);
 
+/// Work-around trait for `Get<ShouldClose>`.
+/// Used to support generic constraints.
+pub trait GetShouldClose: Get<ShouldClose> {
+    /// Returns whether window should close.
+    fn get_should_close(&self) -> ShouldClose {
+        self.get()
+    }
+}
+
+impl<T: Get<ShouldClose>> GetShouldClose for T {}
+
+/// Work-around trait for `Set<ShouldClose>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetShouldClose: Set<ShouldClose> {
+    /// Sets whether window should close.
+    fn set_should_close(&mut self, val: ShouldClose);
+}
+
 /// The size of the window.
 pub struct Size(pub [u32, ..2]);
+
+/// Work-around trait for `Get<Size>`.
+/// Used to support generic constraints.
+pub trait GetSize: Get<Size> {
+    /// Returns the size of window.
+    fn get_size(&self) -> Size {
+        self.get()
+    }
+}
+
+impl<T: Get<Size>> GetSize for T {}
+
+/// Work-around trait for `Get<Size>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetSize: Set<Size> {
+    /// Sets size of window.
+    fn set_size(&mut self, val: Size);
+}
+
+#[test]
+fn test_methods() {
+    use current::Modifier;
+    
+    struct Obj;
+
+    impl Get<ShouldClose> for Obj {
+        fn get(&self) -> ShouldClose { ShouldClose(false) }
+    }
+
+    impl Modifier<Obj> for ShouldClose {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetShouldClose for Obj {
+        fn set_should_close(&mut self, val: ShouldClose) {
+            self.set_mut(val);
+        }
+    }
+
+    impl Get<Size> for Obj {
+        fn get(&self) -> Size { Size([0, 0]) }
+    }
+
+    impl Modifier<Obj> for Size {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetSize for Obj {
+        fn set_size(&mut self, val: Size) {
+            self.set_mut(val);
+        }
+    }
+
+    fn foo<T: GetShouldClose 
+            + GetSize 
+            + SetShouldClose
+            + SetSize>(_obj: T) {}
+
+    foo(Obj);
+}
 
 /// Implemented by windows that can swap buffers.
 pub trait SwapBuffers {
@@ -85,28 +165,6 @@ impl WindowSettings {
         }
     }
 }
-
-/// Work-around trait for `Get<ShouldClose>`.
-/// Used to support generic constraints.
-pub trait GetShouldClose: Get<ShouldClose> {
-    /// Returns whether window should close.
-    fn get_should_close(&self) -> ShouldClose {
-        self.get()
-    }
-}
-
-impl<T: Get<ShouldClose>> GetShouldClose for T {}
-
-/// Work-around trait for `Get<Size>`.
-/// Used to support generic constraints.
-pub trait GetSize: Get<Size> {
-    /// Returns the size of window.
-    fn get_size(&self) -> Size {
-        self.get()
-    }
-}
-
-impl<T: Get<Size>> GetSize for T {}
 
 /// Implemented by window back-end.
 pub trait Window<E: GenericEvent = InputEvent>:
