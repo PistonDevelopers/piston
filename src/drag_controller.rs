@@ -1,4 +1,4 @@
-//! A drag controller.
+//! A drag controller
 
 use {
     FocusEvent,
@@ -12,7 +12,7 @@ use input::{
     Mouse,
 };
 
-/// Describes a drag.
+/// Describes a drag
 pub enum Drag {
     /// When the drag is interrupted by something,
     /// for example when the window is defocused.

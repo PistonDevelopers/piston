@@ -1,8 +1,8 @@
-//! Dynamic reflection of temporary pointers.
+//! Dynamic reflection of temporary pointers
 
 use std::intrinsics::{ get_tydesc, TypeId };
 
-/// A safe temporary wrapper for pointers.
+/// A safe temporary wrapper for pointers
 ///
 /// This can be used to call a generic callback,
 /// where the type is agreed upon, but not verified by type system.

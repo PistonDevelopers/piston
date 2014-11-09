@@ -3,7 +3,7 @@ use std::intrinsics::TypeId;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Implemented by event structures that support focus event.
+/// When window gets or looses focus
 pub trait FocusEvent {
     /// Creates a focus event.
     fn from_focused(focused: bool) -> Option<Self>;

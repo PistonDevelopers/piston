@@ -4,7 +4,7 @@ use input::Button;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Implemented by event structures that support press event.
+/// The press of a button
 pub trait PressEvent {
     /// Creates a press event.
     fn from_button(button: Button) -> Option<Self>;

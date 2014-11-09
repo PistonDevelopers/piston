@@ -3,7 +3,7 @@ use std::intrinsics::TypeId;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Implemented by event structures that support mouse cursor event.
+/// The position of the mouse cursor
 pub trait MouseCursorEvent {
     /// Creates a mouse cursor event.
     fn from_xy(x: f64, y: f64) -> Option<Self>;
@@ -30,7 +30,7 @@ impl<T: GenericEvent> MouseCursorEvent for T {
     }
 }
 
-/// Implemented by event structures that support mouse relative event.
+/// The relative movement of mouse cursor
 pub trait MouseRelativeEvent {
     /// Creates a mouse relative event.
     fn from_xy(x: f64, y: f64) -> Option<Self>;
@@ -57,7 +57,7 @@ impl<T: GenericEvent> MouseRelativeEvent for T {
     }
 }
 
-/// Implemented by event structures that support mouse scroll event.
+/// The scroll of the mouse wheel
 pub trait MouseScrollEvent {
     /// Creates a mouse scroll event.
     fn from_xy(x: f64, y: f64) -> Option<Self>;

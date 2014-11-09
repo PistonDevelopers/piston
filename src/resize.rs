@@ -3,7 +3,7 @@ use std::intrinsics::TypeId;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Implemented by event structures that support resize event.
+/// When the window is resized
 pub trait ResizeEvent {
     /// Creates a resize event.
     fn from_width_height(w: u32, h: u32) -> Option<Self>;

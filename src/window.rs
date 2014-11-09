@@ -1,4 +1,4 @@
-//! Game window operations.
+//! Window abstraction
 
 use std::cell::RefCell;
 use input::InputEvent;
