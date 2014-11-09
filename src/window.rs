@@ -42,12 +42,144 @@ pub trait GetSize: Get<Size> {
 
 impl<T: Get<Size>> GetSize for T {}
 
-/// Work-around trait for `Get<Size>`.
+/// Work-around trait for `Set<Size>`.
 /// Used to support generic constraints.
 /// This must be implemented for every `Modifier` impl.
 pub trait SetSize: Set<Size> {
     /// Sets size of window.
     fn set_size(&mut self, val: Size);
+}
+
+/// The title of the window.
+pub struct Title(pub String);
+
+/// Work-around trait for `Get<Title>`.
+/// Used to support generic constraints.
+pub trait GetTitle: Get<Title> {
+    /// Returns the title of the window.
+    fn get_title(&self) -> Title {
+        self.get()
+    }
+}
+
+impl<T: Get<Title>> GetTitle for T {}
+
+/// Work-around trait for `Set<Title>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetTitle: Set<Title> {
+    /// Sets title of window.
+    fn set_title(&mut self, val: Title);
+}
+
+/// The anti-aliasing samples when rendering.
+pub struct Samples(pub u8);
+
+/// Work-around trait for `Get<Samples>`.
+/// Used to support generic constraints.
+pub trait GetSamples: Get<Samples> {
+    /// Returns the antialiasing samples when rendering.
+    fn get_samples(&self) -> Samples {
+        self.get()
+    }
+}
+
+impl<T: Get<Samples>> GetSamples for T {}
+
+/// Work-around trait for `Set<Samples>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetSamples: Set<Samples> {
+    /// Sets antialiasing samples of window.
+    fn set_samples(&mut self, val: Samples);
+}
+
+/// Whether window is opened in full screen mode.
+pub struct Fullscreen(pub bool);
+
+/// Work-around trait for `Get<Fullscreen>`.
+/// Used to support generic constraints.
+pub trait GetFullscreen: Get<Fullscreen> {
+    /// Returns whether window is in full screen mode.
+    fn get_fullscreen(&self) -> Fullscreen {
+        self.get()
+    }
+}
+
+impl<T: Get<Fullscreen>> GetFullscreen for T {}
+
+/// Work-around trait for `Set<Fullscreen>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetFullscreen: Set<Fullscreen> {
+    /// Sets window to fullscreen mode.
+    fn set_fullscreen(&mut self, val: Fullscreen);
+}
+
+/// Whether to exit when pressing the Esc keyboard button.
+pub struct ExitOnEsc(pub bool);
+
+/// Work-around trait for `Get<ExitOnEsc>`.
+/// Used to support generic constraints.
+pub trait GetExitOnEsc: Get<ExitOnEsc> {
+    /// Returns whether window exits when pressing Esc.
+    fn get_exit_on_esc(&self) -> ExitOnEsc {
+        self.get()
+    }
+}
+
+impl<T: Get<ExitOnEsc>> GetExitOnEsc for T {}
+
+/// Work-around trait for `Set<ExitOnEsc>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetExitOnEsc: Set<ExitOnEsc> {
+    /// Sets exit when pressing Esc.
+    fn set_exit_on_esc(&mut self, val: ExitOnEsc);
+}
+
+/// Whether to capture the mouse cursor.
+pub struct CaptureCursor(pub bool);
+
+/// Work-around trait for `Get<CaptureCursor>`.
+/// Used to support generic constraints.
+pub trait GetCaptureCursor: Get<CaptureCursor> {
+    /// Returns whether window captures cursor.
+    fn get_capture_cursor(&self) -> CaptureCursor {
+        self.get()
+    }
+}
+
+impl<T: Get<CaptureCursor>> GetCaptureCursor for T {}
+
+/// Work-around trait for `Set<CaptureCursor>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetCaptureCursor: Set<CaptureCursor> {
+    /// Sets capture cursor.
+    fn set_capture_cursor(&mut self, val: CaptureCursor);
+}
+
+/// The draw size of the window.
+pub struct DrawSize(pub [u32, ..2]);
+
+/// Work-around trait for `Get<DrawSize>`.
+/// Used to support generic constraints.
+pub trait GetDrawSize: Get<DrawSize> {
+    /// Returns the draw size of window.
+    fn get_draw_size(&self) -> DrawSize {
+        self.get()
+    }
+}
+
+impl<T: Get<DrawSize>> GetDrawSize for T {}
+
+/// Work-around trait for `Set<DrawSize>`.
+/// Used to support generic constraints.
+/// This must be implemented for every `Modifier` impl.
+pub trait SetDrawSize: Set<DrawSize> {
+    /// Sets draw size.
+    fn set_draw_size(&mut self, val: DrawSize);
 }
 
 #[test]
@@ -84,10 +216,98 @@ fn test_methods() {
         }
     }
 
-    fn foo<T: GetShouldClose 
-            + GetSize 
-            + SetShouldClose
-            + SetSize>(_obj: T) {}
+    impl Get<Title> for Obj {
+        fn get(&self) -> Title { Title("hello".to_string()) }
+    }
+
+    impl Modifier<Obj> for Title {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetTitle for Obj {
+        fn set_title(&mut self, val: Title) {
+            self.set_mut(val);
+        }
+    }
+
+    impl Get<Samples> for Obj {
+        fn get(&self) -> Samples { Samples(0) }
+    }
+
+    impl Modifier<Obj> for Samples {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetSamples for Obj {
+        fn set_samples(&mut self, val: Samples) {
+            self.set_mut(val);
+        }
+    }
+
+    impl Get<Fullscreen> for Obj {
+        fn get(&self) -> Fullscreen { Fullscreen(false) }
+    }
+
+    impl Modifier<Obj> for Fullscreen {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetFullscreen for Obj {
+        fn set_fullscreen(&mut self, val: Fullscreen) {
+            self.set_mut(val);
+        }
+    }
+
+    impl Get<ExitOnEsc> for Obj {
+        fn get(&self) -> ExitOnEsc { ExitOnEsc(true) }
+    }
+
+    impl Modifier<Obj> for ExitOnEsc {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetExitOnEsc for Obj {
+        fn set_exit_on_esc(&mut self, val: ExitOnEsc) {
+            self.set_mut(val);
+        }
+    }
+
+    impl Get<CaptureCursor> for Obj {
+        fn get(&self) -> CaptureCursor { CaptureCursor(false) }
+    }
+
+    impl Modifier<Obj> for CaptureCursor {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetCaptureCursor for Obj {
+        fn set_capture_cursor(&mut self, val: CaptureCursor) {
+            self.set_mut(val);
+        }
+    }
+
+    impl Get<DrawSize> for Obj {
+        fn get(&self) -> DrawSize { DrawSize([0, 0]) }
+    }
+
+    impl Modifier<Obj> for DrawSize {
+        fn modify(self, _obj: &mut Obj) {}
+    }
+
+    impl SetDrawSize for Obj {
+        fn set_draw_size(&mut self, val: DrawSize) {
+            self.set_mut(val);
+        }
+    }
+
+    fn foo<T: GetShouldClose + SetShouldClose
+            + GetSize + SetSize
+            + GetTitle + SetTitle
+            + GetSamples + SetSamples
+            + GetFullscreen + SetFullscreen
+            + GetExitOnEsc + SetExitOnEsc
+            + GetCaptureCursor + SetCaptureCursor
+            + GetDrawSize + SetDrawSize>(_obj: T) {}
 
     foo(Obj);
 }
