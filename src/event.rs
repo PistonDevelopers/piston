@@ -11,12 +11,12 @@ use {
 };
 use ptr::Ptr;
 
-/// Contains the different game events.
+/// Adds render and update events to input events
 #[deriving(Clone, PartialEq, Show)]
 pub enum Event<I = input::InputEvent> {
     /// Render graphics.
     Render(RenderArgs),
-    /// Update physical state of the game.
+    /// Update the state of the application.
     Update(UpdateArgs),
     /// Input event.
     Input(I),

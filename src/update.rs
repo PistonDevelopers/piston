@@ -3,14 +3,14 @@ use std::intrinsics::TypeId;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Update argument.
+/// Update arguments, such as delta time in seconds
 #[deriving(Clone, PartialEq, Show)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
 }
 
-/// Implemented by event structures that supports update event.
+/// When the application state should be updated
 pub trait UpdateEvent {
     /// Creates an update event.
     fn from_update_args(args: &UpdateArgs) -> Option<Self>;

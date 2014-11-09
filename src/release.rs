@@ -4,7 +4,7 @@ use input::Button;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Implemented by event structures that support release event.
+/// The release of a button
 pub trait ReleaseEvent {
     /// Creates a release event.
     fn from_button(button: Button) -> Option<Self>;

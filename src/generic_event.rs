@@ -26,7 +26,7 @@ use {
 };
 use ptr::Ptr;
 
-/// Used as generic constraint for events.
+/// Used as generic constraint for events
 ///
 /// Methods should not be called directly.
 ///
@@ -40,8 +40,11 @@ pub trait GenericEvent {
     fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U>;
 }
 
-/// Asserts that an event is supported correctly and is that event.
+/// Asserts that an event is supported correctly
 ///
+/// This is used in unit tests to check that an implementation of `GenericEvent`
+/// is implemented correctly for a given event.
+/// The event must implement `PartialEq` to use this test.
 /// Example: `assert_event_trait::<Event, Box<Render>>(&e);`
 pub fn assert_event_trait<
     E: GenericEvent + PartialEq + Show,

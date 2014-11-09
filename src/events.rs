@@ -30,7 +30,9 @@ enum EventsState {
     UpdateState,
 }
 
-/// The number of updates per second.
+/// The number of updates per second
+///
+/// This is the fixed update rate on average over time.
 /// If the event loop lags, it will try to catch up.
 pub struct Ups(pub u64);
 
@@ -41,8 +43,11 @@ impl<W> Modifier<Events<W>> for Ups {
     }
 }
 
-/// The maximum number of frames per second.
-/// Next frame is always scheduled from the previous frame.
+/// The maximum number of frames per second
+///
+/// The frame rate can be lower because the
+/// next frame is always scheduled from the previous frame.
+/// This causes the frames to "slip" over time.
 pub struct MaxFps(pub u64);
 
 impl<W> Modifier<Events<W>> for MaxFps {
@@ -59,7 +64,7 @@ pub trait EventWindow<I: GenericEvent>: PollEvent<I> + GetShouldClose + GetSize 
 impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I: GenericEvent>
 EventWindow<I> for T {}
 
-/// A game loop iterator.
+/// An event loop iterator
 ///
 /// *Warning: Because the iterator polls events from the window back-end,
 /// it must be used on the same thread as the window back-end (usually main thread),

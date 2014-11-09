@@ -3,7 +3,7 @@ use std::intrinsics::TypeId;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Implemented by event structures that support text event.
+/// When receiving text from user, such as typing a character
 pub trait TextEvent {
     /// Creates a text event.
     fn from_text(text: &str) -> Option<Self>;

@@ -3,7 +3,7 @@ use std::intrinsics::TypeId;
 use GenericEvent;
 use ptr::Ptr;
 
-/// Render argument.
+/// Render arguments
 #[deriving(Clone, PartialEq, Show)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
@@ -14,7 +14,7 @@ pub struct RenderArgs {
     pub height: u32,
 }
 
-/// Implemented by event structures that supports render event.
+/// When the next frame should be rendered
 pub trait RenderEvent {
     /// Creates a render event.
     fn from_render_args(args: &RenderArgs) -> Option<Self>;

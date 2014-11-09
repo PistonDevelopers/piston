@@ -1,11 +1,41 @@
-//! A Behavior Tree implementation for event logic and game AI
+//! A library for window abstraction and event logic
 //!
-//! Each action returns either `Success`, `Failure` or `Running`.
-//! Actions are combined with behaviors such as `Wait` and `Select`.
-//! The combined behavior is stored in a `Behavior` object.
+//! This library is used as an abstraction layer on top of
+//! different window back-ends, such that libraries
+//! can be written without more dependencies than required.
 //!
-//! For each `Behavior` there is a `State`.
-//! The state tracks the behavior over time.
+//! An event loop can be created in different ways:
+//!
+//! ```ignore
+//! // Move window by value (this prevents you from using the window elsewhere).
+//! for e in Events::new(window) {
+//!    ...
+//! }
+//!
+//! // Use shared reference (this allows you to use the window elsewhere).
+//! let window = RefCell::new(window);
+//! for e in Events::new(&window) {
+//!    ...
+//! }
+//!
+//! // Use current window (the window must be set as current object).
+//! for e in Events::new(current::UseCurrent::<Window>) {
+//!    ...
+//! }
+//! 
+//! // Specify usage.
+//! let window = RefCell::new(window);
+//! let usage = current::Use(&window);
+//! for e in Events::new(usage) {
+//!    ...
+//! }
+//! ```
+//!
+//! It is also designed to provide an extensible model for events,
+//! such that window back-ends can add new kinds of events.
+//! The new event can be created as trait and implemented for
+//! all types that uses `GenericEvent`.
+//! For examples, see the different events in this library.
 
 #![crate_type = "lib"]
 #![crate_name = "event"]
