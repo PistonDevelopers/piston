@@ -2,7 +2,7 @@
 
 use std::cell::RefCell;
 use input::InputEvent;
-use current::{ Get, Set, Usage };
+use current::{ Get, Modifier, Set, Usage };
 
 use GenericEvent;
 
@@ -391,7 +391,8 @@ pub trait Window<E: GenericEvent = InputEvent>:
     SwapBuffers
   + PollEvent<E>
   + GetShouldClose
-  + GetSize {
+  + GetSize
+  + SetCaptureCursor {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a WindowSettings;
 
@@ -400,11 +401,6 @@ pub trait Window<E: GenericEvent = InputEvent>:
 
     /// Get the size in drawing coordinates.
     fn get_draw_size(&self) -> (u32, u32);
-
-    /// When the cursor is captured,
-    /// it is hidden and the cursor position does not change.
-    /// Only relative mouse motion is registered.
-    fn capture_cursor(&mut self, _enabled: bool);
 }
 
 /// An implementation of Window that runs without a window at all.
@@ -443,6 +439,16 @@ impl Get<Size> for NoWindow {
     }
 }
 
+impl Modifier<NoWindow> for CaptureCursor {
+    fn modify(self, _window: &mut NoWindow) {}
+}
+
+impl SetCaptureCursor for NoWindow {
+    fn set_capture_cursor(&mut self, val: CaptureCursor) {
+        self.set_mut(val);
+    }
+}
+
 impl Window<InputEvent> for NoWindow {
      fn get_settings<'a>(&'a self) -> &'a WindowSettings {
         &self.settings
@@ -456,6 +462,5 @@ impl Window<InputEvent> for NoWindow {
         let Size([w, h]) = self.get_size();
         (w, h)
     }
-
-    fn capture_cursor(&mut self, _enabled: bool) {}
 }
+
