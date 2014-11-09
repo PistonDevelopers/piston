@@ -396,14 +396,10 @@ pub trait Window<E: GenericEvent = InputEvent>:
   + SetCaptureCursor
   + GetDrawSize
   + GetTitle
-  + SetTitle {
-    /// Get the window's settings.
-    fn get_settings<'a>(&'a self) -> &'a WindowSettings;
-}
+  + SetTitle {}
 
 /// An implementation of Window that runs without a window at all.
 pub struct NoWindow {
-    settings: WindowSettings,
     should_close: bool,
     title: String,
 }
@@ -413,7 +409,6 @@ impl NoWindow {
     pub fn new(settings: WindowSettings) -> NoWindow {
         let title = settings.title.clone();
         NoWindow {
-            settings: settings,
             should_close: false,
             title: title,
         }
@@ -470,11 +465,7 @@ impl Get<DrawSize> for NoWindow {
     }
 }
 
-impl Window<InputEvent> for NoWindow {
-    fn get_settings<'a>(&'a self) -> &'a WindowSettings {
-        &self.settings
-    }
-}
+impl Window<InputEvent> for NoWindow {}
 
 impl Get<Title> for NoWindow {
     fn get(&self) -> Title {
