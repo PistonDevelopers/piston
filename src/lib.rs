@@ -69,7 +69,6 @@ pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
 
 pub mod ptr;
-pub mod drag_controller;
 pub mod window;
 
 mod events;
