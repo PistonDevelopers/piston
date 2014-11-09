@@ -393,12 +393,10 @@ pub trait Window<E: GenericEvent = InputEvent>:
   + GetShouldClose
   + SetShouldClose
   + GetSize
-  + SetCaptureCursor {
+  + SetCaptureCursor
+  + GetDrawSize {
     /// Get the window's settings.
     fn get_settings<'a>(&'a self) -> &'a WindowSettings;
-
-    /// Get the size in drawing coordinates.
-    fn get_draw_size(&self) -> (u32, u32);
 }
 
 /// An implementation of Window that runs without a window at all.
@@ -460,14 +458,16 @@ impl SetShouldClose for NoWindow {
     }
 }
 
-impl Window<InputEvent> for NoWindow {
-     fn get_settings<'a>(&'a self) -> &'a WindowSettings {
-        &self.settings
-     }
+impl Get<DrawSize> for NoWindow {
+    fn get(&self) -> DrawSize {
+        let Size(val) = self.get();
+        DrawSize(val)
+    }
+}
 
-    fn get_draw_size(&self) -> (u32, u32) {
-        let Size([w, h]) = self.get_size();
-        (w, h)
+impl Window<InputEvent> for NoWindow {
+    fn get_settings<'a>(&'a self) -> &'a WindowSettings {
+        &self.settings
     }
 }
 
