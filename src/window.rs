@@ -22,11 +22,14 @@ impl<T: Get<ShouldClose>> GetShouldClose for T {}
 
 /// Work-around trait for `Set<ShouldClose>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetShouldClose: Set<ShouldClose> {
     /// Sets whether window should close.
-    fn set_should_close(&mut self, val: ShouldClose);
+    fn set_should_close(&mut self, val: ShouldClose) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<ShouldClose>> SetShouldClose for T {}
 
 /// The size of the window.
 pub struct Size(pub [u32, ..2]);
@@ -44,11 +47,14 @@ impl<T: Get<Size>> GetSize for T {}
 
 /// Work-around trait for `Set<Size>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetSize: Set<Size> {
     /// Sets size of window.
-    fn set_size(&mut self, val: Size);
+    fn set_size(&mut self, val: Size) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<Size>> SetSize for T {}
 
 /// The title of the window.
 pub struct Title(pub String);
@@ -66,11 +72,14 @@ impl<T: Get<Title>> GetTitle for T {}
 
 /// Work-around trait for `Set<Title>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetTitle: Set<Title> {
     /// Sets title of window.
-    fn set_title(&mut self, val: Title);
+    fn set_title(&mut self, val: Title) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<Title>> SetTitle for T {}
 
 /// The anti-aliasing samples when rendering.
 pub struct Samples(pub u8);
@@ -88,11 +97,14 @@ impl<T: Get<Samples>> GetSamples for T {}
 
 /// Work-around trait for `Set<Samples>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetSamples: Set<Samples> {
     /// Sets antialiasing samples of window.
-    fn set_samples(&mut self, val: Samples);
+    fn set_samples(&mut self, val: Samples) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<Samples>> SetSamples for T {}
 
 /// Whether window is opened in full screen mode.
 pub struct Fullscreen(pub bool);
@@ -110,11 +122,14 @@ impl<T: Get<Fullscreen>> GetFullscreen for T {}
 
 /// Work-around trait for `Set<Fullscreen>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetFullscreen: Set<Fullscreen> {
     /// Sets window to fullscreen mode.
-    fn set_fullscreen(&mut self, val: Fullscreen);
+    fn set_fullscreen(&mut self, val: Fullscreen) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<Fullscreen>> SetFullscreen for T {}
 
 /// Whether to exit when pressing the Esc keyboard button.
 pub struct ExitOnEsc(pub bool);
@@ -132,11 +147,14 @@ impl<T: Get<ExitOnEsc>> GetExitOnEsc for T {}
 
 /// Work-around trait for `Set<ExitOnEsc>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetExitOnEsc: Set<ExitOnEsc> {
     /// Sets exit when pressing Esc.
-    fn set_exit_on_esc(&mut self, val: ExitOnEsc);
+    fn set_exit_on_esc(&mut self, val: ExitOnEsc) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<ExitOnEsc>> SetExitOnEsc for T {}
 
 /// Whether to capture the mouse cursor.
 pub struct CaptureCursor(pub bool);
@@ -154,11 +172,14 @@ impl<T: Get<CaptureCursor>> GetCaptureCursor for T {}
 
 /// Work-around trait for `Set<CaptureCursor>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetCaptureCursor: Set<CaptureCursor> {
     /// Sets capture cursor.
-    fn set_capture_cursor(&mut self, val: CaptureCursor);
+    fn set_capture_cursor(&mut self, val: CaptureCursor) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<CaptureCursor>> SetCaptureCursor for T {}
 
 /// The draw size of the window.
 pub struct DrawSize(pub [u32, ..2]);
@@ -176,11 +197,14 @@ impl<T: Get<DrawSize>> GetDrawSize for T {}
 
 /// Work-around trait for `Set<DrawSize>`.
 /// Used to support generic constraints.
-/// This must be implemented for every `Modifier` impl.
 pub trait SetDrawSize: Set<DrawSize> {
     /// Sets draw size.
-    fn set_draw_size(&mut self, val: DrawSize);
+    fn set_draw_size(&mut self, val: DrawSize) {
+        self.set_mut(val);
+    }
 }
+
+impl<T: Set<DrawSize>> SetDrawSize for T {}
 
 #[test]
 fn test_methods() {
@@ -196,24 +220,12 @@ fn test_methods() {
         fn modify(self, _obj: &mut Obj) {}
     }
 
-    impl SetShouldClose for Obj {
-        fn set_should_close(&mut self, val: ShouldClose) {
-            self.set_mut(val);
-        }
-    }
-
     impl Get<Size> for Obj {
         fn get(&self) -> Size { Size([0, 0]) }
     }
 
     impl Modifier<Obj> for Size {
         fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl SetSize for Obj {
-        fn set_size(&mut self, val: Size) {
-            self.set_mut(val);
-        }
     }
 
     impl Get<Title> for Obj {
@@ -224,24 +236,12 @@ fn test_methods() {
         fn modify(self, _obj: &mut Obj) {}
     }
 
-    impl SetTitle for Obj {
-        fn set_title(&mut self, val: Title) {
-            self.set_mut(val);
-        }
-    }
-
     impl Get<Samples> for Obj {
         fn get(&self) -> Samples { Samples(0) }
     }
 
     impl Modifier<Obj> for Samples {
         fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl SetSamples for Obj {
-        fn set_samples(&mut self, val: Samples) {
-            self.set_mut(val);
-        }
     }
 
     impl Get<Fullscreen> for Obj {
@@ -252,24 +252,12 @@ fn test_methods() {
         fn modify(self, _obj: &mut Obj) {}
     }
 
-    impl SetFullscreen for Obj {
-        fn set_fullscreen(&mut self, val: Fullscreen) {
-            self.set_mut(val);
-        }
-    }
-
     impl Get<ExitOnEsc> for Obj {
         fn get(&self) -> ExitOnEsc { ExitOnEsc(true) }
     }
 
     impl Modifier<Obj> for ExitOnEsc {
         fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl SetExitOnEsc for Obj {
-        fn set_exit_on_esc(&mut self, val: ExitOnEsc) {
-            self.set_mut(val);
-        }
     }
 
     impl Get<CaptureCursor> for Obj {
@@ -280,24 +268,12 @@ fn test_methods() {
         fn modify(self, _obj: &mut Obj) {}
     }
 
-    impl SetCaptureCursor for Obj {
-        fn set_capture_cursor(&mut self, val: CaptureCursor) {
-            self.set_mut(val);
-        }
-    }
-
     impl Get<DrawSize> for Obj {
         fn get(&self) -> DrawSize { DrawSize([0, 0]) }
     }
 
     impl Modifier<Obj> for DrawSize {
         fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl SetDrawSize for Obj {
-        fn set_draw_size(&mut self, val: DrawSize) {
-            self.set_mut(val);
-        }
     }
 
     fn foo<T: GetShouldClose + SetShouldClose
@@ -438,22 +414,10 @@ impl Modifier<NoWindow> for CaptureCursor {
     fn modify(self, _window: &mut NoWindow) {}
 }
 
-impl SetCaptureCursor for NoWindow {
-    fn set_capture_cursor(&mut self, val: CaptureCursor) {
-        self.set_mut(val);
-    }
-}
-
 impl Modifier<NoWindow> for ShouldClose {
     fn modify(self, window: &mut NoWindow) {
         let ShouldClose(val) = self;
         window.should_close = val;
-    }
-}
-
-impl SetShouldClose for NoWindow {
-    fn set_should_close(&mut self, val: ShouldClose) {
-        self.set_mut(val);
     }
 }
 
@@ -479,12 +443,6 @@ impl Modifier<NoWindow> for Title {
     }
 }
 
-impl SetTitle for NoWindow {
-    fn set_title(&mut self, val: Title) {
-        self.set_mut(val);
-    }
-}
-
 impl Get<ExitOnEsc> for NoWindow {
     fn get(&self) -> ExitOnEsc {
         ExitOnEsc(false)
@@ -494,11 +452,5 @@ impl Get<ExitOnEsc> for NoWindow {
 impl Modifier<NoWindow> for ExitOnEsc {
     // Ignore attempt to exit by pressing Esc.
     fn modify(self, _window: &mut NoWindow) {}
-}
-
-impl SetExitOnEsc for NoWindow {
-    fn set_exit_on_esc(&mut self, val: ExitOnEsc) {
-        self.set_mut(val);
-    }    
 }
 
