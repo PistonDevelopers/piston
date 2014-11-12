@@ -2,7 +2,7 @@
 
 use std::cell::RefCell;
 use input::InputEvent;
-use current::{ Get, Modifier, Set, Usage };
+use current::{ Current, Get, Modifier, Set };
 
 use GenericEvent;
 
@@ -294,12 +294,10 @@ pub trait SwapBuffers {
     fn swap_buffers(&mut self);
 }
 
-impl<'a, W: 'a + SwapBuffers> SwapBuffers for Usage<'a, W> {
+impl<W: SwapBuffers> SwapBuffers for Current<W> {
     #[inline(always)]
     fn swap_buffers(&mut self) {
-        self.with_unwrap(|window: &RefCell<W>| {
-            window.borrow_mut().deref_mut().swap_buffers()
-        })
+        (*self).deref_mut().swap_buffers();
     }
 }
 
@@ -316,12 +314,9 @@ pub trait PollEvent<E: GenericEvent> {
     fn poll_event(&mut self) -> Option<E>;
 }
 
-impl<'a, W: 'a + PollEvent<I>, I: GenericEvent> PollEvent<I> for Usage<'a, W> {
-    #[inline(always)]
+impl<W: PollEvent<I>, I: GenericEvent> PollEvent<I> for Current<W> {
     fn poll_event(&mut self) -> Option<I> {
-        self.with_unwrap(|window: &RefCell<W>| {
-            window.borrow_mut().deref_mut().poll_event()
-        })
+        (*self).deref_mut().poll_event()
     }
 }
 
