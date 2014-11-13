@@ -10,6 +10,7 @@ use {
     GenericEvent,
 };
 use ptr::Ptr;
+use events::EventMap;
 
 /// Adds render and update events to input events
 #[deriving(Clone, PartialEq, Show)]
@@ -20,6 +21,12 @@ pub enum Event<I = input::InputEvent> {
     Update(UpdateArgs),
     /// Input event.
     Input(I),
+}
+
+impl<I> EventMap<I> for Event<I> {
+    fn render(args: RenderArgs) -> Event<I> { Render(args) }
+    fn update(args: UpdateArgs) -> Event<I> { Update(args) }
+    fn input(args: I) -> Event<I> { Input(args) }
 }
 
 impl<I: GenericEvent> GenericEvent for Event<I> {

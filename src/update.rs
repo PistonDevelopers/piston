@@ -2,13 +2,7 @@ use std::intrinsics::TypeId;
 
 use GenericEvent;
 use ptr::Ptr;
-
-/// Update arguments, such as delta time in seconds
-#[deriving(Clone, PartialEq, Show)]
-pub struct UpdateArgs {
-    /// Delta time in seconds.
-    pub dt: f64,
-}
+use UpdateArgs;
 
 /// When the application state should be updated
 pub trait UpdateEvent {

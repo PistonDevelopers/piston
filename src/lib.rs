@@ -22,7 +22,7 @@
 //! for e in Events::new(current::UseCurrent::<Window>) {
 //!    ...
 //! }
-//! 
+//!
 //! // Specify usage.
 //! let window = RefCell::new(window);
 //! let usage = current::Use(&window);
@@ -56,10 +56,12 @@ pub use events::{
     Events,
     MaxFps,
     Ups,
+    UpdateArgs,
+    RenderArgs,
 };
 pub use generic_event::{ assert_event_trait, GenericEvent };
-pub use update::{ UpdateArgs, UpdateEvent };
-pub use render::{ RenderArgs, RenderEvent };
+pub use update::{ UpdateEvent };
+pub use render::{ RenderEvent };
 pub use event::{ Event, Render, Update, Input };
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
