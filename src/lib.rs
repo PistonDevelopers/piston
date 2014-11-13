@@ -41,12 +41,15 @@
 #![crate_name = "event"]
 #![deny(missing_docs)]
 #![feature(default_type_params)]
+#![feature(globs)]
 
 extern crate time;
 extern crate input;
 extern crate serialize;
 extern crate current;
+extern crate event_loop;
 
+pub use event_loop as events;
 pub use window::{
     Window,
     WindowSettings,
@@ -73,7 +76,6 @@ pub use focus::FocusEvent;
 pub mod ptr;
 pub mod window;
 
-mod events;
 mod generic_event;
 mod update;
 mod render;

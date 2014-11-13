@@ -1,59 +1,10 @@
 //! Window abstraction
 
-use std::cell::RefCell;
 use input::InputEvent;
-use current::{ Current, Get, Modifier, Set };
-use events::{ EventWindow };
+use current::{ Get, Modifier, Set };
 
-/// Whether window should close or not.
-pub struct ShouldClose(pub bool);
-
-/// Work-around trait for `Get<ShouldClose>`.
-/// Used to support generic constraints.
-pub trait GetShouldClose: Get<ShouldClose> {
-    /// Returns whether window should close.
-    fn get_should_close(&self) -> ShouldClose {
-        self.get()
-    }
-}
-
-impl<T: Get<ShouldClose>> GetShouldClose for T {}
-
-/// Work-around trait for `Set<ShouldClose>`.
-/// Used to support generic constraints.
-pub trait SetShouldClose: Set<ShouldClose> {
-    /// Sets whether window should close.
-    fn set_should_close(&mut self, val: ShouldClose) {
-        self.set_mut(val);
-    }
-}
-
-impl<T: Set<ShouldClose>> SetShouldClose for T {}
-
-/// The size of the window.
-pub struct Size(pub [u32, ..2]);
-
-/// Work-around trait for `Get<Size>`.
-/// Used to support generic constraints.
-pub trait GetSize: Get<Size> {
-    /// Returns the size of window.
-    fn get_size(&self) -> Size {
-        self.get()
-    }
-}
-
-impl<T: Get<Size>> GetSize for T {}
-
-/// Work-around trait for `Set<Size>`.
-/// Used to support generic constraints.
-pub trait SetSize: Set<Size> {
-    /// Sets size of window.
-    fn set_size(&mut self, val: Size) {
-        self.set_mut(val);
-    }
-}
-
-impl<T: Set<Size>> SetSize for T {}
+// Reexport everything from event_loop.
+pub use events::*;
 
 /// The title of the window.
 pub struct Title(pub String);
@@ -287,45 +238,6 @@ fn test_methods() {
     foo(Obj);
 }
 
-/// Implemented by windows that can swap buffers.
-pub trait SwapBuffers {
-    /// Swaps the buffers.
-    fn swap_buffers(&mut self);
-}
-
-impl<W: SwapBuffers> SwapBuffers for Current<W> {
-    #[inline(always)]
-    fn swap_buffers(&mut self) {
-        self.deref_mut().swap_buffers();
-    }
-}
-
-impl<'a, W: 'a + SwapBuffers> SwapBuffers for &'a RefCell<W> {
-    #[inline(always)]
-    fn swap_buffers(&mut self) {
-        self.borrow_mut().deref_mut().swap_buffers()
-    }
-}
-
-/// Implemented by windows that can pull events.
-pub trait PollEvent<E> {
-    /// Polls event from window.
-    fn poll_event(&mut self) -> Option<E>;
-}
-
-impl<W: PollEvent<I>, I> PollEvent<I> for Current<W> {
-    fn poll_event(&mut self) -> Option<I> {
-        self.deref_mut().poll_event()
-    }
-}
-
-impl<'a, W: 'a + PollEvent<I>, I> PollEvent<I> for &'a RefCell<W> {
-    #[inline(always)]
-    fn poll_event(&mut self) -> Option<I> {
-        self.borrow_mut().deref_mut().poll_event()
-    }
-}
-
 /// Settings for window behavior.
 pub struct WindowSettings {
     /// Title of the window.
@@ -366,28 +278,6 @@ pub trait Window<E = InputEvent>:
   + GetDrawSize
   + GetTitle + SetTitle
   + GetExitOnEsc + SetExitOnEsc {}
-
-impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I>
-EventWindow<I> for T {
-  #[inline(always)]
-  fn poll_event(&mut self) -> Option<I> {
-      self.poll_event()
-  }
-  #[inline(always)]
-  fn should_close(&self) -> bool {
-      let ShouldClose(val) = self.get_should_close();
-      val
-  }
-  #[inline(always)]
-  fn size(&self) -> [u32, ..2] {
-      let Size(val) = self.get_size();
-      val
-  }
-  #[inline(always)]
-  fn swap_buffers(&mut self) {
-      self.swap_buffers();
-  }
-}
 
 /// An implementation of Window that runs without a window at all.
 pub struct NoWindow {
