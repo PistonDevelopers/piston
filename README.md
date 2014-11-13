@@ -1,10 +1,6 @@
 # event [![Build Status](https://travis-ci.org/PistonDevelopers/event.svg?branch=master)](https://travis-ci.org/PistonDevelopers/event)
 
-A library for window abstraction and event logic
-
-* Game loop
-* Window trait
-* Generic event handling
+A library for flexible generic event threading
 
 This library is reexported under [Piston](https://github.com/pistondevelopers/piston)
 
