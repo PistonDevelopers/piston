@@ -1,0 +1,27 @@
+[package]
+
+name = "window"
+version = "0.0.0"
+authors = [
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>"
+]
+tags = []
+
+[lib]
+
+name = "window"
+path = "src/lib.rs"
+
+[dependencies.input]
+
+git = "https://github.com/pistondevelopers/input"
+
+[dependencies.current]
+
+git = "https://github.com/pistondevelopers/current"
+
+[dependencies.event_loop]
+
+git = "https://github.com/pistondevelopers/event_loop"
+
