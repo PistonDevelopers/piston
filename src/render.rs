@@ -2,17 +2,7 @@ use std::intrinsics::TypeId;
 
 use GenericEvent;
 use ptr::Ptr;
-
-/// Render arguments
-#[deriving(Clone, PartialEq, Show)]
-pub struct RenderArgs {
-    /// Extrapolated time in seconds, used to do smooth animation.
-    pub ext_dt: f64,
-    /// The width of rendered area.
-    pub width: u32,
-    /// The height of rendered area.
-    pub height: u32,
-}
+use RenderArgs;
 
 /// When the next frame should be rendered
 pub trait RenderEvent {

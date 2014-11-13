@@ -1,25 +1,36 @@
 use time;
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use current::{ Modifier };
-use window::{
-    PollEvent, 
-    ShouldClose, GetShouldClose,
-    Size, GetSize,
-    SwapBuffers,
-};
-
-use {
-    Event,
-    GenericEvent,
-    Input,
-    Render,
-    RenderArgs,
-    Update,
-    UpdateArgs,
-};
-
+use current::{ Modifier, Set };
 use std::cmp;
+
+/// Render arguments
+#[deriving(Clone, PartialEq, Show)]
+pub struct RenderArgs {
+    /// Extrapolated time in seconds, used to do smooth animation.
+    pub ext_dt: f64,
+    /// The width of rendered area.
+    pub width: u32,
+    /// The height of rendered area.
+    pub height: u32,
+}
+
+/// Update arguments, such as delta time in seconds
+#[deriving(Clone, PartialEq, Show)]
+pub struct UpdateArgs {
+    /// Delta time in seconds.
+    pub dt: f64,
+}
+
+/// Methods required to map from consumed event to emitted event.
+pub trait EventMap<I> {
+    /// Creates a render event.
+    fn render(args: RenderArgs) -> Self;
+    /// Creates an update event.
+    fn update(args: UpdateArgs) -> Self;
+    /// Creates an input event.
+    fn input(args: I) -> Self;
+}
 
 #[deriving(Show)]
 enum EventsState {
@@ -43,6 +54,16 @@ impl<W> Modifier<Events<W>> for Ups {
     }
 }
 
+/// Wrapper trait for `Set<Ups>`
+pub trait SetUps: Set<Ups> {
+    /// Sets updates per second.
+    fn set_ups(&mut self, val: Ups) {
+        self.set_mut(val);
+    }
+}
+
+impl<T: Set<Ups>> SetUps for T {}
+
 /// The maximum number of frames per second
 ///
 /// The frame rate can be lower because the
@@ -57,12 +78,27 @@ impl<W> Modifier<Events<W>> for MaxFps {
     }
 }
 
-/// Defines generic constraints for event loop.
-/// This is auto implemented by all types that satisfy the constraints.
-pub trait EventWindow<I: GenericEvent>: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers {}
+/// Wrapper trait for `Set<Fps>`
+pub trait SetMaxFps: Set<MaxFps> {
+    /// Sets frames per second.
+    fn set_max_fps(&mut self, val: MaxFps) {
+        self.set_mut(val);
+    }
+}
 
-impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I: GenericEvent>
-EventWindow<I> for T {}
+impl<T: Set<MaxFps>> SetMaxFps for T {}
+
+/// Must be implemented by window.
+pub trait EventWindow<I> {
+    /// Polls event from window.
+    fn poll_event(&mut self) -> Option<I>;
+    /// Whether the window should close.
+    fn should_close(&self) -> bool;
+    /// The size of window.
+    fn size(&self) -> [u32, ..2];
+    /// Called when swapping buffers.
+    fn swap_buffers(&mut self);
+}
 
 /// An event loop iterator
 ///
@@ -119,7 +155,7 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<W: EventWindow<I>, I: GenericEvent> Events<W> {
+impl<W: EventWindow<I>, I> Events<W> {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new(window: W) -> Events<W> {
         let start = time::precise_time_ns();
@@ -137,27 +173,27 @@ impl<W: EventWindow<I>, I: GenericEvent> Events<W> {
     }
 }
 
-impl<W: EventWindow<I>, I: GenericEvent>
-Iterator<Event<I>>
+impl<W: EventWindow<I>, I, E: EventMap<I>>
+Iterator<E>
 for Events<W> {
     /// Returns the next game event.
-    fn next(&mut self) -> Option<Event<I>> {
+    fn next(&mut self) -> Option<E> {
         loop {
             self.state = match self.state {
                 RenderState => {
-                    let ShouldClose(should_close) = self.window.get_should_close();
+                    let should_close = self.window.should_close();
                     if should_close { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let Size([w, h]) = self.window.get_size();
+                    let [w, h] = self.window.size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
-                        return Some(Render(RenderArgs {
+                        return Some(EventMap::render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (start_render - self.last_update) as f64 
+                            ext_dt: (start_render - self.last_update) as f64
                                     / BILLION as f64,
                             width: w,
                             height: h,
@@ -188,13 +224,13 @@ for Events<W> {
                     // Handle all events before updating.
                     match self.window.poll_event() {
                         None => UpdateState,
-                        Some(x) => { return Some(Input(x)); },
+                        Some(x) => { return Some(EventMap::input(x)); },
                     }
                 }
                 UpdateState => {
                     self.state = UpdateLoopState;
                     self.last_update += self.dt_update_in_ns;
-                    return Some(Update(UpdateArgs{ dt: self.dt }));
+                    return Some(EventMap::update(UpdateArgs{ dt: self.dt }));
                 }
             };
         }

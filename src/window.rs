@@ -3,8 +3,7 @@
 use std::cell::RefCell;
 use input::InputEvent;
 use current::{ Current, Get, Modifier, Set };
-
-use GenericEvent;
+use events::{ EventWindow };
 
 /// Whether window should close or not.
 pub struct ShouldClose(pub bool);
@@ -209,7 +208,7 @@ impl<T: Set<DrawSize>> SetDrawSize for T {}
 #[test]
 fn test_methods() {
     use current::Modifier;
-    
+
     struct Obj;
 
     impl Get<ShouldClose> for Obj {
@@ -309,18 +308,18 @@ impl<'a, W: 'a + SwapBuffers> SwapBuffers for &'a RefCell<W> {
 }
 
 /// Implemented by windows that can pull events.
-pub trait PollEvent<E: GenericEvent> {
+pub trait PollEvent<E> {
     /// Polls event from window.
     fn poll_event(&mut self) -> Option<E>;
 }
 
-impl<W: PollEvent<I>, I: GenericEvent> PollEvent<I> for Current<W> {
+impl<W: PollEvent<I>, I> PollEvent<I> for Current<W> {
     fn poll_event(&mut self) -> Option<I> {
         self.deref_mut().poll_event()
     }
 }
 
-impl<'a, W: 'a + PollEvent<I>, I: GenericEvent> PollEvent<I> for &'a RefCell<W> {
+impl<'a, W: 'a + PollEvent<I>, I> PollEvent<I> for &'a RefCell<W> {
     #[inline(always)]
     fn poll_event(&mut self) -> Option<I> {
         self.borrow_mut().deref_mut().poll_event()
@@ -358,7 +357,7 @@ impl WindowSettings {
 }
 
 /// Implemented by window back-end.
-pub trait Window<E: GenericEvent = InputEvent>:
+pub trait Window<E = InputEvent>:
     SwapBuffers
   + PollEvent<E>
   + GetShouldClose + SetShouldClose
@@ -367,6 +366,28 @@ pub trait Window<E: GenericEvent = InputEvent>:
   + GetDrawSize
   + GetTitle + SetTitle
   + GetExitOnEsc + SetExitOnEsc {}
+
+impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I>
+EventWindow<I> for T {
+  #[inline(always)]
+  fn poll_event(&mut self) -> Option<I> {
+      self.poll_event()
+  }
+  #[inline(always)]
+  fn should_close(&self) -> bool {
+      let ShouldClose(val) = self.get_should_close();
+      val
+  }
+  #[inline(always)]
+  fn size(&self) -> [u32, ..2] {
+      let Size(val) = self.get_size();
+      val
+  }
+  #[inline(always)]
+  fn swap_buffers(&mut self) {
+      self.swap_buffers();
+  }
+}
 
 /// An implementation of Window that runs without a window at all.
 pub struct NoWindow {
@@ -448,4 +469,3 @@ impl Modifier<NoWindow> for ExitOnEsc {
     // Ignore attempt to exit by pressing Esc.
     fn modify(self, _window: &mut NoWindow) {}
 }
-
