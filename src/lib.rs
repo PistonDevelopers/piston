@@ -48,7 +48,9 @@ extern crate input;
 extern crate serialize;
 extern crate current;
 extern crate event_loop;
+extern crate "window" as window_lib;
 
+pub use window_lib as window;
 pub use event_loop as events;
 pub use window::{
     Window,
@@ -74,7 +76,6 @@ pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
 
 pub mod ptr;
-pub mod window;
 
 mod generic_event;
 mod update;
