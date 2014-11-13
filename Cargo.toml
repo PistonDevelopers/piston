@@ -1,0 +1,19 @@
+[package]
+
+name = "event_loop"
+version = "0.0.0"
+authors = [
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>"
+]
+tags = []
+
+[lib]
+
+name = "event_loop"
+path = "src/lib.rs"
+
+[dependencies.current]
+
+git = "https://github.com/pistondevelopers/current"
+
