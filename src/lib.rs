@@ -7,8 +7,99 @@ extern crate current;
 
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use current::{ Modifier, Set };
+use current::{ Current, Get, Modifier, Set };
 use std::cmp;
+use std::cell::RefCell;
+
+/// Whether window should close or not.
+pub struct ShouldClose(pub bool);
+
+/// Work-around trait for `Get<ShouldClose>`.
+/// Used to support generic constraints.
+pub trait GetShouldClose: Get<ShouldClose> {
+    /// Returns whether window should close.
+    fn get_should_close(&self) -> ShouldClose {
+        self.get()
+    }
+}
+
+impl<T: Get<ShouldClose>> GetShouldClose for T {}
+
+/// Work-around trait for `Set<ShouldClose>`.
+/// Used to support generic constraints.
+pub trait SetShouldClose: Set<ShouldClose> {
+    /// Sets whether window should close.
+    fn set_should_close(&mut self, val: ShouldClose) {
+        self.set_mut(val);
+    }
+}
+
+impl<T: Set<ShouldClose>> SetShouldClose for T {}
+
+/// The size of the window.
+pub struct Size(pub [u32, ..2]);
+
+/// Work-around trait for `Get<Size>`.
+/// Used to support generic constraints.
+pub trait GetSize: Get<Size> {
+    /// Returns the size of window.
+    fn get_size(&self) -> Size {
+        self.get()
+    }
+}
+
+impl<T: Get<Size>> GetSize for T {}
+
+/// Work-around trait for `Set<Size>`.
+/// Used to support generic constraints.
+pub trait SetSize: Set<Size> {
+    /// Sets size of window.
+    fn set_size(&mut self, val: Size) {
+        self.set_mut(val);
+    }
+}
+
+impl<T: Set<Size>> SetSize for T {}
+
+
+/// Implemented by windows that can swap buffers.
+pub trait SwapBuffers {
+    /// Swaps the buffers.
+    fn swap_buffers(&mut self);
+}
+
+impl<W: SwapBuffers> SwapBuffers for Current<W> {
+    #[inline(always)]
+    fn swap_buffers(&mut self) {
+        self.deref_mut().swap_buffers();
+    }
+}
+
+impl<'a, W: 'a + SwapBuffers> SwapBuffers for &'a RefCell<W> {
+    #[inline(always)]
+    fn swap_buffers(&mut self) {
+        self.borrow_mut().deref_mut().swap_buffers()
+    }
+}
+
+/// Implemented by windows that can pull events.
+pub trait PollEvent<E> {
+    /// Polls event from window.
+    fn poll_event(&mut self) -> Option<E>;
+}
+
+impl<W: PollEvent<I>, I> PollEvent<I> for Current<W> {
+    fn poll_event(&mut self) -> Option<I> {
+        self.deref_mut().poll_event()
+    }
+}
+
+impl<'a, W: 'a + PollEvent<I>, I> PollEvent<I> for &'a RefCell<W> {
+    #[inline(always)]
+    fn poll_event(&mut self) -> Option<I> {
+        self.borrow_mut().deref_mut().poll_event()
+    }
+}
 
 /// Render arguments
 #[deriving(Clone, PartialEq, Show)]
@@ -94,17 +185,15 @@ pub trait SetMaxFps: Set<MaxFps> {
 
 impl<T: Set<MaxFps>> SetMaxFps for T {}
 
-/// Must be implemented by window.
-pub trait EventWindow<I> {
-    /// Polls event from window.
-    fn poll_event(&mut self) -> Option<I>;
-    /// Whether the window should close.
-    fn should_close(&self) -> bool;
-    /// The size of window.
-    fn size(&self) -> [u32, ..2];
-    /// Called when swapping buffers.
-    fn swap_buffers(&mut self);
-}
+/// Blanket impl for object that fulfill requirements.
+pub trait EventWindow<I>:
+    PollEvent<I>
+  + GetShouldClose
+  + GetSize
+  + SwapBuffers {}
+
+impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I>
+EventWindow<I> for T {}
 
 /// An event loop iterator
 ///
@@ -187,13 +276,13 @@ for Events<W> {
         loop {
             self.state = match self.state {
                 RenderState => {
-                    let should_close = self.window.should_close();
+                    let ShouldClose(should_close) = self.window.get_should_close();
                     if should_close { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let [w, h] = self.window.size();
+                    let Size([w, h]) = self.window.get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = SwapBuffersState;
