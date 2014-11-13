@@ -23,3 +23,8 @@ git = "https://github.com/PistonDevelopers/current"
 [dependencies.event_loop]
 
 git = "https://github.com/PistonDevelopers/event_loop"
+
+[dependencies.window]
+
+git = "https://github.com/PistonDevelopers/window"
+
