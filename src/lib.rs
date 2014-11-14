@@ -33,7 +33,6 @@ pub use noise_lib as noise;
 pub use genmesh_lib as genmesh;
 pub use sprite_lib as sprite;
 
-pub use asset_store::AssetStore;
 pub use event::{
     Render,
     Update,
@@ -47,4 +46,3 @@ pub use event::{
     WindowSettings,
 };
 
-mod asset_store;
