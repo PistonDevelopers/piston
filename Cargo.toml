@@ -45,13 +45,29 @@ git = "https://github.com/pistondevelopers/cam"
 
 git = "https://github.com/pistondevelopers/image"
 
+[dependencies.fps_counter]
+
+git = "https://github.com/pistondevelopers/fps_counter"
+
 [dependencies.graphics]
 
 git = "https://github.com/pistondevelopers/graphics"
 
+[dependencies.opengl_graphics]
+
+git = "https://github.com/pistondevelopers/opengl_graphics"
+
+[dependencies.gfx_graphics]
+
+git = "https://github.com/pistondevelopers/gfx_graphics"
+
 [dependencies.sprite]
 
 git = "https://github.com/pistondevelopers/sprite"
+
+[dependencies.sdl2_window]
+
+git = "https://github.com/pistondevelopers/sdl2_window"
 
 [dependencies.noise-rs]
 
@@ -60,4 +76,8 @@ git = "https://github.com/bjz/noise-rs"
 [dependencies.genmesh]
 
 git = "https://github.com/csherratt/genmesh.git"
+
+[dependencies.gfx]
+
+git = "https://github.com/gfx-rs/gfx-rs"
 
