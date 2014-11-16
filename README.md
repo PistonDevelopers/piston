@@ -6,6 +6,8 @@ This library is reexported under [Piston](https://github.com/pistondevelopers/pi
 
 [Online docs](http://www.rust-ci.org/PistonDevelopers/piston/doc/piston/event/index.html)
 
+[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
+
 ### How to build
 
 Install [Rust](http://www.rust-lang.org/)
