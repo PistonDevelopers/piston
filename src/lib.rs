@@ -7,7 +7,6 @@
 
 //! A user friendly game engine written in Rust.
 
-extern crate time;
 extern crate sync;
 extern crate gfx;
 extern crate gfx_graphics;
@@ -29,6 +28,11 @@ extern crate "genmesh" as genmesh_lib;
 extern crate "sprite" as sprite_lib;
 extern crate "current" as current_lib;
 extern crate "fps_counter" as fps_counter_lib;
+extern crate "wavefront-obj" as wavefront_obj_lib;
+extern crate "drag_controller" as drag_controller_lib;
+extern crate "read_color" as read_color_lib;
+extern crate "select_color" as select_color_lib;
+extern crate "texture_packer" as texture_packer_lib;
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -43,6 +47,9 @@ pub use genmesh_lib as genmesh;
 pub use sprite_lib as sprite;
 pub use current_lib as current;
 pub use fps_counter_lib as fps_counter;
+pub use wavefront_obj_lib as wavefront_obj;
+pub use drag_controller_lib as drag_controller;
+pub use texture_packer_lib as texture_packer;
 
 pub use sdl2_window::Sdl2Window as WindowBackEnd;
 pub use event::{
@@ -69,6 +76,13 @@ use gfx_graphics::G2D;
 use opengl_graphics::Gl;
 use fps_counter::FPSCounter;
 use gfx::{ DeviceHelper };
+
+pub mod color {
+    //! Rexported libraries for working with colors
+    pub use read_color_lib as read_color;
+    pub use select_color_lib as select_color;
+}
+
 
 /// Initializes window and sets up current objects.
 pub fn start(
