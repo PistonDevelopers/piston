@@ -287,10 +287,28 @@ pub trait Window<E = InputEvent>:
   + GetTitle + SetTitle
   + GetExitOnEsc + SetExitOnEsc {}
 
+impl<T:
+    SwapBuffers
+  + PollEvent<E>
+  + GetShouldClose + SetShouldClose
+  + GetSize
+  + SetCaptureCursor
+  + GetDrawSize
+  + GetTitle + SetTitle
+  + GetExitOnEsc + SetExitOnEsc,
+    E> Window<E> for T {}
+
 /// An implementation of Window that runs without a window at all.
 pub struct NoWindow {
     should_close: bool,
     title: String,
+}
+
+#[test]
+fn test_no_window() {
+    fn foo<T: Window>() {}
+
+    foo::<NoWindow>();
 }
 
 impl NoWindow {
@@ -341,8 +359,6 @@ impl Get<DrawSize> for NoWindow {
         DrawSize(val)
     }
 }
-
-impl Window<InputEvent> for NoWindow {}
 
 impl Get<Title> for NoWindow {
     fn get(&self) -> Title {
