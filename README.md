@@ -13,3 +13,5 @@ This library contains:
 * Window resize
 * Window focus
 * Modifier keys
+
+[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
