@@ -49,6 +49,22 @@ git = "https://github.com/pistondevelopers/image"
 
 git = "https://github.com/pistondevelopers/fps_counter"
 
+[dependencies.drag_controller]
+
+git = "https://github.com/pistondevelopers/drag_controller"
+
+[dependencies.select_color]
+
+git = "https://github.com/pistondevelopers/select_color"
+
+[dependencies.read_color]
+
+git = "https://github.com/pistondevelopers/read_color"
+
+[dependencies.texture-packer]
+
+git = "https://github.com/PistonDevelopers/texture-packer"
+
 [dependencies.graphics]
 
 git = "https://github.com/pistondevelopers/graphics"
@@ -68,6 +84,10 @@ git = "https://github.com/pistondevelopers/sprite"
 [dependencies.sdl2_window]
 
 git = "https://github.com/pistondevelopers/sdl2_window"
+
+[dependencies.wavefront-obj]
+
+git = "https://github.com/pistondevelopers/wavefront-obj"
 
 [dependencies.noise-rs]
 
