@@ -10,7 +10,7 @@ We use the issue tracker heavily. We try to plan as much as possible up front an
 
 Here is how you get started:
 
-1. Fork the repository (the button in the upper right corner).
+1. [Fork](https://github.com/PistonDevelopers/piston/fork) the repository.
 2. Clone your repository to the local hard drive ([GitHub for Mac](https://mac.github.com/), [Github for Window](https://windows.github.com/)).
 3. Open up the Terminal and navigate to the project directory.
 4. If you have not installed Rust yet, download it [here](http://www.rust-lang.org/).
