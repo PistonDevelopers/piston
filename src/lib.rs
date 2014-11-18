@@ -67,7 +67,7 @@ pub use events::{
 pub use generic_event::{ assert_event_trait, GenericEvent };
 pub use update::{ UpdateEvent };
 pub use render::{ RenderEvent };
-pub use event::{ Event, Render, Update, Input };
+pub use event::Event;
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
 pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
