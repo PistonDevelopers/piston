@@ -1,7 +1,6 @@
 #![crate_name = "input"]
 #![deny(missing_docs)]
 #![feature(globs)]
-#![feature(struct_variant)]
 
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
