@@ -19,3 +19,7 @@ path = "src/lib.rs"
 
 git = "https://github.com/pistondevelopers/current"
 
+[dependencies.time]
+
+git = "https://github.com/rust-lang/time"
+
