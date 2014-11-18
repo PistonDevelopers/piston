@@ -9,6 +9,7 @@ use {
     UpdateEvent,
     GenericEvent,
 };
+use Event::{ Render, Update, Input };
 use ptr::Ptr;
 use events::EventMap;
 
