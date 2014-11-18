@@ -131,11 +131,11 @@ pub trait EventMap<I> {
 
 #[deriving(Show)]
 enum EventsState {
-    RenderState,
-    SwapBuffersState,
-    UpdateLoopState,
-    HandleEventsState,
-    UpdateState,
+    Render,
+    SwapBuffers,
+    UpdateLoop,
+    HandleEvents,
+    Update,
 }
 
 /// The number of updates per second
@@ -258,7 +258,7 @@ impl<W: EventWindow<I>, I> Events<W> {
         let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
         Events {
             window: window,
-            state: EventsState::RenderState,
+            state: EventsState::Render,
             last_update: start,
             last_frame: start,
             dt_update_in_ns: BILLION / updates_per_second,
@@ -275,7 +275,7 @@ for Events<W> {
     fn next(&mut self) -> Option<E> {
         loop {
             self.state = match self.state {
-                EventsState::RenderState => {
+                EventsState::Render => {
                     let ShouldClose(should_close) = self.window.get_should_close();
                     if should_close { return None; }
 
@@ -285,7 +285,7 @@ for Events<W> {
                     let Size([w, h]) = self.window.get_size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
-                        self.state = EventsState::SwapBuffersState;
+                        self.state = EventsState::SwapBuffers;
                         return Some(EventMap::render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: (start_render - self.last_update) as f64
@@ -295,35 +295,35 @@ for Events<W> {
                         }));
                     }
 
-                    EventsState::UpdateLoopState
+                    EventsState::UpdateLoop
                 }
-                EventsState::SwapBuffersState => {
+                EventsState::SwapBuffers => {
                     self.window.swap_buffers();
-                    EventsState::UpdateLoopState
+                    EventsState::UpdateLoop
                 }
-                EventsState::UpdateLoopState => {
+                EventsState::UpdateLoop => {
                     let current_time = time::precise_time_ns();
                     let next_frame = self.last_frame + self.dt_frame_in_ns;
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
                     if next_event > current_time {
                         sleep( Duration::nanoseconds((next_event - current_time) as i64) );
-                        EventsState::UpdateLoopState
+                        EventsState::UpdateLoop
                     } else if next_event == next_frame {
-                        EventsState::RenderState
+                        EventsState::Render
                     } else {
-                        EventsState::HandleEventsState
+                        EventsState::HandleEvents
                     }
                 }
-                EventsState::HandleEventsState => {
+                EventsState::HandleEvents => {
                     // Handle all events before updating.
                     match self.window.poll_event() {
-                        None => EventsState::UpdateState,
+                        None => EventsState::Update,
                         Some(x) => { return Some(EventMap::input(x)); },
                     }
                 }
-                EventsState::UpdateState => {
-                    self.state = EventsState::UpdateLoopState;
+                EventsState::Update => {
+                    self.state = EventsState::UpdateLoop;
                     self.last_update += self.dt_update_in_ns;
                     return Some(EventMap::update(UpdateArgs{ dt: self.dt }));
                 }
