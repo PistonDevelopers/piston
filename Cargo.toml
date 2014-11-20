@@ -28,7 +28,3 @@ git = "https://github.com/PistonDevelopers/event_loop"
 
 git = "https://github.com/PistonDevelopers/window"
 
-[dependencies.time]
-
-git = "http://github.com/rust-lang/time"
-
