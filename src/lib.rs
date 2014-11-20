@@ -43,7 +43,6 @@
 #![feature(default_type_params)]
 #![feature(globs)]
 
-extern crate time;
 extern crate input;
 extern crate serialize;
 extern crate current;
