@@ -53,9 +53,6 @@ pub use texture_packer_lib as texture_packer;
 
 pub use sdl2_window::Sdl2Window as WindowBackEnd;
 pub use event::{
-    Render,
-    Update,
-    Input,
     Event,
     Events,
     NoWindow,
