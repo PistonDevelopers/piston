@@ -21,5 +21,5 @@ git = "https://github.com/pistondevelopers/current"
 
 [dependencies.time]
 
-git = "https://github.com/rust-lang/time"
+git = "https://github.com/pistondevelopers/time"
 
