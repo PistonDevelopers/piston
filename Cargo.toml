@@ -105,6 +105,10 @@ git = "https://github.com/gfx-rs/gfx-rs"
 
 git = "https://github.com/TyOverby/wire"
 
+[dependencies.astar]
+
+git = "https://github.com/TyOverby/astar"
+
 [dependencies.img_hash]
 
 git = "https://github.com/cybergeek94/img_hash"
