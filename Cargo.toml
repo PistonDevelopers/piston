@@ -113,3 +113,7 @@ git = "https://github.com/cybergeek94/img_hash"
 
 git = "https://github.com/sebcrozet/nalgebra"
 
+[dependencies.ncollide]
+
+git = "https://github.com/sebcrozet/ncollide"
+
