@@ -109,3 +109,7 @@ git = "https://github.com/TyOverby/wire"
 
 git = "https://github.com/cybergeek94/img_hash"
 
+[dependencies.nalgebra]
+
+git = "https://github.com/sebcrozet/nalgebra"
+
