@@ -101,3 +101,7 @@ git = "https://github.com/csherratt/genmesh.git"
 
 git = "https://github.com/gfx-rs/gfx-rs"
 
+[dependencies.wire]
+
+git = "https://github.com/TyOverby/wire"
+
