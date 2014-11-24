@@ -33,6 +33,7 @@ extern crate "drag_controller" as drag_controller_lib;
 extern crate "read_color" as read_color_lib;
 extern crate "select_color" as select_color_lib;
 extern crate "texture_packer" as texture_packer_lib;
+extern crate "wire" as wire_lib;
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -50,6 +51,7 @@ pub use fps_counter_lib as fps_counter;
 pub use wavefront_obj_lib as wavefront_obj;
 pub use drag_controller_lib as drag_controller;
 pub use texture_packer_lib as texture_packer;
+pub use wire_lib as wire;
 
 pub use sdl2_window::Sdl2Window as WindowBackEnd;
 pub use event::{
