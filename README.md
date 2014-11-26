@@ -94,3 +94,8 @@ In addition we do research or plan to in the following areas:
 * Animation
 * Sound and music
 * Network
+
+### Dependency graph
+
+![dependencies](./Cargo.png)
+
