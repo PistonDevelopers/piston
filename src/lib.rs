@@ -7,7 +7,6 @@
 
 //! A user friendly game engine written in Rust.
 
-extern crate sync;
 extern crate gfx;
 extern crate gfx_graphics;
 extern crate opengl_graphics;
