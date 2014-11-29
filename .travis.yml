@@ -16,6 +16,9 @@ before_install:
     - tar -xzvf SDL2-2.0.0.tar.gz
 install:
     - (cd SDL2-2.0.0 && ./configure && make && sudo make install)
+    - curl -O http://www.portaudio.com/archives/pa_stable_v19_20140130.tgz
+    - tar xfz pa_stable_v19_20140130.tgz
+    - (cd portaudio/ && ./configure && make && sudo make install)
 script:
     - cargo build -v
     - cargo test -v
