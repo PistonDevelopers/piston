@@ -173,7 +173,7 @@ pub fn set_title(text: String) {
 /// Renders 2D graphics using Gfx.
 pub fn render_2d_gfx(
     bg_color: Option<[f32, ..4]>, 
-    f: |&graphics::Context, 
+    f: |graphics::Context, 
         &mut gfx_graphics::GraphicsBackEnd<gfx::GlCommandBuffer>|
 ) {
     use gfx::Device;    
@@ -187,7 +187,7 @@ pub fn render_2d_gfx(
                 if let Some(bg_color) = bg_color {
                     c.color(bg_color).draw(g);
                 }
-                f(&c, g);
+                f(c, g);
             });
         current_gfx_device().submit(current_renderer().as_buffer());
         current_renderer().reset();
@@ -197,20 +197,20 @@ pub fn render_2d_gfx(
 /// Renders 2D graphics using OpenGL.
 pub fn render_2d_opengl(
     bg_color: Option<[f32, ..4]>,
-    f: |&graphics::Context,
+    f: |graphics::Context,
         &mut opengl_graphics::Gl|
 ) {
     unsafe {
         use graphics::*;
         let gl = &mut *current_gl();
         let window::Size([w, h]) = current_window().get();
-        gl.viewport(0, 0, w as i32, h as i32);
-        gl.clear_program();
-        let c = Context::abs(w as f64, h as f64);
-        if let Some(bg_color) = bg_color {
-            c.color(bg_color).draw(gl);
-        }
-        f(&c, gl);
+        gl.draw([0, 0, w as i32, h as i32], |c, g| {
+            use graphics::*;
+            if let Some(bg_color) = bg_color {
+                c.color(bg_color).draw(g);
+            }
+            f(c, g);
+        });
     }
 }
 
