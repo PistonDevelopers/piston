@@ -89,6 +89,10 @@ git = "https://github.com/pistondevelopers/sdl2_window"
 
 git = "https://github.com/pistondevelopers/wavefront-obj"
 
+[dependencies.conrod]
+
+git = "https://github.com/pistondevelopers/conrod"
+
 [dependencies.noise]
 
 git = "https://github.com/bjz/noise-rs"
