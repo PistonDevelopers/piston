@@ -93,6 +93,10 @@ git = "https://github.com/pistondevelopers/wavefront-obj"
 
 git = "https://github.com/pistondevelopers/conrod"
 
+[dependencies.dsp-chain]
+
+git = "https://github.com/RustAudio/dsp-chain"
+
 [dependencies.noise]
 
 git = "https://github.com/bjz/noise-rs"
