@@ -183,9 +183,8 @@ pub fn render_2d_gfx(
             &mut *current_renderer(),
             &*current_frame(), 
             |c, g| {
-                use graphics::*;
                 if let Some(bg_color) = bg_color {
-                    c.color(bg_color).draw(g);
+                    graphics::clear(bg_color, g);
                 }
                 f(c, g);
             });
@@ -201,13 +200,12 @@ pub fn render_2d_opengl(
         &mut opengl_graphics::Gl|
 ) {
     unsafe {
-        use graphics::*;
         let gl = &mut *current_gl();
         let window::Size([w, h]) = current_window().get();
         gl.draw([0, 0, w as i32, h as i32], |c, g| {
             use graphics::*;
             if let Some(bg_color) = bg_color {
-                c.color(bg_color).draw(g);
+                graphics::clear(bg_color, g);
             }
             f(c, g);
         });
