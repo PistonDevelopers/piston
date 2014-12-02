@@ -121,11 +121,3 @@ git = "https://github.com/TyOverby/astar"
 
 git = "https://github.com/pistondevelopers/img_hash"
 
-[dependencies.nalgebra]
-
-git = "https://github.com/sebcrozet/nalgebra"
-
-[dependencies.ncollide]
-
-git = "https://github.com/sebcrozet/ncollide"
-
