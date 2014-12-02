@@ -37,8 +37,6 @@ extern crate "dsp" as dsp_lib;
 extern crate "wire" as wire_lib;
 extern crate "astar" as astar_lib;
 extern crate "img_hash" as img_hash_lib;
-extern crate "nalgebra" as nalgebra_lib;
-extern crate "ncollide" as ncollide_lib;
 
 // Reexports.
 pub use shader_version_lib as shader_version;
@@ -61,8 +59,6 @@ pub use dsp_lib as dsp;
 pub use wire_lib as wire;
 pub use astar_lib as astar;
 pub use img_hash_lib as img_hash;
-pub use nalgebra_lib as nalgebra;
-pub use ncollide_lib as ncollide;
 
 pub use sdl2_window::Sdl2Window as WindowBackEnd;
 pub use event::{
