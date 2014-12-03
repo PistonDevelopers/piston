@@ -3,15 +3,7 @@ use std::fmt::Show;
 use input::{
     Button,
     InputEvent,
-    Focus,
-    Move,
-    MouseCursor,
-    MouseRelative,
-    MouseScroll,
-    Press,
-    Release,
-    Resize,
-    Text,
+    Motion,
 };
 
 use {
@@ -82,33 +74,33 @@ impl GenericEvent for InputEvent {
         let focus = TypeId::of::<Box<FocusEvent>>();
         match event_trait_id {
             x if x == press => {
-                Some(Press(*args.expect::<Button>()))
+                Some(InputEvent::Press(*args.expect::<Button>()))
             }
             x if x == release => {
-                Some(Release(*args.expect::<Button>()))
+                Some(InputEvent::Release(*args.expect::<Button>()))
             }
             x if x == mouse_cursor => {
                 let &(x, y) = args.expect::<(f64, f64)>();
-                Some(Move(MouseCursor(x, y)))
+                Some(InputEvent::Move(Motion::MouseCursor(x, y)))
             }
             x if x == mouse_relative => {
                 let &(x, y) = args.expect::<(f64, f64)>();
-                Some(Move(MouseRelative(x, y)))
+                Some(InputEvent::Move(Motion::MouseRelative(x, y)))
             }
             x if x == mouse_scroll => {
                 let &(x, y) = args.expect::<(f64, f64)>();
-                Some(Move(MouseScroll(x, y)))
+                Some(InputEvent::Move(Motion::MouseScroll(x, y)))
             }
             x if x == text => {
                 let text = args.expect_str();
-                Some(Text(text.to_string()))
+                Some(InputEvent::Text(text.to_string()))
             }
             x if x == resize => {
                 let &(w, h) = args.expect::<(u32, u32)>();
-                Some(Resize(w, h))
+                Some(InputEvent::Resize(w, h))
             }
             x if x == focus => {
-                Some(Focus(*args.expect::<bool>()))
+                Some(InputEvent::Focus(*args.expect::<bool>()))
             }
             _ => None
         }
@@ -127,49 +119,57 @@ impl GenericEvent for InputEvent {
         match event_trait_id {
             x if x == press => {
                 match *self {
-                    Press(ref button) => Some(Ptr::with_ref(button, f)),
+                    InputEvent::Press(ref button) => 
+                        Some(Ptr::with_ref(button, f)),
                     _ => None
                 }
             }
             x if x == release => {
                 match *self {
-                    Release(ref button) => Some(Ptr::with_ref(button, f)),
+                    InputEvent::Release(ref button) => 
+                        Some(Ptr::with_ref(button, f)),
                     _ => None
                 }
             }
             x if x == mouse_cursor => {
                 match *self {
-                    Move(MouseCursor(x, y)) => Some(Ptr::with_ref(&(x, y), f)),
+                    InputEvent::Move(Motion::MouseCursor(x, y)) => 
+                        Some(Ptr::with_ref(&(x, y), f)),
                     _ => None
                 }
             }
             x if x == mouse_relative => {
                 match *self {
-                    Move(MouseRelative(x, y)) => Some(Ptr::with_ref(&(x, y), f)),
+                    InputEvent::Move(Motion::MouseRelative(x, y)) => 
+                        Some(Ptr::with_ref(&(x, y), f)),
                     _ => None
                 }
             }
             x if x == mouse_scroll => {
                 match *self {
-                    Move(MouseScroll(x, y)) => Some(Ptr::with_ref(&(x, y), f)),
+                    InputEvent::Move(Motion::MouseScroll(x, y)) => 
+                        Some(Ptr::with_ref(&(x, y), f)),
                     _ => None
                 }
             }
             x if x == text => {
                 match *self {
-                    Text(ref text) => Some(Ptr::with_str(text.as_slice(), f)),
+                    InputEvent::Text(ref text) => 
+                        Some(Ptr::with_str(text.as_slice(), f)),
                     _ => None
                 }
             }
             x if x == resize => {
                 match *self {
-                    Resize(w, h) => Some(Ptr::with_ref(&(w, h), f)),
+                    InputEvent::Resize(w, h) => 
+                        Some(Ptr::with_ref(&(w, h), f)),
                     _ => None
                 }
             }
             x if x == focus => {
                 match *self {
-                    Focus(focused) => Some(Ptr::with_ref(&focused, f)),
+                    InputEvent::Focus(focused) =>
+                        Some(Ptr::with_ref(&focused, f)),
                     _ => None
                 }
             }
@@ -180,13 +180,13 @@ impl GenericEvent for InputEvent {
 
 #[test]
 fn test_input_event() {
-    use input;
-    use input::Keyboard;
+    use input::Button::Keyboard;
+    use input::keyboard::Key;
 
-    let ref e = PressEvent::from_button(Keyboard(input::keyboard::A)).unwrap();
+    let ref e = PressEvent::from_button(Keyboard(Key::A)).unwrap();
     assert_event_trait::<InputEvent, Box<PressEvent>>(e);
 
-    let ref e = ReleaseEvent::from_button(Keyboard(input::keyboard::B)).unwrap();
+    let ref e = ReleaseEvent::from_button(Keyboard(Key::B)).unwrap();
     assert_event_trait::<InputEvent, Box<ReleaseEvent>>(e);
 
     let ref e = MouseCursorEvent::from_xy(1.0, 0.0).unwrap();
