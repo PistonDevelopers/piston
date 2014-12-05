@@ -85,9 +85,9 @@ git = "https://github.com/pistondevelopers/sprite"
 
 git = "https://github.com/pistondevelopers/sdl2_window"
 
-[dependencies.wavefront-obj]
+[dependencies.wavefront_obj]
 
-git = "https://github.com/pistondevelopers/wavefront-obj"
+git = "https://github.com/pistondevelopers/wavefront_obj"
 
 [dependencies.conrod]
 

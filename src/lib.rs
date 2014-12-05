@@ -27,7 +27,7 @@ extern crate "genmesh" as genmesh_lib;
 extern crate "sprite" as sprite_lib;
 extern crate "current" as current_lib;
 extern crate "fps_counter" as fps_counter_lib;
-extern crate "wavefront-obj" as wavefront_obj_lib;
+extern crate "wavefront_obj" as wavefront_obj_lib;
 extern crate "drag_controller" as drag_controller_lib;
 extern crate "read_color" as read_color_lib;
 extern crate "select_color" as select_color_lib;
