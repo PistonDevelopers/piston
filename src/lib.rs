@@ -12,7 +12,6 @@ extern crate gfx_graphics;
 extern crate opengl_graphics;
 extern crate sdl2;
 extern crate sdl2_window;
-extern crate window;
 
 // Crates used to reexport.
 extern crate "vecmath" as vecmath_lib;
@@ -21,6 +20,7 @@ extern crate "image" as image_lib;
 extern crate "graphics" as graphics_lib;
 extern crate "input" as input_lib;
 extern crate "event" as event_lib;
+extern crate "window" as window_lib;
 extern crate "cam" as cam_lib;
 extern crate "noise" as noise_lib;
 extern crate "genmesh" as genmesh_lib;
@@ -45,6 +45,7 @@ pub use graphics_lib as graphics;
 pub use vecmath_lib as vecmath;
 pub use input_lib as input;
 pub use event_lib as event;
+pub use window_lib as window;
 pub use cam_lib as cam;
 pub use noise_lib as noise;
 pub use genmesh_lib as genmesh;
