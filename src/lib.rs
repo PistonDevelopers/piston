@@ -167,6 +167,16 @@ pub fn set_title(text: String) {
     }
 }
 
+/// Returns true if the current window should be closed.
+pub fn should_close() -> bool {
+    use window::ShouldClose;
+
+    unsafe {
+        let ShouldClose(val) = current_window().get();
+        val
+    }
+}
+
 /// Renders 2D graphics using Gfx.
 pub fn render_2d_gfx(
     bg_color: Option<[f32, ..4]>, 
