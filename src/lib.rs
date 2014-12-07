@@ -3,7 +3,6 @@
 #![warn(dead_code)]
 #![feature(default_type_params)]
 #![feature(globs)]
-#![feature(if_let)]
 
 //! A user friendly game engine written in Rust.
 
@@ -14,6 +13,7 @@ extern crate sdl2;
 extern crate sdl2_window;
 
 // Crates used to reexport.
+extern crate "ai_behavior" as ai_behavior_lib;
 extern crate "vecmath" as vecmath_lib;
 extern crate "shader_version" as shader_version_lib;
 extern crate "image" as image_lib;
@@ -39,6 +39,7 @@ extern crate "astar" as astar_lib;
 extern crate "img_hash" as img_hash_lib;
 
 // Reexports.
+pub use ai_behavior_lib as ai_behavior;
 pub use shader_version_lib as shader_version;
 pub use image_lib as image;
 pub use graphics_lib as graphics;
