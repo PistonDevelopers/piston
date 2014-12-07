@@ -77,6 +77,10 @@ git = "https://github.com/pistondevelopers/opengl_graphics"
 
 git = "https://github.com/pistondevelopers/gfx_graphics"
 
+[dependencies.ai_behavior]
+
+git = "https://github.com/pistondevelopers/ai_behavior"
+
 [dependencies.sprite]
 
 git = "https://github.com/pistondevelopers/sprite"
