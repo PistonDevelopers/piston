@@ -6,7 +6,7 @@ use std::num::FromPrimitive;
 use std::num::ToPrimitive;
 use std::default::Default;
 
-use InputEvent;
+use Input;
 use Button;
 
 // Defining every combination to allow assignment in static expressions.
@@ -52,25 +52,25 @@ impl ModifierKey {
     /// Change modifier key state depending on input.
     ///
     /// If the left or side button is released, it counts as a release.
-    pub fn handle_input(&mut self, input: &InputEvent) {
+    pub fn handle_input(&mut self, input: &Input) {
         match *input {
-            InputEvent::Press(Button::Keyboard(Key::LCtrl))
-          | InputEvent::Press(Button::Keyboard(Key::RCtrl)) => self.insert(CTRL),
-            InputEvent::Release(Button::Keyboard(Key::LCtrl))
-          | InputEvent::Release(Button::Keyboard(Key::RCtrl)) => self.remove(CTRL),
-            InputEvent::Press(Button::Keyboard(Key::LShift))
-          | InputEvent::Press(Button::Keyboard(Key::RShift)) => self.insert(SHIFT),
-            InputEvent::Release(Button::Keyboard(Key::LShift))
-          | InputEvent::Release(Button::Keyboard(Key::RShift)) => self.remove(SHIFT),
-            InputEvent::Press(Button::Keyboard(Key::LAlt))
-          | InputEvent::Press(Button::Keyboard(Key::RAlt)) => self.insert(ALT),
-            InputEvent::Release(Button::Keyboard(Key::LAlt))
-          | InputEvent::Release(Button::Keyboard(Key::RAlt)) => self.remove(ALT),
-            InputEvent::Press(Button::Keyboard(Key::LGui))
-          | InputEvent::Press(Button::Keyboard(Key::RGui)) => self.insert(GUI),
-            InputEvent::Release(Button::Keyboard(Key::LGui))
-          | InputEvent::Release(Button::Keyboard(Key::RGui)) => self.remove(GUI),
-            InputEvent::Focus(false) => *self = NO_MODIFIER,
+            Input::Press(Button::Keyboard(Key::LCtrl))
+          | Input::Press(Button::Keyboard(Key::RCtrl)) => self.insert(CTRL),
+            Input::Release(Button::Keyboard(Key::LCtrl))
+          | Input::Release(Button::Keyboard(Key::RCtrl)) => self.remove(CTRL),
+            Input::Press(Button::Keyboard(Key::LShift))
+          | Input::Press(Button::Keyboard(Key::RShift)) => self.insert(SHIFT),
+            Input::Release(Button::Keyboard(Key::LShift))
+          | Input::Release(Button::Keyboard(Key::RShift)) => self.remove(SHIFT),
+            Input::Press(Button::Keyboard(Key::LAlt))
+          | Input::Press(Button::Keyboard(Key::RAlt)) => self.insert(ALT),
+            Input::Release(Button::Keyboard(Key::LAlt))
+          | Input::Release(Button::Keyboard(Key::RAlt)) => self.remove(ALT),
+            Input::Press(Button::Keyboard(Key::LGui))
+          | Input::Press(Button::Keyboard(Key::RGui)) => self.insert(GUI),
+            Input::Release(Button::Keyboard(Key::LGui))
+          | Input::Release(Button::Keyboard(Key::RGui)) => self.remove(GUI),
+            Input::Focus(false) => *self = NO_MODIFIER,
             _ => {}
         }
     }

@@ -35,7 +35,7 @@ pub enum Motion {
 
 /// Models input events.
 #[deriving(Clone, Decodable, Encodable, PartialEq, Show)]
-pub enum InputEvent {
+pub enum Input {
     /// Pressed a button.
     Press(Button),
     /// Released a button.
