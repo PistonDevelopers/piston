@@ -8,7 +8,7 @@ extern crate input;
 extern crate current;
 extern crate event_loop;
 
-use input::InputEvent;
+use input::Input;
 use current::{ Get, Modifier, Set };
 
 // Reexport everything from event_loop.
@@ -277,7 +277,7 @@ impl WindowSettings {
 }
 
 /// Implemented by window back-end.
-pub trait Window<E = InputEvent>:
+pub trait Window<E = Input>:
     SwapBuffers
   + PollEvent<E>
   + GetShouldClose + SetShouldClose
@@ -326,8 +326,8 @@ impl SwapBuffers for NoWindow {
     fn swap_buffers(&mut self) {}
 }
 
-impl PollEvent<InputEvent> for NoWindow {
-    fn poll_event(&mut self) -> Option<InputEvent> { None }
+impl PollEvent<Input> for NoWindow {
+    fn poll_event(&mut self) -> Option<Input> { None }
 }
 
 impl Get<ShouldClose> for NoWindow {
