@@ -4,7 +4,7 @@
 /// Represent a mouse button.
 #[deriving(Clone, Decodable, Encodable, PartialEq,
     Eq, Ord, PartialOrd, Hash, Show)]
-pub enum Button {
+pub enum MouseButton {
     /// Unknown mouse button.
     Unknown,
     /// Left mouse button.

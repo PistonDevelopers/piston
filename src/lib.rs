@@ -7,6 +7,9 @@
 
 extern crate serialize;
 
+pub use mouse::MouseButton;
+pub use keyboard::Key;
+
 pub mod keyboard;
 pub mod mouse;
 
@@ -14,9 +17,9 @@ pub mod mouse;
 #[deriving(Clone, Decodable, Encodable, PartialEq, Eq, Show)]
 pub enum Button {
     /// A keyboard button.
-    Keyboard(keyboard::Key),
+    Keyboard(Key),
     /// A mouse button.
-    Mouse(mouse::Button),
+    Mouse(MouseButton),
 }
 
 /// Models different kinds of motion.
