@@ -15,7 +15,7 @@ use events::EventMap;
 
 /// Adds render and update events to input events
 #[deriving(Clone, PartialEq, Show)]
-pub enum Event<I = input::InputEvent> {
+pub enum Event<I = input::Input> {
     /// Render graphics.
     Render(RenderArgs),
     /// Update the state of the application.

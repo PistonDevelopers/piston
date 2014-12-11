@@ -1,30 +1,36 @@
 [package]
 
-name = "event"
+name = "pistoncore-event"
 version = "0.0.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
 ]
+tags = ["event"]
+description = "A library for flexible generic event threading"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/event.git"
+homepage = "https://github.com/pistondevelopers/event"
 
 [lib]
 
 name = "event"
 path = "src/lib.rs"
 
-[dependencies.input]
+[dependencies.pistoncore-input]
 
 git = "https://github.com/PistonDevelopers/input"
 
-[dependencies.current]
+[dependencies.pistoncore-current]
 
 git = "https://github.com/PistonDevelopers/current"
 
-[dependencies.event_loop]
+[dependencies.pistoncore-event_loop]
 
 git = "https://github.com/PistonDevelopers/event_loop"
 
-[dependencies.window]
+[dependencies.pistoncore-window]
 
 git = "https://github.com/PistonDevelopers/window"
 
