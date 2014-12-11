@@ -1,27 +1,32 @@
 [package]
 
-name = "window"
+name = "pistoncore-window"
 version = "0.0.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
 ]
-tags = []
+tags = ["window", "game"]
+description = "A library for window abstraction"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/window.git"
+homepage = "https://github.com/pistondevelopers/window"
 
 [lib]
 
 name = "window"
 path = "src/lib.rs"
 
-[dependencies.input]
+[dependencies.pistoncore-input]
 
 git = "https://github.com/pistondevelopers/input"
 
-[dependencies.current]
+[dependencies.pistoncore-current]
 
 git = "https://github.com/pistondevelopers/current"
 
-[dependencies.event_loop]
+[dependencies.pistoncore-event_loop]
 
 git = "https://github.com/pistondevelopers/event_loop"
 
