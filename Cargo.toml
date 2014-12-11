@@ -1,9 +1,14 @@
 [package]
 
-name = "input"
+name = "pistoncore-input"
 version = "0.0.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
-tags = []
+tags = ["keyboard", "mouse", "input"]
+description = "A structure for user input"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/input.git"
+homepage = "https://github.com/pistondevelopers/input"
 
 [lib]
 
