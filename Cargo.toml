@@ -1,6 +1,6 @@
 [package]
 
-name = "event_loop"
+name = "pistoncore-event_loop"
 version = "0.0.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
@@ -8,14 +8,19 @@ authors = [
     "gmorenz",
     "bfops",
 ]
-tags = []
+tags = ["game", "event", "loop"]
+description = "A generic event loop for games and interactive applications"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/event_loop.git"
+homepage = "https://github.com/pistondevelopers/event_loop"
 
 [lib]
 
 name = "event_loop"
 path = "src/lib.rs"
 
-[dependencies.current]
+[dependencies.pistoncore-current]
 
 git = "https://github.com/pistondevelopers/current"
 
