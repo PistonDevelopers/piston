@@ -1,6 +1,7 @@
 //! A generic event loop for games and interactive applications
 
 #![deny(missing_docs)]
+#![deny(missing_copy_implementations)]
 
 extern crate time;
 extern crate current;
@@ -12,6 +13,7 @@ use std::cmp;
 use std::cell::RefCell;
 
 /// Whether window should close or not.
+#[deriving(Copy)]
 pub struct ShouldClose(pub bool);
 
 /// Work-around trait for `Get<ShouldClose>`.
@@ -37,6 +39,7 @@ pub trait SetShouldClose: Set<ShouldClose> {
 impl<T: Set<ShouldClose>> SetShouldClose for T {}
 
 /// The size of the window.
+#[deriving(Copy)]
 pub struct Size(pub [u32, ..2]);
 
 /// Work-around trait for `Get<Size>`.
@@ -102,7 +105,7 @@ impl<'a, W: 'a + PollEvent<I>, I> PollEvent<I> for &'a RefCell<W> {
 }
 
 /// Render arguments
-#[deriving(Clone, PartialEq, Show)]
+#[deriving(Copy, Clone, PartialEq, Show)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
@@ -113,7 +116,7 @@ pub struct RenderArgs {
 }
 
 /// Update arguments, such as delta time in seconds
-#[deriving(Clone, PartialEq, Show)]
+#[deriving(Copy, Clone, PartialEq, Show)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
@@ -129,7 +132,7 @@ pub trait EventMap<I> {
     fn input(args: I) -> Self;
 }
 
-#[deriving(Show)]
+#[deriving(Copy, Show)]
 enum State {
     Render,
     SwapBuffers,
@@ -142,6 +145,7 @@ enum State {
 ///
 /// This is the fixed update rate on average over time.
 /// If the event loop lags, it will try to catch up.
+#[deriving(Copy)]
 pub struct Ups(pub u64);
 
 impl<W> Modifier<Events<W>> for Ups {
@@ -166,6 +170,7 @@ impl<T: Set<Ups>> SetUps for T {}
 /// The frame rate can be lower because the
 /// next frame is always scheduled from the previous frame.
 /// This causes the frames to "slip" over time.
+#[deriving(Copy)]
 pub struct MaxFps(pub u64);
 
 impl<W> Modifier<Events<W>> for MaxFps {
