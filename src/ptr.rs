@@ -29,6 +29,7 @@ use std::intrinsics::{ get_tydesc, TypeId };
 /// with the expected type name and the type name it was attempted to cast to.
 ///
 /// `Ptr(type id, raw ptr, type desc)`
+#[allow(missing_copy_implementations)]
 pub struct Ptr(TypeId, *const u8, &'static str);
 
 impl Ptr {
