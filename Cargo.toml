@@ -1,12 +1,12 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.0.0"
+version = "0.0.1"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
 ]
-tags = ["window", "game"]
+keywords = ["window", "game"]
 description = "A library for window abstraction"
 license = "MIT"
 readme = "README.md"

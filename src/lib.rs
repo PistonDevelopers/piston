@@ -1,4 +1,5 @@
 #![deny(missing_docs)]
+#![deny(missing_copy_implementations)]
 #![feature(globs)]
 #![feature(default_type_params)]
 
@@ -40,6 +41,7 @@ pub trait SetTitle: Set<Title> {
 impl<T: Set<Title>> SetTitle for T {}
 
 /// The anti-aliasing samples when rendering.
+#[deriving(Copy)]
 pub struct Samples(pub u8);
 
 /// Work-around trait for `Get<Samples>`.
@@ -65,6 +67,7 @@ pub trait SetSamples: Set<Samples> {
 impl<T: Set<Samples>> SetSamples for T {}
 
 /// Whether window is opened in full screen mode.
+#[deriving(Copy)]
 pub struct Fullscreen(pub bool);
 
 /// Work-around trait for `Get<Fullscreen>`.
@@ -90,6 +93,7 @@ pub trait SetFullscreen: Set<Fullscreen> {
 impl<T: Set<Fullscreen>> SetFullscreen for T {}
 
 /// Whether to exit when pressing the Esc keyboard button.
+#[deriving(Copy)]
 pub struct ExitOnEsc(pub bool);
 
 /// Work-around trait for `Get<ExitOnEsc>`.
@@ -115,6 +119,7 @@ pub trait SetExitOnEsc: Set<ExitOnEsc> {
 impl<T: Set<ExitOnEsc>> SetExitOnEsc for T {}
 
 /// Whether to capture the mouse cursor.
+#[deriving(Copy)]
 pub struct CaptureCursor(pub bool);
 
 /// Work-around trait for `Get<CaptureCursor>`.
@@ -140,6 +145,7 @@ pub trait SetCaptureCursor: Set<CaptureCursor> {
 impl<T: Set<CaptureCursor>> SetCaptureCursor for T {}
 
 /// The draw size of the window.
+#[deriving(Copy)]
 pub struct DrawSize(pub [u32, ..2]);
 
 /// Work-around trait for `Get<DrawSize>`.
