@@ -13,7 +13,7 @@ use Button;
 bitflags!(
     #[deriving(Show)]
     #[allow(missing_docs)]
-    #[deriving(Decodable, Encodable)]
+    #[deriving(Copy, Decodable, Encodable)]
     flags ModifierKey: u8 {
         const NO_MODIFIER           = 0b00000000,
         const CTRL                  = 0b00000001,
@@ -82,7 +82,7 @@ impl Default for ModifierKey {
 
 /// Represent a keyboard key.
 #[allow(missing_docs)]
-#[deriving(Clone, Decodable, Encodable, Show)]
+#[deriving(Copy, Clone, Decodable, Encodable, Show)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
