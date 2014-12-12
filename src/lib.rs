@@ -1,5 +1,6 @@
 #![crate_name = "input"]
 #![deny(missing_docs)]
+#![deny(missing_copy_implementations)]
 #![feature(globs)]
 
 //! A flexible structure for user interactions
@@ -14,7 +15,7 @@ pub mod keyboard;
 pub mod mouse;
 
 /// Models different kinds of buttons.
-#[deriving(Clone, Decodable, Encodable, PartialEq, Eq, Show)]
+#[deriving(Copy, Clone, Decodable, Encodable, PartialEq, Eq, Show)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(Key),
@@ -23,7 +24,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[deriving(Clone, Decodable, Encodable, PartialEq, Show)]
+#[deriving(Copy, Clone, Decodable, Encodable, PartialEq, Show)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),

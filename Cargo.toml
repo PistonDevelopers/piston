@@ -3,7 +3,7 @@
 name = "pistoncore-input"
 version = "0.0.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
-tags = ["keyboard", "mouse", "input"]
+keywords = ["keyboard", "mouse", "input"]
 description = "A structure for user input"
 license = "MIT"
 readme = "README.md"
