@@ -40,6 +40,7 @@
 #![crate_type = "lib"]
 #![crate_name = "event"]
 #![deny(missing_docs)]
+#![deny(missing_copy_implementations)]
 #![feature(default_type_params)]
 #![feature(globs)]
 
