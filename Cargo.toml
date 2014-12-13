@@ -25,11 +25,11 @@ path = "./src/lib.rs"
 
 git = "https://github.com/pistondevelopers/vecmath"
 
-[dependencies.input]
+[dependencies.pistoncore-input]
 
 git = "https://github.com/pistondevelopers/input"
 
-[dependencies.event]
+[dependencies.pistoncore-event]
 
 git = "https://github.com/pistondevelopers/event"
 
@@ -37,7 +37,7 @@ git = "https://github.com/pistondevelopers/event"
 
 git = "https://github.com/pistondevelopers/shader_version"
 
-[dependencies.cam]
+[dependencies.piston3d-cam]
 
 git = "https://github.com/pistondevelopers/cam"
 
@@ -49,7 +49,7 @@ git = "https://github.com/pistondevelopers/image"
 
 git = "https://github.com/pistondevelopers/fps_counter"
 
-[dependencies.drag_controller]
+[dependencies.piston2d-drag_controller]
 
 git = "https://github.com/pistondevelopers/drag_controller"
 
@@ -65,27 +65,27 @@ git = "https://github.com/pistondevelopers/read_color"
 
 git = "https://github.com/PistonDevelopers/texture-packer"
 
-[dependencies.graphics]
+[dependencies.piston2d-graphics]
 
 git = "https://github.com/pistondevelopers/graphics"
 
-[dependencies.opengl_graphics]
+[dependencies.piston2d-opengl_graphics]
 
 git = "https://github.com/pistondevelopers/opengl_graphics"
 
-[dependencies.gfx_graphics]
+[dependencies.piston2d-gfx_graphics]
 
 git = "https://github.com/pistondevelopers/gfx_graphics"
 
-[dependencies.ai_behavior]
+[dependencies.piston-ai_behavior]
 
 git = "https://github.com/pistondevelopers/ai_behavior"
 
-[dependencies.sprite]
+[dependencies.piston2d-sprite]
 
 git = "https://github.com/pistondevelopers/sprite"
 
-[dependencies.sdl2_window]
+[dependencies.pistoncore-sdl2_window]
 
 git = "https://github.com/pistondevelopers/sdl2_window"
 
