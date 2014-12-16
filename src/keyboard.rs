@@ -13,7 +13,7 @@ use Button;
 bitflags!(
     #[deriving(Show)]
     #[allow(missing_docs)]
-    #[deriving(Copy, Decodable, Encodable)]
+    #[deriving(Decodable, Encodable)]
     flags ModifierKey: u8 {
         const NO_MODIFIER           = 0b00000000,
         const CTRL                  = 0b00000001,
