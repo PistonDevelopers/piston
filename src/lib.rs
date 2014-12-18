@@ -71,7 +71,7 @@ pub trait SwapBuffers {
     fn swap_buffers(&mut self);
 }
 
-impl<W: SwapBuffers> SwapBuffers for Current<W> {
+impl<W: 'static + SwapBuffers> SwapBuffers for Current<W> {
     #[inline(always)]
     fn swap_buffers(&mut self) {
         self.deref_mut().swap_buffers();
@@ -91,7 +91,7 @@ pub trait PollEvent<E> {
     fn poll_event(&mut self) -> Option<E>;
 }
 
-impl<W: PollEvent<I>, I> PollEvent<I> for Current<W> {
+impl<W: 'static + PollEvent<I>, I> PollEvent<I> for Current<W> {
     fn poll_event(&mut self) -> Option<I> {
         self.deref_mut().poll_event()
     }
