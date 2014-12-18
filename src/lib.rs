@@ -22,23 +22,14 @@ extern crate "input" as input_lib;
 extern crate "event" as event_lib;
 extern crate "window" as window_lib;
 extern crate "cam" as cam_lib;
-extern crate "noise" as noise_lib;
-extern crate "genmesh" as genmesh_lib;
-extern crate "sprite" as sprite_lib;
 extern crate "current" as current_lib;
 extern crate "fps_counter" as fps_counter_lib;
-extern crate "wavefront_obj" as wavefront_obj_lib;
 extern crate "drag_controller" as drag_controller_lib;
 extern crate "read_color" as read_color_lib;
 extern crate "select_color" as select_color_lib;
-extern crate "texture_packer" as texture_packer_lib;
-extern crate "conrod" as conrod_lib;
-extern crate "dsp" as dsp_lib;
-extern crate "wire" as wire_lib;
-extern crate "astar" as astar_lib;
-extern crate "img_hash" as img_hash_lib;
 
 // Reexports.
+pub use current_lib as current;
 pub use ai_behavior_lib as ai_behavior;
 pub use shader_version_lib as shader_version;
 pub use image_lib as image;
@@ -48,19 +39,8 @@ pub use input_lib as input;
 pub use event_lib as event;
 pub use window_lib as window;
 pub use cam_lib as cam;
-pub use noise_lib as noise;
-pub use genmesh_lib as genmesh;
-pub use sprite_lib as sprite;
-pub use current_lib as current;
 pub use fps_counter_lib as fps_counter;
-pub use wavefront_obj_lib as wavefront_obj;
 pub use drag_controller_lib as drag_controller;
-pub use texture_packer_lib as texture_packer;
-pub use conrod_lib as conrod;
-pub use dsp_lib as dsp;
-pub use wire_lib as wire;
-pub use astar_lib as astar;
-pub use img_hash_lib as img_hash;
 
 pub use sdl2_window::Sdl2Window as WindowBackEnd;
 pub use event::{
@@ -72,6 +52,7 @@ pub use event::{
     Window,
     WindowSettings,
 };
+
 pub use current::{
     Get,
     Set,

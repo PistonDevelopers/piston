@@ -61,10 +61,6 @@ git = "https://github.com/pistondevelopers/select_color"
 
 git = "https://github.com/pistondevelopers/read_color"
 
-[dependencies.texture_packer]
-
-git = "https://github.com/PistonDevelopers/texture_packer"
-
 [dependencies.piston2d-graphics]
 
 git = "https://github.com/pistondevelopers/graphics"
@@ -81,47 +77,11 @@ git = "https://github.com/pistondevelopers/gfx_graphics"
 
 git = "https://github.com/pistondevelopers/ai_behavior"
 
-[dependencies.piston2d-sprite]
-
-git = "https://github.com/pistondevelopers/sprite"
-
 [dependencies.pistoncore-sdl2_window]
 
 git = "https://github.com/pistondevelopers/sdl2_window"
 
-[dependencies.wavefront_obj]
-
-git = "https://github.com/pistondevelopers/wavefront_obj"
-
-[dependencies.conrod]
-
-git = "https://github.com/pistondevelopers/conrod"
-
-[dependencies.dsp-chain]
-
-git = "https://github.com/RustAudio/dsp-chain"
-
-[dependencies.noise]
-
-git = "https://github.com/bjz/noise-rs"
-
-[dependencies.genmesh]
-
-git = "https://github.com/csherratt/genmesh.git"
-
 [dependencies.gfx]
 
 git = "https://github.com/gfx-rs/gfx-rs"
-
-[dependencies.wire]
-
-git = "https://github.com/TyOverby/wire"
-
-[dependencies.astar]
-
-git = "https://github.com/TyOverby/astar"
-
-[dependencies.img_hash]
-
-git = "https://github.com/cybergeek94/img_hash"
 
