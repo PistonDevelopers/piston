@@ -61,9 +61,9 @@ git = "https://github.com/pistondevelopers/select_color"
 
 git = "https://github.com/pistondevelopers/read_color"
 
-[dependencies.texture-packer]
+[dependencies.texture_packer]
 
-git = "https://github.com/PistonDevelopers/texture-packer"
+git = "https://github.com/PistonDevelopers/texture_packer"
 
 [dependencies.piston2d-graphics]
 
