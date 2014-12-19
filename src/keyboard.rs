@@ -46,7 +46,7 @@ bitflags!(
         const ALT_GUI               = ALT.bits
                                     | GUI.bits
     }
-)
+);
 
 impl ModifierKey {
     /// Change modifier key state depending on input.
