@@ -152,6 +152,7 @@ impl<W> Modifier<Events<W>> for Ups {
     fn modify(self, events: &mut Events<W>) {
         let Ups(frames) = self;
         events.dt_update_in_ns = BILLION / frames;
+        events.dt = 1.0 / frames as f64;
     }
 }
 
