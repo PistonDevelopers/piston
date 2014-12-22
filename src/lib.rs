@@ -6,7 +6,9 @@
 
 //! A user friendly game engine written in Rust.
 
+#[cfg(feature = "include_gfx")]
 extern crate gfx;
+#[cfg(feature = "include_gfx")]
 extern crate gfx_graphics;
 extern crate opengl_graphics;
 extern crate sdl2;
@@ -61,10 +63,12 @@ pub use current::{
     CurrentGuard,
 };
 
+#[cfg(feature = "include_gfx")]
 use gfx_graphics::G2D;
+#[cfg(feature = "include_gfx")]
+use gfx::{ DeviceHelper };
 use opengl_graphics::Gl;
 use fps_counter::FPSCounter;
-use gfx::{ DeviceHelper };
 
 pub mod color {
     //! Rexported libraries for working with colors
@@ -72,10 +76,8 @@ pub mod color {
     pub use select_color_lib as select_color;
 }
 
-
-/// Initializes window and sets up current objects.
-pub fn start(
-    opengl: shader_version::opengl::OpenGL,
+fn start_window(
+    opengl: shader_version::OpenGL,
     window_settings: WindowSettings,
     f: ||
 ) {
@@ -84,46 +86,78 @@ pub fn start(
         window_settings,
     );
 
-    let mut device = gfx::GlDevice::new(|s| unsafe {
-        std::mem::transmute(sdl2::video::gl_get_proc_address(s))
-    });
     let mut gl = Gl::new(opengl);
-    let mut g2d = G2D::new(&mut device);
-    let mut renderer = device.create_renderer();
-    let event::window::Size([w, h]) = window.get();
-    let mut frame = gfx::Frame::new(w as u16, h as u16);
     let mut fps_counter = FPSCounter::new();
 
     let window_guard = CurrentGuard::new(&mut window);
-    let device_guard = CurrentGuard::new(&mut device);
     let gl_guard = CurrentGuard::new(&mut gl);
-    let g2d_guard = CurrentGuard::new(&mut g2d);
-    let renderer_guard = CurrentGuard::new(&mut renderer);
-    let frame_guard = CurrentGuard::new(&mut frame);
     let fps_counter_guard = CurrentGuard::new(&mut fps_counter);
 
     f();
 
     drop(window_guard);
-    drop(device_guard);
     drop(gl_guard);
+    drop(fps_counter_guard);
+}
+
+#[cfg(feature = "include_gfx")]
+fn start_gfx(f: ||) {
+    let mut device = gfx::GlDevice::new(|s| unsafe {
+        std::mem::transmute(sdl2::video::gl_get_proc_address(s))
+    });
+    let mut g2d = G2D::new(&mut device);
+    let mut renderer = device.create_renderer();
+    let event::window::Size([w, h]) = window.get(); 
+    let mut frame = gfx::Frame::new(w as u16, h as u16);
+
+    let device_guard = CurrentGuard::new(&mut device);
+    let g2d_guard = CurrentGuard::new(&mut g2d);
+    let renderer_guard = CurrentGuard::new(&mut renderer);
+    let frame_guard = CurrentGuard::new(&mut frame);
+
+    f();
+    
     drop(g2d_guard);
     drop(renderer_guard);
     drop(frame_guard);
-    drop(fps_counter_guard);
+    drop(device_guard);
+}
+
+#[cfg(not(feature = "include_gfx"))]
+fn start_gfx(f: ||) {
+    f();
+}
+
+/// Initializes window and sets up current objects.
+pub fn start(
+    opengl: shader_version::OpenGL,
+    window_settings: WindowSettings,
+    f: ||
+) {
+    start_window(opengl, window_settings, || {
+        if cfg!(feature = "include_gfx") {
+            start_gfx(|| f());
+        } else {
+            f();
+        }
+    });
 }
 
 /// The current window
 pub unsafe fn current_window() -> Current<WindowBackEnd> { Current }
 /// The current Gfx device
+#[cfg(feature = "include_gfx")]
 pub unsafe fn current_gfx_device() -> Current<gfx::GlDevice> { Current }
 /// The current opengl_graphics back-end
 pub unsafe fn current_gl() -> Current<Gl> { Current }
 /// The current gfx_graphics back-end
+#[cfg(feature = "include_gfx")]
 pub unsafe fn current_g2d() -> Current<G2D> { Current }
 /// The current Gfx renderer
+#[cfg(feature = "include_gfx")]
 pub unsafe fn current_renderer() -> Current<gfx::Renderer<gfx::GlCommandBuffer>> { Current }
 /// The current Gfx frame
+#[cfg(feature = "include_gfx")]
 pub unsafe fn current_frame() -> Current<gfx::Frame> { Current }
 /// The current FPS counter
 pub unsafe fn current_fps_counter() -> Current<FPSCounter> { Current }
@@ -160,6 +194,7 @@ pub fn should_close() -> bool {
 }
 
 /// Renders 2D graphics using Gfx.
+#[cfg(feature = "include_gfx")]
 pub fn render_2d_gfx(
     bg_color: Option<[f32, ..4]>, 
     f: |graphics::Context, 
