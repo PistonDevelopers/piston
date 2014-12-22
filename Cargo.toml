@@ -71,6 +71,7 @@ git = "https://github.com/pistondevelopers/opengl_graphics"
 
 [dependencies.piston2d-gfx_graphics]
 
+optional = true
 git = "https://github.com/pistondevelopers/gfx_graphics"
 
 [dependencies.piston-ai_behavior]
@@ -83,5 +84,10 @@ git = "https://github.com/pistondevelopers/sdl2_window"
 
 [dependencies.gfx]
 
+optional = true
 git = "https://github.com/gfx-rs/gfx-rs"
+
+[features]
+default = []
+include_gfx = ["gfx", "piston2d-gfx_graphics"]
 
