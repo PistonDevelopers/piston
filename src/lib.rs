@@ -194,8 +194,14 @@ pub fn should_close() -> bool {
 }
 
 /// Renders 2D graphics using Gfx.
+///
+/// ### DANGER
+///
+/// This function should not be called nested within the closure.
+/// Doing so will lead to mutable aliased references to the graphics back-end.
 #[cfg(feature = "include_gfx")]
 pub fn render_2d_gfx(
+    _: current::DANGER,
     bg_color: Option<[f32, ..4]>, 
     f: |graphics::Context, 
         &mut gfx_graphics::GraphicsBackEnd<gfx::GlCommandBuffer>|
@@ -218,7 +224,13 @@ pub fn render_2d_gfx(
 }
 
 /// Renders 2D graphics using OpenGL.
+///
+/// ### DANGER
+///
+/// This function should not be called nested within the closure.
+/// Doing so will lead to mutable aliased references to the graphics back-end.
 pub fn render_2d_opengl(
+    _: current::DANGER,
     bg_color: Option<[f32, ..4]>,
     f: |graphics::Context,
         &mut opengl_graphics::Gl|
