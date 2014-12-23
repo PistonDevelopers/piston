@@ -2,7 +2,7 @@
 //! Back-end agnostic mouse buttons.
 
 /// Represent a mouse button.
-#[deriving(Copy, Clone, Decodable, Encodable, PartialEq,
+#[deriving(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
     Eq, Ord, PartialOrd, Hash, Show)]
 pub enum MouseButton {
     /// Unknown mouse button.
