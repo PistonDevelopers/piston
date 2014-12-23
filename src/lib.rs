@@ -144,23 +144,23 @@ pub fn start(
 }
 
 /// The current window
-pub unsafe fn current_window() -> Current<WindowBackEnd> { Current }
+pub unsafe fn current_window() -> Current<WindowBackEnd> { Current::new() }
 /// The current Gfx device
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_gfx_device() -> Current<gfx::GlDevice> { Current }
+pub unsafe fn current_gfx_device() -> Current<gfx::GlDevice> { Current::new() }
 /// The current opengl_graphics back-end
-pub unsafe fn current_gl() -> Current<Gl> { Current }
+pub unsafe fn current_gl() -> Current<Gl> { Current::new() }
 /// The current gfx_graphics back-end
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_g2d() -> Current<G2D> { Current }
+pub unsafe fn current_g2d() -> Current<G2D> { Current::new() }
 /// The current Gfx renderer
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_renderer() -> Current<gfx::Renderer<gfx::GlCommandBuffer>> { Current }
+pub unsafe fn current_renderer() -> Current<gfx::Renderer<gfx::GlCommandBuffer>> { Current::new() }
 /// The current Gfx frame
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_frame() -> Current<gfx::Frame> { Current }
+pub unsafe fn current_frame() -> Current<gfx::Frame> { Current::new() }
 /// The current FPS counter
-pub unsafe fn current_fps_counter() -> Current<FPSCounter> { Current }
+pub unsafe fn current_fps_counter() -> Current<FPSCounter> { Current::new() }
 
 /// Returns an event iterator for the event loop
 pub fn events() -> event::Events<Current<WindowBackEnd>> {
