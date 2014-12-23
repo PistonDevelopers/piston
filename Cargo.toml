@@ -6,7 +6,7 @@ authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
 ]
-tags = ["event"]
+keywords = ["event", "piston"]
 description = "A library for flexible generic event threading"
 license = "MIT"
 readme = "README.md"
