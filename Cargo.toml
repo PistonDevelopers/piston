@@ -82,6 +82,10 @@ git = "https://github.com/pistondevelopers/ai_behavior"
 
 git = "https://github.com/pistondevelopers/sdl2_window"
 
+[dependencies.sdl2]
+
+version = "*"
+
 [dependencies.gfx]
 
 optional = true
