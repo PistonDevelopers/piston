@@ -6,7 +6,7 @@
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
 
-extern crate serialize;
+extern crate "rustc-serialize" as rustc_serialize;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
@@ -15,7 +15,7 @@ pub mod keyboard;
 pub mod mouse;
 
 /// Models different kinds of buttons.
-#[deriving(Copy, Clone, Decodable, Encodable, PartialEq, Eq, Show)]
+#[deriving(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Eq, Show)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(Key),
@@ -24,7 +24,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[deriving(Copy, Clone, Decodable, Encodable, PartialEq, Show)]
+#[deriving(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Show)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),
@@ -35,7 +35,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[deriving(Clone, Decodable, Encodable, PartialEq, Show)]
+#[deriving(Clone, RustcDecodable, RustcEncodable, PartialEq, Show)]
 pub enum Input {
     /// Pressed a button.
     Press(Button),
