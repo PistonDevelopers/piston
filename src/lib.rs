@@ -56,6 +56,7 @@ pub use event::{
 };
 
 pub use current::{
+    DANGER,
     Get,
     Set,
     Modifier,
