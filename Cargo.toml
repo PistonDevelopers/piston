@@ -15,7 +15,7 @@ homepage = "https://github.com/pistondevelopers/input"
 name = "input"
 path = "src/lib.rs"
 
-[dependencies.rustc-serialize]
+[dependencies]
 
-git = "https://github.com/rust-lang/rustc-serialize"
+rustc-serialize = "*"
 
