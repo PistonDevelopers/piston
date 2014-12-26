@@ -8,101 +8,46 @@ extern crate current;
 
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use current::{ Current, Get, Modifier, Set };
+use current::{ ActOn, Action, GetFrom, Get, SetAt };
 use std::cmp;
-use std::cell::RefCell;
 
 /// Whether window should close or not.
 #[deriving(Copy)]
 pub struct ShouldClose(pub bool);
 
-/// Work-around trait for `Get<ShouldClose>`.
-/// Used to support generic constraints.
-pub trait GetShouldClose: Get<ShouldClose> {
-    /// Returns whether window should close.
-    fn get_should_close(&self) -> ShouldClose {
-        self.get()
-    }
-}
-
-impl<T: Get<ShouldClose>> GetShouldClose for T {}
-
-/// Work-around trait for `Set<ShouldClose>`.
-/// Used to support generic constraints.
-pub trait SetShouldClose: Set<ShouldClose> {
-    /// Sets whether window should close.
-    fn set_should_close(&mut self, val: ShouldClose) {
-        self.set_mut(val);
-    }
-}
-
-impl<T: Set<ShouldClose>> SetShouldClose for T {}
+impl Sized for ShouldClose {}
 
 /// The size of the window.
 #[deriving(Copy)]
 pub struct Size(pub [u32, ..2]);
 
-/// Work-around trait for `Get<Size>`.
-/// Used to support generic constraints.
-pub trait GetSize: Get<Size> {
-    /// Returns the size of window.
-    fn get_size(&self) -> Size {
-        self.get()
-    }
-}
+impl Sized for Size {}
 
-impl<T: Get<Size>> GetSize for T {}
+/// Tells window to swap buffers.
+///
+/// ~~~ignore
+/// use current::Action;
+///
+/// ...
+/// window.action(SwapBuffers);
+/// ~~~
+#[deriving(Copy)]
+pub struct SwapBuffers;
 
-/// Work-around trait for `Set<Size>`.
-/// Used to support generic constraints.
-pub trait SetSize: Set<Size> {
-    /// Sets size of window.
-    fn set_size(&mut self, val: Size) {
-        self.set_mut(val);
-    }
-}
+impl Sized for SwapBuffers {}
 
-impl<T: Set<Size>> SetSize for T {}
+/// Polls event from window.
+///
+/// ~~~ignore
+/// use current::Action;
+///
+/// ...
+/// let e = window.action(PollEvent);
+/// ~~~
+#[deriving(Copy)]
+pub struct PollEvent;
 
-
-/// Implemented by windows that can swap buffers.
-pub trait SwapBuffers {
-    /// Swaps the buffers.
-    fn swap_buffers(&mut self);
-}
-
-impl<W: 'static + SwapBuffers> SwapBuffers for Current<W> {
-    #[inline(always)]
-    fn swap_buffers(&mut self) {
-        self.deref_mut().swap_buffers();
-    }
-}
-
-impl<'a, W: 'a + SwapBuffers> SwapBuffers for &'a RefCell<W> {
-    #[inline(always)]
-    fn swap_buffers(&mut self) {
-        self.borrow_mut().deref_mut().swap_buffers()
-    }
-}
-
-/// Implemented by windows that can pull events.
-pub trait PollEvent<E> {
-    /// Polls event from window.
-    fn poll_event(&mut self) -> Option<E>;
-}
-
-impl<W: 'static + PollEvent<I>, I> PollEvent<I> for Current<W> {
-    fn poll_event(&mut self) -> Option<I> {
-        self.deref_mut().poll_event()
-    }
-}
-
-impl<'a, W: 'a + PollEvent<I>, I> PollEvent<I> for &'a RefCell<W> {
-    #[inline(always)]
-    fn poll_event(&mut self) -> Option<I> {
-        self.borrow_mut().deref_mut().poll_event()
-    }
-}
+impl Sized for PollEvent {}
 
 /// Render arguments
 #[deriving(Copy, Clone, PartialEq, Show)]
@@ -148,23 +93,13 @@ enum State {
 #[deriving(Copy)]
 pub struct Ups(pub u64);
 
-impl<W> Modifier<Events<W>> for Ups {
-    fn modify(self, events: &mut Events<W>) {
+impl<W> SetAt<Events<W>> for Ups {
+    fn set_at(self, events: &mut Events<W>) {
         let Ups(frames) = self;
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
     }
 }
-
-/// Wrapper trait for `Set<Ups>`
-pub trait SetUps: Set<Ups> {
-    /// Sets updates per second.
-    fn set_ups(&mut self, val: Ups) {
-        self.set_mut(val);
-    }
-}
-
-impl<T: Set<Ups>> SetUps for T {}
 
 /// The maximum number of frames per second
 ///
@@ -174,32 +109,12 @@ impl<T: Set<Ups>> SetUps for T {}
 #[deriving(Copy)]
 pub struct MaxFps(pub u64);
 
-impl<W> Modifier<Events<W>> for MaxFps {
-    fn modify(self, events: &mut Events<W>) {
+impl<W> SetAt<Events<W>> for MaxFps {
+    fn set_at(self, events: &mut Events<W>) {
         let MaxFps(frames) = self;
         events.dt_frame_in_ns = BILLION / frames;
     }
 }
-
-/// Wrapper trait for `Set<Fps>`
-pub trait SetMaxFps: Set<MaxFps> {
-    /// Sets frames per second.
-    fn set_max_fps(&mut self, val: MaxFps) {
-        self.set_mut(val);
-    }
-}
-
-impl<T: Set<MaxFps>> SetMaxFps for T {}
-
-/// Blanket impl for object that fulfill requirements.
-pub trait EventWindow<I>:
-    PollEvent<I>
-  + GetShouldClose
-  + GetSize
-  + SwapBuffers {}
-
-impl<T: PollEvent<I> + GetShouldClose + GetSize + SwapBuffers, I>
-EventWindow<I> for T {}
 
 /// An event loop iterator
 ///
@@ -209,7 +124,7 @@ EventWindow<I> for T {}
 ///
 /// Example:
 ///
-/// ```Rust
+/// ~~~ignore
 /// fn main() {
 ///     let opengl = shader_version::opengl::OpenGL_3_2;
 ///     let window = Sdl2Window::new(
@@ -237,7 +152,7 @@ EventWindow<I> for T {}
 ///         });
 ///     }
 /// }
-/// ```
+/// ~~~
 pub struct Events<W> {
     /// The game window used by iterator.
     pub window: W,
@@ -256,7 +171,7 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<W: EventWindow<I>, I> Events<W> {
+impl<W> Events<W> {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new(window: W) -> Events<W> {
         let start = time::precise_time_ns();
@@ -274,21 +189,27 @@ impl<W: EventWindow<I>, I> Events<W> {
     }
 }
 
-impl<W: EventWindow<I>, I, E: EventMap<I>>
+impl<W, I, E: EventMap<I>>
 Iterator<E>
-for Events<W> {
+for Events<W>
+    where
+        ShouldClose: GetFrom<W>,
+        Size: GetFrom<W>,
+        SwapBuffers: ActOn<W, ()>,
+        PollEvent: ActOn<W, Option<I>>
+{
     /// Returns the next game event.
     fn next(&mut self) -> Option<E> {
         loop {
             self.state = match self.state {
                 State::Render => {
-                    let ShouldClose(should_close) = self.window.get_should_close();
+                    let ShouldClose(should_close) = self.window.get();
                     if should_close { return None; }
 
                     let start_render = time::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let Size([w, h]) = self.window.get_size();
+                    let Size([w, h]) = self.window.get();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
@@ -304,7 +225,7 @@ for Events<W> {
                     State::UpdateLoop
                 }
                 State::SwapBuffers => {
-                    self.window.swap_buffers();
+                    self.window.action(SwapBuffers);
                     State::UpdateLoop
                 }
                 State::UpdateLoop => {
@@ -323,7 +244,7 @@ for Events<W> {
                 }
                 State::HandleEvents => {
                     // Handle all events before updating.
-                    match self.window.poll_event() {
+                    match self.window.action(PollEvent) {
                         None => State::Update,
                         Some(x) => { return Some(EventMap::input(x)); },
                     }
