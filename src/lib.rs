@@ -51,15 +51,17 @@ pub use event::{
     NoWindow,
     RenderArgs,
     UpdateArgs,
-    Window,
     WindowSettings,
 };
 
 pub use current::{
     DANGER,
+    Action,
+    ActOn,
     Get,
+    GetFrom,
     Set,
-    Modifier,
+    SetAt,
     Current,
     CurrentGuard,
 };
