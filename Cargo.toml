@@ -27,6 +27,6 @@ git = "https://github.com/pistondevelopers/current"
 
 [dependencies.time]
 
-git = "https://github.com/rust-lang/time"
-#version = "0.1.3"
+#git = "https://github.com/rust-lang/time"
+version = "*"
 
