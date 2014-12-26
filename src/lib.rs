@@ -38,88 +38,6 @@ pub struct CaptureCursor(pub bool);
 #[deriving(Copy)]
 pub struct DrawSize(pub [u32, ..2]);
 
-#[test]
-fn test_methods() {
-    use current::Modifier;
-
-    struct Obj;
-
-    impl Get<ShouldClose> for Obj {
-        fn get(&self) -> ShouldClose { ShouldClose(false) }
-    }
-
-    impl Modifier<Obj> for ShouldClose {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<Size> for Obj {
-        fn get(&self) -> Size { Size([0, 0]) }
-    }
-
-    impl Modifier<Obj> for Size {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<Title> for Obj {
-        fn get(&self) -> Title { Title("hello".to_string()) }
-    }
-
-    impl Modifier<Obj> for Title {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<Samples> for Obj {
-        fn get(&self) -> Samples { Samples(0) }
-    }
-
-    impl Modifier<Obj> for Samples {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<Fullscreen> for Obj {
-        fn get(&self) -> Fullscreen { Fullscreen(false) }
-    }
-
-    impl Modifier<Obj> for Fullscreen {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<ExitOnEsc> for Obj {
-        fn get(&self) -> ExitOnEsc { ExitOnEsc(true) }
-    }
-
-    impl Modifier<Obj> for ExitOnEsc {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<CaptureCursor> for Obj {
-        fn get(&self) -> CaptureCursor { CaptureCursor(false) }
-    }
-
-    impl Modifier<Obj> for CaptureCursor {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    impl Get<DrawSize> for Obj {
-        fn get(&self) -> DrawSize { DrawSize([0, 0]) }
-    }
-
-    impl Modifier<Obj> for DrawSize {
-        fn modify(self, _obj: &mut Obj) {}
-    }
-
-    fn foo<T: GetShouldClose + SetShouldClose
-            + GetSize + SetSize
-            + GetTitle + SetTitle
-            + GetSamples + SetSamples
-            + GetFullscreen + SetFullscreen
-            + GetExitOnEsc + SetExitOnEsc
-            + GetCaptureCursor + SetCaptureCursor
-            + GetDrawSize + SetDrawSize>(_obj: T) {}
-
-    foo(Obj);
-}
-
 /// Settings for window behavior.
 pub struct WindowSettings {
     /// Title of the window.
@@ -154,13 +72,6 @@ impl WindowSettings {
 pub struct NoWindow {
     should_close: bool,
     title: String,
-}
-
-#[test]
-fn test_no_window() {
-    fn foo<T: Window>() {}
-
-    foo::<NoWindow>();
 }
 
 impl NoWindow {
