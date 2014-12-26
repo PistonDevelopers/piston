@@ -53,7 +53,6 @@ extern crate "window" as window_lib;
 pub use window_lib as window;
 pub use event_loop as events;
 pub use window::{
-    Window,
     WindowSettings,
     NoWindow
 };
