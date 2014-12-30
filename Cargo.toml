@@ -84,7 +84,8 @@ git = "https://github.com/pistondevelopers/sdl2_window"
 
 [dependencies.sdl2]
 
-version = "*"
+git = "https://github.com/pistondevelopers/rust-sdl2"
+#version = "*"
 
 [dependencies.gfx]
 
