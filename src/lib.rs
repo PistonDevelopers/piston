@@ -105,6 +105,8 @@ fn start_window(
 
 #[cfg(feature = "include_gfx")]
 fn start_gfx(f: ||) {
+    let window = unsafe { &mut *current_window() };
+
     let mut device = gfx::GlDevice::new(|s| unsafe {
         std::mem::transmute(sdl2::video::gl_get_proc_address(s))
     });
@@ -198,20 +200,24 @@ pub fn should_close() -> bool {
 
 /// Renders 2D graphics using Gfx.
 ///
-/// ### DANGER
-///
-/// This function should not be called nested within the closure.
-/// Doing so will lead to mutable aliased references to the graphics back-end.
+/// Panics if called nested within the closure
+/// to prevent mutable aliased references to the graphics back-end.
 #[cfg(feature = "include_gfx")]
 pub fn render_2d_gfx(
-    _: current::DANGER,
     bg_color: Option<[f32, ..4]>, 
     f: |graphics::Context, 
         &mut gfx_graphics::GraphicsBackEnd<gfx::GlCommandBuffer>|
 ) {
     use gfx::Device;    
 
+    struct Called;
+
     unsafe {
+        if Current::<Called>::new().current().is_some() {
+            panic!("`render_2d_gfx` can not be called nested in the closure");
+        }
+        let mut called = Called;
+        let called_guard = CurrentGuard::new(&mut called);
         current_g2d().draw(
             &mut *current_renderer(),
             &*current_frame(), 
@@ -223,22 +229,27 @@ pub fn render_2d_gfx(
             });
         current_gfx_device().submit(current_renderer().as_buffer());
         current_renderer().reset();
+        drop(called_guard);
     }
 }
 
 /// Renders 2D graphics using OpenGL.
 ///
-/// ### DANGER
-///
-/// This function should not be called nested within the closure.
-/// Doing so will lead to mutable aliased references to the graphics back-end.
+/// Panics if called nested within the closure
+/// to prevent mutable aliases to the graphics back-end.
 pub fn render_2d_opengl(
-    _: current::DANGER,
     bg_color: Option<[f32, ..4]>,
     f: |graphics::Context,
         &mut opengl_graphics::Gl|
 ) {
+    struct Called;
+
     unsafe {
+        if Current::<Called>::new().current().is_some() {
+            panic!("`render_2d_opengl` can not be called nested in the closure");
+        }
+        let mut called = Called;
+        let called_guard = CurrentGuard::new(&mut called);
         let gl = &mut *current_gl();
         let window::Size([w, h]) = current_window().get();
         gl.draw([0, 0, w as i32, h as i32], |c, g| {
@@ -248,6 +259,7 @@ pub fn render_2d_opengl(
             }
             f(c, g);
         });
+        drop(called_guard);
     }
 }
 
