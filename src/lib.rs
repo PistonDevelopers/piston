@@ -154,8 +154,7 @@ impl<W> SetAt<Events<W>> for MaxFps {
 /// }
 /// ~~~
 pub struct Events<W> {
-    /// The game window used by iterator.
-    pub window: W,
+    window: W,
     state: State,
     last_update: u64,
     last_frame: u64,
