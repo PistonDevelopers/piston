@@ -73,6 +73,9 @@ use gfx::{ DeviceHelper };
 use opengl_graphics::Gl;
 use fps_counter::FPSCounter;
 
+use std::rc::Rc;
+use std::cell::RefCell;
+
 pub mod color {
     //! Rexported libraries for working with colors
     pub use read_color_lib as read_color;
@@ -84,13 +87,12 @@ fn start_window(
     window_settings: WindowSettings,
     f: ||
 ) {
-    let mut window = WindowBackEnd::new(
+    let mut window = Rc::new(RefCell::new(WindowBackEnd::new(
         opengl,
         window_settings,
-    );
-
-    let mut gl = Gl::new(opengl);
-    let mut fps_counter = FPSCounter::new();
+    )));
+    let mut gl = Rc::new(RefCell::new(Gl::new(opengl)));
+    let mut fps_counter = Rc::new(RefCell::new(FPSCounter::new()));
 
     let window_guard = CurrentGuard::new(&mut window);
     let gl_guard = CurrentGuard::new(&mut gl);
@@ -105,15 +107,15 @@ fn start_window(
 
 #[cfg(feature = "include_gfx")]
 fn start_gfx(f: ||) {
-    let window = unsafe { &mut *current_window() };
+    let window = current_window();
 
-    let mut device = gfx::GlDevice::new(|s| unsafe {
+    let mut device = Rc::new(RefCell::new(gfx::GlDevice::new(|s| unsafe {
         std::mem::transmute(sdl2::video::gl_get_proc_address(s))
-    });
-    let mut g2d = G2D::new(&mut device);
-    let mut renderer = device.create_renderer();
+    })));
+    let mut g2d = Rc::new(RefCell::new(G2D::new(device.borrow_mut().deref_mut())));
+    let mut renderer = Rc::new(RefCell::new(device.borrow_mut().create_renderer()));
     let event::window::Size([w, h]) = window.get(); 
-    let mut frame = gfx::Frame::new(w as u16, h as u16);
+    let mut frame = Rc::new(RefCell::new(gfx::Frame::new(w as u16, h as u16)));
 
     let device_guard = CurrentGuard::new(&mut device);
     let g2d_guard = CurrentGuard::new(&mut g2d);
@@ -149,59 +151,75 @@ pub fn start(
 }
 
 /// The current window
-pub unsafe fn current_window() -> Current<WindowBackEnd> { Current::new() }
+pub fn current_window() -> Rc<RefCell<WindowBackEnd>> {
+    unsafe {
+        Current::<Rc<RefCell<WindowBackEnd>>>::new().clone()
+    }
+}
 /// The current Gfx device
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_gfx_device() -> Current<gfx::GlDevice> { Current::new() }
+pub fn current_gfx_device() -> Rc<RefCell<gfx::GlDevice>> {
+    unsafe {
+        Current::<Rc<RefCell<gfx::GlDevice>>>::new().clone()
+    }
+}
 /// The current opengl_graphics back-end
-pub unsafe fn current_gl() -> Current<Gl> { Current::new() }
+pub fn current_gl() -> Rc<RefCell<Gl>> {
+    unsafe {
+        Current::<Rc<RefCell<Gl>>>::new().clone()
+    }
+}
 /// The current gfx_graphics back-end
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_g2d() -> Current<G2D> { Current::new() }
+pub fn current_g2d() -> Rc<RefCell<G2D>> {
+    unsafe {
+        Current::<Rc<RefCell<G2D>>>::new().clone()
+    }
+}
 /// The current Gfx renderer
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_renderer() -> Current<gfx::Renderer<gfx::GlCommandBuffer>> { Current::new() }
+pub fn current_renderer() -> Rc<RefCell<gfx::Renderer<gfx::GlCommandBuffer>>> {
+    unsafe {
+        Current::<Rc<RefCell<gfx::Renderer<gfx::GlCommandBuffer>>>>::new().clone()
+    }
+}
 /// The current Gfx frame
 #[cfg(feature = "include_gfx")]
-pub unsafe fn current_frame() -> Current<gfx::Frame> { Current::new() }
+pub fn current_frame() -> Rc<RefCell<gfx::Frame>> {
+    unsafe {
+        Current::<Rc<RefCell<gfx::Frame>>>::new().clone()
+    }
+}
 /// The current FPS counter
-pub unsafe fn current_fps_counter() -> Current<FPSCounter> { Current::new() }
+pub fn current_fps_counter() -> Rc<RefCell<FPSCounter>> {
+    unsafe {
+        Current::<Rc<RefCell<FPSCounter>>>::new().clone()
+    }
+}
 
 /// Returns an event iterator for the event loop
-pub fn events() -> event::Events<Current<WindowBackEnd>> {
-    unsafe {
-        Events::new(current_window())
-    }
+pub fn events() -> event::Events<Rc<RefCell<WindowBackEnd>>> {
+    Events::new(current_window())
 }
 
 /// Updates the FPS counter and gets the frames per second.
 pub fn fps_tick() -> uint {
-    unsafe {
-        current_fps_counter().tick()
-    }
+    current_fps_counter().borrow_mut().tick()
 }
 
 /// Sets title of the current window.
 pub fn set_title(text: String) {
-    unsafe {
-        current_window().set_mut(window::Title(text));
-    }
+    current_window().set_mut(window::Title(text));
 }
 
 /// Returns true if the current window should be closed.
 pub fn should_close() -> bool {
     use window::ShouldClose;
-
-    unsafe {
-        let ShouldClose(val) = current_window().get();
-        val
-    }
+    let ShouldClose(val) = current_window().get();
+    val
 }
 
 /// Renders 2D graphics using Gfx.
-///
-/// Panics if called nested within the closure
-/// to prevent mutable aliased references to the graphics back-end.
 #[cfg(feature = "include_gfx")]
 pub fn render_2d_gfx(
     bg_color: Option<[f32, ..4]>, 
@@ -210,27 +228,20 @@ pub fn render_2d_gfx(
 ) {
     use gfx::Device;    
 
-    struct Called;
-
-    unsafe {
-        if Current::<Called>::new().current().is_some() {
-            panic!("`render_2d_gfx` can not be called nested in the closure");
-        }
-        let mut called = Called;
-        let called_guard = CurrentGuard::new(&mut called);
-        current_g2d().draw(
-            &mut *current_renderer(),
-            &*current_frame(), 
-            |c, g| {
-                if let Some(bg_color) = bg_color {
-                    graphics::clear(bg_color, g);
-                }
-                f(c, g);
-            });
-        current_gfx_device().submit(current_renderer().as_buffer());
-        current_renderer().reset();
-        drop(called_guard);
-    }
+    let renderer = current_renderer();
+    let mut renderer = renderer.borrow_mut();
+    let renderer = renderer.deref_mut();
+    current_g2d().borrow_mut().draw(
+        renderer,
+        current_frame().borrow_mut().deref_mut(), 
+        |c, g| {
+            if let Some(bg_color) = bg_color {
+                graphics::clear(bg_color, g);
+            }
+            f(c, g);
+        });
+    current_gfx_device().borrow_mut().submit(renderer.as_buffer());
+    renderer.reset();
 }
 
 /// Renders 2D graphics using OpenGL.
@@ -242,24 +253,13 @@ pub fn render_2d_opengl(
     f: |graphics::Context,
         &mut opengl_graphics::Gl|
 ) {
-    struct Called;
-
-    unsafe {
-        if Current::<Called>::new().current().is_some() {
-            panic!("`render_2d_opengl` can not be called nested in the closure");
+    let window::Size([w, h]) = current_window().borrow().deref().get();
+    current_gl().borrow_mut().draw([0, 0, w as i32, h as i32], |c, g| {
+        use graphics::*;
+        if let Some(bg_color) = bg_color {
+            graphics::clear(bg_color, g);
         }
-        let mut called = Called;
-        let called_guard = CurrentGuard::new(&mut called);
-        let gl = &mut *current_gl();
-        let window::Size([w, h]) = current_window().get();
-        gl.draw([0, 0, w as i32, h as i32], |c, g| {
-            use graphics::*;
-            if let Some(bg_color) = bg_color {
-                graphics::clear(bg_color, g);
-            }
-            f(c, g);
-        });
-        drop(called_guard);
-    }
+        f(c, g);
+    });
 }
 
