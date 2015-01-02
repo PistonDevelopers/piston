@@ -20,10 +20,10 @@ homepage = "https://github.com/pistondevelopers/event_loop"
 name = "event_loop"
 path = "src/lib.rs"
 
-[dependencies.pistoncore-current]
+[dependencies.quack]
 
-git = "https://github.com/pistondevelopers/current"
-#version = "0.0.2"
+git = "https://github.com/pistondevelopers/quack"
+#version = "0.0.0"
 
 [dependencies.time]
 
