@@ -6,11 +6,11 @@
 //! Window abstraction
 
 extern crate input;
-extern crate current;
+extern crate quack;
 extern crate event_loop;
 
 use input::Input;
-use current::{ ActOn, GetFrom, SetAt };
+use quack::{ ActOn, GetFrom, SetAt };
 
 // Reexport everything from event_loop.
 pub use event_loop::*;

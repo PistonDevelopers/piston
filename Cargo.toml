@@ -22,11 +22,11 @@ path = "src/lib.rs"
 
 git = "https://github.com/pistondevelopers/input"
 
-[dependencies.pistoncore-current]
-
-git = "https://github.com/pistondevelopers/current"
-
 [dependencies.pistoncore-event_loop]
 
 git = "https://github.com/pistondevelopers/event_loop"
+
+[dependencies.quack]
+
+git = "https://github.com/pistondevelopers/quack"
 
