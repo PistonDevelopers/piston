@@ -25,6 +25,7 @@ extern crate "event" as event_lib;
 extern crate "window" as window_lib;
 extern crate "cam" as cam_lib;
 extern crate "current" as current_lib;
+extern crate "quack" as quack_lib;
 extern crate "fps_counter" as fps_counter_lib;
 extern crate "drag_controller" as drag_controller_lib;
 extern crate "read_color" as read_color_lib;
@@ -32,6 +33,7 @@ extern crate "select_color" as select_color_lib;
 
 // Reexports.
 pub use current_lib as current;
+pub use quack_lib as quack;
 pub use ai_behavior_lib as ai_behavior;
 pub use shader_version_lib as shader_version;
 pub use image_lib as image;
@@ -54,14 +56,15 @@ pub use event::{
     WindowSettings,
 };
 
-pub use current::{
-    DANGER,
+pub use quack::{
     Action,
     ActOn,
     Get,
     GetFrom,
     Set,
     SetAt,
+};
+pub use current::{
     Current,
     CurrentGuard,
 };
