@@ -4,11 +4,11 @@
 #![deny(missing_copy_implementations)]
 
 extern crate time;
-extern crate current;
+extern crate quack;
 
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use current::{ ActOn, Action, GetFrom, Get, SetAt };
+use quack::{ ActOn, Action, GetFrom, Get, SetAt };
 use std::cmp;
 
 /// Whether window should close or not.
