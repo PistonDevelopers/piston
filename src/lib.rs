@@ -2,6 +2,7 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
+#![feature(old_orphan_check)]
 
 extern crate time;
 extern crate quack;
@@ -12,14 +13,14 @@ use quack::{ ActOn, Action, GetFrom, Get, SetAt };
 use std::cmp;
 
 /// Whether window should close or not.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct ShouldClose(pub bool);
 
 impl Sized for ShouldClose {}
 
 /// The size of the window.
-#[deriving(Copy)]
-pub struct Size(pub [u32, ..2]);
+#[derive(Copy)]
+pub struct Size(pub [u32; 2]);
 
 impl Sized for Size {}
 
@@ -31,7 +32,7 @@ impl Sized for Size {}
 /// ...
 /// window.action(SwapBuffers);
 /// ~~~
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct SwapBuffers;
 
 impl Sized for SwapBuffers {}
@@ -44,13 +45,13 @@ impl Sized for SwapBuffers {}
 /// ...
 /// let e = window.action(PollEvent);
 /// ~~~
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct PollEvent;
 
 impl Sized for PollEvent {}
 
 /// Render arguments
-#[deriving(Copy, Clone, PartialEq, Show)]
+#[derive(Copy, Clone, PartialEq, Show)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
@@ -61,7 +62,7 @@ pub struct RenderArgs {
 }
 
 /// Update arguments, such as delta time in seconds
-#[deriving(Copy, Clone, PartialEq, Show)]
+#[derive(Copy, Clone, PartialEq, Show)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
@@ -77,7 +78,7 @@ pub trait EventMap<I> {
     fn input(args: I) -> Self;
 }
 
-#[deriving(Copy, Show)]
+#[derive(Copy, Show)]
 enum State {
     Render,
     SwapBuffers,
@@ -90,7 +91,7 @@ enum State {
 ///
 /// This is the fixed update rate on average over time.
 /// If the event loop lags, it will try to catch up.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Ups(pub u64);
 
 impl<W> SetAt<Events<W>> for Ups {
@@ -106,7 +107,7 @@ impl<W> SetAt<Events<W>> for Ups {
 /// The frame rate can be lower because the
 /// next frame is always scheduled from the previous frame.
 /// This causes the frames to "slip" over time.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct MaxFps(pub u64);
 
 impl<W> SetAt<Events<W>> for MaxFps {
