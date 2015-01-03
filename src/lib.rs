@@ -19,31 +19,31 @@ pub use event_loop::*;
 pub struct Title(pub String);
 
 /// The anti-aliasing samples when rendering.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Samples(pub u8);
 
 /// Whether window is opened in full screen mode.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Fullscreen(pub bool);
 
 /// Whether to exit when pressing the Esc keyboard button.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct ExitOnEsc(pub bool);
 
 /// Whether to capture the mouse cursor.
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct CaptureCursor(pub bool);
 
 /// The draw size of the window.
-#[deriving(Copy)]
-pub struct DrawSize(pub [u32, ..2]);
+#[derive(Copy)]
+pub struct DrawSize(pub [u32; 2]);
 
 /// Settings for window behavior.
 pub struct WindowSettings {
     /// Title of the window.
     pub title: String,
     /// The size of the window.
-    pub size: [u32, ..2],
+    pub size: [u32; 2],
     /// Number samples per pixel (anti-aliasing).
     pub samples: u8,
     /// If true, the window is fullscreen.
