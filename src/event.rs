@@ -14,7 +14,7 @@ use ptr::Ptr;
 use events::EventMap;
 
 /// Adds render and update events to input events
-#[deriving(Clone, PartialEq, Show)]
+#[derive(Clone, PartialEq, Show)]
 pub enum Event<I = input::Input> {
     /// Render graphics.
     Render(RenderArgs),
