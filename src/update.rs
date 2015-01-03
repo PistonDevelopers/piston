@@ -12,6 +12,10 @@ pub trait UpdateEvent {
     fn from_dt(dt: f64) -> Option<Self>;
     /// Calls closure if this is an update event.
     fn update<U>(&self, f: |&UpdateArgs| -> U) -> Option<U>;
+    /// Returns update arguments.
+    fn update_args(&self) -> Option<UpdateArgs> {
+        self.update(|args| args.clone())
+    }
 }
 
 impl<T: GenericEvent> UpdateEvent for T {

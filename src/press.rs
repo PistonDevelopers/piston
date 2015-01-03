@@ -10,6 +10,10 @@ pub trait PressEvent {
     fn from_button(button: Button) -> Option<Self>;
     /// Calls closure if this is a press event.
     fn press<U>(&self, f: |Button| -> U) -> Option<U>;
+    /// Returns press arguments.
+    fn press_args(&self) -> Option<Button> {
+        self.press(|button| button)
+    }
 }
 
 impl<T: GenericEvent> PressEvent for T {

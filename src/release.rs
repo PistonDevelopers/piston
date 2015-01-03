@@ -10,6 +10,10 @@ pub trait ReleaseEvent {
     fn from_button(button: Button) -> Option<Self>;
     /// Calls closure if this is a release event.
     fn release<U>(&self, f: |Button| -> U) -> Option<U>;
+    /// Returns release arguments.
+    fn release_args(&self) -> Option<Button> {
+        self.release(|button| button)
+    }
 }
 
 impl<T: GenericEvent> ReleaseEvent for T {

@@ -1,4 +1,5 @@
 use std::intrinsics::TypeId;
+use std::borrow::ToOwned;
 
 use GenericEvent;
 use ptr::Ptr;
@@ -9,6 +10,10 @@ pub trait TextEvent {
     fn from_text(text: &str) -> Option<Self>;
     /// Calls closure if this is a text event.
     fn text<U>(&self, f: |&str| -> U) -> Option<U>;
+    /// Returns text arguments.
+    fn text_args(&self) -> Option<String> {
+        self.text(|text| text.to_owned())
+    }
 }
 
 impl<T: GenericEvent> TextEvent for T {
