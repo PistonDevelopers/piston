@@ -2,6 +2,7 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 #![feature(globs)]
+#![feature(old_orphan_check)]
 
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
@@ -15,7 +16,7 @@ pub mod keyboard;
 pub mod mouse;
 
 /// Models different kinds of buttons.
-#[deriving(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Eq, Show)]
+#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Eq, Show)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(Key),
@@ -24,7 +25,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[deriving(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Show)]
+#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Show)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),
@@ -35,7 +36,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[deriving(Clone, RustcDecodable, RustcEncodable, PartialEq, Show)]
+#[derive(Clone, RustcDecodable, RustcEncodable, PartialEq, Show)]
 pub enum Input {
     /// Pressed a button.
     Press(Button),

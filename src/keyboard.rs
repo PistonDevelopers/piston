@@ -5,15 +5,16 @@ use std::hash::sip::SipState;
 use std::num::FromPrimitive;
 use std::num::ToPrimitive;
 use std::default::Default;
+use std::cmp::Ordering;
 
 use Input;
 use Button;
 
 // Defining every combination to allow assignment in static expressions.
 bitflags!(
-    #[deriving(Show)]
+    #[derive(Show)]
     #[allow(missing_docs)]
-    #[deriving(RustcDecodable, RustcEncodable)]
+    #[derive(RustcDecodable, RustcEncodable)]
     flags ModifierKey: u8 {
         const NO_MODIFIER           = 0b00000000,
         const CTRL                  = 0b00000001,
@@ -82,7 +83,7 @@ impl Default for ModifierKey {
 
 /// Represent a keyboard key.
 #[allow(missing_docs)]
-#[deriving(Copy, Clone, RustcDecodable, RustcEncodable, Show)]
+#[derive(Copy, Clone, RustcDecodable, RustcEncodable, Show)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
