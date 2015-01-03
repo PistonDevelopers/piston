@@ -9,6 +9,10 @@ pub trait ResizeEvent {
     fn from_width_height(w: u32, h: u32) -> Option<Self>;
     /// Calls closure if this is a resize event.
     fn resize<U>(&self, f: |u32, u32| -> U) -> Option<U>;
+    /// Returns resize arguments.
+    fn resize_args(&self) -> Option<[u32; 2]> {
+        self.resize(|x, y| [x, y])
+    }
 }
 
 impl<T: GenericEvent> ResizeEvent for T {

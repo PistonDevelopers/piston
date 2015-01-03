@@ -9,6 +9,10 @@ pub trait FocusEvent {
     fn from_focused(focused: bool) -> Option<Self>;
     /// Calls closure if this is a focus event.
     fn focus<U>(&self, f: |bool| -> U) -> Option<U>;
+    /// Returns focus arguments.
+    fn focus_args(&self) -> Option<bool> {
+        self.focus(|val| val)
+    }
 }
 
 impl<T: GenericEvent> FocusEvent for T {

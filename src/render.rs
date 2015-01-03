@@ -10,6 +10,10 @@ pub trait RenderEvent {
     fn from_render_args(args: &RenderArgs) -> Option<Self>;
     /// Calls closure if this is a render event.
     fn render<U>(&self, f: |&RenderArgs| -> U) -> Option<U>;
+    /// Returns render arguments.
+    fn render_args(&self) -> Option<RenderArgs> {
+        self.render(|args| args.clone())
+    }
 }
 
 impl<T: GenericEvent> RenderEvent for T {
