@@ -202,7 +202,7 @@ pub fn current_fps_counter() -> Rc<RefCell<FPSCounter>> {
 }
 
 /// Returns an event iterator for the event loop
-pub fn events() -> event::Events<Rc<RefCell<WindowBackEnd>>> {
+pub fn events<E>() -> event::Events<Rc<RefCell<WindowBackEnd>>, E> {
     Events::new(current_window())
 }
 
@@ -257,6 +257,8 @@ pub fn render_2d_opengl(
     f: |graphics::Context,
         &mut opengl_graphics::Gl|
 ) {
+    use std::ops::Deref;
+
     let window::Size([w, h]) = current_window().borrow().deref().get();
     current_gl().borrow_mut().draw([0, 0, w as i32, h as i32], |c, g| {
         use graphics::*;
