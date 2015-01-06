@@ -2,7 +2,7 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(associated_types)]
+#![feature(old_orphan_check)]
 
 extern crate time;
 extern crate quack;
@@ -189,8 +189,8 @@ impl<W> Events<W> {
     }
 }
 
-impl<W, I: EventMap<I>>
-Iterator
+impl<W, I, E: EventMap<I>>
+Iterator<E>
 for Events<W>
     where
         ShouldClose: GetFrom<W>,
@@ -198,9 +198,8 @@ for Events<W>
         SwapBuffers: ActOn<W, ()>,
         PollEvent: ActOn<W, Option<I>>
 {
-    type Item = I;
     /// Returns the next game event.
-    fn next(&mut self) -> Option<I> {
+    fn next(&mut self) -> Option<E> {
         loop {
             self.state = match self.state {
                 State::Render => {
