@@ -201,8 +201,8 @@ pub fn current_fps_counter() -> Rc<RefCell<FPSCounter>> {
 }
 
 /// Returns an event iterator for the event loop
-pub fn events<E>() -> event::Events<Rc<RefCell<WindowBackEnd>>, E> {
-    Events::new(current_window())
+pub fn events() -> event::Events<Rc<RefCell<WindowBackEnd>>, event::Event> {
+    event::events(current_window())
 }
 
 /// Updates the FPS counter and gets the frames per second.
