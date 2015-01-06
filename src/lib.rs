@@ -86,3 +86,9 @@ mod mouse;
 mod text;
 mod resize;
 mod focus;
+
+/// Creates event iterator from window.
+pub fn events<W>(window: W) -> event_loop::Events<W, Event> {
+    event_loop::Events::new(window)
+}
+
