@@ -78,6 +78,7 @@ use fps_counter::FPSCounter;
 
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::ops::Deref;
 
 pub mod color {
     //! Rexported libraries for working with colors
@@ -225,7 +226,7 @@ pub fn should_close() -> bool {
 /// Renders 2D graphics using Gfx.
 #[cfg(feature = "include_gfx")]
 pub fn render_2d_gfx(
-    bg_color: Option<[f32, ..4]>, 
+    bg_color: Option<[f32; 4]>, 
     f: |graphics::Context, 
         &mut gfx_graphics::GraphicsBackEnd<gfx::GlCommandBuffer>|
 ) {
@@ -252,7 +253,7 @@ pub fn render_2d_gfx(
 /// Panics if called nested within the closure
 /// to prevent mutable aliases to the graphics back-end.
 pub fn render_2d_opengl(
-    bg_color: Option<[f32, ..4]>,
+    bg_color: Option<[f32; 4]>,
     f: |graphics::Context,
         &mut opengl_graphics::Gl|
 ) {
