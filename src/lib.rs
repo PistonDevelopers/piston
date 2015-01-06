@@ -3,6 +3,7 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 #![feature(old_orphan_check)]
+#![feature(associated_types)]
 
 extern crate time;
 extern crate quack;
@@ -94,8 +95,8 @@ enum State {
 #[derive(Copy)]
 pub struct Ups(pub u64);
 
-impl<W> SetAt<Events<W>> for Ups {
-    fn set_at(self, events: &mut Events<W>) {
+impl<W, E> SetAt<Events<W, E>> for Ups {
+    fn set_at(self, events: &mut Events<W, E>) {
         let Ups(frames) = self;
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
@@ -110,8 +111,8 @@ impl<W> SetAt<Events<W>> for Ups {
 #[derive(Copy)]
 pub struct MaxFps(pub u64);
 
-impl<W> SetAt<Events<W>> for MaxFps {
-    fn set_at(self, events: &mut Events<W>) {
+impl<W, E> SetAt<Events<W, E>> for MaxFps {
+    fn set_at(self, events: &mut Events<W, E>) {
         let MaxFps(frames) = self;
         events.dt_frame_in_ns = BILLION / frames;
     }
@@ -154,7 +155,7 @@ impl<W> SetAt<Events<W>> for MaxFps {
 ///     }
 /// }
 /// ~~~
-pub struct Events<W> {
+pub struct Events<W, E> {
     window: W,
     state: State,
     last_update: u64,
@@ -171,9 +172,9 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<W> Events<W> {
+impl<W, E> Events<W, E> {
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new(window: W) -> Events<W> {
+    pub fn new(window: W) -> Events<W, E> {
         let start = time::precise_time_ns();
         let Ups(updates_per_second) = DEFAULT_UPS;
         let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
@@ -189,15 +190,18 @@ impl<W> Events<W> {
     }
 }
 
-impl<W, I, E: EventMap<I>>
-Iterator<E>
-for Events<W>
+impl<W, I, E>
+Iterator
+for Events<W, E>
     where
         ShouldClose: GetFrom<W>,
         Size: GetFrom<W>,
         SwapBuffers: ActOn<W, ()>,
-        PollEvent: ActOn<W, Option<I>>
+        PollEvent: ActOn<W, Option<I>>,
+        E: EventMap<I>,
 {
+    type Item = E;
+
     /// Returns the next game event.
     fn next(&mut self) -> Option<E> {
         loop {
