@@ -1,8 +1,7 @@
 #![crate_name = "input"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(globs)]
-#![feature(old_orphan_check)]
+#![allow(unstable)]
 
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.

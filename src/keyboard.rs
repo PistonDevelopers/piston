@@ -1,7 +1,5 @@
 //! Back-end agnostic keyboard keys.
 
-use std::hash;
-use std::hash::sip::SipState;
 use std::num::FromPrimitive;
 use std::num::ToPrimitive;
 use std::default::Default;
@@ -83,7 +81,7 @@ impl Default for ModifierKey {
 
 /// Represent a keyboard key.
 #[allow(missing_docs)]
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, Show)]
+#[derive(Copy, Clone, RustcDecodable, RustcEncodable, Show, Hash)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
@@ -354,13 +352,6 @@ impl Key {
     }
 }
 
-impl hash::Hash for Key {
-    #[inline(always)]
-    fn hash(&self, state: &mut SipState) {
-        self.code().hash(state);
-    }
-}
-
 impl ToPrimitive for Key {
     #[inline(always)]
     fn to_i64(&self) -> Option<i64> {
@@ -373,8 +364,8 @@ impl ToPrimitive for Key {
     }
 
     #[inline(always)]
-    fn to_int(&self) -> Option<int> {
-        Some(self.code() as int)
+    fn to_int(&self) -> Option<isize> {
+        Some(self.code() as isize)
     }
 }
 
@@ -628,7 +619,7 @@ impl FromPrimitive for Key {
     }
 
     #[inline(always)]
-    fn from_int(n: int) -> Option<Key> {
+    fn from_int(n: isize) -> Option<Key> {
         FromPrimitive::from_u64(n as u64)
     }
 }
