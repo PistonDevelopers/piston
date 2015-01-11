@@ -2,15 +2,14 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(old_orphan_check)]
-#![feature(associated_types)]
+#![allow(unstable)]
 
 extern crate time;
 extern crate quack;
 
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use quack::{ ActOn, Action, GetFrom, Get, SetAt };
+use quack::{ ActOn, Action, GetFrom, Get, Me, SetAt };
 use std::cmp;
 
 /// Whether window should close or not.
@@ -95,9 +94,11 @@ enum State {
 #[derive(Copy)]
 pub struct Ups(pub u64);
 
-impl<W, E> SetAt<Events<W, E>> for Ups {
-    fn set_at(self, events: &mut Events<W, E>) {
-        let Ups(frames) = self;
+impl<W, I, E> SetAt for (Ups, Events<W, I, E>) {
+    type Property = Ups;
+    type Object = Events<W, I, E>;
+
+    fn set_at(_: Me<Self>, Ups(frames): Ups, events: &mut Events<W, I, E>) {
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
     }
@@ -111,9 +112,12 @@ impl<W, E> SetAt<Events<W, E>> for Ups {
 #[derive(Copy)]
 pub struct MaxFps(pub u64);
 
-impl<W, E> SetAt<Events<W, E>> for MaxFps {
-    fn set_at(self, events: &mut Events<W, E>) {
-        let MaxFps(frames) = self;
+impl<W, I, E> SetAt for (MaxFps, Events<W, I, E>) {
+    type Property = MaxFps;
+    type Object = Events<W, I, E>;
+
+    fn set_at(_: Me<Self>, MaxFps(frames): MaxFps, 
+        events: &mut Events<W, I, E>) {
         events.dt_frame_in_ns = BILLION / frames;
     }
 }
@@ -155,7 +159,7 @@ impl<W, E> SetAt<Events<W, E>> for MaxFps {
 ///     }
 /// }
 /// ~~~
-pub struct Events<W, E> {
+pub struct Events<W, I, E> {
     window: W,
     state: State,
     last_update: u64,
@@ -172,9 +176,9 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<W, E> Events<W, E> {
+impl<W, I, E> Events<W, I, E> {
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new(window: W) -> Events<W, E> {
+    pub fn new(window: W) -> Events<W, I, E> {
         let start = time::precise_time_ns();
         let Ups(updates_per_second) = DEFAULT_UPS;
         let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
@@ -192,12 +196,12 @@ impl<W, E> Events<W, E> {
 
 impl<W, I, E>
 Iterator
-for Events<W, E>
+for Events<W, I, E>
     where
-        ShouldClose: GetFrom<W>,
-        Size: GetFrom<W>,
-        SwapBuffers: ActOn<W, ()>,
-        PollEvent: ActOn<W, Option<I>>,
+        (ShouldClose, W): GetFrom<Property = ShouldClose, Object = W>,
+        (Size, W): GetFrom<Property = Size, Object = W>,
+        (SwapBuffers, W): ActOn<(), Action = SwapBuffers, Object = W>,
+        (PollEvent, W): ActOn<Option<I>, Action = PollEvent, Object = W>,
         E: EventMap<I>,
 {
     type Item = E;
