@@ -1,8 +1,6 @@
 #![crate_name = "piston"]
 #![deny(missing_docs)]
 #![warn(dead_code)]
-#![feature(default_type_params)]
-#![feature(globs)]
 
 //! A user friendly game engine written in Rust.
 
@@ -86,11 +84,14 @@ pub mod color {
     pub use select_color_lib as select_color;
 }
 
-fn start_window(
+fn start_window<F>(
     opengl: shader_version::OpenGL,
     window_settings: WindowSettings,
-    f: ||
-) {
+    mut f: F
+)
+    where
+        F: FnMut()
+{
     let mut window = Rc::new(RefCell::new(WindowBackEnd::new(
         opengl,
         window_settings,
@@ -110,7 +111,10 @@ fn start_window(
 }
 
 #[cfg(feature = "include_gfx")]
-fn start_gfx(f: ||) {
+fn start_gfx<F>(f: F)
+    where
+        F: FnMut()
+{
     let window = current_window();
 
     let mut device = Rc::new(RefCell::new(gfx::GlDevice::new(|s| unsafe {
@@ -135,16 +139,22 @@ fn start_gfx(f: ||) {
 }
 
 #[cfg(not(feature = "include_gfx"))]
-fn start_gfx(f: ||) {
+fn start_gfx<F>(mut f: F)
+    where
+        F: FnMut()
+{
     f();
 }
 
 /// Initializes window and sets up current objects.
-pub fn start(
+pub fn start<F>(
     opengl: shader_version::OpenGL,
     window_settings: WindowSettings,
-    f: ||
-) {
+    mut f: F
+)
+    where
+        F: FnMut()
+{
     start_window(opengl, window_settings, || {
         if cfg!(feature = "include_gfx") {
             start_gfx(|| f());
@@ -202,12 +212,12 @@ pub fn current_fps_counter() -> Rc<RefCell<FPSCounter>> {
 }
 
 /// Returns an event iterator for the event loop
-pub fn events() -> event::Events<Rc<RefCell<WindowBackEnd>>, event::Event> {
+pub fn events() -> event::Events<Rc<RefCell<WindowBackEnd>>, input::Input, event::Event> {
     event::events(current_window())
 }
 
 /// Updates the FPS counter and gets the frames per second.
-pub fn fps_tick() -> uint {
+pub fn fps_tick() -> usize {
     current_fps_counter().borrow_mut().tick()
 }
 
@@ -227,9 +237,12 @@ pub fn should_close() -> bool {
 #[cfg(feature = "include_gfx")]
 pub fn render_2d_gfx(
     bg_color: Option<[f32; 4]>, 
-    f: |graphics::Context, 
-        &mut gfx_graphics::GraphicsBackEnd<gfx::GlCommandBuffer>|
-) {
+    mut f: F
+)
+    where
+        F: FnMut(graphics::Context, 
+            &mut gfx_graphics::GraphicsBackEnd<gfx::GlCommandBuffer>)
+{
     use gfx::Device;    
 
     let renderer = current_renderer();
@@ -252,11 +265,13 @@ pub fn render_2d_gfx(
 ///
 /// Panics if called nested within the closure
 /// to prevent mutable aliases to the graphics back-end.
-pub fn render_2d_opengl(
+pub fn render_2d_opengl<F>(
     bg_color: Option<[f32; 4]>,
-    f: |graphics::Context,
-        &mut opengl_graphics::Gl|
-) {
+    mut f: F
+)
+    where
+        F: FnMut(graphics::Context, &mut opengl_graphics::Gl)
+{
     use std::ops::Deref;
 
     let window::Size([w, h]) = current_window().borrow().deref().get();
