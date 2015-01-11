@@ -29,7 +29,8 @@ pub trait GenericEvent {
     /// Creates a new event.
     fn from_event(event_trait_id: TypeId, args: &Ptr) -> Option<Self>;
     /// When correct event type, calls closure with argument.
-    fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U>;
+    fn with_event<U, F>(&self, event_trait_id: TypeId, f: F) -> Option<U>
+        where F: FnOnce(&Ptr) -> U;
 }
 
 /// Asserts that an event is supported correctly
@@ -49,7 +50,7 @@ pub fn assert_event_trait<
     e.with_event(id, |ev| {
         let new_e: E = GenericEvent::from_event(id, ev).expect(
             format!(
-                "Could not construct event of event trait '{}' from '{}'",
+                "Could not construct event of event trait '{:?}' from '{:?}'",
                 name, e
             ).as_slice()
         );
@@ -57,7 +58,7 @@ pub fn assert_event_trait<
         tested_equal = true;
     });
     if !tested_equal {
-        panic!("Expected event trait '{}', found '{}'", name, e);
+        panic!("Expected event trait '{:?}', found '{:?}'", name, e);
     }
 }
 
@@ -107,7 +108,10 @@ impl GenericEvent for Input {
     }
 
     #[inline(always)]
-    fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U> {
+    fn with_event<U, F>(&self, event_trait_id: TypeId, f: F) -> Option<U>
+        where
+            F: FnOnce(&Ptr) -> U
+    {
         let press = TypeId::of::<Box<PressEvent>>();
         let release = TypeId::of::<Box<ReleaseEvent>>();
         let mouse_cursor = TypeId::of::<Box<MouseCursorEvent>>();
