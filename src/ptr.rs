@@ -40,27 +40,39 @@ impl Ptr {
     /// While this method is does not call unsafe code,
     /// it is unsafe to use if the type is wrong.
     #[inline(always)]
-    pub unsafe fn with<T: 'static, U>(ptr: *const u8, f: |&Ptr| -> U) -> U {
+    pub unsafe fn with<T: 'static, U, F>(ptr: *const u8, f: F) -> U
+        where
+            F: FnOnce(&Ptr) -> U
+    {
         let name = (*get_tydesc::<T>()).name;
         f(&Ptr(TypeId::of::<&T>(), ptr, name))
     }
 
     /// Calls a closure with a string slice.
     #[inline(always)]
-    pub fn with_str<U>(text: &str, f: |&Ptr| -> U) -> U {
-        unsafe { Ptr::with::<&str, U>(&text as *const &str as *const u8, f) }
+    pub fn with_str<U, F>(text: &str, f: F) -> U
+        where
+            F: FnOnce(&Ptr) -> U
+    {
+        unsafe { Ptr::with::<&str, U, _>(&text as *const &str as *const u8, f) }
     }
 
     /// Calls a closure with a slice.
     #[inline(always)]
-    pub fn with_slice<T: 'static, U>(arr: &[T], f: |&Ptr| -> U) -> U {
-        unsafe { Ptr::with::<&[T], U>(&arr as *const &[T] as *const u8, f) }
+    pub fn with_slice<T: 'static, U, F>(arr: &[T], f: F) -> U
+        where
+            F: FnOnce(&Ptr) -> U
+    {
+        unsafe { Ptr::with::<&[T], U, _>(&arr as *const &[T] as *const u8, f) }
     }
 
     /// Calls a closure with a reference.
     #[inline(always)]
-    pub fn with_ref<T: 'static, U>(val: &T, f: |&Ptr| -> U) -> U {
-        unsafe { Ptr::with::<T, U>(val as *const T as *const u8, f) }
+    pub fn with_ref<T: 'static, U, F>(val: &T, f: F) -> U
+        where
+            F: FnOnce(&Ptr) -> U
+    {
+        unsafe { Ptr::with::<T, U, _>(val as *const T as *const u8, f) }
     }
 
     /// Casts pointer into a reference.

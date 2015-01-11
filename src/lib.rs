@@ -41,8 +41,7 @@
 #![crate_name = "event"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(default_type_params)]
-#![feature(globs)]
+#![allow(unstable)]
 
 extern crate input;
 extern crate serialize;
@@ -88,7 +87,7 @@ mod resize;
 mod focus;
 
 /// Creates event iterator from window.
-pub fn events<W>(window: W) -> event_loop::Events<W, Event> {
+pub fn events<W>(window: W) -> event_loop::Events<W, input::Input, Event> {
     event_loop::Events::new(window)
 }
 

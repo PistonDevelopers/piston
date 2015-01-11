@@ -55,19 +55,22 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
     }
 
     #[inline(always)]
-    fn with_event<U>(&self, event_trait_id: TypeId, f: |&Ptr| -> U) -> Option<U> {
+    fn with_event<U, F>(&self, event_trait_id: TypeId, mut f: F) -> Option<U>
+        where
+            F: FnMut(&Ptr) -> U
+    {
         let update = TypeId::of::<Box<UpdateEvent>>();
         let render = TypeId::of::<Box<RenderEvent>>();
         match event_trait_id {
             x if x == update => {
                 match *self {
-                    Update(ref args) => Some(Ptr::with_ref(args, |ptr| f(ptr))),
+                    Update(ref args) => Some(Ptr::with_ref(args, |&mut: ptr| f(ptr))),
                     _ => None
                 }
             }
             x if x == render => {
                 match *self {
-                    Render(ref args) => Some(Ptr::with_ref(args, |ptr| f(ptr))),
+                    Render(ref args) => Some(Ptr::with_ref(args, |&mut: ptr| f(ptr))),
                     _ => None
                 }
             }
