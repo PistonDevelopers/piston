@@ -1,7 +1,6 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(globs)]
-#![feature(default_type_params)]
+#![allow(unstable)]
 
 //! Window abstraction
 
@@ -10,7 +9,7 @@ extern crate quack;
 extern crate event_loop;
 
 use input::Input;
-use quack::{ ActOn, GetFrom, SetAt };
+use quack::{ ActOn, GetFrom, SetAt, Me };
 
 // Reexport everything from event_loop.
 pub use event_loop::*;
@@ -85,64 +84,100 @@ impl NoWindow {
     }
 }
 
-impl ActOn<NoWindow, ()> for SwapBuffers {
-    fn act_on(self, _window: &mut NoWindow) {}
+impl ActOn<()> for (SwapBuffers, NoWindow) {
+    type Action = SwapBuffers;
+    type Object = NoWindow;
+
+    fn act_on(_: Me<Self>, _action: SwapBuffers, _window: &mut NoWindow) {}
 }
 
-impl ActOn<NoWindow, Option<Input>> for PollEvent {
-    fn act_on(self, _window: &mut NoWindow) -> Option<Input> { None }
+impl ActOn<Option<Input>> for (PollEvent, NoWindow) {
+    type Action = PollEvent;
+    type Object = NoWindow;
+
+    fn act_on(_: Me<Self>, _action: PollEvent, _window: &mut NoWindow) 
+        -> Option<Input> { None }
 }
 
-impl GetFrom<NoWindow> for ShouldClose {
-    fn get_from(obj: &NoWindow) -> ShouldClose {
+impl GetFrom for (ShouldClose, NoWindow) {
+    type Property = ShouldClose;
+    type Object = NoWindow;
+
+    fn get_from(_: Me<Self>, obj: &NoWindow) -> ShouldClose {
         ShouldClose(obj.should_close)
     }
 }
 
-impl GetFrom<NoWindow> for Size {
-    fn get_from(_obj: &NoWindow) -> Size {
+impl GetFrom for (Size, NoWindow) {
+    type Property = Size;
+    type Object = NoWindow;
+
+    fn get_from(_: Me<Self>, _obj: &NoWindow) -> Size {
         Size([0, 0])
     }
 }
 
-impl SetAt<NoWindow> for CaptureCursor {
-    fn set_at(self, _window: &mut NoWindow) {}
+impl SetAt for (CaptureCursor, NoWindow) {
+    type Property = CaptureCursor;
+    type Object = NoWindow;
+
+    fn set_at(_: Me<Self>, _val: CaptureCursor, _window: &mut NoWindow) {}
 }
 
-impl SetAt<NoWindow> for ShouldClose {
-    fn set_at(self, window: &mut NoWindow) {
-        let ShouldClose(val) = self;
+impl SetAt for (ShouldClose, NoWindow) {
+    type Property = ShouldClose;
+    type Object = NoWindow;
+
+    fn set_at(
+        _: Me<Self>, 
+        ShouldClose(val): ShouldClose, 
+        window: &mut NoWindow
+    ) {
         window.should_close = val;
     }
 }
 
-impl GetFrom<NoWindow> for DrawSize {
-    fn get_from(obj: &NoWindow) -> DrawSize {
-        let Size(val) = GetFrom::get_from(obj);
+impl GetFrom for (DrawSize, NoWindow) {
+    type Property = DrawSize;
+    type Object = NoWindow;
+
+    fn get_from(_: Me<Self>, obj: &NoWindow) -> DrawSize {
+        let Size(val) = GetFrom::get_from(Me::<(Size, NoWindow)>, obj);
         DrawSize(val)
     }
 }
 
-impl GetFrom<NoWindow> for Title {
-    fn get_from(obj: &NoWindow) -> Title {
+impl GetFrom for (Title, NoWindow) {
+    type Property = Title;
+    type Object = NoWindow;
+
+    fn get_from(_: Me<Self>, obj: &NoWindow) -> Title {
         Title(obj.title.clone())
     }
 }
 
-impl SetAt<NoWindow> for Title {
-    fn set_at(self, window: &mut NoWindow) {
-        let Title(val) = self;
+impl SetAt for (Title, NoWindow) {
+    type Property = Title;
+    type Object = NoWindow;
+
+    fn set_at(_: Me<Self>, Title(val): Title, window: &mut NoWindow) {
         window.title = val;
     }
 }
 
-impl GetFrom<NoWindow> for ExitOnEsc {
-    fn get_from(_obj: &NoWindow) -> ExitOnEsc {
+impl GetFrom for (ExitOnEsc, NoWindow) {
+    type Property = ExitOnEsc;
+    type Object = NoWindow;
+
+    fn get_from(_: Me<Self>, _obj: &NoWindow) -> ExitOnEsc {
         ExitOnEsc(false)
     }
 }
 
-impl SetAt<NoWindow> for ExitOnEsc {
+impl SetAt for (ExitOnEsc, NoWindow) {
+    type Property = ExitOnEsc;
+    type Object = NoWindow;
+
     // Ignore attempt to exit by pressing Esc.
-    fn set_at(self, _window: &mut NoWindow) {}
+    fn set_at(_: Me<Self>, _: ExitOnEsc, _window: &mut NoWindow) {}
 }
