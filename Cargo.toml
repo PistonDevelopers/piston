@@ -22,10 +22,6 @@ path = "src/lib.rs"
 
 git = "https://github.com/PistonDevelopers/input"
 
-[dependencies.pistoncore-current]
-
-git = "https://github.com/PistonDevelopers/current"
-
 [dependencies.pistoncore-event_loop]
 
 git = "https://github.com/PistonDevelopers/event_loop"
