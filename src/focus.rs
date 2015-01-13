@@ -1,7 +1,6 @@
-use std::intrinsics::TypeId;
+use input::Input;
 
-use GenericEvent;
-use ptr::Ptr;
+use Event;
 
 /// When window gets or looses focus
 pub trait FocusEvent {
@@ -16,23 +15,40 @@ pub trait FocusEvent {
     }
 }
 
-impl<T: GenericEvent> FocusEvent for T {
-    #[inline(always)]
-    fn from_focused(focused: bool) -> Option<T> {
-        let id = TypeId::of::<Box<FocusEvent>>();
-        Ptr::with_ref::<bool, Option<T>, _>(&focused, |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl FocusEvent for Input {
+    fn from_focused(focused: bool) -> Option<Self> {
+        Some(Input::Focus(focused))
     }
 
-    #[inline(always)]
     fn focus<U, F>(&self, mut f: F) -> Option<U>
-        where
-            F: FnMut(bool) -> U
+        where F: FnMut(bool) -> U
     {
-        let id = TypeId::of::<Box<FocusEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            f(*ptr.expect::<bool>())
-        })
+        if let &Input::Focus(focused) = self {
+            Some(f(focused))
+        } else {
+            None
+        }
+    }
+}
+
+impl<I> FocusEvent for Event<I>
+    where I: FocusEvent
+{
+    fn from_focused(focused: bool) -> Option<Self> {
+        if let Some(input) = FocusEvent::from_focused(focused) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn focus<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(bool) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.focus(f)
+        } else {
+            None
+        }
     }
 }

@@ -1,7 +1,6 @@
-use std::intrinsics::TypeId;
+use input::{ Input, Motion };
 
-use GenericEvent;
-use ptr::Ptr;
+use Event;
 
 /// The position of the mouse cursor
 pub trait MouseCursorEvent {
@@ -16,24 +15,41 @@ pub trait MouseCursorEvent {
     }
 }
 
-impl<T: GenericEvent> MouseCursorEvent for T {
-    #[inline(always)]
-    fn from_xy(x: f64, y: f64) -> Option<T> {
-        let id = TypeId::of::<Box<MouseCursorEvent>>();
-        Ptr::with_ref::<(f64, f64), Option<T>, _>(&(x, y), |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl MouseCursorEvent for Input {
+    fn from_xy(x: f64, y: f64) -> Option<Self> {
+        Some(Input::Move(Motion::MouseCursor(x, y)))
     }
 
-    #[inline(always)]
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = TypeId::of::<Box<MouseCursorEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            let &(x, y) = ptr.expect::<(f64, f64)>();
-            f(x, y)
-        })
+        if let &Input::Move(Motion::MouseCursor(x, y)) = self {
+            Some(f(x, y))
+        } else {
+            None
+        }
+    }
+}
+
+impl<I> MouseCursorEvent for Event<I>
+    where I: MouseCursorEvent
+{
+    fn from_xy(x: f64, y: f64) -> Option<Self> {
+        if let Some(input) = MouseCursorEvent::from_xy(x, y) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn mouse_cursor<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.mouse_cursor(f)
+        } else {
+            None
+        }
     }
 }
 
@@ -50,25 +66,41 @@ pub trait MouseRelativeEvent {
     }
 }
 
-impl<T: GenericEvent> MouseRelativeEvent for T {
-    #[inline(always)]
-    fn from_xy(x: f64, y: f64) -> Option<T> {
-        let id = TypeId::of::<Box<MouseRelativeEvent>>();
-        Ptr::with_ref::<(f64, f64), Option<T>, _>(&(x, y), |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl MouseRelativeEvent for Input {
+    fn from_xy(x: f64, y: f64) -> Option<Self> {
+        Some(Input::Move(Motion::MouseRelative(x, y)))
     }
 
-    #[inline(always)]
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
-        where
-            F: FnMut(f64, f64) -> U
+        where F: FnMut(f64, f64) -> U
     {
-        let id = TypeId::of::<Box<MouseRelativeEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            let &(x, y) = ptr.expect::<(f64, f64)>();
-            f(x, y)
-        })
+        if let &Input::Move(Motion::MouseRelative(x, y)) = self {
+            Some(f(x, y))
+        } else {
+            None
+        }
+    }
+}
+
+impl<I> MouseRelativeEvent for Event<I>
+    where I: MouseRelativeEvent
+{
+    fn from_xy(x: f64, y: f64) -> Option<Self> {
+        if let Some(input) = MouseRelativeEvent::from_xy(x, y) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn mouse_relative<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.mouse_relative(f)
+        } else {
+            None
+        }
     }
 }
 
@@ -85,24 +117,40 @@ pub trait MouseScrollEvent {
     }
 }
 
-impl<T: GenericEvent> MouseScrollEvent for T {
-    #[inline(always)]
-    fn from_xy(x: f64, y: f64) -> Option<T> {
-        let id = TypeId::of::<Box<MouseScrollEvent>>();
-        Ptr::with_ref::<(f64, f64), Option<T>, _>(&(x, y), |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl MouseScrollEvent for Input {
+    fn from_xy(x: f64, y: f64) -> Option<Self> {
+        Some(Input::Move(Motion::MouseScroll(x, y)))
     }
 
-    #[inline(always)]
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
-        where
-            F: FnMut(f64, f64) -> U
+        where F: FnMut(f64, f64) -> U
     {
-        let id = TypeId::of::<Box<MouseScrollEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            let &(x, y) = ptr.expect::<(f64, f64)>();
-            f(x, y)
-        })
+        if let &Input::Move(Motion::MouseScroll(x, y)) = self {
+            Some(f(x, y))
+        } else {
+            None
+        }
+    }
+}
+
+impl<I> MouseScrollEvent for Event<I>
+    where I: MouseScrollEvent
+{
+    fn from_xy(x: f64, y: f64) -> Option<Self> {
+        if let Some(input) = MouseScrollEvent::from_xy(x, y) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn mouse_scroll<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.mouse_scroll(f)
+        } else {
+            None
+        }
     }
 }
