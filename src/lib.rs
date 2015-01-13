@@ -45,7 +45,6 @@
 
 extern crate input;
 extern crate serialize;
-extern crate current;
 extern crate event_loop;
 extern crate "window" as window_lib;
 
