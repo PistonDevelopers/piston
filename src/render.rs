@@ -1,7 +1,6 @@
-use std::intrinsics::TypeId;
+use input::Input;
 
-use GenericEvent;
-use ptr::Ptr;
+use Event;
 use RenderArgs;
 
 /// When the next frame should be rendered
@@ -17,22 +16,30 @@ pub trait RenderEvent {
     }
 }
 
-impl<T: GenericEvent> RenderEvent for T {
-    #[inline(always)]
-    fn from_render_args(args: &RenderArgs) -> Option<T> {
-        let id = TypeId::of::<Box<RenderEvent>>();
-        Ptr::with_ref::<RenderArgs, Option<T>, _>(args, |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl RenderEvent for Input {
+    fn from_render_args(_: &RenderArgs) -> Option<Self> {
+        None
     }
-    #[inline(always)]
-    fn render<U, F>(&self, mut f: F) -> Option<U>
-        where
-            F: FnMut(&RenderArgs) -> U
+
+    fn render<U, F>(&self, _: F) -> Option<U>
+        where F: FnMut(&RenderArgs) -> U
     {
-        let id = TypeId::of::<Box<RenderEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            f(ptr.expect::<RenderArgs>())
-        })
+        None
+    }
+}
+
+impl<I> RenderEvent for Event<I> {
+    fn from_render_args(args: &RenderArgs) -> Option<Self> {
+        Some(Event::Render(args.clone()))
+    }
+
+    fn render<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&RenderArgs) -> U
+    {
+        if let &Event::Render(ref args) = self {
+            Some(f(args))
+        } else {
+            None
+        }
     }
 }

@@ -1,7 +1,6 @@
-use std::intrinsics::TypeId;
+use input::Input;
 
-use GenericEvent;
-use ptr::Ptr;
+use Event;
 
 /// When the window is resized
 pub trait ResizeEvent {
@@ -16,25 +15,40 @@ pub trait ResizeEvent {
     }
 }
 
-impl<T: GenericEvent> ResizeEvent for T {
-    #[inline(always)]
-    fn from_width_height(w: u32, h: u32) -> Option<T> {
-        let id = TypeId::of::<Box<ResizeEvent>>();
-        Ptr::with_ref::<(u32, u32), Option<T>, _>(&(w, h), |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl ResizeEvent for Input {
+    fn from_width_height(w: u32, h: u32) -> Option<Self> {
+        Some(Input::Resize(w, h))
     }
 
-    #[inline(always)]
     fn resize<U, F>(&self, mut f: F) -> Option<U>
-        where
-            F: FnMut(u32, u32) -> U
+        where F: FnMut(u32, u32) -> U
     {
-        let id = TypeId::of::<Box<ResizeEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            let &(w, h) = ptr.expect::<(u32, u32)>();
-            f(w, h)
-        })
+        if let &Input::Resize(w, h) = self {
+            Some(f(w, h))
+        } else {
+            None
+        }
     }
 }
 
+impl<I> ResizeEvent for Event<I>
+    where I: ResizeEvent
+{
+    fn from_width_height(w: u32, h: u32) -> Option<Self> {
+        if let Some(input) = ResizeEvent::from_width_height(w, h) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn resize<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(u32, u32) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.resize(f)
+        } else {
+            None
+        }
+    }
+}

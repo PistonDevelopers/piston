@@ -1,8 +1,8 @@
-use std::intrinsics::TypeId;
 use std::borrow::ToOwned;
 
-use GenericEvent;
-use ptr::Ptr;
+use input::Input;
+
+use Event;
 
 /// When receiving text from user, such as typing a character
 pub trait TextEvent {
@@ -17,22 +17,40 @@ pub trait TextEvent {
     }
 }
 
-impl<T: GenericEvent> TextEvent for T {
-    #[inline(always)]
-    fn from_text(text: &str) -> Option<T> {
-        let id = TypeId::of::<Box<TextEvent>>();
-        Ptr::with_str::<Option<T>, _>(text, |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl TextEvent for Input {
+    fn from_text(text: &str) -> Option<Self> {
+        Some(Input::Text(text.to_owned()))
     }
 
-    #[inline(always)]
     fn text<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&str) -> U
     {
-        let id = TypeId::of::<Box<TextEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            f(ptr.expect_str())
-        })
+        if let &Input::Text(ref text) = self {
+            Some(f(&text[]))
+        } else {
+            None
+        }
+    }
+}
+
+impl<I> TextEvent for Event<I>
+    where I: TextEvent
+{
+    fn from_text(text: &str) -> Option<Self> {
+        if let Some(input) = TextEvent::from_text(text) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn text<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(&str) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.text(f)
+        } else {
+            None
+        }
     }
 }

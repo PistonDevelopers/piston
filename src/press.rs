@@ -1,8 +1,6 @@
-use std::intrinsics::TypeId;
-use input::Button;
+use input::{ Button, Input };
 
-use GenericEvent;
-use ptr::Ptr;
+use Event;
 
 /// The press of a button
 pub trait PressEvent {
@@ -17,23 +15,40 @@ pub trait PressEvent {
     }
 }
 
-impl<T: GenericEvent> PressEvent for T {
-    #[inline(always)]
-    fn from_button(button: Button) -> Option<T> {
-        let id = TypeId::of::<Box<PressEvent>>();
-        Ptr::with_ref::<Button, Option<T>, _>(&button, |: ptr| {
-            GenericEvent::from_event(id, ptr)
-        })
+impl PressEvent for Input {
+    fn from_button(button: Button) -> Option<Self> {
+        Some(Input::Press(button))
     }
-    
-    #[inline(always)]
+
     fn press<U, F>(&self, mut f: F) -> Option<U>
-        where
-            F: FnMut(Button) -> U
+        where F: FnMut(Button) -> U
     {
-        let id = TypeId::of::<Box<PressEvent>>();
-        self.with_event(id, |&mut: ptr| {
-            f(*ptr.expect::<Button>())
-        })
+        if let &Input::Press(button) = self {
+            Some(f(button))
+        } else {
+            None
+        }
+    }
+}
+
+impl<I> PressEvent for Event<I>
+    where I: PressEvent
+{
+    fn from_button(button: Button) -> Option<Self> {
+        if let Some(input) = PressEvent::from_button(button) {
+            Some(Event::Input(input))
+        } else {
+            None
+        }
+    }
+
+    fn press<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(Button) -> U
+    {
+        if let &Event::Input(ref input) = self {
+            input.press(f)
+        } else {
+            None
+        }
     }
 }
