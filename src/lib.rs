@@ -111,7 +111,7 @@ fn start_window<F>(
 }
 
 #[cfg(feature = "include_gfx")]
-fn start_gfx<F>(f: F)
+fn start_gfx<F>(mut f: F)
     where
         F: FnMut()
 {
@@ -120,7 +120,7 @@ fn start_gfx<F>(f: F)
     let mut device = Rc::new(RefCell::new(gfx::GlDevice::new(|s| unsafe {
         std::mem::transmute(sdl2::video::gl_get_proc_address(s))
     })));
-    let mut g2d = Rc::new(RefCell::new(G2D::new(device.borrow_mut().deref_mut())));
+    let mut g2d = Rc::new(RefCell::new(G2D::new(&mut *device.borrow_mut())));
     let mut renderer = Rc::new(RefCell::new(device.borrow_mut().create_renderer()));
     let event::window::Size([w, h]) = window.get(); 
     let mut frame = Rc::new(RefCell::new(gfx::Frame::new(w as u16, h as u16)));
@@ -235,7 +235,7 @@ pub fn should_close() -> bool {
 
 /// Renders 2D graphics using Gfx.
 #[cfg(feature = "include_gfx")]
-pub fn render_2d_gfx(
+pub fn render_2d_gfx<F>(
     bg_color: Option<[f32; 4]>, 
     mut f: F
 )
@@ -247,10 +247,10 @@ pub fn render_2d_gfx(
 
     let renderer = current_renderer();
     let mut renderer = renderer.borrow_mut();
-    let renderer = renderer.deref_mut();
+    let renderer = &mut *renderer;
     current_g2d().borrow_mut().draw(
         renderer,
-        current_frame().borrow_mut().deref_mut(), 
+        &mut *current_frame().borrow_mut(), 
         |c, g| {
             if let Some(bg_color) = bg_color {
                 graphics::clear(bg_color, g);
