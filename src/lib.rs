@@ -6,7 +6,8 @@
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
 
-#[macro_use] extern crate rustc_bitflags;
+#[macro_use]
+extern crate bitflags;
 extern crate "rustc-serialize" as rustc_serialize;
 
 pub use mouse::MouseButton;
