@@ -18,4 +18,5 @@ path = "src/lib.rs"
 [dependencies]
 
 rustc-serialize = "*"
+bitflags = "*"
 
