@@ -70,6 +70,12 @@ git = "https://github.com/pistondevelopers/ai_behavior"
 [dependencies.pistoncore-sdl2_window]
 git = "https://github.com/pistondevelopers/sdl2_window"
 
+[dependencies.pistoncore-window]
+git = "https://github.com/pistondevelopers/window"
+
+[dependencies.quack]
+git = "https://github.com/pistondevelopers/quack"
+
 [dependencies.sdl2]
 #git = "https://github.com/pistondevelopers/rust-sdl2"
 git = "https://github.com/AngryLawyer/rust-sdl2"
