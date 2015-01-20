@@ -1,6 +1,7 @@
-use input::Input;
+use std::intrinsics::TypeId;
+use std::any::Any;
 
-use Event;
+use GenericEvent;
 
 /// When window gets or looses focus
 pub trait FocusEvent {
@@ -15,40 +16,70 @@ pub trait FocusEvent {
     }
 }
 
-impl FocusEvent for Input {
+impl<T: GenericEvent> FocusEvent for T {
     fn from_focused(focused: bool) -> Option<Self> {
-        Some(Input::Focus(focused))
+        GenericEvent::from_args(
+            TypeId::of::<Box<FocusEvent>>().hash(),
+            &focused as &Any
+        )
     }
 
     fn focus<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
-        if let &Input::Focus(focused) = self {
-            Some(f(focused))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<FocusEvent>>().hash() {
+            return None;
         }
+        self.with_args(|any| {
+            if let Some(&focused) = any.downcast_ref::<bool>() {
+                Some(f(focused))
+            } else {
+                panic!("Expected bool")
+            }
+        })
     }
 }
 
-impl<I> FocusEvent for Event<I>
-    where I: FocusEvent
-{
-    fn from_focused(focused: bool) -> Option<Self> {
-        if let Some(input) = FocusEvent::from_focused(focused) {
-            Some(Event::Input(input))
-        } else {
-            None
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[test]
+    fn test_input_focus() {
+        use input::Input;
+
+        let x: Option<Input> = FocusEvent::from_focused(true);
+        let y: Option<Input> = x.clone().unwrap().focus(|focused|
+            FocusEvent::from_focused(focused)).unwrap();
+        assert_eq!(x, y);
     }
 
-    fn focus<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(bool) -> U
-    {
-        if let &Event::Input(ref input) = self {
-            input.focus(f)
-        } else {
-            None
-        }
+    #[bench]
+    fn bench_input_focus(bencher: &mut Bencher) {
+        use input::Input;
+
+        bencher.iter(|| {
+            let _: Option<Input> = FocusEvent::from_focused(true);
+        });
+    }
+
+    #[test]
+    fn test_event_focus() {
+        use Event;
+
+        let x: Option<Event> = FocusEvent::from_focused(true);
+        let y: Option<Event> = x.clone().unwrap().focus(|focused|
+            FocusEvent::from_focused(focused)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_focus(bencher: &mut Bencher) {
+        use Event;
+
+        bencher.iter(|| {
+            let _: Option<Event> = FocusEvent::from_focused(true);
+        });
     }
 }

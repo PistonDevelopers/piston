@@ -1,6 +1,7 @@
-use input::{ Input, Motion };
+use std::intrinsics::TypeId;
+use std::any::Any;
 
-use Event;
+use GenericEvent;
 
 /// The position of the mouse cursor
 pub trait MouseCursorEvent {
@@ -15,41 +16,27 @@ pub trait MouseCursorEvent {
     }
 }
 
-impl MouseCursorEvent for Input {
+impl<T: GenericEvent> MouseCursorEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        Some(Input::Move(Motion::MouseCursor(x, y)))
+        GenericEvent::from_args(
+            TypeId::of::<Box<MouseCursorEvent>>().hash(),
+            &(x, y) as &Any
+        )
     }
 
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if let &Input::Move(Motion::MouseCursor(x, y)) = self {
-            Some(f(x, y))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<MouseCursorEvent>>().hash() {
+            return None;
         }
-    }
-}
-
-impl<I> MouseCursorEvent for Event<I>
-    where I: MouseCursorEvent
-{
-    fn from_xy(x: f64, y: f64) -> Option<Self> {
-        if let Some(input) = MouseCursorEvent::from_xy(x, y) {
-            Some(Event::Input(input))
-        } else {
-            None
-        }
-    }
-
-    fn mouse_cursor<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        if let &Event::Input(ref input) = self {
-            input.mouse_cursor(f)
-        } else {
-            None
-        }
+        self.with_args(|any| {
+            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
+                Some(f(x, y))
+            } else {
+                panic!("Expected (f64, f64)")
+            }
+        })
     }
 }
 
@@ -66,41 +53,27 @@ pub trait MouseRelativeEvent {
     }
 }
 
-impl MouseRelativeEvent for Input {
+impl<T: GenericEvent> MouseRelativeEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        Some(Input::Move(Motion::MouseRelative(x, y)))
+        GenericEvent::from_args(
+            TypeId::of::<Box<MouseRelativeEvent>>().hash(),
+            &(x, y) as &Any
+        )
     }
 
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if let &Input::Move(Motion::MouseRelative(x, y)) = self {
-            Some(f(x, y))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<MouseRelativeEvent>>().hash() {
+            return None;
         }
-    }
-}
-
-impl<I> MouseRelativeEvent for Event<I>
-    where I: MouseRelativeEvent
-{
-    fn from_xy(x: f64, y: f64) -> Option<Self> {
-        if let Some(input) = MouseRelativeEvent::from_xy(x, y) {
-            Some(Event::Input(input))
-        } else {
-            None
-        }
-    }
-
-    fn mouse_relative<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        if let &Event::Input(ref input) = self {
-            input.mouse_relative(f)
-        } else {
-            None
-        }
+        self.with_args(|any| {
+            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
+                Some(f(x, y))
+            } else {
+                panic!("Expected (f64, f64)")
+            }
+        })
     }
 }
 
@@ -117,40 +90,146 @@ pub trait MouseScrollEvent {
     }
 }
 
-impl MouseScrollEvent for Input {
+impl<T: GenericEvent> MouseScrollEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        Some(Input::Move(Motion::MouseScroll(x, y)))
+        GenericEvent::from_args(
+            TypeId::of::<Box<MouseScrollEvent>>().hash(),
+            &(x, y) as &Any
+        )
     }
 
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if let &Input::Move(Motion::MouseScroll(x, y)) = self {
-            Some(f(x, y))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<MouseScrollEvent>>().hash() {
+            return None;
         }
+        self.with_args(|any| {
+            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
+                Some(f(x, y))
+            } else {
+                panic!("Expected (f64, f64)")
+            }
+        })
     }
 }
 
-impl<I> MouseScrollEvent for Event<I>
-    where I: MouseScrollEvent
-{
-    fn from_xy(x: f64, y: f64) -> Option<Self> {
-        if let Some(input) = MouseScrollEvent::from_xy(x, y) {
-            Some(Event::Input(input))
-        } else {
-            None
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[test]
+    fn test_input_mouse_cursor() {
+        use input::Input;
+
+        let x: Option<Input> = MouseCursorEvent::from_xy(1.0, 0.0);
+        let y: Option<Input> = x.clone().unwrap().mouse_cursor(|x, y|
+            MouseCursorEvent::from_xy(x, y)).unwrap();
+        assert_eq!(x, y);
     }
 
-    fn mouse_scroll<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        if let &Event::Input(ref input) = self {
-            input.mouse_scroll(f)
-        } else {
-            None
-        }
+    #[bench]
+    fn bench_input_mouse_cursor(bencher: &mut Bencher) {
+        use input::Input;
+
+        bencher.iter(|| {
+            let _: Option<Input> = MouseCursorEvent::from_xy(1.0, 0.0);
+        });
+    }
+
+    #[test]
+    fn test_event_mouse_cursor() {
+        use Event;
+
+        let x: Option<Event> = MouseCursorEvent::from_xy(1.0, 0.0);
+        let y: Option<Event> = x.clone().unwrap().mouse_cursor(|x, y|
+            MouseCursorEvent::from_xy(x, y)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_mouse_cursor(bencher: &mut Bencher) {
+        use Event;
+
+        bencher.iter(|| {
+            let _: Option<Event> = MouseCursorEvent::from_xy(1.0, 0.0);
+        });
+    }
+
+    #[test]
+    fn test_input_mouse_relative() {
+        use input::Input;
+
+        let x: Option<Input> = MouseRelativeEvent::from_xy(1.0, 0.0);
+        let y: Option<Input> = x.clone().unwrap().mouse_relative(|x, y|
+            MouseRelativeEvent::from_xy(x, y)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_input_mouse_relative(bencher: &mut Bencher) {
+        use input::Input;
+
+        bencher.iter(|| {
+            let _: Option<Input> = MouseRelativeEvent::from_xy(1.0, 0.0);
+        });
+    }
+
+    #[test]
+    fn test_event_mouse_relative() {
+        use Event;
+
+        let x: Option<Event> = MouseRelativeEvent::from_xy(1.0, 0.0);
+        let y: Option<Event> = x.clone().unwrap().mouse_relative(|x, y|
+            MouseRelativeEvent::from_xy(x, y)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_mouse_relative(bencher: &mut Bencher) {
+        use Event;
+
+        bencher.iter(|| {
+            let _: Option<Event> = MouseRelativeEvent::from_xy(1.0, 0.0);
+        });
+    }
+
+    #[test]
+    fn test_input_mouse_scroll() {
+        use input::Input;
+
+        let x: Option<Input> = MouseScrollEvent::from_xy(1.0, 0.0);
+        let y: Option<Input> = x.clone().unwrap().mouse_scroll(|x, y|
+            MouseScrollEvent::from_xy(x, y)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_input_mouse_scroll(bencher: &mut Bencher) {
+        use input::Input;
+
+        bencher.iter(|| {
+            let _: Option<Input> = MouseScrollEvent::from_xy(1.0, 0.0);
+        });
+    }
+
+    #[test]
+    fn test_event_mouse_scroll() {
+        use Event;
+
+        let x: Option<Event> = MouseScrollEvent::from_xy(1.0, 0.0);
+        let y: Option<Event> = x.clone().unwrap().mouse_scroll(|x, y|
+            MouseScrollEvent::from_xy(x, y)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_mouse_scroll(bencher: &mut Bencher) {
+        use Event;
+
+        bencher.iter(|| {
+            let _: Option<Event> = MouseScrollEvent::from_xy(1.0, 0.0);
+        });
     }
 }

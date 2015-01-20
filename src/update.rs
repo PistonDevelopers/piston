@@ -1,6 +1,8 @@
-use input::Input;
+use std::intrinsics::TypeId;
+use std::any::Any;
 
-use Event;
+use GenericEvent;
+
 use UpdateArgs;
 
 /// When the application state should be updated
@@ -20,30 +22,60 @@ pub trait UpdateEvent: Sized {
     }
 }
 
-impl UpdateEvent for Input {
-    fn from_update_args(_: &UpdateArgs) -> Option<Self> {
-        None
-    }
-
-    fn update<U, F>(&self, _: F) -> Option<U>
-        where F: FnMut(&UpdateArgs) -> U
-    {
-        None
-    }
-}
-
-impl<I> UpdateEvent for Event<I> {
+impl<T: GenericEvent> UpdateEvent for T {
     fn from_update_args(args: &UpdateArgs) -> Option<Self> {
-        Some(Event::Update(args.clone()))
+        GenericEvent::from_args(
+            TypeId::of::<Box<UpdateEvent>>().hash(),
+            args as &Any
+        )
     }
 
     fn update<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&UpdateArgs) -> U
     {
-        if let &Event::Update(ref args) = self {
-            Some(f(args))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<UpdateEvent>>().hash() {
+            return None;
         }
+        self.with_args(|any| {
+            if let Some(args) = any.downcast_ref::<UpdateArgs>() {
+                Some(f(args))
+            } else {
+                panic!("Expected UpdateArgs")
+            }
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[test]
+    fn test_event_update() {
+        use Event;
+        use UpdateArgs;
+
+        let x: Option<Event> = UpdateEvent::from_update_args(
+            &UpdateArgs {
+                dt: 1.0,
+            }
+        );
+        let y: Option<Event> = x.clone().unwrap().update(|args|
+            UpdateEvent::from_update_args(args)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_update(bencher: &mut Bencher) {
+        use Event;
+        use UpdateArgs;
+
+        let args = UpdateArgs {
+            dt: 1.0,
+        };
+        bencher.iter(|| {
+            let _: Option<Event> = UpdateEvent::from_update_args(&args);
+        });
     }
 }

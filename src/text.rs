@@ -1,8 +1,8 @@
+use std::intrinsics::TypeId;
 use std::borrow::ToOwned;
+use std::any::Any;
 
-use input::Input;
-
-use Event;
+use GenericEvent;
 
 /// When receiving text from user, such as typing a character
 pub trait TextEvent {
@@ -17,40 +17,70 @@ pub trait TextEvent {
     }
 }
 
-impl TextEvent for Input {
+impl<T: GenericEvent> TextEvent for T {
     fn from_text(text: &str) -> Option<Self> {
-        Some(Input::Text(text.to_owned()))
+        GenericEvent::from_args(
+            TypeId::of::<Box<TextEvent>>().hash(),
+            &text.to_owned() as &Any
+        )
     }
 
     fn text<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&str) -> U
     {
-        if let &Input::Text(ref text) = self {
-            Some(f(&text[]))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<TextEvent>>().hash() {
+            return None;
         }
+        self.with_args(|any| {
+            if let Some(text) = any.downcast_ref::<String>() {
+                Some(f(&text[]))
+            } else {
+                panic!("Expected &str")
+            }
+        })
     }
 }
 
-impl<I> TextEvent for Event<I>
-    where I: TextEvent
-{
-    fn from_text(text: &str) -> Option<Self> {
-        if let Some(input) = TextEvent::from_text(text) {
-            Some(Event::Input(input))
-        } else {
-            None
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[test]
+    fn test_input_text() {
+        use input::Input;
+
+        let x: Option<Input> = TextEvent::from_text("hello");
+        let y: Option<Input> = x.clone().unwrap().text(|text|
+            TextEvent::from_text(text)).unwrap();
+        assert_eq!(x, y);
     }
 
-    fn text<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(&str) -> U
-    {
-        if let &Event::Input(ref input) = self {
-            input.text(f)
-        } else {
-            None
-        }
+    #[bench]
+    fn bench_input_text(bencher: &mut Bencher) {
+        use input::Input;
+
+        bencher.iter(|| {
+            let _: Option<Input> = TextEvent::from_text("hello");
+        });
+    }
+
+    #[test]
+    fn test_event_text() {
+        use Event;
+
+        let x: Option<Event> = TextEvent::from_text("hello");
+        let y: Option<Event> = x.clone().unwrap().text(|text|
+            TextEvent::from_text(text)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_text(bencher: &mut Bencher) {
+        use Event;
+
+        bencher.iter(|| {
+            let _: Option<Event> = TextEvent::from_text("hello");
+        });
     }
 }
