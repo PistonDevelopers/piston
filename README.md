@@ -2,7 +2,7 @@
 
 A user friendly game engine written in Rust
 
-Maintainers: @bvssvni, @Coeuvre
+Maintainers: @bvssvni
 
 [Examples](https://github.com/pistondevelopers/piston-examples)
 
