@@ -21,12 +21,10 @@ name = "event_loop"
 path = "src/lib.rs"
 
 [dependencies.quack]
-
 git = "https://github.com/pistondevelopers/quack"
 #version = "0.0.0"
 
-[dependencies.time]
-
-#git = "https://github.com/rust-lang/time"
-version = "*"
+[dependencies.clock_ticks]
+git = "https://github.com/tomaka/clock_ticks"
+#version = "*"
 
