@@ -6,6 +6,8 @@
 #![deny(missing_copy_implementations)]
 #![allow(unstable)]
 
+#[cfg(test)]
+extern crate test;
 extern crate input;
 extern crate serialize;
 extern crate event_loop;
@@ -35,7 +37,7 @@ pub use text::TextEvent;
 pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
 
-mod generic_event;
+pub mod generic_event;
 mod update;
 mod render;
 mod event;
@@ -50,4 +52,3 @@ mod focus;
 pub fn events<W>(window: W) -> event_loop::Events<W, input::Input, Event> {
     event_loop::Events::new(window)
 }
-

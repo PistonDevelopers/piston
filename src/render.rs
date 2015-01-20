@@ -1,6 +1,7 @@
-use input::Input;
+use std::intrinsics::TypeId;
+use std::any::Any;
 
-use Event;
+use GenericEvent;
 use RenderArgs;
 
 /// When the next frame should be rendered
@@ -16,30 +17,64 @@ pub trait RenderEvent {
     }
 }
 
-impl RenderEvent for Input {
-    fn from_render_args(_: &RenderArgs) -> Option<Self> {
-        None
-    }
-
-    fn render<U, F>(&self, _: F) -> Option<U>
-        where F: FnMut(&RenderArgs) -> U
-    {
-        None
-    }
-}
-
-impl<I> RenderEvent for Event<I> {
+impl<T: GenericEvent> RenderEvent for T {
     fn from_render_args(args: &RenderArgs) -> Option<Self> {
-        Some(Event::Render(args.clone()))
+        GenericEvent::from_args(
+            TypeId::of::<Box<RenderEvent>>().hash(),
+            args as &Any
+        )
     }
 
     fn render<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&RenderArgs) -> U
     {
-        if let &Event::Render(ref args) = self {
-            Some(f(args))
-        } else {
-            None
+        if self.event_id() != TypeId::of::<Box<RenderEvent>>().hash() {
+            return None;
         }
+        self.with_args(|any| {
+            if let Some(args) = any.downcast_ref::<RenderArgs>() {
+                Some(f(args))
+            } else {
+                panic!("Expected RenderArgs")
+            }
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[test]
+    fn test_event_render() {
+        use Event;
+        use RenderArgs;
+
+        let x: Option<Event> = RenderEvent::from_render_args(
+            &RenderArgs {
+                ext_dt: 1.0,
+                width: 10,
+                height: 10,
+            }
+        );
+        let y: Option<Event> = x.clone().unwrap().render(|args|
+            RenderEvent::from_render_args(args)).unwrap();
+        assert_eq!(x, y);
+    }
+
+    #[bench]
+    fn bench_event_render(bencher: &mut Bencher) {
+        use Event;
+        use RenderArgs;
+
+        let args = RenderArgs {
+            ext_dt: 1.0,
+            width: 10,
+            height: 10,
+        };
+        bencher.iter(|| {
+            let _: Option<Event> = RenderEvent::from_render_args(&args);
+        });
     }
 }
