@@ -4,7 +4,7 @@
 #![deny(missing_copy_implementations)]
 #![allow(unstable)]
 
-extern crate time;
+extern crate clock_ticks;
 extern crate quack;
 
 use std::io::timer::sleep;
@@ -179,7 +179,7 @@ pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 impl<W, I, E> Events<W, I, E> {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new(window: W) -> Events<W, I, E> {
-        let start = time::precise_time_ns();
+        let start = clock_ticks::precise_time_ns();
         let Ups(updates_per_second) = DEFAULT_UPS;
         let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
         Events {
@@ -214,7 +214,7 @@ for Events<W, I, E>
                     let ShouldClose(should_close) = self.window.get();
                     if should_close { return None; }
 
-                    let start_render = time::precise_time_ns();
+                    let start_render = clock_ticks::precise_time_ns();
                     self.last_frame = start_render;
 
                     let Size([w, h]) = self.window.get();
@@ -237,7 +237,7 @@ for Events<W, I, E>
                     State::UpdateLoop
                 }
                 State::UpdateLoop => {
-                    let current_time = time::precise_time_ns();
+                    let current_time = clock_ticks::precise_time_ns();
                     let next_frame = self.last_frame + self.dt_frame_in_ns;
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
