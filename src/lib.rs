@@ -68,6 +68,13 @@ pub struct UpdateArgs {
     pub dt: f64,
 }
 
+/// Idle arguments, such as expected idle time in seconds.
+#[derive(Copy, Clone, PartialEq, Show)]
+pub struct IdleArgs {
+    /// Expected idle time in seconds.
+    pub dt: f64
+}
+
 /// Methods required to map from consumed event to emitted event.
 pub trait EventMap<I> {
     /// Creates a render event.
@@ -76,13 +83,22 @@ pub trait EventMap<I> {
     fn update(args: UpdateArgs) -> Self;
     /// Creates an input event.
     fn input(args: I) -> Self;
+    /// Creates an idle event.
+    fn idle(IdleArgs) -> Self;
+}
+
+/// Tells whether last emitted event was idle or not.
+#[derive(Copy, Show, PartialEq, Eq)]
+enum Idle {
+    No,
+    Yes
 }
 
 #[derive(Copy, Show)]
 enum State {
     Render,
     SwapBuffers,
-    UpdateLoop,
+    UpdateLoop(Idle),
     HandleEvents,
     Update,
 }
@@ -230,23 +246,28 @@ for Events<W, I, E>
                         }));
                     }
 
-                    State::UpdateLoop
+                    State::UpdateLoop(Idle::No)
                 }
                 State::SwapBuffers => {
                     self.window.action(SwapBuffers);
-                    State::UpdateLoop
+                    State::UpdateLoop(Idle::No)
                 }
-                State::UpdateLoop => {
+                State::UpdateLoop(ref mut idle) => {
                     let current_time = clock_ticks::precise_time_ns();
                     let next_frame = self.last_frame + self.dt_frame_in_ns;
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
                     if next_event > current_time {
                         if let Some(x) = self.window.action(PollEvent) {
+                            *idle = Idle::No;
                             return Some(EventMap::input(x));
+                        } else if *idle == Idle::No {
+                            *idle = Idle::Yes;
+                            let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
+                            return Some(EventMap::idle(IdleArgs { dt: seconds }))
                         }
                         sleep( Duration::nanoseconds((next_event - current_time) as i64) );
-                        State::UpdateLoop
+                        State::UpdateLoop(Idle::No)
                     } else if next_event == next_frame {
                         State::Render
                     } else {
@@ -261,7 +282,7 @@ for Events<W, I, E>
                     }
                 }
                 State::Update => {
-                    self.state = State::UpdateLoop;
+                    self.state = State::UpdateLoop(Idle::No);
                     self.last_update += self.dt_update_in_ns;
                     return Some(EventMap::update(UpdateArgs{ dt: self.dt }));
                 }
