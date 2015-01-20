@@ -17,8 +17,10 @@ use {
     ResizeEvent,
     UpdateEvent,
     RenderEvent,
+    IdleEvent,
     UpdateArgs,
     RenderArgs,
+    IdleArgs,
 };
 
 /// Implemented by all events
@@ -175,6 +177,9 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
             &Event::Render(_) => {
                 TypeId::of::<Box<RenderEvent>>().hash()
             }
+            &Event::Idle(_) => {
+                TypeId::of::<Box<IdleEvent>>().hash()
+            }
             &Event::Input(ref input) => {
                 input.event_id()
             }
@@ -191,6 +196,9 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
             &Event::Render(ref args) => {
                 f(args as &Any)
             }
+            &Event::Idle(ref args) => {
+                f(args as &Any)
+            }
             &Event::Input(ref input) => {
                 input.with_args(f)
             }
@@ -200,6 +208,7 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
     fn from_args(event_id: u64, any: &Any) -> Option<Self> {
         let update_id = TypeId::of::<Box<UpdateEvent>>().hash();
         let render_id = TypeId::of::<Box<RenderEvent>>().hash();
+        let idle_id = TypeId::of::<Box<IdleEvent>>().hash();
 
         match event_id {
             x if x == update_id => {
@@ -214,6 +223,13 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
                     Some(Event::Render(args))
                 } else {
                     panic!("Expected RenderArgs")
+                }
+            }
+            x if x == idle_id => {
+                if let Some(&args) = any.downcast_ref::<IdleArgs>() {
+                    Some(Event::Idle(args))
+                } else {
+                    panic!("Expected IdleArgs")
                 }
             }
             _ => {

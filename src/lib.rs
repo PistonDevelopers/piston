@@ -25,10 +25,12 @@ pub use events::{
     Ups,
     UpdateArgs,
     RenderArgs,
+    IdleArgs,
 };
 pub use generic_event::GenericEvent;
-pub use update::{ UpdateEvent };
-pub use render::{ RenderEvent };
+pub use update::UpdateEvent;
+pub use render::RenderEvent;
+pub use idle::IdleEvent;
 pub use event::Event;
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
@@ -40,6 +42,7 @@ pub use focus::FocusEvent;
 pub mod generic_event;
 mod update;
 mod render;
+mod idle;
 mod event;
 mod press;
 mod release;
