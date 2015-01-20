@@ -242,6 +242,9 @@ for Events<W, I, E>
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
                     if next_event > current_time {
+                        if let Some(x) = self.window.action(PollEvent) {
+                            return Some(EventMap::input(x));
+                        }
                         sleep( Duration::nanoseconds((next_event - current_time) as i64) );
                         State::UpdateLoop
                     } else if next_event == next_frame {
