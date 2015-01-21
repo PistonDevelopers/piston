@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
@@ -24,9 +24,9 @@ git = "https://github.com/pistondevelopers/input"
 
 [dependencies.pistoncore-event_loop]
 git = "https://github.com/pistondevelopers/event_loop"
-#version = "0.0.3"
+#version = "0.0.4"
 
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.1"
+#version = "0.0.2"
 
