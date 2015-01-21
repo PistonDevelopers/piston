@@ -9,7 +9,7 @@ extern crate quack;
 
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use quack::{ ActOn, Action, GetFrom, Get, Me, SetAt };
+use quack::{ ActOn, Action, GetFrom, Get, SetAt };
 use std::cmp;
 
 /// Whether window should close or not.
@@ -114,7 +114,7 @@ impl<W, I, E> SetAt for (Ups, Events<W, I, E>) {
     type Property = Ups;
     type Object = Events<W, I, E>;
 
-    fn set_at(_: Me<Self>, Ups(frames): Ups, events: &mut Events<W, I, E>) {
+    fn set_at(Ups(frames): Ups, events: &mut Events<W, I, E>) {
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
     }
@@ -132,8 +132,7 @@ impl<W, I, E> SetAt for (MaxFps, Events<W, I, E>) {
     type Property = MaxFps;
     type Object = Events<W, I, E>;
 
-    fn set_at(_: Me<Self>, MaxFps(frames): MaxFps, 
-        events: &mut Events<W, I, E>) {
+    fn set_at(MaxFps(frames): MaxFps, events: &mut Events<W, I, E>) {
         events.dt_frame_in_ns = BILLION / frames;
     }
 }
