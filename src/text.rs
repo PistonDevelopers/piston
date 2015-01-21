@@ -1,6 +1,6 @@
-use std::intrinsics::TypeId;
 use std::borrow::ToOwned;
-use std::any::Any;
+use std::any::{ Any, TypeId };
+use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -19,16 +19,15 @@ pub trait TextEvent {
 
 impl<T: GenericEvent> TextEvent for T {
     fn from_text(text: &str) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<TextEvent>>().hash(),
-            &text.to_owned() as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<TextEvent>>());
+        GenericEvent::from_args(id, &text.to_owned() as &Any)
     }
 
     fn text<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&str) -> U
     {
-        if self.event_id() != TypeId::of::<Box<TextEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<TextEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {

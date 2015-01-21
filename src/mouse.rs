@@ -1,5 +1,5 @@
-use std::intrinsics::TypeId;
-use std::any::Any;
+use std::any::{ Any, TypeId };
+use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -18,16 +18,15 @@ pub trait MouseCursorEvent {
 
 impl<T: GenericEvent> MouseCursorEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<MouseCursorEvent>>().hash(),
-            &(x, y) as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseCursorEvent>>());
+        GenericEvent::from_args(id, &(x, y) as &Any)
     }
 
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if self.event_id() != TypeId::of::<Box<MouseCursorEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseCursorEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {
@@ -55,16 +54,15 @@ pub trait MouseRelativeEvent {
 
 impl<T: GenericEvent> MouseRelativeEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<MouseRelativeEvent>>().hash(),
-            &(x, y) as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseRelativeEvent>>());
+        GenericEvent::from_args(id, &(x, y) as &Any)
     }
 
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if self.event_id() != TypeId::of::<Box<MouseRelativeEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseRelativeEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {
@@ -92,8 +90,9 @@ pub trait MouseScrollEvent {
 
 impl<T: GenericEvent> MouseScrollEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseScrollEvent>>());
         GenericEvent::from_args(
-            TypeId::of::<Box<MouseScrollEvent>>().hash(),
+            id,
             &(x, y) as &Any
         )
     }
@@ -101,7 +100,8 @@ impl<T: GenericEvent> MouseScrollEvent for T {
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if self.event_id() != TypeId::of::<Box<MouseScrollEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseScrollEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {

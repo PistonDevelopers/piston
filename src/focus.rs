@@ -1,5 +1,5 @@
-use std::intrinsics::TypeId;
-use std::any::Any;
+use std::any::{ Any, TypeId };
+use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -18,16 +18,15 @@ pub trait FocusEvent {
 
 impl<T: GenericEvent> FocusEvent for T {
     fn from_focused(focused: bool) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<FocusEvent>>().hash(),
-            &focused as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<FocusEvent>>());
+        GenericEvent::from_args(id, &focused as &Any)
     }
 
     fn focus<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
-        if self.event_id() != TypeId::of::<Box<FocusEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<FocusEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {

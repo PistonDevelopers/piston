@@ -1,5 +1,5 @@
-use std::intrinsics::TypeId;
-use std::any::Any;
+use std::any::{ Any, TypeId };
+use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 use RenderArgs;
@@ -19,16 +19,15 @@ pub trait RenderEvent {
 
 impl<T: GenericEvent> RenderEvent for T {
     fn from_render_args(args: &RenderArgs) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<RenderEvent>>().hash(),
-            args as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<RenderEvent>>());
+        GenericEvent::from_args(id, args as &Any)
     }
 
     fn render<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&RenderArgs) -> U
     {
-        if self.event_id() != TypeId::of::<Box<RenderEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<RenderEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {

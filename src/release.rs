@@ -1,5 +1,5 @@
-use std::intrinsics::TypeId;
-use std::any::Any;
+use std::any::{ Any, TypeId };
+use std::hash::{ hash, SipHasher };
 
 use input::Button;
 use GenericEvent;
@@ -19,16 +19,15 @@ pub trait ReleaseEvent {
 
 impl<T: GenericEvent> ReleaseEvent for T {
     fn from_button(button: Button) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<ReleaseEvent>>().hash(),
-            &button as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<ReleaseEvent>>());
+        GenericEvent::from_args(id, &button as &Any)
     }
 
     fn release<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(Button) -> U
     {
-        if self.event_id() != TypeId::of::<Box<ReleaseEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<ReleaseEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {

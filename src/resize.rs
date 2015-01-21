@@ -1,5 +1,5 @@
-use std::intrinsics::TypeId;
-use std::any::Any;
+use std::any::{ Any, TypeId };
+use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -18,16 +18,15 @@ pub trait ResizeEvent {
 
 impl<T: GenericEvent> ResizeEvent for T {
     fn from_width_height(w: u32, h: u32) -> Option<Self> {
-        GenericEvent::from_args(
-            TypeId::of::<Box<ResizeEvent>>().hash(),
-            &(w, h) as &Any
-        )
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<ResizeEvent>>());
+        GenericEvent::from_args(id, &(w, h) as &Any)
     }
 
     fn resize<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(u32, u32) -> U
     {
-        if self.event_id() != TypeId::of::<Box<ResizeEvent>>().hash() {
+        let id = hash::<_, SipHasher>(&TypeId::of::<Box<ResizeEvent>>());
+        if self.event_id() != id {
             return None;
         }
         self.with_args(|any| {
