@@ -2,7 +2,6 @@
 
 use std::borrow::ToOwned;
 use std::any::{ Any, TypeId };
-use std::hash::{ hash, SipHasher };
 
 use input::{ Button, Input, Motion };
 use {
@@ -25,42 +24,42 @@ use {
 
 /// Implemented by all events
 pub trait GenericEvent {
-    /// The id of this event, usually `TypeOf::of::<Box<EventTrait>>().hash()`
-    fn event_id(&self) -> u64;
+    /// The id of this event, `TypeOf::of::<Box<EventTrait>>()`
+    fn event_id(&self) -> TypeId;
     /// Calls closure with table
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U
     ;
     /// Converts from table to `Self`
-    fn from_args(event_id: u64, any: &Any) -> Option<Self>;
+    fn from_args(event_id: TypeId, any: &Any) -> Option<Self>;
 }
 
 impl GenericEvent for Input {
-    fn event_id(&self) -> u64 {
+    fn event_id(&self) -> TypeId {
         match self {
             &Input::Focus(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<FocusEvent>>())
+                TypeId::of::<Box<FocusEvent>>()
             }
             &Input::Press(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<PressEvent>>())
+                TypeId::of::<Box<PressEvent>>()
             }
             &Input::Release(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<ReleaseEvent>>())
+                TypeId::of::<Box<ReleaseEvent>>()
             }
             &Input::Move(Motion::MouseCursor(_, _)) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<MouseCursorEvent>>())
+                TypeId::of::<Box<MouseCursorEvent>>()
             }
             &Input::Move(Motion::MouseRelative(_, _)) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<MouseRelativeEvent>>())
+                TypeId::of::<Box<MouseRelativeEvent>>()
             }
             &Input::Move(Motion::MouseScroll(_, _)) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<MouseScrollEvent>>())
+                TypeId::of::<Box<MouseScrollEvent>>()
             }
             &Input::Text(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<TextEvent>>())
+                TypeId::of::<Box<TextEvent>>()
             }
             &Input::Resize(_, _) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<ResizeEvent>>())
+                TypeId::of::<Box<ResizeEvent>>()
             }
         }
     }
@@ -96,15 +95,15 @@ impl GenericEvent for Input {
         }
     }
 
-    fn from_args(event_id: u64, any: &Any) -> Option<Self> {
-        let focus_id = hash::<_, SipHasher>(&TypeId::of::<Box<FocusEvent>>());
-        let mouse_cursor_id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseCursorEvent>>());
-        let mouse_relative_id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseRelativeEvent>>());
-        let mouse_scroll_id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseScrollEvent>>());
-        let press_id = hash::<_, SipHasher>(&TypeId::of::<Box<PressEvent>>());
-        let release_id = hash::<_, SipHasher>(&TypeId::of::<Box<ReleaseEvent>>());
-        let resize_id = hash::<_, SipHasher>(&TypeId::of::<Box<ResizeEvent>>());
-        let text_id = hash::<_, SipHasher>(&TypeId::of::<Box<TextEvent>>());
+    fn from_args(event_id: TypeId, any: &Any) -> Option<Self> {
+        let focus_id = TypeId::of::<Box<FocusEvent>>();
+        let mouse_cursor_id = TypeId::of::<Box<MouseCursorEvent>>();
+        let mouse_relative_id = TypeId::of::<Box<MouseRelativeEvent>>();
+        let mouse_scroll_id = TypeId::of::<Box<MouseScrollEvent>>();
+        let press_id = TypeId::of::<Box<PressEvent>>();
+        let release_id = TypeId::of::<Box<ReleaseEvent>>();
+        let resize_id = TypeId::of::<Box<ResizeEvent>>();
+        let text_id = TypeId::of::<Box<TextEvent>>();
 
         match event_id {
             x if x == focus_id => {
@@ -169,16 +168,16 @@ impl GenericEvent for Input {
 }
 
 impl<I: GenericEvent> GenericEvent for Event<I> {
-    fn event_id(&self) -> u64 {
+    fn event_id(&self) -> TypeId {
         match self {
             &Event::Update(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<UpdateEvent>>())
+                TypeId::of::<Box<UpdateEvent>>()
             }
             &Event::Render(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<RenderEvent>>())
+                TypeId::of::<Box<RenderEvent>>()
             }
             &Event::Idle(_) => {
-                hash::<_, SipHasher>(&TypeId::of::<Box<IdleEvent>>())
+                TypeId::of::<Box<IdleEvent>>()
             }
             &Event::Input(ref input) => {
                 input.event_id()
@@ -205,10 +204,10 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
         }
     }
 
-    fn from_args(event_id: u64, any: &Any) -> Option<Self> {
-        let update_id = hash::<_, SipHasher>(&TypeId::of::<Box<UpdateEvent>>());
-        let render_id = hash::<_, SipHasher>(&TypeId::of::<Box<RenderEvent>>());
-        let idle_id = hash::<_, SipHasher>(&TypeId::of::<Box<IdleEvent>>());
+    fn from_args(event_id: TypeId, any: &Any) -> Option<Self> {
+        let update_id = TypeId::of::<Box<UpdateEvent>>();
+        let render_id = TypeId::of::<Box<RenderEvent>>();
+        let idle_id = TypeId::of::<Box<IdleEvent>>();
 
         match event_id {
             x if x == update_id => {

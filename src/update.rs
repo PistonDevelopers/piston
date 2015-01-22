@@ -1,5 +1,4 @@
 use std::any::{ Any, TypeId };
-use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -24,14 +23,14 @@ pub trait UpdateEvent: Sized {
 
 impl<T: GenericEvent> UpdateEvent for T {
     fn from_update_args(args: &UpdateArgs) -> Option<Self> {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<UpdateEvent>>());
+        let id = TypeId::of::<Box<UpdateEvent>>();
         GenericEvent::from_args(id, args as &Any)
     }
 
     fn update<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&UpdateArgs) -> U
     {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<UpdateEvent>>());
+        let id = TypeId::of::<Box<UpdateEvent>>();
         if self.event_id() != id {
             return None;
         }
