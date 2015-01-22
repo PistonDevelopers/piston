@@ -1,5 +1,4 @@
 use std::any::{ Any, TypeId };
-use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -18,14 +17,14 @@ pub trait MouseCursorEvent {
 
 impl<T: GenericEvent> MouseCursorEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseCursorEvent>>());
+        let id = TypeId::of::<Box<MouseCursorEvent>>();
         GenericEvent::from_args(id, &(x, y) as &Any)
     }
 
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseCursorEvent>>());
+        let id = TypeId::of::<Box<MouseCursorEvent>>();
         if self.event_id() != id {
             return None;
         }
@@ -54,14 +53,14 @@ pub trait MouseRelativeEvent {
 
 impl<T: GenericEvent> MouseRelativeEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseRelativeEvent>>());
+        let id = TypeId::of::<Box<MouseRelativeEvent>>();
         GenericEvent::from_args(id, &(x, y) as &Any)
     }
 
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseRelativeEvent>>());
+        let id = TypeId::of::<Box<MouseRelativeEvent>>();
         if self.event_id() != id {
             return None;
         }
@@ -90,7 +89,7 @@ pub trait MouseScrollEvent {
 
 impl<T: GenericEvent> MouseScrollEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseScrollEvent>>());
+        let id = TypeId::of::<Box<MouseScrollEvent>>();
         GenericEvent::from_args(
             id,
             &(x, y) as &Any
@@ -100,7 +99,7 @@ impl<T: GenericEvent> MouseScrollEvent for T {
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<MouseScrollEvent>>());
+        let id = TypeId::of::<Box<MouseScrollEvent>>();
         if self.event_id() != id {
             return None;
         }

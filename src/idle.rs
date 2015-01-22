@@ -1,5 +1,4 @@
 use std::any::{ Any, TypeId };
-use std::hash::{ hash, SipHasher };
 
 use GenericEvent;
 
@@ -24,14 +23,14 @@ pub trait IdleEvent: Sized {
 
 impl<T: GenericEvent> IdleEvent for T {
     fn from_idle_args(args: &IdleArgs) -> Option<Self> {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<IdleEvent>>());
+        let id = TypeId::of::<Box<IdleEvent>>();
         GenericEvent::from_args(id, args as &Any)
     }
 
     fn idle<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&IdleArgs) -> U
     {
-        let id = hash::<_, SipHasher>(&TypeId::of::<Box<IdleEvent>>());
+        let id = TypeId::of::<Box<IdleEvent>>();
         if self.event_id() != id {
             return None;
         }
