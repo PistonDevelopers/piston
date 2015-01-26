@@ -22,9 +22,9 @@ path = "src/lib.rs"
 
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.2"
+#version = "0.0.3"
 
 [dependencies.clock_ticks]
 git = "https://github.com/tomaka/clock_ticks"
-#version = "*"
+#version = "0.0.2"
 
