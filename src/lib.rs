@@ -9,7 +9,7 @@ extern crate quack;
 
 use std::io::timer::sleep;
 use std::time::duration::Duration;
-use quack::{ ActOn, Action, GetFrom, Get, SetAt };
+use quack::{ ActOn, Action, GetFrom, Get, Pair, SetAt };
 use std::cmp;
 
 /// Whether window should close or not.
@@ -111,9 +111,6 @@ enum State {
 pub struct Ups(pub u64);
 
 impl<W, I, E> SetAt for (Ups, Events<W, I, E>) {
-    type Property = Ups;
-    type Object = Events<W, I, E>;
-
     fn set_at(Ups(frames): Ups, events: &mut Events<W, I, E>) {
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
@@ -129,9 +126,6 @@ impl<W, I, E> SetAt for (Ups, Events<W, I, E>) {
 pub struct MaxFps(pub u64);
 
 impl<W, I, E> SetAt for (MaxFps, Events<W, I, E>) {
-    type Property = MaxFps;
-    type Object = Events<W, I, E>;
-
     fn set_at(MaxFps(frames): MaxFps, events: &mut Events<W, I, E>) {
         events.dt_frame_in_ns = BILLION / frames;
     }
@@ -213,10 +207,10 @@ impl<W, I, E>
 Iterator
 for Events<W, I, E>
     where
-        (ShouldClose, W): GetFrom<Property = ShouldClose, Object = W>,
-        (Size, W): GetFrom<Property = Size, Object = W>,
-        (SwapBuffers, W): ActOn<(), Action = SwapBuffers, Object = W>,
-        (PollEvent, W): ActOn<Option<I>, Action = PollEvent, Object = W>,
+        (ShouldClose, W): Pair<Data = ShouldClose, Object = W> + GetFrom,
+        (Size, W): Pair<Data = Size, Object = W> + GetFrom,
+        (SwapBuffers, W): Pair<Data = SwapBuffers, Object = W> + ActOn<()>,
+        (PollEvent, W): Pair<Data = PollEvent, Object = W> + ActOn<Option<I>>,
         E: EventMap<I>,
 {
     type Item = E;
