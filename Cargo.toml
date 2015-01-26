@@ -24,9 +24,9 @@ git = "https://github.com/pistondevelopers/input"
 
 [dependencies.pistoncore-event_loop]
 git = "https://github.com/pistondevelopers/event_loop"
-#version = "0.0.4"
+#version = "0.0.5"
 
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.2"
+#version = "0.0.3"
 
