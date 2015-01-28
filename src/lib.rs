@@ -5,11 +5,12 @@
 //! Window abstraction
 
 extern crate input;
+#[macro_use]
 extern crate quack;
 extern crate event_loop;
 
 use input::Input;
-use quack::{ ActOn, GetFrom, SetAt };
+use quack::Get;
 
 // Reexport everything from event_loop.
 pub use event_loop::*;
@@ -84,63 +85,24 @@ impl NoWindow {
     }
 }
 
-impl ActOn<()> for (SwapBuffers, NoWindow) {
-    fn act_on(_action: SwapBuffers, _window: &mut NoWindow) {}
-}
-
-impl ActOn<Option<Input>> for (PollEvent, NoWindow) {
-    fn act_on(_action: PollEvent, _window: &mut NoWindow) 
-        -> Option<Input> { None }
-}
-
-impl GetFrom for (ShouldClose, NoWindow) {
-    fn get_from(obj: &NoWindow) -> ShouldClose {
-        ShouldClose(obj.should_close)
-    }
-}
-
-impl GetFrom for (Size, NoWindow) {
-    fn get_from(_obj: &NoWindow) -> Size {
-        Size([0, 0])
-    }
-}
-
-impl SetAt for (CaptureCursor, NoWindow) {
-    fn set_at(_val: CaptureCursor, _window: &mut NoWindow) {}
-}
-
-impl SetAt for (ShouldClose, NoWindow) {
-    fn set_at(ShouldClose(val): ShouldClose, window: &mut NoWindow) {
-        window.should_close = val;
-    }
-}
-
-impl GetFrom for (DrawSize, NoWindow) {
-    fn get_from(obj: &NoWindow) -> DrawSize {
-        let Size(val) = <(Size, NoWindow) as GetFrom>::get_from(obj);
+quack! {
+_window: NoWindow[]
+get:
+    fn () -> ShouldClose { ShouldClose(_window.should_close) }
+    fn () -> Size { Size([0, 0]) }
+    fn () -> DrawSize {
+        let Size(val) = _window.get();
         DrawSize(val)
     }
+    fn () -> Title { Title(_window.title.clone()) }
+    fn () -> ExitOnEsc { ExitOnEsc(false) }
+set:
+    fn (__: CaptureCursor) {}
+    fn (val: ShouldClose) { _window.should_close = val.0 }
+    fn (val: Title) { _window.title = val.0; }
+    fn (__: ExitOnEsc) {}
+action:
+    fn (__: SwapBuffers) -> () {}
+    fn (__: PollEvent) -> Option<Input> { None }
 }
 
-impl GetFrom for (Title, NoWindow) {
-    fn get_from(obj: &NoWindow) -> Title {
-        Title(obj.title.clone())
-    }
-}
-
-impl SetAt for (Title, NoWindow) {
-    fn set_at(Title(val): Title, window: &mut NoWindow) {
-        window.title = val;
-    }
-}
-
-impl GetFrom for (ExitOnEsc, NoWindow) {
-    fn get_from(_obj: &NoWindow) -> ExitOnEsc {
-        ExitOnEsc(false)
-    }
-}
-
-impl SetAt for (ExitOnEsc, NoWindow) {
-    // Ignore attempt to exit by pressing Esc.
-    fn set_at(_: ExitOnEsc, _window: &mut NoWindow) {}
-}
