@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-event"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
@@ -24,9 +24,9 @@ git = "https://github.com/PistonDevelopers/input"
 
 [dependencies.pistoncore-event_loop]
 git = "https://github.com/PistonDevelopers/event_loop"
-#version = "0.0.4"
+#version = "0.0.7"
 
 [dependencies.pistoncore-window]
 git = "https://github.com/PistonDevelopers/window"
-#version = "0.0.3"
+#version = "0.0.5"
 
