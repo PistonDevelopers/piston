@@ -11,14 +11,9 @@ extern crate test;
 extern crate input;
 extern crate serialize;
 extern crate event_loop;
-extern crate "window" as window_lib;
+extern crate window;
 
-pub use window_lib as window;
 pub use event_loop as events;
-pub use window::{
-    WindowSettings,
-    NoWindow
-};
 pub use events::{
     Events,
     MaxFps,
