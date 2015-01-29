@@ -21,8 +21,6 @@ Maintainers: @bvssvni
 
 ## Start new project with Piston
 
-*Notice! We recommend using the Piston libraries directly instead of this repo.*
-
 Use one of the [examples](https://github.com/pistondevelopers/piston-examples) as guide.
 
 Almost all projects written in Rust use the Cargo package manager.
