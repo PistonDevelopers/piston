@@ -1,7 +1,7 @@
 [package]
 
 name = "piston"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
