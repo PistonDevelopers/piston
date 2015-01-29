@@ -10,13 +10,7 @@ pub extern crate event;
 pub extern crate window;
 pub extern crate quack;
 
-pub use event::{
-    Event,
-    Events,
-    events,
-    RenderArgs,
-    UpdateArgs,
-};
+pub use event::events;
 
 pub use quack::{
     Action,
