@@ -15,77 +15,30 @@ authors = [
     "TyOverby <ty@pre-alpha.com>",
     "eddyb"
 ]
+keywords = ["piston", "game", "engine", "core"]
+description = "The Piston game engine core libraries"
+license = "MIT"
+repository = "https://github.com/pistondevelopers/piston.git"
+homepage = "https://github.com/pistondevelopers/piston"
 
 [lib]
 
 name = "piston"
 path = "./src/lib.rs"
 
-[dependencies.vecmath]
-git = "https://github.com/pistondevelopers/vecmath"
-
 [dependencies.pistoncore-input]
-git = "https://github.com/pistondevelopers/input"
+#git = "https://github.com/pistondevelopers/input"
+version = "0.0.5"
 
 [dependencies.pistoncore-event]
-git = "https://github.com/pistondevelopers/event"
-
-[dependencies.shader_version]
-git = "https://github.com/pistondevelopers/shader_version"
-
-[dependencies.piston3d-cam]
-git = "https://github.com/pistondevelopers/cam"
-
-[dependencies.image]
-git = "https://github.com/pistondevelopers/image"
-
-[dependencies.fps_counter]
-git = "https://github.com/pistondevelopers/fps_counter"
-
-[dependencies.piston2d-drag_controller]
-git = "https://github.com/pistondevelopers/drag_controller"
-
-[dependencies.select_color]
-git = "https://github.com/pistondevelopers/select_color"
-
-[dependencies.read_color]
-git = "https://github.com/pistondevelopers/read_color"
-
-[dependencies.current]
-git = "https://github.com/pistondevelopers/current"
-
-[dependencies.piston2d-graphics]
-git = "https://github.com/pistondevelopers/graphics"
-
-[dependencies.piston2d-opengl_graphics]
-git = "https://github.com/pistondevelopers/opengl_graphics"
-
-[dependencies.piston2d-gfx_graphics]
-optional = true
-git = "https://github.com/pistondevelopers/gfx_graphics"
-
-[dependencies.piston-ai_behavior]
-git = "https://github.com/pistondevelopers/ai_behavior"
-
-[dependencies.pistoncore-sdl2_window]
-git = "https://github.com/pistondevelopers/sdl2_window"
+#git = "https://github.com/pistondevelopers/event"
+version = "0.0.6"
 
 [dependencies.pistoncore-window]
-git = "https://github.com/pistondevelopers/window"
+#git = "https://github.com/pistondevelopers/window"
+version = "0.0.5"
 
 [dependencies.quack]
-git = "https://github.com/pistondevelopers/quack"
-
-[dependencies.sdl2]
-#git = "https://github.com/pistondevelopers/rust-sdl2"
-git = "https://github.com/AngryLawyer/rust-sdl2"
-#version = "*"
-
-[dependencies.gfx]
-optional = true
-git = "https://github.com/gfx-rs/gfx-rs"
-
-[features]
-default = []
-include_gfx = ["gfx", "piston2d-gfx_graphics"]
+#git = "https://github.com/pistondevelopers/quack"
+version = "0.0.6"
 
