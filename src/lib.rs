@@ -5,16 +5,10 @@
 //! A user friendly game engine written in Rust.
 
 // Reexported crates.
-extern crate "input" as input_lib;
-extern crate "event" as event_lib;
-extern crate "window" as window_lib;
-extern crate "quack" as quack_lib;
-
-// Reexports.
-pub use quack_lib as quack;
-pub use input_lib as input;
-pub use event_lib as event;
-pub use window_lib as window;
+pub extern crate input;
+pub extern crate event;
+pub extern crate window;
+pub extern crate quack;
 
 pub use event::{
     Event,
