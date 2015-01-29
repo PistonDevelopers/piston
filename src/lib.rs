@@ -20,10 +20,8 @@ pub use event::{
     Event,
     Events,
     events,
-    NoWindow,
     RenderArgs,
     UpdateArgs,
-    WindowSettings,
 };
 
 pub use quack::{
