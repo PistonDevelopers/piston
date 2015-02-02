@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![allow(unstable)]
+#![feature(collections)]
 
 //! Window abstraction
 
@@ -88,21 +88,21 @@ impl NoWindow {
 quack! {
 _window: NoWindow[]
 get:
-    fn () -> ShouldClose { ShouldClose(_window.should_close) }
-    fn () -> Size { Size([0, 0]) }
-    fn () -> DrawSize {
+    fn () -> ShouldClose [] { ShouldClose(_window.should_close) }
+    fn () -> Size [] { Size([0, 0]) }
+    fn () -> DrawSize [] {
         let Size(val) = _window.get();
         DrawSize(val)
     }
-    fn () -> Title { Title(_window.title.clone()) }
-    fn () -> ExitOnEsc { ExitOnEsc(false) }
+    fn () -> Title [] { Title(_window.title.clone()) }
+    fn () -> ExitOnEsc [] { ExitOnEsc(false) }
 set:
-    fn (__: CaptureCursor) {}
-    fn (val: ShouldClose) { _window.should_close = val.0 }
-    fn (val: Title) { _window.title = val.0; }
-    fn (__: ExitOnEsc) {}
+    fn (__: CaptureCursor) [] {}
+    fn (val: ShouldClose) [] { _window.should_close = val.0 }
+    fn (val: Title) [] { _window.title = val.0; }
+    fn (__: ExitOnEsc) [] {}
 action:
-    fn (__: SwapBuffers) -> () {}
-    fn (__: PollEvent) -> Option<Input> { None }
+    fn (__: SwapBuffers) -> () [] {}
+    fn (__: PollEvent) -> Option<Input> [] { None }
 }
 
