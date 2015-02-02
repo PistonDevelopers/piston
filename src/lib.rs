@@ -2,7 +2,9 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![allow(unstable)]
+#![feature(io)]
+#![feature(std_misc)]
+#![feature(core)]
 
 extern crate clock_ticks;
 #[macro_use]
@@ -52,7 +54,7 @@ pub struct PollEvent;
 impl Sized for PollEvent {}
 
 /// Render arguments
-#[derive(Copy, Clone, PartialEq, Show)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
@@ -63,14 +65,14 @@ pub struct RenderArgs {
 }
 
 /// Update arguments, such as delta time in seconds
-#[derive(Copy, Clone, PartialEq, Show)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
 }
 
 /// Idle arguments, such as expected idle time in seconds.
-#[derive(Copy, Clone, PartialEq, Show)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub struct IdleArgs {
     /// Expected idle time in seconds.
     pub dt: f64
@@ -89,13 +91,13 @@ pub trait EventMap<I> {
 }
 
 /// Tells whether last emitted event was idle or not.
-#[derive(Copy, Show, PartialEq, Eq)]
+#[derive(Copy, Debug, PartialEq, Eq)]
 enum Idle {
     No,
     Yes
 }
 
-#[derive(Copy, Show)]
+#[derive(Copy, Debug)]
 enum State {
     Render,
     SwapBuffers,
