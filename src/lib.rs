@@ -113,7 +113,7 @@ pub struct Ups(pub u64);
 
 quack_set! {
     events: Events[W, I, E]
-    fn (ups: Ups) {
+    fn (ups: Ups) [] {
         let frames = ups.0;
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
@@ -130,7 +130,7 @@ pub struct MaxFps(pub u64);
 
 quack_set! {
     this: Events[W, I, E]
-    fn (max_fps: MaxFps) {
+    fn (max_fps: MaxFps) [] {
         this.dt_frame_in_ns = BILLION / max_fps.0;
     }
 }
