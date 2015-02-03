@@ -4,7 +4,6 @@
 #![deny(missing_copy_implementations)]
 #![feature(io)]
 #![feature(std_misc)]
-#![feature(core)]
 
 extern crate clock_ticks;
 #[macro_use]
