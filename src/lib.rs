@@ -1,6 +1,5 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(collections)]
 
 //! Window abstraction
 
