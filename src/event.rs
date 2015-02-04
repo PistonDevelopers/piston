@@ -9,7 +9,7 @@ use Event::{ Idle, Render, Update, Input };
 use events::EventMap;
 
 /// Adds render and update events to input events
-#[derive(Clone, PartialEq, Show)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Event<I = input::Input> {
     /// Render graphics.
     Render(RenderArgs),
