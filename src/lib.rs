@@ -4,12 +4,11 @@
 #![crate_name = "event"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![allow(unstable)]
+#![feature(core)]
 
 #[cfg(test)]
 extern crate test;
 extern crate input;
-extern crate serialize;
 extern crate event_loop;
 extern crate window;
 
