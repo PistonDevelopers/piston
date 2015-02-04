@@ -1,6 +1,7 @@
 #![crate_name = "piston"]
 #![deny(missing_docs)]
 #![warn(dead_code)]
+#![feature(macro_reexport)]
 
 //! A user friendly game engine written in Rust.
 
