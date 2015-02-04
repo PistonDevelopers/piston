@@ -32,13 +32,13 @@ git = "https://github.com/pistondevelopers/input"
 
 [dependencies.pistoncore-event]
 git = "https://github.com/pistondevelopers/event"
-#version = "0.0.6"
+#version = "0.0.8"
 
 [dependencies.pistoncore-window]
 git = "https://github.com/pistondevelopers/window"
-#version = "0.0.5"
+#version = "0.0.7"
 
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.6"
+#version = "0.0.10"
 
