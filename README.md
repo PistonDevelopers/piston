@@ -45,7 +45,7 @@ The `Cargo.toml` file is where you put the library dependencies.
 For example, to use the SDL2 back-end, add the following to `Cargo.toml`:
 
 ```
-[dependencies.sdl2_window]
+[dependencies.pistoncore-sdl2_window]
 
 git = "https://github.com/pistondevelopers/sdl2_window"
 ```
