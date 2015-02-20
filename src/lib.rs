@@ -13,6 +13,7 @@ use std::old_io::timer::sleep;
 use std::time::duration::Duration;
 use quack::{ ActOn, Action, GetFrom, Get, Pair };
 use std::cmp;
+use std::marker::{ PhantomData };
 
 /// Whether window should close or not.
 #[derive(Copy)]
@@ -181,6 +182,8 @@ pub struct Events<W, I, E> {
     dt_update_in_ns: u64,
     dt_frame_in_ns: u64,
     dt: f64,
+    _marker_i: PhantomData<I>,
+    _marker_e: PhantomData<E>,
 }
 
 static BILLION: u64 = 1_000_000_000;
@@ -204,6 +207,8 @@ impl<W, I, E> Events<W, I, E> {
             dt_update_in_ns: BILLION / updates_per_second,
             dt_frame_in_ns: BILLION / max_frames_per_second,
             dt: 1.0 / updates_per_second as f64,
+            _marker_i: PhantomData,
+            _marker_e: PhantomData,
         }
     }
 }
