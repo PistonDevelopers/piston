@@ -2,7 +2,7 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(io)]
+#![feature(old_io)]
 #![feature(std_misc)]
 
 extern crate clock_ticks;
