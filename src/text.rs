@@ -31,7 +31,7 @@ impl<T: GenericEvent> TextEvent for T {
         }
         self.with_args(|any| {
             if let Some(text) = any.downcast_ref::<String>() {
-                Some(f(&text[]))
+                Some(f(&text))
             } else {
                 panic!("Expected &str")
             }
