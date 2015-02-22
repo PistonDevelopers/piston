@@ -6,13 +6,101 @@
 extern crate input;
 #[macro_use]
 extern crate quack;
-extern crate event_loop;
 
 use input::Input;
-use quack::{ Associative, Get };
+use quack::{ ActOn, Action, Associative, Get, GetFrom, Pair };
 
-// Reexport everything from event_loop.
-pub use event_loop::*;
+/// Required to use the event loop.
+pub trait Window {
+    type Event;
+
+    /// Returns true if window should close.
+    fn should_close(&self) -> bool;
+
+    /// Gets the size of the window in user coordinates.
+    fn size(&self) -> [u32; 2];
+
+    /// Swaps render buffers.
+    fn swap_buffers(&mut self);
+
+    /// Polls event from window.
+    fn poll_event(&mut self) -> Option<Self::Event>;
+}
+
+impl<T> Window for T
+    where
+        (PollEvent, T): Pair<Data = PollEvent, Object = T>
+            + Associative
+            + ActOn<Result = Option<<(PollEvent, T) as quack::Associative>::Type>>,
+        (ShouldClose, T): Pair<Data = ShouldClose, Object = T>
+            + GetFrom,
+        (SwapBuffers, T): Pair<Data = SwapBuffers, Object = T>
+            + ActOn,
+        (Size, T): Pair<Data = Size, Object = T>
+            + GetFrom
+{
+    type Event = <(PollEvent, T) as Associative>::Type;
+
+    #[inline(always)]
+    fn should_close(&self) -> bool {
+        let ShouldClose(val) = self.get();
+        val
+    }
+
+    #[inline(always)]
+    fn size(&self) -> [u32; 2] {
+        let Size(size) = self.get();
+        size
+    }
+
+    #[inline(always)]
+    fn swap_buffers(&mut self) {
+        self.action(SwapBuffers);
+    }
+
+    #[inline(always)]
+    fn poll_event(&mut self) -> Option<<Self as Window>::Event> {
+        self.action(PollEvent)
+    }
+}
+
+/// Whether window should close or not.
+#[derive(Copy)]
+pub struct ShouldClose(pub bool);
+
+impl Sized for ShouldClose {}
+
+/// The size of the window.
+#[derive(Copy)]
+pub struct Size(pub [u32; 2]);
+
+impl Sized for Size {}
+
+/// Tells window to swap buffers.
+///
+/// ~~~ignore
+/// use current::Action;
+///
+/// ...
+/// window.action(SwapBuffers);
+/// ~~~
+#[derive(Copy)]
+pub struct SwapBuffers;
+
+impl Sized for SwapBuffers {}
+
+/// Polls event from window.
+///
+/// ~~~ignore
+/// use current::Action;
+///
+/// ...
+/// let e = window.action(PollEvent);
+/// ~~~
+#[derive(Copy)]
+pub struct PollEvent;
+
+impl Sized for PollEvent {}
 
 /// The title of the window.
 pub struct Title(pub String);
@@ -116,4 +204,3 @@ action:
 impl Associative for (PollEvent, NoWindow) {
     type Type = Input;
 }
-
