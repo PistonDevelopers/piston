@@ -12,6 +12,8 @@ extern crate input;
 extern crate event_loop;
 extern crate window;
 
+use window::Window;
+
 pub use event_loop as events;
 pub use events::{
     Events,
@@ -46,6 +48,9 @@ mod resize;
 mod focus;
 
 /// Creates event iterator from window.
-pub fn events<W>(window: W) -> event_loop::Events<W, input::Input, Event> {
+pub fn events<W>(window: W) -> event_loop::Events<W, Event<<W as Window>::Event>>
+    where
+        W: Window,
+{
     event_loop::Events::new(window)
 }
