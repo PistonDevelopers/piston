@@ -37,6 +37,14 @@ pub struct CaptureCursor(pub bool);
 #[derive(Copy)]
 pub struct DrawSize(pub [u32; 2]);
 
+/// The position of the window in desktop coordinates.
+#[derive(Copy)]
+pub struct DesktopPosition(pub [u32; 2]);
+
+/// The size of the window in desktop coordinates.
+#[derive(Copy)]
+pub struct DesktopSize(pub [u32; 2]);
+
 /// Settings for window behavior.
 pub struct WindowSettings {
     /// Title of the window.
