@@ -11,9 +11,63 @@ extern crate quack;
 
 use std::old_io::timer::sleep;
 use std::time::duration::Duration;
-use quack::{ ActOn, Action, GetFrom, Get, Pair };
+use quack::{ Associative, ActOn, Action, GetFrom, Get, Pair };
 use std::cmp;
 use std::marker::{ PhantomData };
+
+/// Required to use the event loop.
+pub trait Window {
+    type Event;
+
+    /// Returns true if window should close.
+    fn should_close(&self) -> bool;
+
+    /// Gets the size of the window in user coordinates.
+    fn size(&self) -> [u32; 2];
+
+    /// Swaps render buffers.
+    fn swap_buffers(&mut self);
+
+    /// Polls event from window.
+    fn poll_event(&mut self) -> Option<Self::Event>;
+}
+
+impl<T> Window for T
+    where
+        (PollEvent, T): Pair<Data = PollEvent, Object = T>
+            + Associative 
+            + ActOn<Result = Option<<(PollEvent, T) as quack::Associative>::Type>>,
+        (ShouldClose, T): Pair<Data = ShouldClose, Object = T>
+            + GetFrom,
+        (SwapBuffers, T): Pair<Data = SwapBuffers, Object = T>
+            + ActOn,
+        (Size, T): Pair<Data = Size, Object = T>
+            + GetFrom
+{
+    type Event = <(PollEvent, T) as Associative>::Type;
+
+    #[inline(always)]
+    fn should_close(&self) -> bool {
+        let ShouldClose(val) = self.get();
+        val
+    }
+
+    #[inline(always)]
+    fn size(&self) -> [u32; 2] {
+        let Size(size) = self.get();
+        size
+    }
+
+    #[inline(always)]
+    fn swap_buffers(&mut self) {
+        self.action(SwapBuffers);
+    }
+
+    #[inline(always)]
+    fn poll_event(&mut self) -> Option<<Self as Window>::Event> {
+        self.action(PollEvent)
+    }
+}
 
 /// Whether window should close or not.
 #[derive(Copy)]
@@ -217,10 +271,7 @@ impl<W, I, E>
 Iterator
 for Events<W, I, E>
     where
-        (ShouldClose, W): Pair<Data = ShouldClose, Object = W> + GetFrom,
-        (Size, W): Pair<Data = Size, Object = W> + GetFrom,
-        (SwapBuffers, W): Pair<Data = SwapBuffers, Object = W> + ActOn<()>,
-        (PollEvent, W): Pair<Data = PollEvent, Object = W> + ActOn<Option<I>>,
+        W: Window<Event = I>,
         E: EventMap<I>,
 {
     type Item = E;
@@ -230,13 +281,12 @@ for Events<W, I, E>
         loop {
             self.state = match self.state {
                 State::Render => {
-                    let ShouldClose(should_close) = self.window.get();
-                    if should_close { return None; }
+                    if self.window.should_close() { return None; }
 
                     let start_render = clock_ticks::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let Size([w, h]) = self.window.get();
+                    let [w, h] = self.window.size();
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
@@ -252,7 +302,7 @@ for Events<W, I, E>
                     State::UpdateLoop(Idle::No)
                 }
                 State::SwapBuffers => {
-                    self.window.action(SwapBuffers);
+                    self.window.swap_buffers();
                     State::UpdateLoop(Idle::No)
                 }
                 State::UpdateLoop(ref mut idle) => {
@@ -261,7 +311,7 @@ for Events<W, I, E>
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
                     if next_event > current_time {
-                        if let Some(x) = self.window.action(PollEvent) {
+                        if let Some(x) = self.window.poll_event() {
                             *idle = Idle::No;
                             return Some(EventMap::input(x));
                         } else if *idle == Idle::No {
@@ -279,7 +329,7 @@ for Events<W, I, E>
                 }
                 State::HandleEvents => {
                     // Handle all events before updating.
-                    match self.window.action(PollEvent) {
+                    match self.window.poll_event() {
                         None => State::Update,
                         Some(x) => { return Some(EventMap::input(x)); },
                     }
