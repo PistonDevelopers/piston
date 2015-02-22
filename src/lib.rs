@@ -77,8 +77,12 @@ enum State {
 pub struct Ups(pub u64);
 
 quack_set! {
-    events: Events[W, I, E]
-    fn (ups: Ups) [] {
+    events: Events[W, E]
+    fn (ups: Ups) [
+        where
+            W: Window,
+            E: EventMap<<W as Window>::Event>
+    ] {
         let frames = ups.0;
         events.dt_update_in_ns = BILLION / frames;
         events.dt = 1.0 / frames as f64;
@@ -94,8 +98,12 @@ quack_set! {
 pub struct MaxFps(pub u64);
 
 quack_set! {
-    this: Events[W, I, E]
-    fn (max_fps: MaxFps) [] {
+    this: Events[W, E]
+    fn (max_fps: MaxFps) [
+        where
+            W: Window,
+            E: EventMap<<W as Window>::Event>
+    ] {
         this.dt_frame_in_ns = BILLION / max_fps.0;
     }
 }
@@ -137,7 +145,11 @@ quack_set! {
 ///     }
 /// }
 /// ~~~
-pub struct Events<W, I, E> {
+pub struct Events<W, E>
+    where
+        W: Window,
+        E: EventMap<<W as Window>::Event>
+{
     window: W,
     state: State,
     last_update: u64,
@@ -145,7 +157,6 @@ pub struct Events<W, I, E> {
     dt_update_in_ns: u64,
     dt_frame_in_ns: u64,
     dt: f64,
-    _marker_i: PhantomData<I>,
     _marker_e: PhantomData<E>,
 }
 
@@ -156,9 +167,13 @@ pub const DEFAULT_UPS: Ups = Ups(120);
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
 
-impl<W, I, E> Events<W, I, E> {
+impl<W, E> Events<W, E>
+    where
+        W: Window,
+        E: EventMap<<W as Window>::Event>
+{
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new(window: W) -> Events<W, I, E> {
+    pub fn new(window: W) -> Events<W, E> {
         let start = clock_ticks::precise_time_ns();
         let Ups(updates_per_second) = DEFAULT_UPS;
         let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
@@ -170,18 +185,15 @@ impl<W, I, E> Events<W, I, E> {
             dt_update_in_ns: BILLION / updates_per_second,
             dt_frame_in_ns: BILLION / max_frames_per_second,
             dt: 1.0 / updates_per_second as f64,
-            _marker_i: PhantomData,
             _marker_e: PhantomData,
         }
     }
 }
 
-impl<W, I, E>
-Iterator
-for Events<W, I, E>
+impl<W, E> Iterator for Events<W, E>
     where
-        W: Window<Event = I>,
-        E: EventMap<I>,
+        W: Window,
+        E: EventMap<<W as Window>::Event>,
 {
     type Item = E;
 
