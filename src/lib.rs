@@ -9,7 +9,7 @@ extern crate quack;
 extern crate event_loop;
 
 use input::Input;
-use quack::Get;
+use quack::{ Associative, Get };
 
 // Reexport everything from event_loop.
 pub use event_loop::*;
@@ -111,5 +111,9 @@ set:
 action:
     fn (__: SwapBuffers) -> () [] {}
     fn (__: PollEvent) -> Option<Input> [] { None }
+}
+
+impl Associative for (PollEvent, NoWindow) {
+    type Type = Input;
 }
 
