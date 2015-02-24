@@ -68,13 +68,9 @@ impl<T> Window for T
 #[derive(Copy)]
 pub struct ShouldClose(pub bool);
 
-impl Sized for ShouldClose {}
-
 /// The size of the window.
 #[derive(Copy)]
 pub struct Size(pub [u32; 2]);
-
-impl Sized for Size {}
 
 /// Tells window to swap buffers.
 ///
@@ -87,8 +83,6 @@ impl Sized for Size {}
 #[derive(Copy)]
 pub struct SwapBuffers;
 
-impl Sized for SwapBuffers {}
-
 /// Polls event from window.
 ///
 /// ~~~ignore
@@ -99,8 +93,6 @@ impl Sized for SwapBuffers {}
 /// ~~~
 #[derive(Copy)]
 pub struct PollEvent;
-
-impl Sized for PollEvent {}
 
 /// The title of the window.
 pub struct Title(pub String);
