@@ -5,7 +5,7 @@ use std::num::{ FromPrimitive, ToPrimitive };
 
 /// Represent a mouse button.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
-    Eq, Ord, PartialOrd, Hash, Show)]
+    Eq, Ord, PartialOrd, Hash, Debug)]
 pub enum MouseButton {
     /// Unknown mouse button.
     Unknown,
