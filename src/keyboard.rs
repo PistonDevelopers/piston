@@ -10,9 +10,8 @@ use Button;
 
 // Defining every combination to allow assignment in static expressions.
 bitflags!(
-    #[derive(Show)]
     #[allow(missing_docs)]
-    #[derive(RustcDecodable, RustcEncodable)]
+    #[derive(RustcDecodable, RustcEncodable, Debug)]
     flags ModifierKey: u8 {
         const NO_MODIFIER           = 0b00000000,
         const CTRL                  = 0b00000001,
@@ -81,7 +80,7 @@ impl Default for ModifierKey {
 
 /// Represent a keyboard key.
 #[allow(missing_docs)]
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, Show, Hash)]
+#[derive(Copy, Clone, RustcDecodable, RustcEncodable, Debug, Hash)]
 pub enum Key {
     Unknown                 = 0,
     Backspace               = 8,
