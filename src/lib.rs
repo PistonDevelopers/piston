@@ -12,6 +12,7 @@ use quack::{ ActOn, Action, Associative, Get, GetFrom, Pair };
 
 /// Required to use the event loop.
 pub trait Window {
+    /// The event type emitted by `poll_event`
     type Event;
 
     /// Returns true if window should close.
