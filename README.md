@@ -41,7 +41,7 @@ When you type `cargo run` it will print "Hello, world!".
 
 The `Cargo.toml` file is where you put the library dependencies.
 
-*TIP: Copy links from the sidebar at [/r/rust_gamedev](http://www.reddit.com/r/rust_gamedev/).*
+*TIP: Copy links from [/r/rust_gamedev/wiki/index](http://www.reddit.com/r/rust_gamedev/wiki/index).*
 
 For example, to use the SDL2 back-end, add the following to `Cargo.toml`:
 
