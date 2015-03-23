@@ -2,15 +2,15 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(old_io)]
 #![feature(std_misc)]
+#![feature(thread_sleep)]
 
 extern crate clock_ticks;
 #[macro_use]
 extern crate quack;
 extern crate window;
 
-use std::old_io::timer::sleep;
+use std::thread::sleep;
 use std::time::duration::Duration;
 use std::cmp;
 use std::marker::{ PhantomData };
