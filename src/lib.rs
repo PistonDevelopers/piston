@@ -5,6 +5,7 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 #![feature(core)]
+#![cfg_attr(test, feature(test))]
 
 #[cfg(test)]
 extern crate test;
