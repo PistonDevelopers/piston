@@ -21,11 +21,13 @@ pub use events::{
     Ups,
     UpdateArgs,
     RenderArgs,
+    AfterRenderArgs,
     IdleArgs,
 };
 pub use generic_event::GenericEvent;
 pub use update::UpdateEvent;
 pub use render::RenderEvent;
+pub use after_render::AfterRenderEvent;
 pub use idle::IdleEvent;
 pub use event::Event;
 pub use press::PressEvent;
@@ -38,6 +40,7 @@ pub use focus::FocusEvent;
 pub mod generic_event;
 mod update;
 mod render;
+mod after_render;
 mod idle;
 mod event;
 mod press;

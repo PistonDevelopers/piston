@@ -3,9 +3,10 @@ use input;
 use {
     IdleArgs,
     RenderArgs,
+    AfterRenderArgs,
     UpdateArgs,
 };
-use Event::{ Idle, Render, Update, Input };
+use Event::{ Idle, Render, AfterRender, Update, Input };
 use events::EventMap;
 
 /// Adds render and update events to input events
@@ -13,6 +14,8 @@ use events::EventMap;
 pub enum Event<I = input::Input> {
     /// Render graphics.
     Render(RenderArgs),
+    /// After rendering and swapping buffers.
+    AfterRender(AfterRenderArgs),
     /// Update the state of the application.
     Update(UpdateArgs),
     /// Do background tasks that can be done incrementally.
@@ -23,6 +26,7 @@ pub enum Event<I = input::Input> {
 
 impl<I> EventMap<I> for Event<I> {
     fn render(args: RenderArgs) -> Event<I> { Render(args) }
+    fn after_render(args: AfterRenderArgs) -> Event<I> { AfterRender(args) }
     fn update(args: UpdateArgs) -> Event<I> { Update(args) }
     fn idle(args: IdleArgs) -> Event<I> { Idle(args) }
     fn input(args: I) -> Event<I> { Input(args) }
