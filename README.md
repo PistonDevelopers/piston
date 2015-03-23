@@ -16,8 +16,9 @@ Maintainers: @bvssvni
 
 | Back-ends |
 |--------------------|
-| [sdl2_window](https://github.com/pistondevelopers/sdl2_window) |
 | [glfw_window](https://github.com/pistondevelopers/glfw_window) |
+| [glutin_window](https://github.com/pistondevelopers/glutin_window) |
+| [sdl2_window](https://github.com/pistondevelopers/sdl2_window) |
 
 ## Start new project with Piston
 
