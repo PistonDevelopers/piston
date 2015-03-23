@@ -10,7 +10,7 @@ pub trait AfterRenderEvent {
     /// Calls closure if this is an after render event.
     fn after_render<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(&AfterRenderArgs) -> U;
-    /// Returns render arguments.
+    /// Returns after render arguments.
     fn after_render_args(&self) -> Option<AfterRenderArgs> {
         self.after_render(|args| args.clone())
     }
