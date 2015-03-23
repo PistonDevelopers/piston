@@ -27,6 +27,10 @@ pub struct RenderArgs {
     pub height: u32,
 }
 
+/// After render arguments.
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct AfterRenderArgs;
+
 /// Update arguments, such as delta time in seconds
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct UpdateArgs {
@@ -45,6 +49,8 @@ pub struct IdleArgs {
 pub trait EventMap<I> {
     /// Creates a render event.
     fn render(args: RenderArgs) -> Self;
+    /// Creates an after render event.
+    fn after_render(args: AfterRenderArgs) -> Self;
     /// Creates an update event.
     fn update(args: UpdateArgs) -> Self;
     /// Creates an input event.
@@ -224,7 +230,8 @@ impl<W, E> Iterator for Events<W, E>
                 }
                 State::SwapBuffers => {
                     self.window.swap_buffers();
-                    State::UpdateLoop(Idle::No)
+                    self.state = State::UpdateLoop(Idle::No);
+                    return Some(EventMap::after_render(AfterRenderArgs));
                 }
                 State::UpdateLoop(ref mut idle) => {
                     let current_time = clock_ticks::precise_time_ns();
