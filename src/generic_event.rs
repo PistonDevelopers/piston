@@ -16,9 +16,11 @@ use {
     ResizeEvent,
     UpdateEvent,
     RenderEvent,
+    AfterRenderEvent,
     IdleEvent,
     UpdateArgs,
     RenderArgs,
+    AfterRenderArgs,
     IdleArgs,
 };
 
@@ -176,6 +178,9 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
             &Event::Render(_) => {
                 TypeId::of::<Box<RenderEvent>>()
             }
+            &Event::AfterRender(_) => {
+                TypeId::of::<Box<AfterRenderEvent>>()
+            }
             &Event::Idle(_) => {
                 TypeId::of::<Box<IdleEvent>>()
             }
@@ -195,6 +200,9 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
             &Event::Render(ref args) => {
                 f(args as &Any)
             }
+            &Event::AfterRender(ref args) => {
+                f(args as &Any)
+            }
             &Event::Idle(ref args) => {
                 f(args as &Any)
             }
@@ -207,6 +215,7 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
     fn from_args(event_id: TypeId, any: &Any) -> Option<Self> {
         let update_id = TypeId::of::<Box<UpdateEvent>>();
         let render_id = TypeId::of::<Box<RenderEvent>>();
+        let after_render_id = TypeId::of::<Box<AfterRenderEvent>>();
         let idle_id = TypeId::of::<Box<IdleEvent>>();
 
         match event_id {
@@ -222,6 +231,13 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
                     Some(Event::Render(args))
                 } else {
                     panic!("Expected RenderArgs")
+                }
+            }
+            x if x == after_render_id => {
+                if let Some(&args) = any.downcast_ref::<AfterRenderArgs>() {
+                    Some(Event::AfterRender(args))
+                } else {
+                    panic!("Expected AfterRenderArgs")
                 }
             }
             x if x == idle_id => {
