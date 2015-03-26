@@ -8,7 +8,7 @@
 
 #[macro_use]
 extern crate bitflags;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate rustc_serialize;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
