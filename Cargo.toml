@@ -25,3 +25,6 @@ git = "https://github.com/pistondevelopers/input"
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
 #version = "0.0.13"
+
+[dependencies]
+libc = "0.1"
