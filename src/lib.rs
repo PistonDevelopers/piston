@@ -13,7 +13,7 @@ extern crate window;
 use std::thread::sleep;
 use std::time::duration::Duration;
 use std::cmp;
-use std::marker::{ PhantomData };
+use std::marker::PhantomData;
 use window::Window;
 
 /// Render arguments
@@ -213,7 +213,8 @@ impl<W, E> Iterator for Events<W, E>
                     let start_render = clock_ticks::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let [w, h] = self.window.size();
+                    let size = self.window.size();
+                    let (w, h) = (size[0], size[1]);
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
