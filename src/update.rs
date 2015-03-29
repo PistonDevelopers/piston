@@ -1,11 +1,10 @@
 use std::any::{ Any, TypeId };
+use std::marker::Reflect;
 
-use GenericEvent;
-
-use UpdateArgs;
+use { GenericEvent, UpdateArgs };
 
 /// When the application state should be updated
-pub trait UpdateEvent: Sized {
+pub trait UpdateEvent: Sized + Reflect {
     /// Creates an update event.
     fn from_update_args(args: &UpdateArgs) -> Option<Self>;
     /// Creates an update event with delta time.
@@ -21,7 +20,7 @@ pub trait UpdateEvent: Sized {
     }
 }
 
-impl<T: GenericEvent> UpdateEvent for T {
+impl<T> UpdateEvent for T where T: GenericEvent + Reflect {
     fn from_update_args(args: &UpdateArgs) -> Option<Self> {
         let id = TypeId::of::<Box<UpdateEvent>>();
         GenericEvent::from_args(id, args as &Any)
