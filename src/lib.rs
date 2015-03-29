@@ -3,6 +3,7 @@
 
 //! Window abstraction
 
+extern crate libc;
 extern crate input;
 #[macro_use]
 extern crate quack;
@@ -63,6 +64,18 @@ impl<T> Window for T
     fn poll_event(&mut self) -> Option<<Self as Window>::Event> {
         self.action(PollEvent)
     }
+}
+
+/// Trait for OpenGL specific operations.
+pub trait OpenGLWindow: Window {
+    /// Returns the address of an OpenGL function if it exist, else returns null pointer.
+    fn get_proc_address(&mut self, proc_name: &str) -> *const libc::c_void;
+
+    /// Returns true if this context is the current context.
+    fn is_current(&self) -> bool;
+
+    /// Make this context current.
+    fn make_current(&mut self);
 }
 
 /// Whether window should close or not.
