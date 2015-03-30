@@ -20,7 +20,7 @@ pub trait UpdateEvent: Sized + Reflect {
     }
 }
 
-impl<T> UpdateEvent for T where T: GenericEvent + Reflect {
+impl<T> UpdateEvent for T where T: GenericEvent {
     fn from_update_args(args: &UpdateArgs) -> Option<Self> {
         let id = TypeId::of::<Box<UpdateEvent>>();
         GenericEvent::from_args(id, args as &Any)
