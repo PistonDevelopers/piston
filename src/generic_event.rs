@@ -2,6 +2,7 @@
 
 use std::borrow::ToOwned;
 use std::any::{ Any, TypeId };
+use std::marker::Reflect;
 
 use input::{ Button, Input, Motion };
 use {
@@ -25,7 +26,7 @@ use {
 };
 
 /// Implemented by all events
-pub trait GenericEvent {
+pub trait GenericEvent: Reflect {
     /// The id of this event, `TypeOf::of::<Box<EventTrait>>()`
     fn event_id(&self) -> TypeId;
     /// Calls closure with table
