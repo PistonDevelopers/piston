@@ -12,6 +12,8 @@ use std::thread::sleep;
 use std::time::duration::Duration;
 use std::cmp;
 use std::marker::PhantomData;
+use std::cell::RefCell;
+use std::rc::Rc;
 use window::Window;
 
 /// Render arguments
@@ -115,7 +117,7 @@ pub struct Events<W, E>
         W: Window,
         E: EventMap<<W as Window>::Event>
 {
-    window: W,
+    window: Rc<RefCell<W>>,
     state: State,
     last_update: u64,
     last_frame: u64,
@@ -138,7 +140,7 @@ impl<W, E> Events<W, E>
         E: EventMap<<W as Window>::Event>
 {
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new(window: W) -> Events<W, E> {
+    pub fn new(window: Rc<RefCell<W>>) -> Events<W, E> {
         let start = clock_ticks::precise_time_ns();
         let updates_per_second = DEFAULT_UPS;
         let max_frames_per_second = DEFAULT_MAX_FPS;
@@ -187,12 +189,12 @@ impl<W, E> Iterator for Events<W, E>
         loop {
             self.state = match self.state {
                 State::Render => {
-                    if self.window.should_close() { return None; }
+                    if self.window.borrow().should_close() { return None; }
 
                     let start_render = clock_ticks::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let size = self.window.size();
+                    let size = self.window.borrow().size();
                     let (w, h) = (size[0], size[1]);
                     if w != 0 && h != 0 {
                         // Swap buffers next time.
@@ -209,7 +211,7 @@ impl<W, E> Iterator for Events<W, E>
                     State::UpdateLoop(Idle::No)
                 }
                 State::SwapBuffers => {
-                    self.window.swap_buffers();
+                    self.window.borrow_mut().swap_buffers();
                     self.state = State::UpdateLoop(Idle::No);
                     return Some(EventMap::after_render(AfterRenderArgs));
                 }
@@ -219,7 +221,7 @@ impl<W, E> Iterator for Events<W, E>
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
                     if next_event > current_time {
-                        if let Some(x) = self.window.poll_event() {
+                        if let Some(x) = self.window.borrow_mut().poll_event() {
                             *idle = Idle::No;
                             return Some(EventMap::input(x));
                         } else if *idle == Idle::No {
@@ -237,7 +239,7 @@ impl<W, E> Iterator for Events<W, E>
                 }
                 State::HandleEvents => {
                     // Handle all events before updating.
-                    match self.window.poll_event() {
+                    match self.window.borrow_mut().poll_event() {
                         None => State::Update,
                         Some(x) => { return Some(EventMap::input(x)); },
                     }
