@@ -6,8 +6,6 @@
 #![feature(thread_sleep)]
 
 extern crate clock_ticks;
-#[macro_use]
-extern crate quack;
 extern crate window;
 
 use std::thread::sleep;
@@ -75,45 +73,6 @@ enum State {
     Update,
 }
 
-/// The number of updates per second
-///
-/// This is the fixed update rate on average over time.
-/// If the event loop lags, it will try to catch up.
-#[derive(Copy)]
-pub struct Ups(pub u64);
-
-quack_set! {
-    events: Events[W, E]
-    fn (ups: Ups) [
-        where
-            W: Window,
-            E: EventMap<<W as Window>::Event>
-    ] {
-        let frames = ups.0;
-        events.dt_update_in_ns = BILLION / frames;
-        events.dt = 1.0 / frames as f64;
-    }
-}
-
-/// The maximum number of frames per second
-///
-/// The frame rate can be lower because the
-/// next frame is always scheduled from the previous frame.
-/// This causes the frames to "slip" over time.
-#[derive(Copy)]
-pub struct MaxFps(pub u64);
-
-quack_set! {
-    this: Events[W, E]
-    fn (max_fps: MaxFps) [
-        where
-            W: Window,
-            E: EventMap<<W as Window>::Event>
-    ] {
-        this.dt_frame_in_ns = BILLION / max_fps.0;
-    }
-}
-
 /// An event loop iterator
 ///
 /// *Warning: Because the iterator polls events from the window back-end,
@@ -169,9 +128,9 @@ pub struct Events<W, E>
 static BILLION: u64 = 1_000_000_000;
 
 /// The default updates per second.
-pub const DEFAULT_UPS: Ups = Ups(120);
+pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
-pub const DEFAULT_MAX_FPS: MaxFps = MaxFps(60);
+pub const DEFAULT_MAX_FPS: u64 = 60;
 
 impl<W, E> Events<W, E>
     where
@@ -181,8 +140,8 @@ impl<W, E> Events<W, E>
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new(window: W) -> Events<W, E> {
         let start = clock_ticks::precise_time_ns();
-        let Ups(updates_per_second) = DEFAULT_UPS;
-        let MaxFps(max_frames_per_second) = DEFAULT_MAX_FPS;
+        let updates_per_second = DEFAULT_UPS;
+        let max_frames_per_second = DEFAULT_MAX_FPS;
         Events {
             window: window,
             state: State::Render,
@@ -193,6 +152,26 @@ impl<W, E> Events<W, E>
             dt: 1.0 / updates_per_second as f64,
             _marker_e: PhantomData,
         }
+    }
+
+    /// The number of updates per second
+    ///
+    /// This is the fixed update rate on average over time.
+    /// If the event loop lags, it will try to catch up.
+    pub fn ups(mut self, frames: u64) -> Self {
+        self.dt_update_in_ns = BILLION / frames;
+        self.dt = 1.0 / frames as f64;
+        self
+    }
+
+    /// The maximum number of frames per second
+    ///
+    /// The frame rate can be lower because the
+    /// next frame is always scheduled from the previous frame.
+    /// This causes the frames to "slip" over time.
+    pub fn max_fps(mut self, frames: u64) -> Self {
+        self.dt_frame_in_ns = BILLION / frames;
+        self
     }
 }
 

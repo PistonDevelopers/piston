@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-event_loop"
-version = "0.0.14"
+version = "0.0.15"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -19,10 +19,6 @@ homepage = "https://github.com/pistondevelopers/event_loop"
 
 name = "event_loop"
 path = "src/lib.rs"
-
-[dependencies.quack]
-git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.13"
 
 [dependencies.clock_ticks]
 git = "https://github.com/tomaka/clock_ticks"
