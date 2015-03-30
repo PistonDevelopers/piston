@@ -13,13 +13,13 @@ extern crate input;
 extern crate event_loop;
 extern crate window;
 
+use std::cell::RefCell;
+use std::rc::Rc;
 use window::Window;
 
 pub use event_loop as events;
 pub use events::{
     Events,
-    MaxFps,
-    Ups,
     UpdateArgs,
     RenderArgs,
     AfterRenderArgs,
@@ -52,7 +52,7 @@ mod resize;
 mod focus;
 
 /// Creates event iterator from window.
-pub fn events<W>(window: W) -> event_loop::Events<W, Event<<W as Window>::Event>>
+pub fn events<W>(window: Rc<RefCell<W>>) -> event_loop::Events<W, Event<<W as Window>::Event>>
     where
         W: Window,
 {
