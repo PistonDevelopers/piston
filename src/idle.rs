@@ -20,7 +20,7 @@ pub trait IdleEvent: Sized + Reflect {
     }
 }
 
-impl<T> IdleEvent for T where T: GenericEvent + Reflect {
+impl<T> IdleEvent for T where T: GenericEvent {
     fn from_idle_args(args: &IdleArgs) -> Option<Self> {
         let id = TypeId::of::<Box<IdleEvent>>();
         GenericEvent::from_args(id, args as &Any)
