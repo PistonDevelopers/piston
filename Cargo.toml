@@ -1,12 +1,12 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.0.13"
+version = "0.0.15"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
 ]
-keywords = ["window", "game"]
+keywords = ["window", "game", "piston"]
 description = "A library for window abstraction"
 license = "MIT"
 readme = "README.md"
@@ -20,7 +20,7 @@ path = "src/lib.rs"
 
 [dependencies.pistoncore-input]
 git = "https://github.com/pistondevelopers/input"
-#version = "0.0.5"
+#version = "0.0.7"
 
 [dependencies.quack]
 git = "https://github.com/pistondevelopers/quack"
