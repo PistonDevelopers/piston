@@ -20,13 +20,13 @@ path = "src/lib.rs"
 
 [dependencies.pistoncore-input]
 git = "https://github.com/PistonDevelopers/input"
-#version = "0.0.5"
+#version = "0.0.7"
 
 [dependencies.pistoncore-event_loop]
 git = "https://github.com/PistonDevelopers/event_loop"
-#version = "0.0.13"
+#version = "0.0.17"
 
 [dependencies.pistoncore-window]
 git = "https://github.com/PistonDevelopers/window"
-#version = "0.0.12"
+#version = "0.0.15"
 
