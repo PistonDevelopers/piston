@@ -11,6 +11,9 @@ extern crate quack;
 use input::Input;
 use quack::{ ActOn, Action, Associative, Get, GetFrom, Pair };
 
+/// The type of an OpenGL function address.
+pub type ProcAddress = *const libc::c_void;
+
 /// Required to use the event loop.
 pub trait Window {
     /// The event type emitted by `poll_event`
@@ -69,7 +72,7 @@ impl<T> Window for T
 /// Trait for OpenGL specific operations.
 pub trait OpenGLWindow: Window {
     /// Returns the address of an OpenGL function if it exist, else returns null pointer.
-    fn get_proc_address(&mut self, proc_name: &str) -> *const libc::c_void;
+    fn get_proc_address(&mut self, proc_name: &str) -> ProcAddress;
 
     /// Returns true if this context is the current context.
     fn is_current(&self) -> bool;
