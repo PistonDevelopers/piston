@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn test_mouse_button_primitives() {
-        use std::num::{ FromPrimitive, ToPrimitive };
+        use num::{ FromPrimitive, ToPrimitive };
 
         for i in 0u64..9 {
             let button: MouseButton = FromPrimitive::from_u64(i).unwrap();
