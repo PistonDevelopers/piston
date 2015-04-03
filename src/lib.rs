@@ -2,14 +2,11 @@
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(std_misc)]
-#![feature(thread_sleep)]
 
 extern crate clock_ticks;
 extern crate window;
 
-use std::thread::sleep;
-use std::time::duration::Duration;
+use std::thread::sleep_ms;
 use std::cmp;
 use std::marker::PhantomData;
 use std::cell::RefCell;
@@ -60,13 +57,13 @@ pub trait EventMap<I> {
 }
 
 /// Tells whether last emitted event was idle or not.
-#[derive(Copy, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Idle {
     No,
     Yes
 }
 
-#[derive(Copy, Debug)]
+#[derive(Copy, Clone, Debug)]
 enum State {
     Render,
     SwapBuffers,
@@ -128,6 +125,10 @@ pub struct Events<W, E>
 }
 
 static BILLION: u64 = 1_000_000_000;
+
+fn ns_to_ms(ns: u64) -> u32 {
+    (ns / 1_000_000) as u32
+}
 
 /// The default updates per second.
 pub const DEFAULT_UPS: u64 = 120;
@@ -195,16 +196,15 @@ impl<W, E> Iterator for Events<W, E>
                     self.last_frame = start_render;
 
                     let size = self.window.borrow().size();
-                    let (w, h) = (size[0], size[1]);
-                    if w != 0 && h != 0 {
+                    if size.width != 0 && size.height != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
                         return Some(EventMap::render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: (start_render - self.last_update) as f64
                                     / BILLION as f64,
-                            width: w,
-                            height: h,
+                            width: size.width,
+                            height: size.height,
                         }));
                     }
 
@@ -229,7 +229,7 @@ impl<W, E> Iterator for Events<W, E>
                             let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
                             return Some(EventMap::idle(IdleArgs { dt: seconds }))
                         }
-                        sleep( Duration::nanoseconds((next_event - current_time) as i64) );
+                        sleep_ms(ns_to_ms(next_event - current_time));
                         State::UpdateLoop(Idle::No)
                     } else if next_event == next_frame {
                         State::Render
