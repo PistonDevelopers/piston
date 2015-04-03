@@ -5,14 +5,20 @@
 
 extern crate libc;
 extern crate input;
-#[macro_use]
-extern crate quack;
 
 use input::Input;
-use quack::{ ActOn, Action, Associative, Get, GetFrom, Pair };
 
 /// The type of an OpenGL function address.
 pub type ProcAddress = *const libc::c_void;
+
+/// Size in pixels.
+#[derive(Copy, Clone)]
+pub struct Size {
+    /// The width in pixels.
+    pub width: u32,
+    /// The height in pixels.
+    pub height: u32,
+}
 
 /// Required to use the event loop.
 pub trait Window {
@@ -23,7 +29,7 @@ pub trait Window {
     fn should_close(&self) -> bool;
 
     /// Gets the size of the window in user coordinates.
-    fn size(&self) -> [u32; 2];
+    fn size(&self) -> Size;
 
     /// Swaps render buffers.
     fn swap_buffers(&mut self);
@@ -32,41 +38,47 @@ pub trait Window {
     fn poll_event(&mut self) -> Option<Self::Event>;
 }
 
-impl<T> Window for T
-    where
-        (PollEvent, T): Pair<Data = PollEvent, Object = T>
-            + Associative
-            + ActOn<Result = Option<<(PollEvent, T) as quack::Associative>::Type>>,
-        (ShouldClose, T): Pair<Data = ShouldClose, Object = T>
-            + GetFrom,
-        (SwapBuffers, T): Pair<Data = SwapBuffers, Object = T>
-            + ActOn,
-        (Size, T): Pair<Data = Size, Object = T>
-            + GetFrom
-{
-    type Event = <(PollEvent, T) as Associative>::Type;
+/// Implemented by fully supported window back-ends.
+pub trait AdvancedWindow: Window + Sized {
+    /// Gets a copy of the title of the window.
+    fn get_title(&self) -> String;
 
-    #[inline(always)]
-    fn should_close(&self) -> bool {
-        let ShouldClose(val) = self.get();
-        val
+    /// Sets the title of the window.
+    fn set_title(&mut self, value: String);
+
+    /// Sets title on window.
+    fn title(mut self, value: String) -> Self {
+        self.set_title(value);
+        self
     }
 
-    #[inline(always)]
-    fn size(&self) -> [u32; 2] {
-        let Size(size) = self.get();
-        size
+    /// Gets whether to exit when pressing esc.
+    fn get_exit_on_esc(&self) -> bool;
+
+    /// Sets whether to exit when pressing esc.
+    fn set_exit_on_esc(&mut self, value: bool);
+
+    /// Sets whether to exit when pressing esc.
+    fn exit_on_esc(mut self, value: bool) -> Self {
+        self.set_exit_on_esc(value);
+        self
     }
 
-    #[inline(always)]
-    fn swap_buffers(&mut self) {
-        self.action(SwapBuffers);
+    /// Sets whether to capture/grab cursor.
+    /// This is used to lock and hide cursor to the window,
+    /// for example in a first-person shooter game.
+    fn set_capture_cursor(&mut self, value: bool);
+
+    /// Sets whether to capture/grab cursor (see `set_capture_cursor`).
+    fn capture_cursor(mut self, value: bool) -> Self {
+        self.set_capture_cursor(value);
+        self
     }
 
-    #[inline(always)]
-    fn poll_event(&mut self) -> Option<<Self as Window>::Event> {
-        self.action(PollEvent)
-    }
+    /// Gets draw size of the window.
+    /// This is equal to the size of the frame buffer of the inner window,
+    /// excluding the title bar and borders.
+    fn draw_size(&self) -> Size;
 }
 
 /// Trait for OpenGL specific operations.
@@ -81,86 +93,63 @@ pub trait OpenGLWindow: Window {
     fn make_current(&mut self);
 }
 
-/// Whether window should close or not.
-#[derive(Copy)]
-pub struct ShouldClose(pub bool);
-
-/// The size of the window.
-#[derive(Copy)]
-pub struct Size(pub [u32; 2]);
-
-/// Tells window to swap buffers.
-///
-/// ~~~ignore
-/// use current::Action;
-///
-/// ...
-/// window.action(SwapBuffers);
-/// ~~~
-#[derive(Copy)]
-pub struct SwapBuffers;
-
-/// Polls event from window.
-///
-/// ~~~ignore
-/// use current::Action;
-///
-/// ...
-/// let e = window.action(PollEvent);
-/// ~~~
-#[derive(Copy)]
-pub struct PollEvent;
-
-/// The title of the window.
-pub struct Title(pub String);
-
-/// The anti-aliasing samples when rendering.
-#[derive(Copy)]
-pub struct Samples(pub u8);
-
-/// Whether window is opened in full screen mode.
-#[derive(Copy)]
-pub struct Fullscreen(pub bool);
-
-/// Whether to exit when pressing the Esc keyboard button.
-#[derive(Copy)]
-pub struct ExitOnEsc(pub bool);
-
-/// Whether to capture the mouse cursor.
-#[derive(Copy)]
-pub struct CaptureCursor(pub bool);
-
-/// The draw size of the window.
-#[derive(Copy)]
-pub struct DrawSize(pub [u32; 2]);
-
 /// Settings for window behavior.
 pub struct WindowSettings {
     /// Title of the window.
-    pub title: String,
+    title: String,
     /// The size of the window.
-    pub size: [u32; 2],
+    size: Size,
     /// Number samples per pixel (anti-aliasing).
-    pub samples: u8,
+    samples: u8,
     /// If true, the window is fullscreen.
-    pub fullscreen: bool,
+    fullscreen: bool,
     /// If true, exit when pressing Esc.
-    pub exit_on_esc: bool,
+    exit_on_esc: bool,
 }
 
 impl WindowSettings {
-    /// Gets default settings.
-    ///
-    /// This exits the window when pressing `Esc`.
-    /// The background color is set to black.
-    pub fn default() -> WindowSettings {
+    /// Creates window settings with defaults.
+    /// - samples: 0
+    /// - fullscreen: false
+    /// - exit_on_esc: false
+    pub fn new(title: String, size: Size) -> WindowSettings {
         WindowSettings {
-            title: "Piston".to_string(),
-            size: [640, 480],
+            title: title,
+            size: size,
             samples: 0,
             fullscreen: false,
-            exit_on_esc: true,
+            exit_on_esc: false,
         }
+    }
+
+    /// Sets title.
+    pub fn title(mut self, value: String) -> Self {
+        self.title = value;
+        self
+    }
+
+    /// Sets size.
+    pub fn size(mut self, value: Size) -> Self {
+        self.size = value;
+        self
+    }
+
+    /// Sets fullscreen.
+    pub fn fullscreen(mut self, value: bool) -> Self {
+        self.fullscreen = value;
+        self
+    }
+
+    /// Sets exit on esc.
+    pub fn exit_on_esc(mut self, value: bool) -> Self {
+        self.exit_on_esc = value;
+        self
+    }
+
+    /// Sets samples.
+    pub fn samples(mut self, value: u8) -> Self {
+        self.samples = value;
+        self
     }
 }
 
@@ -181,27 +170,19 @@ impl NoWindow {
     }
 }
 
-quack! {
-_window: NoWindow[]
-get:
-    fn () -> ShouldClose [] { ShouldClose(_window.should_close) }
-    fn () -> Size [] { Size([0, 0]) }
-    fn () -> DrawSize [] {
-        let Size(val) = _window.get();
-        DrawSize(val)
-    }
-    fn () -> Title [] { Title(_window.title.clone()) }
-    fn () -> ExitOnEsc [] { ExitOnEsc(false) }
-set:
-    fn (__: CaptureCursor) [] {}
-    fn (val: ShouldClose) [] { _window.should_close = val.0 }
-    fn (val: Title) [] { _window.title = val.0; }
-    fn (__: ExitOnEsc) [] {}
-action:
-    fn (__: SwapBuffers) -> () [] {}
-    fn (__: PollEvent) -> Option<Input> [] { None }
+impl Window for NoWindow {
+    type Event = Input;
+    fn should_close(&self) -> bool { self.should_close }
+    fn size(&self) -> Size { Size { width: 0, height: 0 } }
+    fn swap_buffers(&mut self) {}
+    fn poll_event(&mut self) -> Option<Input> { None }
 }
 
-impl Associative for (PollEvent, NoWindow) {
-    type Type = Input;
+impl AdvancedWindow for NoWindow {
+    fn get_title(&self) -> String { self.title.clone() }
+    fn set_title(&mut self, value: String) { self.title = value; }
+    fn get_exit_on_esc(&self) -> bool { false }
+    fn set_exit_on_esc(&mut self, _value: bool) {}
+    fn set_capture_cursor(&mut self, _value: bool) {}
+    fn draw_size(&self) -> Size { self.size() }
 }

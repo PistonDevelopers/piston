@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.0.15"
+version = "0.1.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
@@ -21,10 +21,6 @@ path = "src/lib.rs"
 [dependencies.pistoncore-input]
 git = "https://github.com/pistondevelopers/input"
 #version = "0.0.7"
-
-[dependencies.quack]
-git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.13"
 
 [dependencies]
 libc = "0.1"
