@@ -1,7 +1,7 @@
 
 //! Back-end agnostic mouse buttons.
 
-use std::num::{ FromPrimitive, ToPrimitive };
+use num::{ FromPrimitive, ToPrimitive };
 
 /// Represent a mouse button.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
@@ -49,7 +49,7 @@ impl FromPrimitive for MouseButton {
     }
 
     #[inline(always)]
-    fn from_int(n: isize) -> Option<MouseButton> {
+    fn from_isize(n: isize) -> Option<MouseButton> {
         FromPrimitive::from_u64(n as u64)
     }
 }
@@ -75,7 +75,7 @@ impl ToPrimitive for MouseButton {
     }
 
     #[inline(always)]
-    fn to_int(&self) -> Option<isize> {
+    fn to_isize(&self) -> Option<isize> {
         self.to_u64().map(|x| x as isize)
     }
 }

@@ -1,7 +1,7 @@
 //! Back-end agnostic keyboard keys.
 
-use std::num::FromPrimitive;
-use std::num::ToPrimitive;
+use num::FromPrimitive;
+use num::ToPrimitive;
 use std::default::Default;
 use std::cmp::Ordering;
 
@@ -363,7 +363,7 @@ impl ToPrimitive for Key {
     }
 
     #[inline(always)]
-    fn to_int(&self) -> Option<isize> {
+    fn to_isize(&self) -> Option<isize> {
         Some(self.code() as isize)
     }
 }
@@ -618,7 +618,7 @@ impl FromPrimitive for Key {
     }
 
     #[inline(always)]
-    fn from_int(n: isize) -> Option<Key> {
+    fn from_isize(n: isize) -> Option<Key> {
         FromPrimitive::from_u64(n as u64)
     }
 }
