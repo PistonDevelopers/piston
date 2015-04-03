@@ -1,7 +1,6 @@
 #![crate_name = "input"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(core)]
 
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
@@ -9,6 +8,7 @@
 #[macro_use]
 extern crate bitflags;
 extern crate rustc_serialize;
+extern crate num;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
