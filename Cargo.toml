@@ -1,7 +1,7 @@
 [package]
 
 name = "piston"
-version = "0.0.8"
+version = "0.1.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -37,8 +37,3 @@ git = "https://github.com/pistondevelopers/event"
 [dependencies.pistoncore-window]
 git = "https://github.com/pistondevelopers/window"
 #version = "0.0.12"
-
-[dependencies.quack]
-git = "https://github.com/pistondevelopers/quack"
-#version = "0.0.13"
-
