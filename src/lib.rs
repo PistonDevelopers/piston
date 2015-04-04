@@ -122,11 +122,17 @@ impl WindowSettings {
         }
     }
 
+    /// Gets title.
+    pub fn get_title(&self) -> String { self.title.clone() }
+
     /// Sets title.
     pub fn title(mut self, value: String) -> Self {
         self.title = value;
         self
     }
+
+    /// Gets size.
+    pub fn get_size(&self) -> Size { self.size }
 
     /// Sets size.
     pub fn size(mut self, value: Size) -> Self {
@@ -134,17 +140,26 @@ impl WindowSettings {
         self
     }
 
+    /// Gets fullscreen.
+    pub fn get_fullscreen(&self) -> bool { self.fullscreen }
+
     /// Sets fullscreen.
     pub fn fullscreen(mut self, value: bool) -> Self {
         self.fullscreen = value;
         self
     }
 
+    /// Gets exit on esc.
+    pub fn get_exit_on_esc(&self) -> bool { self.exit_on_esc }
+
     /// Sets exit on esc.
     pub fn exit_on_esc(mut self, value: bool) -> Self {
         self.exit_on_esc = value;
         self
     }
+
+    /// Gets samples.
+    pub fn get_samples(&self) -> u8 { self.samples }
 
     /// Sets samples.
     pub fn samples(mut self, value: u8) -> Self {
