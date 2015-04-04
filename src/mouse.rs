@@ -1,6 +1,6 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
-use GenericEvent;
+use { GenericEvent, MOUSE_SCROLL, MOUSE_RELATIVE, MOUSE_CURSOR };
 
 /// The position of the mouse cursor
 pub trait MouseCursorEvent {
@@ -17,15 +17,13 @@ pub trait MouseCursorEvent {
 
 impl<T: GenericEvent> MouseCursorEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        let id = TypeId::of::<Box<MouseCursorEvent>>();
-        GenericEvent::from_args(id, &(x, y) as &Any)
+        GenericEvent::from_args(MOUSE_CURSOR, &(x, y) as &Any)
     }
 
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = TypeId::of::<Box<MouseCursorEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != MOUSE_CURSOR {
             return None;
         }
         self.with_args(|any| {
@@ -53,15 +51,13 @@ pub trait MouseRelativeEvent {
 
 impl<T: GenericEvent> MouseRelativeEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        let id = TypeId::of::<Box<MouseRelativeEvent>>();
-        GenericEvent::from_args(id, &(x, y) as &Any)
+        GenericEvent::from_args(MOUSE_RELATIVE, &(x, y) as &Any)
     }
 
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = TypeId::of::<Box<MouseRelativeEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != MOUSE_RELATIVE {
             return None;
         }
         self.with_args(|any| {
@@ -89,9 +85,8 @@ pub trait MouseScrollEvent {
 
 impl<T: GenericEvent> MouseScrollEvent for T {
     fn from_xy(x: f64, y: f64) -> Option<Self> {
-        let id = TypeId::of::<Box<MouseScrollEvent>>();
         GenericEvent::from_args(
-            id,
+            MOUSE_SCROLL,
             &(x, y) as &Any
         )
     }
@@ -99,8 +94,7 @@ impl<T: GenericEvent> MouseScrollEvent for T {
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        let id = TypeId::of::<Box<MouseScrollEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != MOUSE_SCROLL {
             return None;
         }
         self.with_args(|any| {

@@ -1,7 +1,8 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
 use GenericEvent;
 use AfterRenderArgs;
+use AFTER_RENDER;
 
 /// After rendering and buffers are swapped.
 pub trait AfterRenderEvent {
@@ -18,15 +19,13 @@ pub trait AfterRenderEvent {
 
 impl<T: GenericEvent> AfterRenderEvent for T {
     fn from_after_render_args(args: &AfterRenderArgs) -> Option<Self> {
-        let id = TypeId::of::<Box<AfterRenderEvent>>();
-        GenericEvent::from_args(id, args as &Any)
+        GenericEvent::from_args(AFTER_RENDER, args as &Any)
     }
 
     fn after_render<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&AfterRenderArgs) -> U
     {
-        let id = TypeId::of::<Box<AfterRenderEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != AFTER_RENDER {
             return None;
         }
         self.with_args(|any| {

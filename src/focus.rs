@@ -1,6 +1,6 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
-use GenericEvent;
+use { GenericEvent, FOCUS };
 
 /// When window gets or looses focus
 pub trait FocusEvent {
@@ -17,15 +17,13 @@ pub trait FocusEvent {
 
 impl<T: GenericEvent> FocusEvent for T {
     fn from_focused(focused: bool) -> Option<Self> {
-        let id = TypeId::of::<Box<FocusEvent>>();
-        GenericEvent::from_args(id, &focused as &Any)
+        GenericEvent::from_args(FOCUS, &focused as &Any)
     }
 
     fn focus<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
-        let id = TypeId::of::<Box<FocusEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != FOCUS {
             return None;
         }
         self.with_args(|any| {

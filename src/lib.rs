@@ -4,7 +4,6 @@
 #![crate_name = "event"]
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
-#![feature(core)]
 #![cfg_attr(test, feature(test))]
 
 #[cfg(test)]
@@ -50,6 +49,23 @@ mod mouse;
 mod text;
 mod resize;
 mod focus;
+
+/// Used to identify events arguments provided by traits.
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub struct EventId(pub &'static str);
+
+const FOCUS: EventId = EventId("piston/focus");
+const RESIZE: EventId = EventId("piston/resize");
+const TEXT: EventId = EventId("piston/text");
+const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
+const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
+const MOUSE_CURSOR: EventId = EventId("piston/mouse_cursor");
+const RELEASE: EventId = EventId("piston/release");
+const PRESS: EventId = EventId("piston/press");
+const IDLE: EventId = EventId("piston/idle");
+const AFTER_RENDER: EventId = EventId("piston/after_render");
+const RENDER: EventId = EventId("piston/render");
+const UPDATE: EventId = EventId("piston/update");
 
 /// Creates event iterator from window.
 pub fn events<W>(window: Rc<RefCell<W>>) -> event_loop::Events<W, Event<<W as Window>::Event>>

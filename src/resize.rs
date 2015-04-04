@@ -1,6 +1,6 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
-use GenericEvent;
+use { GenericEvent, RESIZE };
 
 /// When the window is resized
 pub trait ResizeEvent {
@@ -17,15 +17,13 @@ pub trait ResizeEvent {
 
 impl<T: GenericEvent> ResizeEvent for T {
     fn from_width_height(w: u32, h: u32) -> Option<Self> {
-        let id = TypeId::of::<Box<ResizeEvent>>();
-        GenericEvent::from_args(id, &(w, h) as &Any)
+        GenericEvent::from_args(RESIZE, &(w, h) as &Any)
     }
 
     fn resize<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(u32, u32) -> U
     {
-        let id = TypeId::of::<Box<ResizeEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != RESIZE {
             return None;
         }
         self.with_args(|any| {
