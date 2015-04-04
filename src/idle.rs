@@ -1,10 +1,9 @@
-use std::any::{ Any, TypeId };
-use std::marker::Reflect;
+use std::any::Any;
 
-use { GenericEvent, IdleArgs };
+use { GenericEvent, IdleArgs, IDLE };
 
 /// When background tasks should be performed
-pub trait IdleEvent: Sized + Reflect {
+pub trait IdleEvent: Sized {
     /// Creates an idle event.
     fn from_idle_args(args: &IdleArgs) -> Option<Self>;
     /// Creates an update event with delta time.
@@ -22,15 +21,13 @@ pub trait IdleEvent: Sized + Reflect {
 
 impl<T> IdleEvent for T where T: GenericEvent {
     fn from_idle_args(args: &IdleArgs) -> Option<Self> {
-        let id = TypeId::of::<Box<IdleEvent>>();
-        GenericEvent::from_args(id, args as &Any)
+        GenericEvent::from_args(IDLE, args as &Any)
     }
 
     fn idle<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&IdleArgs) -> U
     {
-        let id = TypeId::of::<Box<IdleEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != IDLE {
             return None;
         }
         self.with_args(|any| {

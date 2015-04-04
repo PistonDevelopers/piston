@@ -1,7 +1,7 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
 use input::Button;
-use GenericEvent;
+use { GenericEvent, RELEASE };
 
 /// The release of a button
 pub trait ReleaseEvent {
@@ -18,15 +18,13 @@ pub trait ReleaseEvent {
 
 impl<T: GenericEvent> ReleaseEvent for T {
     fn from_button(button: Button) -> Option<Self> {
-        let id = TypeId::of::<Box<ReleaseEvent>>();
-        GenericEvent::from_args(id, &button as &Any)
+        GenericEvent::from_args(RELEASE, &button as &Any)
     }
 
     fn release<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(Button) -> U
     {
-        let id = TypeId::of::<Box<ReleaseEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != RELEASE {
             return None;
         }
         self.with_args(|any| {

@@ -1,7 +1,7 @@
 use std::borrow::ToOwned;
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
-use GenericEvent;
+use { GenericEvent, TEXT };
 
 /// When receiving text from user, such as typing a character
 pub trait TextEvent {
@@ -18,15 +18,13 @@ pub trait TextEvent {
 
 impl<T: GenericEvent> TextEvent for T {
     fn from_text(text: &str) -> Option<Self> {
-        let id = TypeId::of::<Box<TextEvent>>();
-        GenericEvent::from_args(id, &text.to_owned() as &Any)
+        GenericEvent::from_args(TEXT, &text.to_owned() as &Any)
     }
 
     fn text<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&str) -> U
     {
-        let id = TypeId::of::<Box<TextEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != TEXT {
             return None;
         }
         self.with_args(|any| {

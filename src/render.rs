@@ -1,7 +1,6 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
-use GenericEvent;
-use RenderArgs;
+use { GenericEvent, RenderArgs, RENDER };
 
 /// When the next frame should be rendered
 pub trait RenderEvent {
@@ -18,15 +17,13 @@ pub trait RenderEvent {
 
 impl<T: GenericEvent> RenderEvent for T {
     fn from_render_args(args: &RenderArgs) -> Option<Self> {
-        let id = TypeId::of::<Box<RenderEvent>>();
-        GenericEvent::from_args(id, args as &Any)
+        GenericEvent::from_args(RENDER, args as &Any)
     }
 
     fn render<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&RenderArgs) -> U
     {
-        let id = TypeId::of::<Box<RenderEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != RENDER {
             return None;
         }
         self.with_args(|any| {

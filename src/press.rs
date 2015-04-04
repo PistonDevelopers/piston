@@ -1,7 +1,7 @@
-use std::any::{ Any, TypeId };
+use std::any::Any;
 
 use input::Button;
-use GenericEvent;
+use { GenericEvent, PRESS };
 
 /// The press of a button
 pub trait PressEvent {
@@ -18,15 +18,13 @@ pub trait PressEvent {
 
 impl<T: GenericEvent> PressEvent for T {
     fn from_button(button: Button) -> Option<Self> {
-        let id = TypeId::of::<Box<PressEvent>>();
-        GenericEvent::from_args(id, &button as &Any)
+        GenericEvent::from_args(PRESS, &button as &Any)
     }
 
     fn press<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(Button) -> U
     {
-        let id = TypeId::of::<Box<PressEvent>>();
-        if self.event_id() != id {
+        if self.event_id() != PRESS {
             return None;
         }
         self.with_args(|any| {
