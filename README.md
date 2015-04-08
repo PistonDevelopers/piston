@@ -10,7 +10,7 @@ Maintainers: @bvssvni
 
 [List of games made with Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
 
-[Piston online docs](http://www.rustdox.com/PistonDevelopers/piston/piston/)
+[Piston online docs](http://www.piston.rs/docs/piston/piston/index.html)
 
 [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 
