@@ -1,1 +1,6 @@
 language: rust
+script:
+  - cargo build -v
+  - cargo doc -v
+after_success:
+  - curl https://raw.githubusercontent.com/PistonDevelopers/docs/gh-pages/travis-doc-upload.sh | sh
