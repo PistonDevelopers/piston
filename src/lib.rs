@@ -13,4 +13,3 @@ pub use input_lib as input;
 pub use event_lib as event;
 pub use window_lib as window;
 
-pub use event::events;
