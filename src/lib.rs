@@ -121,6 +121,7 @@ pub struct Events<W, E>
     dt_update_in_ns: u64,
     dt_frame_in_ns: u64,
     dt: f64,
+    swap_buffers: bool,
     _marker_e: PhantomData<E>,
 }
 
@@ -153,6 +154,7 @@ impl<W, E> Events<W, E>
             dt_update_in_ns: BILLION / updates_per_second,
             dt_frame_in_ns: BILLION / max_frames_per_second,
             dt: 1.0 / updates_per_second as f64,
+            swap_buffers: true,
             _marker_e: PhantomData,
         }
     }
@@ -174,6 +176,12 @@ impl<W, E> Events<W, E>
     /// This causes the frames to "slip" over time.
     pub fn max_fps(mut self, frames: u64) -> Self {
         self.dt_frame_in_ns = BILLION / frames;
+        self
+    }
+
+    /// Enable or disable automatic swapping of buffers.
+    pub fn swap_buffers(mut self, enable: bool) -> Self {
+        self.swap_buffers = enable;
         self
     }
 }
@@ -211,9 +219,13 @@ impl<W, E> Iterator for Events<W, E>
                     State::UpdateLoop(Idle::No)
                 }
                 State::SwapBuffers => {
-                    self.window.borrow_mut().swap_buffers();
-                    self.state = State::UpdateLoop(Idle::No);
-                    return Some(EventMap::after_render(AfterRenderArgs));
+                    if self.swap_buffers {
+                        self.window.borrow_mut().swap_buffers();
+                        self.state = State::UpdateLoop(Idle::No);
+                        return Some(EventMap::after_render(AfterRenderArgs));
+                    } else {
+                        State::UpdateLoop(Idle::No)
+                    }
                 }
                 State::UpdateLoop(ref mut idle) => {
                     let current_time = clock_ticks::precise_time_ns();
