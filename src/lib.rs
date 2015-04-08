@@ -18,7 +18,6 @@ use window::Window;
 
 pub use event_loop as events;
 pub use events::{
-    Events,
     UpdateArgs,
     RenderArgs,
     AfterRenderArgs,
@@ -67,10 +66,14 @@ const AFTER_RENDER: EventId = EventId("piston/after_render");
 const RENDER: EventId = EventId("piston/render");
 const UPDATE: EventId = EventId("piston/update");
 
-/// Creates event iterator from window.
-pub fn events<W>(window: Rc<RefCell<W>>) -> event_loop::Events<W, Event<<W as Window>::Event>>
-    where
-        W: Window,
-{
-    event_loop::Events::new(window)
+/// A trait for create event iterator from window.
+pub trait Events<W> where W: Window {
+    /// Creates event iterator from window.
+    fn events(self) -> events::Events<W, Event<W::Event>>;
+}
+
+impl<W> Events<W> for Rc<RefCell<W>> where W: Window {
+    fn events(self) -> events::Events<W, Event<W::Event>> {
+        events::Events::new(self)
+    }
 }
