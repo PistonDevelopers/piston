@@ -77,3 +77,9 @@ impl<W> Events<W> for Rc<RefCell<W>> where W: Window {
         events::Events::new(self)
     }
 }
+
+impl<W: Window> Events<W> for W {
+    fn events(self) -> events::Events<W, Event<W::Event>> {
+        Rc::new(RefCell::new(self)).events()
+    }
+}
