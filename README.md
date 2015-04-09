@@ -30,7 +30,7 @@ Almost all projects written in Rust use the Cargo package manager.
 2. Open the Terminal window and type:
 
 ```
-cargo new --git --bin "mygame"
+cargo new --vcs git --bin "mygame"
 ```
 
 This will create a new folder "mygame" that contains a `Cargo.toml` and a folder `src`.
