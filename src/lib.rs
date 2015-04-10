@@ -78,8 +78,14 @@ impl<W> Events<W> for Rc<RefCell<W>> where W: Window {
     }
 }
 
-impl<W: Window> Events<W> for W {
+impl<W> Events<W> for W where W: Window {
     fn events(self) -> events::Events<W, Event<W::Event>> {
         Rc::new(RefCell::new(self)).events()
+    }
+}
+
+impl<'a, W> Events<W> for &'a Rc<RefCell<W>> where W: Window {
+    fn events(self) -> events::Events<W, Event<W::Event>> {
+        self.clone().events()
     }
 }
