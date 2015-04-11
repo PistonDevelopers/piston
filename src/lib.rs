@@ -18,10 +18,14 @@ use window::Window;
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
-    /// The width of rendered area.
+    /// The width of rendered area in points.
     pub width: u32,
-    /// The height of rendered area.
+    /// The height of rendered area in points.
     pub height: u32,
+    /// The width of rendered area in pixels.
+    pub draw_width: u32,
+    /// The height of rendered area in pixels.
+    pub draw_height: u32,
 }
 
 /// After render arguments.
@@ -198,12 +202,14 @@ impl<W, E> Iterator for Events<W, E>
         loop {
             self.state = match self.state {
                 State::Render => {
-                    if self.window.borrow().should_close() { return None; }
+                    let window = self.window.borrow();
+                    if window.should_close() { return None; }
 
                     let start_render = clock_ticks::precise_time_ns();
                     self.last_frame = start_render;
 
-                    let size = self.window.borrow().size();
+                    let size = window.size();
+                    let draw_size = window.draw_size();
                     if size.width != 0 && size.height != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
@@ -213,6 +219,8 @@ impl<W, E> Iterator for Events<W, E>
                                     / BILLION as f64,
                             width: size.width,
                             height: size.height,
+                            draw_width: draw_size.width,
+                            draw_height: draw_size.height,
                         }));
                     }
 
