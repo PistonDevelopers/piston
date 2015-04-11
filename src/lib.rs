@@ -5,6 +5,7 @@
 
 extern crate clock_ticks;
 extern crate window;
+extern crate viewport;
 
 use std::thread::sleep_ms;
 use std::cmp;
@@ -12,6 +13,7 @@ use std::marker::PhantomData;
 use std::cell::RefCell;
 use std::rc::Rc;
 use window::Window;
+use viewport::Viewport;
 
 /// Render arguments
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -26,6 +28,17 @@ pub struct RenderArgs {
     pub draw_width: u32,
     /// The height of rendered area in pixels.
     pub draw_height: u32,
+}
+
+impl RenderArgs {
+    /// Returns viewport information filling entire render area.
+    pub fn viewport(&self) -> Viewport {
+        Viewport {
+            rect: [0, 0, self.draw_width as i32, self.draw_height as i32],
+            window_size: [self.width, self.height],
+            draw_size: [self.draw_width, self.draw_height],
+        }
+    }
 }
 
 /// After render arguments.
