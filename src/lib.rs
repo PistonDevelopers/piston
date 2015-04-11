@@ -36,6 +36,11 @@ pub trait Window {
 
     /// Polls event from window.
     fn poll_event(&mut self) -> Option<Self::Event>;
+
+    /// Gets draw size of the window.
+    /// This is equal to the size of the frame buffer of the inner window,
+    /// excluding the title bar and borders.
+    fn draw_size(&self) -> Size;
 }
 
 /// Implemented by fully supported window back-ends.
@@ -74,11 +79,6 @@ pub trait AdvancedWindow: Window + Sized {
         self.set_capture_cursor(value);
         self
     }
-
-    /// Gets draw size of the window.
-    /// This is equal to the size of the frame buffer of the inner window,
-    /// excluding the title bar and borders.
-    fn draw_size(&self) -> Size;
 }
 
 /// Trait for OpenGL specific operations.
@@ -191,6 +191,7 @@ impl Window for NoWindow {
     fn size(&self) -> Size { Size { width: 0, height: 0 } }
     fn swap_buffers(&mut self) {}
     fn poll_event(&mut self) -> Option<Input> { None }
+    fn draw_size(&self) -> Size { self.size() }
 }
 
 impl AdvancedWindow for NoWindow {
@@ -199,5 +200,4 @@ impl AdvancedWindow for NoWindow {
     fn get_exit_on_esc(&self) -> bool { false }
     fn set_exit_on_esc(&mut self, _value: bool) {}
     fn set_capture_cursor(&mut self, _value: bool) {}
-    fn draw_size(&self) -> Size { self.size() }
 }
