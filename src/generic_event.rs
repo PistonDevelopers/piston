@@ -34,7 +34,7 @@ pub trait GenericEvent {
         where F: FnMut(&Any) -> U
     ;
     /// Converts from table to `Self`
-    fn from_args(event_id: EventId, any: &Any) -> Option<Self>;
+    fn from_args(event_id: EventId, any: &Any, old_event: &Self) -> Option<Self>;
 }
 
 impl GenericEvent for Input {
@@ -82,7 +82,7 @@ impl GenericEvent for Input {
         }
     }
 
-    fn from_args(event_id: EventId, any: &Any) -> Option<Self> {
+    fn from_args(event_id: EventId, any: &Any, _old_event: &Self) -> Option<Self> {
         match event_id {
             x if x == FOCUS => {
                 if let Some(&focused) = any.downcast_ref::<bool>() {
@@ -180,7 +180,7 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
         }
     }
 
-    fn from_args(event_id: EventId, any: &Any) -> Option<Self> {
+    fn from_args(event_id: EventId, any: &Any, old_event: &Self) -> Option<Self> {
         match event_id {
             x if x == UPDATE => {
                 if let Some(&args) = any.downcast_ref::<UpdateArgs>() {
@@ -211,12 +211,14 @@ impl<I: GenericEvent> GenericEvent for Event<I> {
                 }
             }
             _ => {
-                let input: Option<I> =
-                    GenericEvent::from_args(event_id, any);
-                match input {
-                    Some(x) => Some(Event::Input(x)),
-                    None => None
-                }
+                if let &Event::Input(ref old_input) = old_event {
+                    let input: Option<I> =
+                        GenericEvent::from_args(event_id, any, old_input);
+                    match input {
+                        Some(x) => Some(Event::Input(x)),
+                        None => None
+                    }
+                } else { return None; }
             }
         }
     }
