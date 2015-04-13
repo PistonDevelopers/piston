@@ -6,7 +6,7 @@ use { GenericEvent, RELEASE };
 /// The release of a button
 pub trait ReleaseEvent {
     /// Creates a release event.
-    fn from_button(button: Button) -> Option<Self>;
+    fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a release event.
     fn release<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(Button) -> U;
@@ -17,8 +17,8 @@ pub trait ReleaseEvent {
 }
 
 impl<T: GenericEvent> ReleaseEvent for T {
-    fn from_button(button: Button) -> Option<Self> {
-        GenericEvent::from_args(RELEASE, &button as &Any)
+    fn from_button(button: Button, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(RELEASE, &button as &Any, old_event)
     }
 
     fn release<U, F>(&self, mut f: F) -> Option<U>
@@ -47,10 +47,11 @@ mod tests {
     fn test_input_release() {
         use input::{ Button, Key, Input };
 
-        let a = Button::Keyboard(Key::A);
-        let x: Option<Input> = ReleaseEvent::from_button(a);
+        let e = Input::Release(Button::Keyboard(Key::S));
+        let button = Button::Keyboard(Key::A);
+        let x: Option<Input> = ReleaseEvent::from_button(button, &e);
         let y: Option<Input> = x.clone().unwrap().release(|button|
-            ReleaseEvent::from_button(button)).unwrap();
+            ReleaseEvent::from_button(button, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }
 
@@ -58,32 +59,35 @@ mod tests {
     fn bench_input_release(bencher: &mut Bencher) {
         use input::{ Button, Input, Key };
 
-        let a = Button::Keyboard(Key::A);
+        let e = Input::Release(Button::Keyboard(Key::S));
+        let button = Button::Keyboard(Key::A);
         bencher.iter(|| {
-            let _: Option<Input> = ReleaseEvent::from_button(a);
+            let _: Option<Input> = ReleaseEvent::from_button(button, &e);
         });
     }
 
     #[test]
     fn test_event_release() {
         use Event;
-        use input::{ Button, Key };
+        use input::{ Button, Key, Input };
 
-        let a = Button::Keyboard(Key::A);
-        let x: Option<Event> = ReleaseEvent::from_button(a);
+        let e = Event::Input(Input::Release(Button::Keyboard(Key::S)));
+        let button = Button::Keyboard(Key::A);
+        let x: Option<Event> = ReleaseEvent::from_button(button, &e);
         let y: Option<Event> = x.clone().unwrap().release(|button|
-            ReleaseEvent::from_button(button)).unwrap();
+            ReleaseEvent::from_button(button, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }
 
     #[bench]
     fn bench_event_release(bencher: &mut Bencher) {
         use Event;
-        use input::{ Button, Key };
+        use input::{ Button, Key, Input };
 
-        let a = Button::Keyboard(Key::A);
+        let e = Event::Input(Input::Release(Button::Keyboard(Key::S)));
+        let button = Button::Keyboard(Key::A);
         bencher.iter(|| {
-            let _: Option<Event> = ReleaseEvent::from_button(a);
+            let _: Option<Event> = ReleaseEvent::from_button(button, &e);
         });
     }
 }

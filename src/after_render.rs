@@ -7,7 +7,7 @@ use AFTER_RENDER;
 /// After rendering and buffers are swapped.
 pub trait AfterRenderEvent {
     /// Creates an after render event.
-    fn from_after_render_args(args: &AfterRenderArgs) -> Option<Self>;
+    fn from_after_render_args(args: &AfterRenderArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is an after render event.
     fn after_render<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(&AfterRenderArgs) -> U;
@@ -18,8 +18,8 @@ pub trait AfterRenderEvent {
 }
 
 impl<T: GenericEvent> AfterRenderEvent for T {
-    fn from_after_render_args(args: &AfterRenderArgs) -> Option<Self> {
-        GenericEvent::from_args(AFTER_RENDER, args as &Any)
+    fn from_after_render_args(args: &AfterRenderArgs, old_event: &T) -> Option<Self> {
+        GenericEvent::from_args(AFTER_RENDER, args as &Any, old_event)
     }
 
     fn after_render<U, F>(&self, mut f: F) -> Option<U>
@@ -48,11 +48,11 @@ mod tests {
         use Event;
         use AfterRenderArgs;
 
+        let e = Event::AfterRender(AfterRenderArgs);
         let x: Option<Event> = AfterRenderEvent::from_after_render_args(
-            &AfterRenderArgs
-        );
+            &AfterRenderArgs, &e);
         let y: Option<Event> = x.clone().unwrap().after_render(|args|
-            AfterRenderEvent::from_after_render_args(args)).unwrap();
+            AfterRenderEvent::from_after_render_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }
 
@@ -61,9 +61,10 @@ mod tests {
         use Event;
         use AfterRenderArgs;
 
+        let e = Event::AfterRender(AfterRenderArgs);
         let args = AfterRenderArgs;
         bencher.iter(|| {
-            let _: Option<Event> = AfterRenderEvent::from_after_render_args(&args);
+            let _: Option<Event> = AfterRenderEvent::from_after_render_args(&args, &e);
         });
     }
 }

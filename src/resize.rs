@@ -5,7 +5,7 @@ use { GenericEvent, RESIZE };
 /// When the window is resized
 pub trait ResizeEvent {
     /// Creates a resize event.
-    fn from_width_height(w: u32, h: u32) -> Option<Self>;
+    fn from_width_height(w: u32, h: u32, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a resize event.
     fn resize<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(u32, u32) -> U;
@@ -16,8 +16,8 @@ pub trait ResizeEvent {
 }
 
 impl<T: GenericEvent> ResizeEvent for T {
-    fn from_width_height(w: u32, h: u32) -> Option<Self> {
-        GenericEvent::from_args(RESIZE, &(w, h) as &Any)
+    fn from_width_height(w: u32, h: u32, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(RESIZE, &(w, h) as &Any, old_event)
     }
 
     fn resize<U, F>(&self, mut f: F) -> Option<U>
@@ -45,9 +45,10 @@ mod tests {
     fn test_input_resize() {
         use input::Input;
 
-        let x: Option<Input> = ResizeEvent::from_width_height(100, 100);
+        let e = Input::Resize(0, 0);
+        let x: Option<Input> = ResizeEvent::from_width_height(100, 100, &e);
         let y: Option<Input> = x.clone().unwrap().resize(|w, h|
-            ResizeEvent::from_width_height(w, h)).unwrap();
+            ResizeEvent::from_width_height(w, h, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }
 
@@ -55,27 +56,32 @@ mod tests {
     fn bench_input_resize(bencher: &mut Bencher) {
         use input::Input;
 
+        let e = Input::Resize(0, 0);
         bencher.iter(|| {
-            let _: Option<Input> = ResizeEvent::from_width_height(100, 100);
+            let _: Option<Input> = ResizeEvent::from_width_height(100, 100, &e);
         });
     }
 
     #[test]
     fn test_event_resize() {
         use Event;
+        use input::Input;
 
-        let x: Option<Event> = ResizeEvent::from_width_height(100, 100);
+        let e = Event::Input(Input::Resize(0, 0));
+        let x: Option<Event> = ResizeEvent::from_width_height(100, 100, &e);
         let y: Option<Event> = x.clone().unwrap().resize(|w, h|
-            ResizeEvent::from_width_height(w, h)).unwrap();
+            ResizeEvent::from_width_height(w, h, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }
 
     #[bench]
     fn bench_event_resize(bencher: &mut Bencher) {
         use Event;
+        use input::Input;
 
+        let e = Event::Input(Input::Resize(0, 0));
         bencher.iter(|| {
-            let _: Option<Event> = ResizeEvent::from_width_height(100, 100);
+            let _: Option<Event> = ResizeEvent::from_width_height(100, 100, &e);
         });
     }
 }
