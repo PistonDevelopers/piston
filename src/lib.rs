@@ -126,10 +126,12 @@ impl WindowSettings {
     /// - samples: 0
     /// - fullscreen: false
     /// - exit_on_esc: false
-    pub fn new(title: String, size: Size) -> WindowSettings {
+    pub fn new<T: Into<String>, S: Into<Size>>(
+        title: T, size: S) -> WindowSettings
+    {
         WindowSettings {
-            title: title,
-            size: size,
+            title: title.into(),
+            size: size.into(),
             samples: 0,
             fullscreen: false,
             exit_on_esc: false,
