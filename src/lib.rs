@@ -20,6 +20,20 @@ pub struct Size {
     pub height: u32,
 }
 
+impl From<[u32; 2]> for Size {
+    #[inline(always)]
+    fn from(value: [u32; 2]) -> Size {
+        Size { width: value[0], height: value[1] }
+    }
+}
+
+impl From<(u32, u32)> for Size {
+    #[inline(always)]
+    fn from(value: (u32, u32)) -> Size {
+        Size { width: value.0, height: value.1 }
+    }
+}
+
 /// Required to use the event loop.
 pub trait Window {
     /// The event type emitted by `poll_event`
