@@ -94,38 +94,6 @@ enum State {
 /// *Warning: Because the iterator polls events from the window back-end,
 /// it must be used on the same thread as the window back-end (usually main thread),
 /// unless the window back-end supports multi-thread event polling.*
-///
-/// Example:
-///
-/// ~~~ignore
-/// fn main() {
-///     let opengl = shader_version::opengl::OpenGL_3_2;
-///     let window = Sdl2Window::new(
-///         opengl,
-///         WindowSettings {
-///             title: "Example".to_string(),
-///             size: [500, 500],
-///             fullscreen: false,
-///             exit_on_esc: true,
-///             samples: 0,
-///         }
-///     )
-///     let ref mut gl = Gl::new();
-///     let window = RefCell::new(window);
-///     for e in Events::new(&window)
-///         .set(Ups(120))
-///         .set(MaxFps(60)) {
-///         use event::RenderEvent;
-///         e.render(|args| {
-///             // Set the viewport in window to render graphics.
-///             gl.viewport(0, 0, args.width as i32, args.height as i32);
-///             // Create graphics context with absolute coordinates.
-///             let c = Context::abs(args.width as f64, args.height as f64);
-///             // Do rendering here.
-///         });
-///     }
-/// }
-/// ~~~
 pub struct Events<W, E>
     where
         W: Window,
