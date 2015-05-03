@@ -94,7 +94,7 @@ enum State {
 /// *Warning: Because the iterator polls events from the window back-end,
 /// it must be used on the same thread as the window back-end (usually main thread),
 /// unless the window back-end supports multi-thread event polling.*
-pub struct Events<W, E>
+pub struct WindowEvents<W, E>
     where
         W: Window,
         E: EventMap<<W as Window>::Event>
@@ -121,17 +121,17 @@ pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: u64 = 60;
 
-impl<W, E> Events<W, E>
+impl<W, E> WindowEvents<W, E>
     where
         W: Window,
         E: EventMap<<W as Window>::Event>
 {
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new(window: Rc<RefCell<W>>) -> Events<W, E> {
+    pub fn new(window: Rc<RefCell<W>>) -> WindowEvents<W, E> {
         let start = clock_ticks::precise_time_ns();
         let updates_per_second = DEFAULT_UPS;
         let max_frames_per_second = DEFAULT_MAX_FPS;
-        Events {
+        WindowEvents {
             window: window,
             state: State::Render,
             last_update: start,
@@ -171,7 +171,7 @@ impl<W, E> Events<W, E>
     }
 }
 
-impl<W, E> Iterator for Events<W, E>
+impl<W, E> Iterator for WindowEvents<W, E>
     where
         W: Window,
         E: EventMap<<W as Window>::Event>,
