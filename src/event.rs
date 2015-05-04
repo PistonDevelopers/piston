@@ -1,13 +1,13 @@
 use input;
 
 use {
+    EventMap,
     IdleArgs,
     RenderArgs,
     AfterRenderArgs,
     UpdateArgs,
 };
 use Event::{ Idle, Render, AfterRender, Update, Input };
-use events::EventMap;
 
 /// Adds render and update events to input events
 #[derive(Clone, PartialEq, Debug)]
