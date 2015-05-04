@@ -119,6 +119,8 @@ pub struct WindowSettings {
     fullscreen: bool,
     /// If true, exit when pressing Esc.
     exit_on_esc: bool,
+    /// If true, enable vsync.
+    vsync: bool,
 }
 
 impl WindowSettings {
@@ -135,6 +137,7 @@ impl WindowSettings {
             samples: 0,
             fullscreen: false,
             exit_on_esc: false,
+            vsync: false,
         }
     }
 
@@ -180,6 +183,15 @@ impl WindowSettings {
     /// Sets samples.
     pub fn samples(mut self, value: u8) -> Self {
         self.samples = value;
+        self
+    }
+
+    /// Gets vsync.
+    pub fn get_vsync(&self) -> bool { self.vsync }
+
+    /// Sets vsync.
+    pub fn vsync(mut self, value: bool) -> Self {
+        self.vsync = value;
         self
     }
 }
