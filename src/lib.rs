@@ -16,13 +16,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use window::Window;
 
-pub use event_loop as events;
-pub use events::{
-    UpdateArgs,
-    RenderArgs,
-    AfterRenderArgs,
-    IdleArgs,
-};
+pub use event_loop::*;
 pub use generic_event::GenericEvent;
 pub use update::UpdateEvent;
 pub use render::RenderEvent;
@@ -69,23 +63,23 @@ const UPDATE: EventId = EventId("piston/update");
 /// A trait for create event iterator from window.
 pub trait Events<W> where W: Window {
     /// Creates event iterator from window.
-    fn events(self) -> events::Events<W, Event<W::Event>>;
+    fn events(self) -> WindowEvents<W, Event<W::Event>>;
 }
 
 impl<W> Events<W> for Rc<RefCell<W>> where W: Window {
-    fn events(self) -> events::Events<W, Event<W::Event>> {
-        events::Events::new(self)
+    fn events(self) -> WindowEvents<W, Event<W::Event>> {
+        WindowEvents::new(self)
     }
 }
 
 impl<W> Events<W> for W where W: Window {
-    fn events(self) -> events::Events<W, Event<W::Event>> {
+    fn events(self) -> WindowEvents<W, Event<W::Event>> {
         Rc::new(RefCell::new(self)).events()
     }
 }
 
 impl<'a, W> Events<W> for &'a Rc<RefCell<W>> where W: Window {
-    fn events(self) -> events::Events<W, Event<W::Event>> {
+    fn events(self) -> WindowEvents<W, Event<W::Event>> {
         self.clone().events()
     }
 }

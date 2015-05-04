@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-event"
-version = "0.1.2"
+version = "0.1.3"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
