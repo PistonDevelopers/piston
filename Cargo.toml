@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-event_loop"
-version = "0.1.4"
+version = "0.1.5"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -31,4 +31,3 @@ git = "https://github.com/pistondevelopers/window"
 [dependencies.piston-viewport]
 git = "https://github.com/pistondevelopers/viewport"
 #version = "0.0.0"
-

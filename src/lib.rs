@@ -107,6 +107,7 @@ pub struct WindowEvents<W, E>
     dt_frame_in_ns: u64,
     dt: f64,
     swap_buffers: bool,
+    bench_mode: bool,
     _marker_e: PhantomData<E>,
 }
 
@@ -140,6 +141,7 @@ impl<W, E> WindowEvents<W, E>
             dt_frame_in_ns: BILLION / max_frames_per_second,
             dt: 1.0 / updates_per_second as f64,
             swap_buffers: true,
+            bench_mode: false,
             _marker_e: PhantomData,
         }
     }
@@ -169,6 +171,14 @@ impl<W, E> WindowEvents<W, E>
         self.swap_buffers = enable;
         self
     }
+
+    /// Enable or disable benchmark mode.
+    /// When enabled, it will render and update without sleep and ignore input.
+    /// Used to test performance by playing through as fast as possible.
+    pub fn bench_mode(mut self, enable: bool) -> Self {
+        self.bench_mode = enable;
+        self
+    }
 }
 
 impl<W, E> Iterator for WindowEvents<W, E>
@@ -186,8 +196,13 @@ impl<W, E> Iterator for WindowEvents<W, E>
                     let window = self.window.borrow();
                     if window.should_close() { return None; }
 
-                    let start_render = clock_ticks::precise_time_ns();
-                    self.last_frame = start_render;
+                    if self.bench_mode {
+                        // In benchmark mode, pretend FPS is perfect.
+                        self.last_frame += self.dt_frame_in_ns;
+                    } else {
+                        // In normal mode, let the FPS slip if late.
+                        self.last_frame = clock_ticks::precise_time_ns();
+                    }
 
                     let size = window.size();
                     let draw_size = window.draw_size();
@@ -196,7 +211,7 @@ impl<W, E> Iterator for WindowEvents<W, E>
                         self.state = State::SwapBuffers;
                         return Some(EventMap::render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (start_render - self.last_update) as f64
+                            ext_dt: (self.last_frame - self.last_update) as f64
                                     / BILLION as f64,
                             width: size.width,
                             height: size.height,
@@ -217,32 +232,53 @@ impl<W, E> Iterator for WindowEvents<W, E>
                     }
                 }
                 State::UpdateLoop(ref mut idle) => {
-                    let current_time = clock_ticks::precise_time_ns();
-                    let next_frame = self.last_frame + self.dt_frame_in_ns;
-                    let next_update = self.last_update + self.dt_update_in_ns;
-                    let next_event = cmp::min(next_frame, next_update);
-                    if next_event > current_time {
-                        if let Some(x) = self.window.borrow_mut().poll_event() {
-                            *idle = Idle::No;
-                            return Some(EventMap::input(x));
-                        } else if *idle == Idle::No {
-                            *idle = Idle::Yes;
-                            let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
-                            return Some(EventMap::idle(IdleArgs { dt: seconds }))
+                    if self.bench_mode {
+                        // In benchmark mode, pick the next event without sleep.
+                        // Idle and input events are ignored.
+                        let next_frame = self.last_frame + self.dt_frame_in_ns;
+                        let next_update = self.last_update + self.dt_update_in_ns;
+                        let next_event = cmp::min(next_frame, next_update);
+                        if next_event == next_frame {
+                            State::Render
+                        } else {
+                            State::HandleEvents
                         }
-                        sleep_ms(ns_to_ms(next_event - current_time));
-                        State::UpdateLoop(Idle::No)
-                    } else if next_event == next_frame {
-                        State::Render
                     } else {
-                        State::HandleEvents
+                        let current_time = clock_ticks::precise_time_ns();
+                        let next_frame = self.last_frame + self.dt_frame_in_ns;
+                        let next_update = self.last_update + self.dt_update_in_ns;
+                        let next_event = cmp::min(next_frame, next_update);
+                        if next_event > current_time {
+                            if let Some(x) = self.window.borrow_mut().poll_event() {
+                                *idle = Idle::No;
+                                return Some(EventMap::input(x));
+                            } else if *idle == Idle::No {
+                                *idle = Idle::Yes;
+                                let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
+                                return Some(EventMap::idle(IdleArgs { dt: seconds }))
+                            }
+                            sleep_ms(ns_to_ms(next_event - current_time));
+                            State::UpdateLoop(Idle::No)
+                        } else if next_event == next_frame {
+                            State::Render
+                        } else {
+                            State::HandleEvents
+                        }
                     }
                 }
                 State::HandleEvents => {
-                    // Handle all events before updating.
-                    match self.window.borrow_mut().poll_event() {
-                        None => State::Update,
-                        Some(x) => { return Some(EventMap::input(x)); },
+                    if self.bench_mode {
+                        // Ignore input to prevent it affecting the benchmark.
+                        match self.window.borrow_mut().poll_event() {
+                            None => State::Update,
+                            Some(_) => State::HandleEvents,
+                        }
+                    } else {
+                        // Handle all events before updating.
+                        match self.window.borrow_mut().poll_event() {
+                            None => State::Update,
+                            Some(x) => { return Some(EventMap::input(x)); },
+                        }
                     }
                 }
                 State::Update => {
