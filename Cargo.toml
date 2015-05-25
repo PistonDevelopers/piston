@@ -18,9 +18,7 @@ homepage = "https://github.com/pistondevelopers/window"
 name = "window"
 path = "src/lib.rs"
 
-[dependencies.pistoncore-input]
-git = "https://github.com/pistondevelopers/input"
-#version = "0.0.9"
-
 [dependencies]
+
 libc = "0.1"
+pistoncore-input = "0.0.9"
