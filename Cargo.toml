@@ -17,7 +17,6 @@ path = "src/lib.rs"
 
 [dependencies]
 
-rustc-serialize = "*"
-bitflags = "*"
+rustc-serialize = "0.3.14"
+bitflags = "0.1.1"
 num = "0.1.21"
-
