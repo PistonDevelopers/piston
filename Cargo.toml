@@ -36,4 +36,4 @@ version = "0.1.0"
 
 [dependencies.pistoncore-window]
 #git = "https://github.com/pistondevelopers/window"
-version = "0.1.1"
+version = "0.1.2"
