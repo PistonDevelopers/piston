@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-input"
-version = "0.0.9"
+version = "0.1.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
 keywords = ["keyboard", "mouse", "input", "piston"]
 description = "A structure for user input"
