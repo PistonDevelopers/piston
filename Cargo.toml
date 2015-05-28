@@ -1,7 +1,7 @@
 [package]
 
 name = "piston"
-version = "0.1.3"
+version = "0.1.4"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -26,14 +26,7 @@ homepage = "https://github.com/pistondevelopers/piston"
 name = "piston"
 path = "./src/lib.rs"
 
-[dependencies.pistoncore-input]
-#git = "https://github.com/pistondevelopers/input"
-version = "0.0.9"
-
-[dependencies.pistoncore-event]
-#git = "https://github.com/pistondevelopers/event"
-version = "0.1.0"
-
-[dependencies.pistoncore-window]
-#git = "https://github.com/pistondevelopers/window"
-version = "0.1.2"
+[dependencies]
+pistoncore-input = "0.1.0"
+pistoncore-event = "0.1.0"
+pistoncore-window = "0.1.0"
