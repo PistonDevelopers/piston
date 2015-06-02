@@ -5,7 +5,9 @@
 
 extern crate libc;
 extern crate input;
+extern crate shader_version;
 
+use shader_version::OpenGL;
 use input::Input;
 
 /// The type of an OpenGL function address.
@@ -121,6 +123,8 @@ pub struct WindowSettings {
     exit_on_esc: bool,
     /// If true, enable vsync.
     vsync: bool,
+    /// An optional OpenGL version.
+    opengl: Option<OpenGL>,
 }
 
 impl WindowSettings {
@@ -138,6 +142,7 @@ impl WindowSettings {
             fullscreen: false,
             exit_on_esc: false,
             vsync: false,
+            opengl: None,
         }
     }
 
@@ -192,6 +197,21 @@ impl WindowSettings {
     /// Sets vsync.
     pub fn vsync(mut self, value: bool) -> Self {
         self.vsync = value;
+        self
+    }
+
+    /// Gets opengl.
+    pub fn get_maybe_opengl(&self) -> Option<OpenGL> { self.opengl }
+
+    /// Sets opengl.
+    pub fn maybe_opengl(mut self, value: Option<OpenGL>) -> Self {
+        self.opengl = value;
+        self
+    }
+
+    /// Sets opengl.
+    pub fn opengl(mut self, value: OpenGL) -> Self {
+        self.opengl = Some(value);
         self
     }
 }

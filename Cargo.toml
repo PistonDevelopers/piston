@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.1.3"
+version = "0.1.4"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
@@ -22,3 +22,4 @@ path = "src/lib.rs"
 
 libc = "0.1"
 pistoncore-input = "0.1.0"
+shader_version = "0.1.0"
