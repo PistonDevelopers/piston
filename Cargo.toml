@@ -1,7 +1,7 @@
 [package]
 
 name = "piston"
-version = "0.1.5"
+version = "0.2.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -28,5 +28,5 @@ path = "./src/lib.rs"
 
 [dependencies]
 pistoncore-input = "0.1.0"
-pistoncore-event = "0.1.4"
+pistoncore-event = "0.2.0"
 pistoncore-window = "0.1.4"
