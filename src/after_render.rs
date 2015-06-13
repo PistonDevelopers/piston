@@ -41,7 +41,6 @@ impl<T: GenericEvent> AfterRenderEvent for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_event_after_render() {
@@ -54,17 +53,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().after_render(|args|
             AfterRenderEvent::from_after_render_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_after_render(bencher: &mut Bencher) {
-        use Event;
-        use AfterRenderArgs;
-
-        let e = Event::AfterRender(AfterRenderArgs);
-        let args = AfterRenderArgs;
-        bencher.iter(|| {
-            let _: Option<Event> = AfterRenderEvent::from_after_render_args(&args, &e);
-        });
     }
 }

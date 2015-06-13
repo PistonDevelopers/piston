@@ -40,7 +40,6 @@ impl<T: GenericEvent> TextEvent for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_input_text() {
@@ -53,15 +52,6 @@ mod tests {
         assert_eq!(x, y);
     }
 
-    #[bench]
-    fn bench_input_text(bencher: &mut Bencher) {
-        use input::Input;
-
-        let e = Input::Text("".to_string());
-        bencher.iter(|| {
-            let _: Option<Input> = TextEvent::from_text("hello", &e);
-        });
-    }
 
     #[test]
     fn test_event_text() {
@@ -73,16 +63,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().text(|text|
             TextEvent::from_text(text, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_text(bencher: &mut Bencher) {
-        use Event;
-        use input::Input;
-
-        let e = Event::Input(Input::Text("".to_string()));
-        bencher.iter(|| {
-            let _: Option<Event> = TextEvent::from_text("hello", &e);
-        });
     }
 }

@@ -39,7 +39,6 @@ impl<T: GenericEvent> RenderEvent for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_event_render() {
@@ -60,24 +59,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().render(|args|
             RenderEvent::from_render_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_render(bencher: &mut Bencher) {
-        use Event;
-        use RenderArgs;
-
-        let e = Event::Render(RenderArgs { ext_dt: 0.0, width: 0, height: 0,
-            draw_width: 0, draw_height: 0 });
-        let args = RenderArgs {
-            ext_dt: 1.0,
-            width: 10,
-            height: 10,
-            draw_width: 10,
-            draw_height: 10,
-        };
-        bencher.iter(|| {
-            let _: Option<Event> = RenderEvent::from_render_args(&args, &e);
-        });
     }
 }

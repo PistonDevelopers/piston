@@ -43,7 +43,6 @@ impl<T> UpdateEvent for T where T: GenericEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_event_update() {
@@ -56,17 +55,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().update(|args|
             UpdateEvent::from_update_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_update(bencher: &mut Bencher) {
-        use Event;
-        use UpdateArgs;
-
-        let e = Event::Update(UpdateArgs { dt: 0.0 });
-        let args = UpdateArgs { dt: 1.0 };
-        bencher.iter(|| {
-            let _: Option<Event> = UpdateEvent::from_update_args(&args, &e);
-        });
     }
 }

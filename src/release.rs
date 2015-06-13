@@ -41,7 +41,6 @@ impl<T: GenericEvent> ReleaseEvent for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_input_release() {
@@ -55,17 +54,6 @@ mod tests {
         assert_eq!(x, y);
     }
 
-    #[bench]
-    fn bench_input_release(bencher: &mut Bencher) {
-        use input::{ Button, Input, Key };
-
-        let e = Input::Release(Button::Keyboard(Key::S));
-        let button = Button::Keyboard(Key::A);
-        bencher.iter(|| {
-            let _: Option<Input> = ReleaseEvent::from_button(button, &e);
-        });
-    }
-
     #[test]
     fn test_event_release() {
         use Event;
@@ -77,17 +65,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().release(|button|
             ReleaseEvent::from_button(button, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_release(bencher: &mut Bencher) {
-        use Event;
-        use input::{ Button, Key, Input };
-
-        let e = Event::Input(Input::Release(Button::Keyboard(Key::S)));
-        let button = Button::Keyboard(Key::A);
-        bencher.iter(|| {
-            let _: Option<Event> = ReleaseEvent::from_button(button, &e);
-        });
     }
 }

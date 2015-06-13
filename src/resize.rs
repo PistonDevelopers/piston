@@ -39,7 +39,6 @@ impl<T: GenericEvent> ResizeEvent for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_input_resize() {
@@ -52,16 +51,6 @@ mod tests {
         assert_eq!(x, y);
     }
 
-    #[bench]
-    fn bench_input_resize(bencher: &mut Bencher) {
-        use input::Input;
-
-        let e = Input::Resize(0, 0);
-        bencher.iter(|| {
-            let _: Option<Input> = ResizeEvent::from_width_height(100, 100, &e);
-        });
-    }
-
     #[test]
     fn test_event_resize() {
         use Event;
@@ -72,16 +61,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().resize(|w, h|
             ResizeEvent::from_width_height(w, h, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_resize(bencher: &mut Bencher) {
-        use Event;
-        use input::Input;
-
-        let e = Event::Input(Input::Resize(0, 0));
-        bencher.iter(|| {
-            let _: Option<Event> = ResizeEvent::from_width_height(100, 100, &e);
-        });
     }
 }
