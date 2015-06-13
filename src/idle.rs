@@ -43,7 +43,6 @@ impl<T> IdleEvent for T where T: GenericEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_event_idle() {
@@ -56,19 +55,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().idle(|args|
             IdleEvent::from_idle_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_idle(bencher: &mut Bencher) {
-        use Event;
-        use IdleArgs;
-
-        let e = Event::Idle(IdleArgs { dt: 1.0 });
-        let args = IdleArgs {
-            dt: 1.0,
-        };
-        bencher.iter(|| {
-            let _: Option<Event> = IdleEvent::from_idle_args(&args, &e);
-        });
     }
 }

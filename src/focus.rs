@@ -39,7 +39,6 @@ impl<T: GenericEvent> FocusEvent for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     #[test]
     fn test_input_focus() {
@@ -52,16 +51,6 @@ mod tests {
         assert_eq!(x, y);
     }
 
-    #[bench]
-    fn bench_input_focus(bencher: &mut Bencher) {
-        use input::Input;
-
-        let e = Input::Focus(false);
-        bencher.iter(|| {
-            let _: Option<Input> = FocusEvent::from_focused(true, &e);
-        });
-    }
-
     #[test]
     fn test_event_focus() {
         use Event;
@@ -72,16 +61,5 @@ mod tests {
         let y: Option<Event> = x.clone().unwrap().focus(|focused|
             FocusEvent::from_focused(focused, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
-    }
-
-    #[bench]
-    fn bench_event_focus(bencher: &mut Bencher) {
-        use Event;
-        use input::Input;
-
-        let e = Event::Input(Input::Focus(false));
-        bencher.iter(|| {
-            let _: Option<Event> = FocusEvent::from_focused(true, &e);
-        });
     }
 }
