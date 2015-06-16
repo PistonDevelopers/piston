@@ -1,0 +1,25 @@
+[package]
+
+name = "pistoncore-window"
+version = "0.1.4"
+authors = [
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>"
+]
+keywords = ["window", "game", "piston"]
+description = "A library for window abstraction"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/window.git"
+homepage = "https://github.com/pistondevelopers/window"
+
+[lib]
+
+name = "window"
+path = "src/lib.rs"
+
+[dependencies]
+
+libc = "0.1"
+pistoncore-input = "0.1.0"
+shader_version = "0.1.0"
