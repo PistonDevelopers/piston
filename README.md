@@ -14,61 +14,65 @@ Maintainers: @bvssvni
 
 [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 
-| Back-ends |
-|--------------------|
-| [glfw_window](https://github.com/pistondevelopers/glfw_window) |
-| [glutin_window](https://github.com/pistondevelopers/glutin_window) |
-| [sdl2_window](https://github.com/pistondevelopers/sdl2_window) |
-
 ## Start new project with Piston
 
-Use one of the [examples](https://github.com/pistondevelopers/piston-examples) as guide.
+You should know how to build "hello world" with Rust, see http://www.rust-lang.org/.
 
-Almost all projects written in Rust use the Cargo package manager.
+Piston uses FreeType for font rendering.
 
-1. Install [Cargo](https://github.com/rust-lang/cargo)
-2. Open the Terminal window and type:
+#### Freetype on OS X
 
-```
-cargo new --vcs git --bin "mygame"
-```
-
-This will create a new folder "mygame" that contains a `Cargo.toml` and a folder `src`.
-Inside the `src` folder where you put the source code.
-For binaries, the default entry file is `src/main.rs` and for libraries `src/lib.rs`.
-
-When you type `cargo run` it will print "Hello, world!".
-
-The `Cargo.toml` file is where you put the library dependencies.
-
-*TIP: Copy links from [/r/rust_gamedev/wiki/index](http://www.reddit.com/r/rust_gamedev/wiki/index).*
-
-For example, to use the SDL2 back-end, add the following to `Cargo.toml`:
+With [Homebrew](http://brew.sh), install freetype with
 
 ```
-[dependencies.pistoncore-sdl2_window]
-
-git = "https://github.com/pistondevelopers/sdl2_window"
+brew install freetype
 ```
 
-Then add `extern crate sdl2_window;` to the `main.rs` file.
+Alternatively, download directly from http://www.freetype.org/download.html
 
-* To compile, use `cargo build`
-* To run, use `cargo run`
-* To generate docs, use `cargo doc`
-
-You will find more documentation about Cargo [here](http://doc.crates.io/).
-
-## How to build Piston
-
-1. Install [Cargo](https://github.com/rust-lang/cargo)
-2. Open up the Terminal window and type:
+#### Freetype on Ubuntu
+If you are on Ubuntu, you can run
 
 ```
-git clone https://github.com/PistonDevelopers/piston
-cd piston
-cargo build
+sudo apt-get install libfreetype6-dev`
 ```
+
+#### Freetype on Windows
+Copy `libfreetype-6.a` to `$RUST_ROOT\bin\rustlib\$CPU_ARCH-pc-windows-gnu\lib`.
+- For 32-bit Windows, download [this libfreetype-6.a](https://github.com/tedsta/getting-started-with-piston/blob/master/windows_clibs/i686/libfreetype-6.a?raw=true) to e.g. `C:\Rust\bin\rustlib\i686-pc-windows-gnu\lib\`.
+- For 64-bit Windows, download [that libfreetype-6.a](https://github.com/tedsta/getting-started-with-piston/blob/master/windows_clibs/x86_64/libfreetype-6.a?raw=true) to e.g. `C:\Rust\bin\rustlib\x86_64-pc-windows-gnu\lib\`.
+
+### Drawing a red rectangle
+
+Add [piston_window](https://crates.io/crates/piston_window) to your Cargo.toml, for example:
+
+```
+[dependencies]
+piston_window = "0.3.0"
+```
+
+In "src/main.rs", type the following code:
+
+```Rust
+extern crate piston_window;
+
+use piston_window::*;
+
+fn main() {
+    let window: PistonWindow = WindowSettings::new("Hello Piston!", [640, 480])
+        .exit_on_esc(true).into();
+    for e in window {
+        e.draw_2d(|c, g| {
+            clear([1.0; 4], g);
+            rectangle([1.0, 0.0, 0.0, 1.0], // red
+                      [0.0, 0.0, 100.0, 100.0],
+                      c.transform, g);
+        });
+    }
+}
+```
+
+Use `cargo run` to start the application. It should clear the screen in white color and draw a red rectangle.
 
 ## Goals
 
