@@ -74,6 +74,8 @@ fn main() {
 
 Use `cargo run` to start the application. It should clear the screen in white color and draw a red rectangle.
 
+![red-rectangle](./images/red-rectangle.png)
+
 ## Goals
 
 The Piston project is a large collaboration among many developers.
