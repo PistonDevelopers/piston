@@ -1,0 +1,20 @@
+digraph dependencies {
+    N0[label="pistoncore-event"];
+    N1[label="bitflags"];
+    N2[label="quack"];
+    N3[label="clock_ticks"];
+    N4[label="pistoncore-event_loop"];
+    N5[label="pistoncore-window"];
+    N6[label="pistoncore-input"];
+    N7[label="rustc-serialize"];
+    N4 -> N2[label=""];
+    N4 -> N3[label=""];
+    N5 -> N2[label=""];
+    N5 -> N6[label=""];
+    N5 -> N4[label=""];
+    N6 -> N1[label=""];
+    N6 -> N7[label=""];
+    N0 -> N4[label=""];
+    N0 -> N6[label=""];
+    N0 -> N5[label=""];
+}
