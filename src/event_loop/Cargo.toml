@@ -20,14 +20,10 @@ homepage = "https://github.com/pistondevelopers/event_loop"
 name = "event_loop"
 path = "src/lib.rs"
 
-[dependencies.clock_ticks]
-#git = "https://github.com/tomaka/clock_ticks"
-version = "0.0.5"
-
 [dependencies.pistoncore-window]
-#git = "https://github.com/pistondevelopers/window"
+path = "../window"
 version = "0.1.0"
 
-[dependencies.piston-viewport]
-#git = "https://github.com/pistondevelopers/viewport"
-version = "0.1.0"
+[dependencies]
+clock_ticks = "0.0.5"
+piston-viewport = "0.1.0"

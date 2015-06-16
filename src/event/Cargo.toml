@@ -18,7 +18,15 @@ homepage = "https://github.com/pistondevelopers/event"
 name = "event"
 path = "src/lib.rs"
 
-[dependencies]
-pistoncore-input = "0.1.0"
-pistoncore-event_loop = "0.2.0"
-pistoncore-window = "0.1.4"
+[dependencies.pistoncore-input]
+path = "../input"
+version = "0.1.0"
+
+[dependencies.pistoncore-event_loop]
+path = "../event_loop"
+version = "0.2.0"
+
+[dependencies.pistoncore-window]
+path = "../window"
+version = "0.1.4"
+
