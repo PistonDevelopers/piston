@@ -1,0 +1,22 @@
+[package]
+
+name = "pistoncore-input"
+version = "0.1.0"
+authors = ["bvssvni <bvssvni@gmail.com>"]
+keywords = ["keyboard", "mouse", "input", "piston"]
+description = "A structure for user input"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/input.git"
+homepage = "https://github.com/pistondevelopers/input"
+
+[lib]
+
+name = "input"
+path = "src/lib.rs"
+
+[dependencies]
+
+rustc-serialize = "0.3.14"
+bitflags = "0.1.1"
+num = "0.1.21"

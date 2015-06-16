@@ -26,7 +26,14 @@ homepage = "https://github.com/pistondevelopers/piston"
 name = "piston"
 path = "./src/lib.rs"
 
-[dependencies]
-pistoncore-input = "0.1.0"
-pistoncore-event = "0.2.0"
-pistoncore-window = "0.1.4"
+[dependencies.pistoncore-input]
+path = "src/input"
+version = "0.1.0"
+
+[dependencies.pistoncore-event]
+path = "src/event"
+version = "0.2.0"
+
+[dependencies.pistoncore-window]
+path = "src/window"
+version = "0.1.4"
