@@ -1,0 +1,33 @@
+[package]
+
+name = "pistoncore-event_loop"
+version = "0.2.0"
+authors = [
+    "bvssvni <bvssvni@gmail.com>",
+    "Coeuvre <coeuvre@gmail.com>",
+    "gmorenz",
+    "bfops",
+]
+keywords = ["game", "event", "loop", "piston"]
+description = "A generic event loop for games and interactive applications"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/pistondevelopers/event_loop.git"
+homepage = "https://github.com/pistondevelopers/event_loop"
+
+[lib]
+
+name = "event_loop"
+path = "src/lib.rs"
+
+[dependencies.clock_ticks]
+#git = "https://github.com/tomaka/clock_ticks"
+version = "0.0.5"
+
+[dependencies.pistoncore-window]
+#git = "https://github.com/pistondevelopers/window"
+version = "0.1.0"
+
+[dependencies.piston-viewport]
+#git = "https://github.com/pistondevelopers/viewport"
+version = "0.1.0"
