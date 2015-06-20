@@ -18,8 +18,8 @@ authors = [
 keywords = ["piston", "game", "engine", "core"]
 description = "The Piston game engine core libraries"
 license = "MIT"
-repository = "https://github.com/pistondevelopers/piston.git"
-homepage = "https://github.com/pistondevelopers/piston"
+repository = "https://github.com/PistonDevelopers/piston.git"
+homepage = "https://github.com/PistonDevelopers/piston"
 
 [lib]
 
