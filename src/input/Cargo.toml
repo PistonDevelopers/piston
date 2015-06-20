@@ -7,8 +7,8 @@ keywords = ["keyboard", "mouse", "input", "piston"]
 description = "A structure for user input"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/pistondevelopers/input.git"
-homepage = "https://github.com/pistondevelopers/input"
+repository = "https://github.com/PistonDevelopers/piston.git"
+homepage = "https://github.com/PistonDevelopers/piston"
 
 [lib]
 

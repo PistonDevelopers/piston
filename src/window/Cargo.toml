@@ -10,8 +10,8 @@ keywords = ["window", "game", "piston"]
 description = "A library for window abstraction"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/pistondevelopers/window.git"
-homepage = "https://github.com/pistondevelopers/window"
+repository = "https://github.com/PistonDevelopers/piston.git"
+homepage = "https://github.com/PistonDevelopers/piston"
 
 [lib]
 name = "window"

@@ -12,8 +12,8 @@ keywords = ["game", "event", "loop", "piston"]
 description = "A generic event loop for games and interactive applications"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/pistondevelopers/event_loop.git"
-homepage = "https://github.com/pistondevelopers/event_loop"
+repository = "https://github.com/PistonDevelopers/piston.git"
+homepage = "https://github.com/PistonDevelopers/piston"
 
 [lib]
 

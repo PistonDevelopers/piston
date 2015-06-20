@@ -10,8 +10,8 @@ keywords = ["event", "piston"]
 description = "A library for flexible generic event threading"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/pistondevelopers/event.git"
-homepage = "https://github.com/pistondevelopers/event"
+repository = "https://github.com/PistonDevelopers/piston.git"
+homepage = "https://github.com/PistonDevelopers/piston"
 
 [lib]
 
