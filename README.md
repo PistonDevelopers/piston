@@ -19,28 +19,7 @@ Maintainers: @bvssvni
 You should know how to build "hello world" with Rust, see http://www.rust-lang.org/.
 
 Piston uses FreeType for font rendering.
-
-#### Freetype on OS X
-
-With [Homebrew](http://brew.sh), install freetype with
-
-```
-brew install freetype
-```
-
-Alternatively, download directly from http://www.freetype.org/download.html
-
-#### Freetype on Ubuntu
-If you are on Ubuntu, you can run
-
-```
-sudo apt-get install libfreetype6-dev`
-```
-
-#### Freetype on Windows
-Copy `libfreetype-6.a` to `$RUST_ROOT\bin\rustlib\$CPU_ARCH-pc-windows-gnu\lib`.
-- For 32-bit Windows, download [this libfreetype-6.a](https://github.com/tedsta/getting-started-with-piston/blob/master/windows_clibs/i686/libfreetype-6.a?raw=true) to e.g. `C:\Rust\bin\rustlib\i686-pc-windows-gnu\lib\`.
-- For 64-bit Windows, download [that libfreetype-6.a](https://github.com/tedsta/getting-started-with-piston/blob/master/windows_clibs/x86_64/libfreetype-6.a?raw=true) to e.g. `C:\Rust\bin\rustlib\x86_64-pc-windows-gnu\lib\`.
+[How to install FreeType](https://github.com/PistonDevelopers/piston/issues/912)
 
 ### Drawing a red rectangle
 
