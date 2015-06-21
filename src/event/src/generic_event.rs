@@ -29,11 +29,11 @@ use {
 pub trait GenericEvent {
     /// The id of this event.
     fn event_id(&self) -> EventId;
-    /// Calls closure with table
+    /// Calls closure with arguments
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U
     ;
-    /// Converts from table to `Self`
+    /// Converts from arguments to `Self`
     fn from_args(event_id: EventId, any: &Any, old_event: &Self) -> Option<Self>;
 }
 
