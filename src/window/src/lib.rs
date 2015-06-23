@@ -220,15 +220,16 @@ impl WindowSettings {
 pub struct NoWindow {
     should_close: bool,
     title: String,
+    size: Size
 }
 
 impl NoWindow {
     /// Returns a new `NoWindow`.
     pub fn new(settings: WindowSettings) -> NoWindow {
-        let title = settings.title.clone();
         NoWindow {
             should_close: false,
-            title: title,
+            title: settings.title,
+            size: settings.size,
         }
     }
 }
@@ -242,7 +243,7 @@ impl From<WindowSettings> for NoWindow {
 impl Window for NoWindow {
     type Event = Input;
     fn should_close(&self) -> bool { self.should_close }
-    fn size(&self) -> Size { Size { width: 0, height: 0 } }
+    fn size(&self) -> Size { self.size }
     fn swap_buffers(&mut self) {}
     fn poll_event(&mut self) -> Option<Input> { None }
     fn draw_size(&self) -> Size { self.size() }
