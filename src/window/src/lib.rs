@@ -233,6 +233,12 @@ impl NoWindow {
     }
 }
 
+impl From<WindowSettings> for NoWindow {
+    fn from(settings: WindowSettings) -> NoWindow {
+        NoWindow::new(settings)
+    }
+}
+
 impl Window for NoWindow {
     type Event = Input;
     fn should_close(&self) -> bool { self.should_close }
