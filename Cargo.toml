@@ -20,6 +20,7 @@ description = "The Piston game engine core libraries"
 license = "MIT"
 repository = "https://github.com/PistonDevelopers/piston.git"
 homepage = "https://github.com/PistonDevelopers/piston"
+documentation = "http://www.piston.rs/docs/piston/piston/index.html"
 
 [lib]
 
