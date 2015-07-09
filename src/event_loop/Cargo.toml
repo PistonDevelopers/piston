@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-event_loop"
-version = "0.2.2"
+version = "0.3.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -22,8 +22,8 @@ path = "src/lib.rs"
 
 [dependencies.pistoncore-window]
 path = "../window"
-version = "0.1.6"
+version = "0.2.0"
 
 [dependencies]
-clock_ticks = "0.0.5"
+clock_ticks = "0.0.6"
 piston-viewport = "0.1.0"
