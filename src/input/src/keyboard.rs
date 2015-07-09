@@ -11,7 +11,7 @@ use Button;
 // Defining every combination to allow assignment in static expressions.
 bitflags!(
     #[allow(missing_docs)]
-    #[derive(RustcDecodable, RustcEncodable, Debug)]
+    #[derive(RustcDecodable, RustcEncodable)]
     flags ModifierKey: u8 {
         /// No modifier.
         const NO_MODIFIER           = 0b00000000,
