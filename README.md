@@ -18,8 +18,8 @@ Maintainers: @bvssvni
 
 You should know how to build "hello world" with Rust, see http://www.rust-lang.org/.
 
-Piston uses FreeType for font rendering.
 [How to install FreeType](https://github.com/PistonDevelopers/piston/issues/912)
+Piston uses FreeType for font rendering.
 
 ### Drawing a red rectangle
 
