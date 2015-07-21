@@ -2,12 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
 extern crate input;
 
 use test::Bencher;
-use event::{ Event, FocusEvent };
-use input::Input;
+use input::{ Event, FocusEvent, Input };
 
 #[bench]
 fn bench_input_focus(bencher: &mut Bencher) {

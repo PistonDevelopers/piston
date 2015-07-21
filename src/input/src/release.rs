@@ -1,7 +1,6 @@
 use std::any::Any;
 
-use input::Button;
-use { GenericEvent, RELEASE };
+use { Button, GenericEvent, RELEASE };
 
 /// The release of a button
 pub trait ReleaseEvent {
@@ -44,7 +43,7 @@ mod tests {
 
     #[test]
     fn test_input_release() {
-        use input::{ Button, Key, Input };
+        use super::super::{ Button, Key, Input };
 
         let e = Input::Release(Button::Keyboard(Key::S));
         let button = Button::Keyboard(Key::A);
@@ -57,7 +56,7 @@ mod tests {
     #[test]
     fn test_event_release() {
         use Event;
-        use input::{ Button, Key, Input };
+        use super::super::{ Button, Key, Input };
 
         let e = Event::Input(Input::Release(Button::Keyboard(Key::S)));
         let button = Button::Keyboard(Key::A);

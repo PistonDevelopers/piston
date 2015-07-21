@@ -42,7 +42,7 @@ mod tests {
 
     #[test]
     fn test_input_focus() {
-        use input::Input;
+        use super::super::Input;
 
         let e = Input::Focus(false);
         let x: Option<Input> = FocusEvent::from_focused(true, &e);
@@ -54,7 +54,7 @@ mod tests {
     #[test]
     fn test_event_focus() {
         use Event;
-        use input::Input;
+        use super::super::Input;
 
         let e = Event::Input(Input::Focus(false));
         let x: Option<Event> = FocusEvent::from_focused(true, &e);

@@ -42,7 +42,7 @@ mod tests {
 
     #[test]
     fn test_input_resize() {
-        use input::Input;
+        use super::super::Input;
 
         let e = Input::Resize(0, 0);
         let x: Option<Input> = ResizeEvent::from_width_height(100, 100, &e);
@@ -54,7 +54,7 @@ mod tests {
     #[test]
     fn test_event_resize() {
         use Event;
-        use input::Input;
+        use super::super::Input;
 
         let e = Event::Input(Input::Resize(0, 0));
         let x: Option<Event> = ResizeEvent::from_width_height(100, 100, &e);

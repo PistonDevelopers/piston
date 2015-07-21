@@ -1,8 +1,11 @@
 use std::any::Any;
 
 use GenericEvent;
-use AfterRenderArgs;
 use AFTER_RENDER;
+
+/// After render arguments.
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct AfterRenderArgs;
 
 /// After rendering and buffers are swapped.
 pub trait AfterRenderEvent {

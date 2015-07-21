@@ -43,7 +43,7 @@ mod tests {
 
     #[test]
     fn test_input_text() {
-        use input::Input;
+        use super::super::Input;
 
         let e = Input::Text("".to_string());
         let x: Option<Input> = TextEvent::from_text("hello", &e);
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn test_event_text() {
         use Event;
-        use input::Input;
+        use super::super::Input;
 
         let e = Event::Input(Input::Text("".to_string()));
         let x: Option<Event> = TextEvent::from_text("hello", &e);

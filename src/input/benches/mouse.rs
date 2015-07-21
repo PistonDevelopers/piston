@@ -2,12 +2,17 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
 extern crate input;
 
 use test::Bencher;
-use event::{ Event, MouseScrollEvent, MouseRelativeEvent, MouseCursorEvent };
-use input::{ Input, Motion };
+use input::{
+    Event,
+    Input,
+    Motion,
+    MouseScrollEvent,
+    MouseRelativeEvent,
+    MouseCursorEvent
+};
 
 #[bench]
 fn bench_input_mouse_cursor(bencher: &mut Bencher) {

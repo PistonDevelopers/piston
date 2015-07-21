@@ -2,12 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
 extern crate input;
 
 use test::Bencher;
-use event::{ Event, ResizeEvent };
-use input::Input;
+use input::{ Event, Input, ResizeEvent };
 
 #[bench]
 fn bench_input_resize(bencher: &mut Bencher) {

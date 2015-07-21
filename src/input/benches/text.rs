@@ -2,12 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
 extern crate input;
 
 use test::Bencher;
-use event::{ Event, TextEvent };
-use input::Input;
+use input::{ Event, Input, TextEvent };
 
 #[bench]
 fn bench_input_text(bencher: &mut Bencher) {
