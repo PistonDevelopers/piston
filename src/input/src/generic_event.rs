@@ -3,14 +3,16 @@
 use std::borrow::ToOwned;
 use std::any::Any;
 
-use input::{ Button, Input, Motion };
 use {
+    Button,
     Event,
     EventId,
     UpdateArgs,
     RenderArgs,
     AfterRenderArgs,
     IdleArgs,
+    Input,
+    Motion,
     IDLE,
     AFTER_RENDER,
     RENDER,

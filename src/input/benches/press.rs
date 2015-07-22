@@ -2,12 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
 extern crate input;
 
 use test::Bencher;
-use event::{ Event, PressEvent };
-use input::{ Button, Key, Input };
+use input::{ Button, Event, Key, Input, PressEvent };
 
 #[bench]
 fn bench_input_press(bencher: &mut Bencher) {

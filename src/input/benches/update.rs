@@ -2,10 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
+extern crate input;
 
 use test::Bencher;
-use event::{ Event, UpdateArgs, UpdateEvent };
+use input::{ Event, UpdateArgs, UpdateEvent };
 
 #[bench]
 fn bench_event_update(bencher: &mut Bencher) {

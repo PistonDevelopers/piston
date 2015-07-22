@@ -1,6 +1,13 @@
 use std::any::Any;
 
-use { GenericEvent, IdleArgs, IDLE };
+use { GenericEvent, IDLE };
+
+/// Idle arguments, such as expected idle time in seconds.
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct IdleArgs {
+    /// Expected idle time in seconds.
+    pub dt: f64
+}
 
 /// When background tasks should be performed
 pub trait IdleEvent: Sized {

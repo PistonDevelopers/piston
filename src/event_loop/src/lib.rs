@@ -5,59 +5,16 @@
 
 extern crate clock_ticks;
 extern crate window;
+extern crate input;
 extern crate viewport;
 
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::thread::sleep_ms;
 use std::cmp;
 use std::marker::PhantomData;
-use std::cell::RefCell;
-use std::rc::Rc;
 use window::Window;
-use viewport::Viewport;
-
-/// Render arguments
-#[derive(Copy, Clone, PartialEq, Debug)]
-pub struct RenderArgs {
-    /// Extrapolated time in seconds, used to do smooth animation.
-    pub ext_dt: f64,
-    /// The width of rendered area in points.
-    pub width: u32,
-    /// The height of rendered area in points.
-    pub height: u32,
-    /// The width of rendered area in pixels.
-    pub draw_width: u32,
-    /// The height of rendered area in pixels.
-    pub draw_height: u32,
-}
-
-impl RenderArgs {
-    /// Returns viewport information filling entire render area.
-    pub fn viewport(&self) -> Viewport {
-        Viewport {
-            rect: [0, 0, self.draw_width as i32, self.draw_height as i32],
-            window_size: [self.width, self.height],
-            draw_size: [self.draw_width, self.draw_height],
-        }
-    }
-}
-
-/// After render arguments.
-#[derive(Copy, Clone, PartialEq, Debug)]
-pub struct AfterRenderArgs;
-
-/// Update arguments, such as delta time in seconds
-#[derive(Copy, Clone, PartialEq, Debug)]
-pub struct UpdateArgs {
-    /// Delta time in seconds.
-    pub dt: f64,
-}
-
-/// Idle arguments, such as expected idle time in seconds.
-#[derive(Copy, Clone, PartialEq, Debug)]
-pub struct IdleArgs {
-    /// Expected idle time in seconds.
-    pub dt: f64
-}
+use input::{ AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs };
 
 /// Methods required to map from consumed event to emitted event.
 pub trait EventMap<I> {
@@ -73,12 +30,55 @@ pub trait EventMap<I> {
     fn idle(IdleArgs) -> Self;
 }
 
+impl<I> EventMap<I> for Event<I> {
+    fn render(args: RenderArgs) -> Event<I> {
+        Event::Render(args)
+    }
+    fn after_render(args: AfterRenderArgs) -> Event<I> {
+        Event::AfterRender(args)
+    }
+    fn update(args: UpdateArgs) -> Event<I> {
+        Event::Update(args)
+    }
+    fn idle(args: IdleArgs) -> Event<I> {
+        Event::Idle(args)
+    }
+    fn input(args: I) -> Event<I> {
+        Event::Input(args)
+    }
+}
+
+/// A trait for create event iterator from window.
+pub trait Events<W> where W: Window {
+    /// Creates event iterator from window.
+    fn events(self) -> WindowEvents<W, Event<W::Event>>;
+}
+
+impl<W> Events<W> for Rc<RefCell<W>> where W: Window {
+    fn events(self) -> WindowEvents<W, Event<W::Event>> {
+        WindowEvents::new(self)
+    }
+}
+
+impl<W> Events<W> for W where W: Window {
+    fn events(self) -> WindowEvents<W, Event<W::Event>> {
+        Rc::new(RefCell::new(self)).events()
+    }
+}
+
+impl<'a, W> Events<W> for &'a Rc<RefCell<W>> where W: Window {
+    fn events(self) -> WindowEvents<W, Event<W::Event>> {
+        self.clone().events()
+    }
+}
+
 /// Tells whether last emitted event was idle or not.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Idle {
     No,
     Yes
 }
+
 
 #[derive(Copy, Clone, Debug)]
 enum State {
@@ -96,7 +96,7 @@ pub trait EventLoop: Sized {
     /// This is the fixed update rate on average over time.
     /// If the event loop lags, it will try to catch up.
     fn set_ups(&mut self, frames: u64);
-    
+
     /// The number of updates per second
     ///
     /// This is the fixed update rate on average over time.
@@ -105,14 +105,14 @@ pub trait EventLoop: Sized {
         self.set_ups(frames);
         self
     }
-    
+
     /// The maximum number of frames per second
     ///
     /// The frame rate can be lower because the
     /// next frame is always scheduled from the previous frame.
     /// This causes the frames to "slip" over time.
     fn set_max_fps(&mut self, frames: u64);
-    
+
     /// The maximum number of frames per second
     ///
     /// The frame rate can be lower because the
@@ -122,21 +122,21 @@ pub trait EventLoop: Sized {
         self.set_max_fps(frames);
         self
     }
-    
+
     /// Enable or disable automatic swapping of buffers.
     fn set_swap_buffers(&mut self, enable: bool);
-    
+
     /// Enable or disable automatic swapping of buffers.
     fn swap_buffers(mut self, enable: bool) -> Self {
         self.set_swap_buffers(enable);
         self
     }
-    
+
     /// Enable or disable benchmark mode.
     /// When enabled, it will render and update without sleep and ignore input.
     /// Used to test performance by playing through as fast as possible.
     fn set_bench_mode(&mut self, enable: bool);
-    
+
     /// Enable or disable benchmark mode.
     /// When enabled, it will render and update without sleep and ignore input.
     /// Used to test performance by playing through as fast as possible.

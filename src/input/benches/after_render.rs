@@ -2,10 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
+extern crate input;
 
 use test::Bencher;
-use event::{ Event, AfterRenderArgs, AfterRenderEvent };
+use input::{ Event, AfterRenderArgs, AfterRenderEvent };
 
 #[bench]
 fn bench_event_after_render(bencher: &mut Bencher) {

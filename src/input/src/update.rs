@@ -1,6 +1,13 @@
 use std::any::Any;
 
-use { GenericEvent, UpdateArgs, UPDATE };
+use { GenericEvent, UPDATE };
+
+/// Update arguments, such as delta time in seconds
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub struct UpdateArgs {
+    /// Delta time in seconds.
+    pub dt: f64,
+}
 
 /// When the application state should be updated
 pub trait UpdateEvent: Sized {

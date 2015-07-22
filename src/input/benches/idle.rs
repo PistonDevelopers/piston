@@ -2,10 +2,10 @@
 #![feature(test)]
 
 extern crate test;
-extern crate event;
+extern crate input;
 
 use test::Bencher;
-use event::{ Event, IdleArgs, IdleEvent };
+use input::{ Event, IdleArgs, IdleEvent };
 
 #[bench]
 fn bench_event_idle(bencher: &mut Bencher) {

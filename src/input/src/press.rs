@@ -1,7 +1,6 @@
 use std::any::Any;
 
-use input::Button;
-use { GenericEvent, PRESS };
+use { Button, GenericEvent, PRESS };
 
 /// The press of a button
 pub trait PressEvent {
@@ -43,7 +42,7 @@ mod tests {
 
     #[test]
     fn test_input_press() {
-        use input::{ Button, Key, Input };
+        use super::super::{ Button, Key, Input };
 
         let e = Input::Press(Button::Keyboard(Key::S));
         let button = Button::Keyboard(Key::A);
@@ -57,7 +56,7 @@ mod tests {
     #[test]
     fn test_event_press() {
         use Event;
-        use input::{ Button, Key, Input };
+        use super::super::{ Button, Key, Input };
 
         let e = Event::Input(Input::Press(Button::Keyboard(Key::S)));
         let button = Button::Keyboard(Key::A);
