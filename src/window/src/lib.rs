@@ -41,6 +41,9 @@ pub trait Window {
     /// The event type emitted by `poll_event`
     type Event;
 
+    /// Tells the window to close or stay open.
+    fn set_should_close(&mut self, value: bool);
+
     /// Returns true if window should close.
     fn should_close(&self) -> bool;
 
@@ -243,6 +246,7 @@ impl From<WindowSettings> for NoWindow {
 impl Window for NoWindow {
     type Event = Input;
     fn should_close(&self) -> bool { self.should_close }
+    fn set_should_close(&mut self, value: bool) { self.should_close = value; }
     fn size(&self) -> Size { self.size }
     fn swap_buffers(&mut self) {}
     fn poll_event(&mut self) -> Option<Input> { None }
