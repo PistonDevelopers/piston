@@ -1,7 +1,6 @@
 
 //! Back-end agnostic mouse buttons.
 
-use num::{ FromPrimitive, ToPrimitive };
 use std::any::Any;
 
 use { GenericEvent, MOUSE_SCROLL, MOUSE_RELATIVE, MOUSE_CURSOR };
@@ -30,56 +29,36 @@ pub enum MouseButton {
     Button8,
 }
 
-impl FromPrimitive for MouseButton {
-    fn from_u64(n: u64) -> Option<MouseButton> {
+impl From<u32> for MouseButton {
+    fn from(n: u32) -> MouseButton {
         match n {
-            0 => Some(MouseButton::Unknown),
-            1 => Some(MouseButton::Left),
-            2 => Some(MouseButton::Right),
-            3 => Some(MouseButton::Middle),
-            4 => Some(MouseButton::X1),
-            5 => Some(MouseButton::X2),
-            6 => Some(MouseButton::Button6),
-            7 => Some(MouseButton::Button7),
-            8 => Some(MouseButton::Button8),
-            _ => Some(MouseButton::Unknown),
+            0 => MouseButton::Unknown,
+            1 => MouseButton::Left,
+            2 => MouseButton::Right,
+            3 => MouseButton::Middle,
+            4 => MouseButton::X1,
+            5 => MouseButton::X2,
+            6 => MouseButton::Button6,
+            7 => MouseButton::Button7,
+            8 => MouseButton::Button8,
+            _ => MouseButton::Unknown,
         }
-    }
-
-    #[inline(always)]
-    fn from_i64(n: i64) -> Option<MouseButton> {
-        FromPrimitive::from_u64(n as u64)
-    }
-
-    #[inline(always)]
-    fn from_isize(n: isize) -> Option<MouseButton> {
-        FromPrimitive::from_u64(n as u64)
     }
 }
 
-impl ToPrimitive for MouseButton {
-    fn to_u64(&self) -> Option<u64> {
-        match self {
-            &MouseButton::Unknown => Some(0),
-            &MouseButton::Left => Some(1),
-            &MouseButton::Right => Some(2),
-            &MouseButton::Middle => Some(3),
-            &MouseButton::X1 => Some(4),
-            &MouseButton::X2 => Some(5),
-            &MouseButton::Button6 => Some(6),
-            &MouseButton::Button7 => Some(7),
-            &MouseButton::Button8 => Some(8),
+impl From<MouseButton> for u32 {
+    fn from(button: MouseButton) -> u32 {
+        match button {
+            MouseButton::Unknown => 0,
+            MouseButton::Left => 1,
+            MouseButton::Right => 2,
+            MouseButton::Middle => 3,
+            MouseButton::X1 => 4,
+            MouseButton::X2 => 5,
+            MouseButton::Button6 => 6,
+            MouseButton::Button7 => 7,
+            MouseButton::Button8 => 8,
         }
-    }
-
-    #[inline(always)]
-    fn to_i64(&self) -> Option<i64> {
-        self.to_u64().map(|x| x as i64)
-    }
-
-    #[inline(always)]
-    fn to_isize(&self) -> Option<isize> {
-        self.to_u64().map(|x| x as isize)
     }
 }
 
@@ -89,11 +68,9 @@ mod mouse_button_tests {
 
     #[test]
     fn test_mouse_button_primitives() {
-        use num::{ FromPrimitive, ToPrimitive };
-
-        for i in 0u64..9 {
-            let button: MouseButton = FromPrimitive::from_u64(i).unwrap();
-            let j = ToPrimitive::to_u64(&button).unwrap();
+        for i in 0u32..9 {
+            let button: MouseButton = i.into();
+            let j: u32 = button.into();
             assert_eq!(i, j);
         }
     }

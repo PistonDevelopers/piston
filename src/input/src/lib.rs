@@ -8,7 +8,6 @@
 #[macro_use]
 extern crate bitflags;
 extern crate rustc_serialize;
-extern crate num;
 extern crate viewport;
 
 pub use mouse::MouseButton;
