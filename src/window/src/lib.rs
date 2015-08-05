@@ -64,6 +64,10 @@ pub trait Window {
 
 /// Implemented by fully supported window back-ends.
 pub trait AdvancedWindow: Window + Sized {
+    /// Builds window from window settings.
+    fn build_from_window_settings(settings: WindowSettings)
+    -> Result<Self, String>;
+
     /// Gets a copy of the title of the window.
     fn get_title(&self) -> String;
 
@@ -147,6 +151,11 @@ impl WindowSettings {
             vsync: false,
             opengl: None,
         }
+    }
+
+    /// Builds window.
+    pub fn build<W: AdvancedWindow>(self) -> Result<W, String> {
+        AdvancedWindow::build_from_window_settings(self)
     }
 
     /// Gets title.
@@ -237,12 +246,6 @@ impl NoWindow {
     }
 }
 
-impl From<WindowSettings> for NoWindow {
-    fn from(settings: WindowSettings) -> NoWindow {
-        NoWindow::new(settings)
-    }
-}
-
 impl Window for NoWindow {
     type Event = Input;
     fn should_close(&self) -> bool { self.should_close }
@@ -254,6 +257,10 @@ impl Window for NoWindow {
 }
 
 impl AdvancedWindow for NoWindow {
+    fn build_from_window_settings(settings: WindowSettings)
+    -> Result<Self, String> {
+        Ok(NoWindow::new(settings))
+    }
     fn get_title(&self) -> String { self.title.clone() }
     fn set_title(&mut self, value: String) { self.title = value; }
     fn get_exit_on_esc(&self) -> bool { false }
