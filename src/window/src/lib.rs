@@ -36,6 +36,13 @@ impl From<(u32, u32)> for Size {
     }
 }
 
+/// Builds window from window settings.
+pub trait BuildFromWindowSettings {
+    /// Builds window from window settings.
+    fn build_from_window_settings(settings: WindowSettings)
+    -> Result<Self, String>;
+}
+
 /// Required to use the event loop.
 pub trait Window {
     /// The event type emitted by `poll_event`
@@ -64,10 +71,6 @@ pub trait Window {
 
 /// Implemented by fully supported window back-ends.
 pub trait AdvancedWindow: Window + Sized {
-    /// Builds window from window settings.
-    fn build_from_window_settings(settings: WindowSettings)
-    -> Result<Self, String>;
-
     /// Gets a copy of the title of the window.
     fn get_title(&self) -> String;
 
@@ -154,8 +157,8 @@ impl WindowSettings {
     }
 
     /// Builds window.
-    pub fn build<W: AdvancedWindow>(self) -> Result<W, String> {
-        AdvancedWindow::build_from_window_settings(self)
+    pub fn build<W: BuildFromWindowSettings>(self) -> Result<W, String> {
+        BuildFromWindowSettings::build_from_window_settings(self)
     }
 
     /// Gets title.
@@ -256,11 +259,14 @@ impl Window for NoWindow {
     fn draw_size(&self) -> Size { self.size() }
 }
 
-impl AdvancedWindow for NoWindow {
+impl BuildFromWindowSettings for NoWindow {
     fn build_from_window_settings(settings: WindowSettings)
     -> Result<Self, String> {
         Ok(NoWindow::new(settings))
     }
+}
+
+impl AdvancedWindow for NoWindow {
     fn get_title(&self) -> String { self.title.clone() }
     fn set_title(&mut self, value: String) { self.title = value; }
     fn get_exit_on_esc(&self) -> bool { false }
