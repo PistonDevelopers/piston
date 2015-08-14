@@ -28,6 +28,7 @@ pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
 pub use text::TextEvent;
 pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
+pub use cursor::CursorEvent;
 
 pub mod generic_event;
 mod update;
@@ -40,12 +41,14 @@ mod release;
 mod text;
 mod resize;
 mod focus;
+mod cursor;
 
 /// Used to identify events arguments provided by traits.
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub struct EventId(pub &'static str);
 
 const FOCUS: EventId = EventId("piston/focus");
+const CURSOR: EventId = EventId("piston/cursor");
 const RESIZE: EventId = EventId("piston/resize");
 const TEXT: EventId = EventId("piston/text");
 const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
@@ -93,4 +96,6 @@ pub enum Input {
     Resize(u32, u32),
     /// Window gained or lost focus.
     Focus(bool),
+    /// Window gained or lost cursor.
+    Cursor(bool),
 }
