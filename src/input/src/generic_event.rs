@@ -25,6 +25,7 @@ use {
     MOUSE_RELATIVE,
     MOUSE_CURSOR,
     FOCUS,
+    CURSOR,
 };
 
 /// Implemented by all events
@@ -43,6 +44,7 @@ impl GenericEvent for Input {
     fn event_id(&self) -> EventId {
         match self {
             &Input::Focus(_) => FOCUS,
+            &Input::Cursor(_) => CURSOR,
             &Input::Press(_) => PRESS,
             &Input::Release(_) => RELEASE,
             &Input::Move(Motion::MouseCursor(_, _)) => MOUSE_CURSOR,
@@ -59,6 +61,9 @@ impl GenericEvent for Input {
         match self {
             &Input::Focus(focused) => {
                 f(&focused as &Any)
+            }
+            &Input::Cursor(cursor) => {
+                f(&cursor as &Any)
             }
             &Input::Press(button) => {
                 f(&button as &Any)
@@ -89,6 +94,13 @@ impl GenericEvent for Input {
             x if x == FOCUS => {
                 if let Some(&focused) = any.downcast_ref::<bool>() {
                     Some(Input::Focus(focused))
+                } else {
+                    panic!("Expected bool")
+                }
+            }
+            x if x == CURSOR => {
+                if let Some(&cursor) = any.downcast_ref::<bool>() {
+                    Some(Input::Cursor(cursor))
                 } else {
                     panic!("Expected bool")
                 }
