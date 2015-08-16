@@ -27,7 +27,7 @@ Add [piston_window](https://crates.io/crates/piston_window) to your Cargo.toml, 
 
 ```
 [dependencies]
-piston_window = "0.11.0"
+piston_window = "0.15.0"
 ```
 
 In "src/main.rs", type the following code:
@@ -40,7 +40,7 @@ use piston_window::*;
 fn main() {
     let window: PistonWindow =
         WindowSettings::new("Hello Piston!", [640, 480])
-        .exit_on_esc(true).into();
+        .exit_on_esc(true).build().unwrap();
     for e in window {
         e.draw_2d(|c, g| {
             clear([1.0; 4], g);
