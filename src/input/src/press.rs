@@ -3,7 +3,7 @@ use std::any::Any;
 use { Button, GenericEvent, PRESS };
 
 /// The press of a button
-pub trait PressEvent {
+pub trait PressEvent: Sized {
     /// Creates a press event.
     fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a press event.

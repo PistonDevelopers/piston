@@ -4,7 +4,7 @@ use std::any::Any;
 use { GenericEvent, TEXT };
 
 /// When receiving text from user, such as typing a character
-pub trait TextEvent {
+pub trait TextEvent: Sized {
     /// Creates a text event.
     fn from_text(text: &str, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a text event.

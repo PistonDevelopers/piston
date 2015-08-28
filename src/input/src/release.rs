@@ -3,7 +3,7 @@ use std::any::Any;
 use { Button, GenericEvent, RELEASE };
 
 /// The release of a button
-pub trait ReleaseEvent {
+pub trait ReleaseEvent: Sized {
     /// Creates a release event.
     fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a release event.

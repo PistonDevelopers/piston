@@ -29,7 +29,7 @@ use {
 };
 
 /// Implemented by all events
-pub trait GenericEvent {
+pub trait GenericEvent: Sized {
     /// The id of this event.
     fn event_id(&self) -> EventId;
     /// Calls closure with arguments

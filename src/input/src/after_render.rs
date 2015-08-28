@@ -8,7 +8,7 @@ use AFTER_RENDER;
 pub struct AfterRenderArgs;
 
 /// After rendering and buffers are swapped.
-pub trait AfterRenderEvent {
+pub trait AfterRenderEvent: Sized {
     /// Creates an after render event.
     fn from_after_render_args(args: &AfterRenderArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is an after render event.

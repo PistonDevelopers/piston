@@ -3,7 +3,7 @@ use std::any::Any;
 use { GenericEvent, RESIZE };
 
 /// When the window is resized
-pub trait ResizeEvent {
+pub trait ResizeEvent: Sized {
     /// Creates a resize event.
     fn from_width_height(w: u32, h: u32, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a resize event.
