@@ -3,7 +3,7 @@ use std::any::Any;
 use { GenericEvent, CURSOR };
 
 /// When window gets or looses cursor
-pub trait CursorEvent {
+pub trait CursorEvent: Sized {
     /// Creates a cursor event.
     fn from_cursor(cursor: bool, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a cursor event.

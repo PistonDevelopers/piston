@@ -30,7 +30,7 @@ impl RenderArgs {
 }
 
 /// When the next frame should be rendered
-pub trait RenderEvent {
+pub trait RenderEvent: Sized {
     /// Creates a render event.
     fn from_render_args(args: &RenderArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a render event.

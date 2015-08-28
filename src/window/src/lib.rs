@@ -37,7 +37,7 @@ impl From<(u32, u32)> for Size {
 }
 
 /// Builds window from window settings.
-pub trait BuildFromWindowSettings {
+pub trait BuildFromWindowSettings: Sized {
     /// Builds window from window settings.
     fn build_from_window_settings(settings: WindowSettings)
     -> Result<Self, String>;

@@ -77,7 +77,7 @@ mod mouse_button_tests {
 }
 
 /// The position of the mouse cursor
-pub trait MouseCursorEvent {
+pub trait MouseCursorEvent: Sized {
     /// Creates a mouse cursor event.
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a mouse cursor event.
@@ -111,7 +111,7 @@ impl<T: GenericEvent> MouseCursorEvent for T {
 }
 
 /// The relative movement of mouse cursor
-pub trait MouseRelativeEvent {
+pub trait MouseRelativeEvent: Sized {
     /// Creates a mouse relative event.
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a mouse relative event.
@@ -145,7 +145,7 @@ impl<T: GenericEvent> MouseRelativeEvent for T {
 }
 
 /// The scroll of the mouse wheel
-pub trait MouseScrollEvent {
+pub trait MouseScrollEvent: Sized {
     /// Creates a mouse scroll event.
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self>;
     /// Calls a closure if this is a mouse scroll event.
