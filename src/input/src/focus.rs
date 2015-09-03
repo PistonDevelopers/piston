@@ -2,7 +2,7 @@ use std::any::Any;
 
 use { GenericEvent, FOCUS };
 
-/// When window gets or looses focus
+/// When window gets or loses focus
 pub trait FocusEvent: Sized {
     /// Creates a focus event.
     fn from_focused(focused: bool, old_event: &Self) -> Option<Self>;
