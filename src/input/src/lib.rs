@@ -12,9 +12,11 @@ extern crate viewport;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
+pub use joystick::{ JoystickAxisArgs, JoystickButton };
 
 pub mod keyboard;
 pub mod mouse;
+pub mod joystick;
 
 pub use generic_event::GenericEvent;
 pub use update::{ UpdateArgs, UpdateEvent };
@@ -25,6 +27,7 @@ pub use event::Event;
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
 pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
+pub use joystick::{ JoystickAxisEvent };
 pub use text::TextEvent;
 pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
@@ -44,7 +47,7 @@ mod focus;
 mod cursor;
 
 /// Used to identify events arguments provided by traits.
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct EventId(pub &'static str);
 
 const FOCUS: EventId = EventId("piston/focus");
@@ -54,6 +57,7 @@ const TEXT: EventId = EventId("piston/text");
 const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
 const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
 const MOUSE_CURSOR: EventId = EventId("piston/mouse_cursor");
+const JOYSTICK_AXIS: EventId = EventId("piston/joystick_axis");
 const RELEASE: EventId = EventId("piston/release");
 const PRESS: EventId = EventId("piston/press");
 const IDLE: EventId = EventId("piston/idle");
@@ -68,6 +72,8 @@ pub enum Button {
     Keyboard(Key),
     /// A mouse button.
     Mouse(MouseButton),
+    /// A joystick button.
+    Joystick(JoystickButton),
 }
 
 /// Models different kinds of motion.
@@ -79,6 +85,8 @@ pub enum Motion {
     MouseRelative(f64, f64),
     /// x and y in scroll ticks.
     MouseScroll(f64, f64),
+    /// joystick axis move event.
+    JoystickAxis(JoystickAxisArgs),
 }
 
 /// Models input events.
