@@ -273,3 +273,20 @@ impl AdvancedWindow for NoWindow {
     fn set_exit_on_esc(&mut self, _value: bool) {}
     fn set_capture_cursor(&mut self, _value: bool) {}
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    #[allow(unused_variables)]
+    fn test_zero_size() {
+        let both_zero = Size { height: 0, width: 1 };
+        let height_zero = Size { height: 0, width: 1 };
+        let width_zero = Size { height: 1, width: 0 };
+    }
+
+    // fn test_overflow_size() should we add this?
+
+}
