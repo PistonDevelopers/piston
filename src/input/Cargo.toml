@@ -1,6 +1,6 @@
 [package]
 name = "pistoncore-input"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
 keywords = ["keyboard", "mouse", "input", "piston"]
 description = "A structure for user input"
@@ -16,4 +16,4 @@ path = "src/lib.rs"
 [dependencies]
 rustc-serialize = "0.3.16"
 bitflags = "0.3.2"
-piston-viewport = "0.1.0"
+piston-viewport = "0.2.0"
