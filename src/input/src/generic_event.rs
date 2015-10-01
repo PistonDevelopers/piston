@@ -3,6 +3,8 @@
 use std::borrow::ToOwned;
 use std::any::Any;
 
+use joystick::JoystickAxisArgs;
+
 use {
     Button,
     Event,
@@ -24,6 +26,7 @@ use {
     MOUSE_SCROLL,
     MOUSE_RELATIVE,
     MOUSE_CURSOR,
+    JOYSTICK_AXIS,
     FOCUS,
     CURSOR,
 };
@@ -50,6 +53,7 @@ impl GenericEvent for Input {
             &Input::Move(Motion::MouseCursor(_, _)) => MOUSE_CURSOR,
             &Input::Move(Motion::MouseRelative(_, _)) => MOUSE_RELATIVE,
             &Input::Move(Motion::MouseScroll(_, _)) => MOUSE_SCROLL,
+            &Input::Move(Motion::JoystickAxis(_)) => JOYSTICK_AXIS,
             &Input::Text(_) => TEXT,
             &Input::Resize(_, _) => RESIZE,
         }
@@ -79,6 +83,9 @@ impl GenericEvent for Input {
             }
             &Input::Move(Motion::MouseScroll(x, y)) => {
                 f(&(x, y) as &Any)
+            }
+            &Input::Move(Motion::JoystickAxis(args)) => {
+                f(&args as &Any)
             }
             &Input::Text(ref text) => {
                 f(text as &Any)
@@ -124,6 +131,13 @@ impl GenericEvent for Input {
                     Some(Input::Move(Motion::MouseScroll(x, y)))
                 } else {
                     panic!("Expected (f64, f64)")
+                }
+            }
+            x if x == JOYSTICK_AXIS => {
+                if let Some(&args) = any.downcast_ref::<JoystickAxisArgs>() {
+                    Some(Input::Move(Motion::JoystickAxis(args)))
+                } else {
+                    panic!("Expected JoystickAxisArgs")
                 }
             }
             x if x == PRESS => {
