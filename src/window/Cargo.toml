@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.10.0"
+version = "0.11.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>"
@@ -19,7 +19,7 @@ path = "src/lib.rs"
 
 [dependencies.pistoncore-input]
 path = "../input"
-version = "0.6.0"
+version = "0.7.0"
 
 [dependencies]
 libc = "0.1"
