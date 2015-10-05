@@ -3,7 +3,7 @@
 use std::default::Default;
 use std::cmp::Ordering;
 
-use Input;
+use GenericEvent;
 use Button;
 
 // Defining every combination to allow assignment in static expressions.
@@ -63,26 +63,37 @@ impl ModifierKey {
     /// Change modifier key state depending on input.
     ///
     /// If the left or side button is released, it counts as a release.
-    pub fn handle_input(&mut self, input: &Input) {
-        match *input {
-            Input::Press(Button::Keyboard(Key::LCtrl))
-          | Input::Press(Button::Keyboard(Key::RCtrl)) => self.insert(CTRL),
-            Input::Release(Button::Keyboard(Key::LCtrl))
-          | Input::Release(Button::Keyboard(Key::RCtrl)) => self.remove(CTRL),
-            Input::Press(Button::Keyboard(Key::LShift))
-          | Input::Press(Button::Keyboard(Key::RShift)) => self.insert(SHIFT),
-            Input::Release(Button::Keyboard(Key::LShift))
-          | Input::Release(Button::Keyboard(Key::RShift)) => self.remove(SHIFT),
-            Input::Press(Button::Keyboard(Key::LAlt))
-          | Input::Press(Button::Keyboard(Key::RAlt)) => self.insert(ALT),
-            Input::Release(Button::Keyboard(Key::LAlt))
-          | Input::Release(Button::Keyboard(Key::RAlt)) => self.remove(ALT),
-            Input::Press(Button::Keyboard(Key::LGui))
-          | Input::Press(Button::Keyboard(Key::RGui)) => self.insert(GUI),
-            Input::Release(Button::Keyboard(Key::LGui))
-          | Input::Release(Button::Keyboard(Key::RGui)) => self.remove(GUI),
-            Input::Focus(false) => *self = NO_MODIFIER,
-            _ => {}
+    pub fn event<E: GenericEvent>(&mut self, e: &E) {
+        use { FocusEvent, PressEvent, ReleaseEvent };
+
+        if let Some(button) = e.press_args() {
+            match button {
+                Button::Keyboard(Key::LCtrl) |
+                Button::Keyboard(Key::RCtrl) => self.insert(CTRL),
+                Button::Keyboard(Key::LShift) |
+                Button::Keyboard(Key::RShift) => self.insert(SHIFT),
+                Button::Keyboard(Key::LAlt) |
+                Button::Keyboard(Key::RAlt) => self.insert(ALT),
+                Button::Keyboard(Key::LGui) |
+                Button::Keyboard(Key::RGui) => self.insert(GUI),
+                _ => {}
+            }
+        }
+        if let Some(button) = e.release_args() {
+            match button {
+                Button::Keyboard(Key::LCtrl) |
+                Button::Keyboard(Key::RCtrl) => self.remove(CTRL),
+                Button::Keyboard(Key::LShift) |
+                Button::Keyboard(Key::RShift) => self.remove(SHIFT),
+                Button::Keyboard(Key::LAlt) |
+                Button::Keyboard(Key::RAlt) => self.remove(ALT),
+                Button::Keyboard(Key::LGui) |
+                Button::Keyboard(Key::RGui) => self.remove(GUI),
+                _ => {}
+            }
+        }
+        if let Some(false) = e.focus_args() {
+            *self = NO_MODIFIER;
         }
     }
 }
