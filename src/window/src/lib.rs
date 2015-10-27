@@ -14,7 +14,7 @@ use input::Input;
 pub type ProcAddress = *const libc::c_void;
 
 /// Size in pixels.
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Size {
     /// The width in pixels.
     pub width: u32,
