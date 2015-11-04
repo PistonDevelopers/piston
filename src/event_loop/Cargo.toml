@@ -29,5 +29,5 @@ path = "../input"
 version = "0.8.0"
 
 [dependencies]
-clock_ticks = "0.0.6"
+clock_ticks = "0.1.0"
 piston-viewport = "0.2.0"
