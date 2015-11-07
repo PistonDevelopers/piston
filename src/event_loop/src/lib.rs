@@ -3,7 +3,7 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 
-extern crate clock_ticks;
+extern crate time;
 extern crate window;
 extern crate input;
 extern crate viewport;
@@ -186,7 +186,7 @@ impl<W, E> WindowEvents<W, E>
 {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new(window: Rc<RefCell<W>>) -> WindowEvents<W, E> {
-        let start = clock_ticks::precise_time_ns();
+        let start = time::precise_time_ns();
         let updates_per_second = DEFAULT_UPS;
         let max_frames_per_second = DEFAULT_MAX_FPS;
         WindowEvents {
@@ -247,7 +247,7 @@ impl<W, E> Iterator for WindowEvents<W, E>
                         self.last_frame += self.dt_frame_in_ns;
                     } else {
                         // In normal mode, let the FPS slip if late.
-                        self.last_frame = clock_ticks::precise_time_ns();
+                        self.last_frame = time::precise_time_ns();
                     }
 
                     let size = window.size();
@@ -290,7 +290,7 @@ impl<W, E> Iterator for WindowEvents<W, E>
                             State::HandleEvents
                         }
                     } else {
-                        let current_time = clock_ticks::precise_time_ns();
+                        let current_time = time::precise_time_ns();
                         let next_frame = self.last_frame + self.dt_frame_in_ns;
                         let next_update = self.last_update + self.dt_update_in_ns;
                         let next_event = cmp::min(next_frame, next_update);
