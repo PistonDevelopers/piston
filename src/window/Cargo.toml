@@ -22,5 +22,5 @@ path = "../input"
 version = "0.8.0"
 
 [dependencies]
-libc = "0.1"
+libc = "0.2"
 shader_version = "0.2.1"
