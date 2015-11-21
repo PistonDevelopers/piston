@@ -3,14 +3,15 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 
-extern crate time;
 extern crate window;
 extern crate input;
 extern crate viewport;
+extern crate time;
 
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::thread::sleep_ms;
+use std::thread::sleep;
+use std::time::Duration;
 use std::cmp;
 use std::marker::PhantomData;
 use window::Window;
@@ -170,8 +171,10 @@ pub struct WindowEvents<W, E>
 
 static BILLION: u64 = 1_000_000_000;
 
-fn ns_to_ms(ns: u64) -> u32 {
-    (ns / 1_000_000) as u32
+fn ns_to_duration(ns: u64) -> Duration {
+    let secs = ns / BILLION;
+    let nanos = (ns % BILLION) as u32;
+    Duration::new(secs, nanos)
 }
 
 /// The default updates per second.
@@ -303,7 +306,7 @@ impl<W, E> Iterator for WindowEvents<W, E>
                                 let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
                                 return Some(EventMap::idle(IdleArgs { dt: seconds }))
                             }
-                            sleep_ms(ns_to_ms(next_event - current_time));
+                            sleep(ns_to_duration(next_event - current_time));
                             State::UpdateLoop(Idle::No)
                         } else if next_event == next_frame {
                             State::Render

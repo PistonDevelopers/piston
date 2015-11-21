@@ -3,7 +3,6 @@
 
 //! Window abstraction
 
-extern crate libc;
 extern crate input;
 extern crate shader_version;
 
@@ -11,7 +10,7 @@ use shader_version::OpenGL;
 use input::Input;
 
 /// The type of an OpenGL function address.
-pub type ProcAddress = *const libc::c_void;
+pub type ProcAddress = *const ();
 
 /// Size in pixels.
 #[derive(Debug, Copy, Clone)]
