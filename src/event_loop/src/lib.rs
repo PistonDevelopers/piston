@@ -17,38 +17,6 @@ use std::marker::PhantomData;
 use window::Window;
 use input::{ AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs };
 
-/// Methods required to map from consumed event to emitted event.
-pub trait EventMap<I> {
-    /// Creates a render event.
-    fn render(args: RenderArgs) -> Self;
-    /// Creates an after render event.
-    fn after_render(args: AfterRenderArgs) -> Self;
-    /// Creates an update event.
-    fn update(args: UpdateArgs) -> Self;
-    /// Creates an input event.
-    fn input(args: I) -> Self;
-    /// Creates an idle event.
-    fn idle(IdleArgs) -> Self;
-}
-
-impl<I> EventMap<I> for Event<I> {
-    fn render(args: RenderArgs) -> Event<I> {
-        Event::Render(args)
-    }
-    fn after_render(args: AfterRenderArgs) -> Event<I> {
-        Event::AfterRender(args)
-    }
-    fn update(args: UpdateArgs) -> Event<I> {
-        Event::Update(args)
-    }
-    fn idle(args: IdleArgs) -> Event<I> {
-        Event::Idle(args)
-    }
-    fn input(args: I) -> Event<I> {
-        Event::Input(args)
-    }
-}
-
 /// A trait for create event iterator from window.
 pub trait Events<W> where W: Window {
     /// Creates event iterator from window.
@@ -153,9 +121,7 @@ pub trait EventLoop: Sized {
 /// it must be used on the same thread as the window back-end (usually main thread),
 /// unless the window back-end supports multi-thread event polling.*
 pub struct WindowEvents<W, E>
-    where
-        W: Window,
-        E: EventMap<<W as Window>::Event>
+    where W: Window
 {
     window: Rc<RefCell<W>>,
     state: State,
@@ -182,13 +148,11 @@ pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: u64 = 60;
 
-impl<W, E> WindowEvents<W, E>
-    where
-        W: Window,
-        E: EventMap<<W as Window>::Event>
+impl<W> WindowEvents<W, Event<<W as Window>::Event>>
+    where W: Window
 {
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new(window: Rc<RefCell<W>>) -> WindowEvents<W, E> {
+    pub fn new(window: Rc<RefCell<W>>) -> WindowEvents<W, Event<<W as Window>::Event>> {
         let start = time::precise_time_ns();
         let updates_per_second = DEFAULT_UPS;
         let max_frames_per_second = DEFAULT_MAX_FPS;
@@ -207,10 +171,8 @@ impl<W, E> WindowEvents<W, E>
     }
 }
 
-impl<W, E> EventLoop for WindowEvents<W, E>
-    where
-        W: Window,
-        E: EventMap<<W as Window>::Event>
+impl<W> EventLoop for WindowEvents<W, Event<<W as Window>::Event>>
+    where W: Window
 {
     fn set_ups(&mut self, frames: u64) {
         self.dt_update_in_ns = BILLION / frames;
@@ -230,15 +192,13 @@ impl<W, E> EventLoop for WindowEvents<W, E>
     }
 }
 
-impl<W, E> Iterator for WindowEvents<W, E>
-    where
-        W: Window,
-        E: EventMap<<W as Window>::Event>,
+impl<W> Iterator for WindowEvents<W, Event<<W as Window>::Event>>
+    where W: Window
 {
-    type Item = E;
+    type Item = Event<<W as Window>::Event>;
 
     /// Returns the next game event.
-    fn next(&mut self) -> Option<E> {
+    fn next(&mut self) -> Option<Event<<W as Window>::Event>> {
         loop {
             self.state = match self.state {
                 State::Render => {
@@ -258,7 +218,7 @@ impl<W, E> Iterator for WindowEvents<W, E>
                     if size.width != 0 && size.height != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
-                        return Some(EventMap::render(RenderArgs {
+                        return Some(Event::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: (self.last_frame - self.last_update) as f64
                                     / BILLION as f64,
@@ -275,7 +235,7 @@ impl<W, E> Iterator for WindowEvents<W, E>
                     if self.swap_buffers {
                         self.window.borrow_mut().swap_buffers();
                         self.state = State::UpdateLoop(Idle::No);
-                        return Some(EventMap::after_render(AfterRenderArgs));
+                        return Some(Event::AfterRender(AfterRenderArgs));
                     } else {
                         State::UpdateLoop(Idle::No)
                     }
@@ -300,11 +260,11 @@ impl<W, E> Iterator for WindowEvents<W, E>
                         if next_event > current_time {
                             if let Some(x) = self.window.borrow_mut().poll_event() {
                                 *idle = Idle::No;
-                                return Some(EventMap::input(x));
+                                return Some(Event::Input(x));
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
                                 let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
-                                return Some(EventMap::idle(IdleArgs { dt: seconds }))
+                                return Some(Event::Idle(IdleArgs { dt: seconds }))
                             }
                             sleep(ns_to_duration(next_event - current_time));
                             State::UpdateLoop(Idle::No)
@@ -326,14 +286,14 @@ impl<W, E> Iterator for WindowEvents<W, E>
                         // Handle all events before updating.
                         match self.window.borrow_mut().poll_event() {
                             None => State::Update,
-                            Some(x) => { return Some(EventMap::input(x)); },
+                            Some(x) => { return Some(Event::Input(x)); },
                         }
                     }
                 }
                 State::Update => {
                     self.state = State::UpdateLoop(Idle::No);
                     self.last_update += self.dt_update_in_ns;
-                    return Some(EventMap::update(UpdateArgs{ dt: self.dt }));
+                    return Some(Event::Update(UpdateArgs{ dt: self.dt }));
                 }
             };
         }
