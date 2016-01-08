@@ -1,7 +1,7 @@
 [package]
 
 name = "piston"
-version = "0.16.0"
+version = "0.17.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -37,4 +37,4 @@ version = "0.14.0"
 
 [dependencies.pistoncore-event_loop]
 path = "src/event_loop"
-version = "0.16.0"
+version = "0.17.0"
