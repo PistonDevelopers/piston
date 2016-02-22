@@ -134,13 +134,18 @@ pub struct WindowSettings {
     vsync: bool,
     /// An optional OpenGL version.
     opengl: Option<OpenGL>,
+    /// Whether sRGB is enabled.
+    srgb: bool,
 }
 
 impl WindowSettings {
     /// Creates window settings with defaults.
+    ///
     /// - samples: 0
     /// - fullscreen: false
     /// - exit_on_esc: false
+    /// - vsync: false
+    /// - srgb: true
     pub fn new<T: Into<String>, S: Into<Size>>(
         title: T, size: S) -> WindowSettings
     {
@@ -152,6 +157,7 @@ impl WindowSettings {
             exit_on_esc: false,
             vsync: false,
             opengl: None,
+            srgb: true,
         }
     }
 
@@ -200,12 +206,17 @@ impl WindowSettings {
     pub fn get_samples(&self) -> u8 { self.samples }
 
     /// Sets samples.
+    ///
+    /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// for more information.
     pub fn samples(mut self, value: u8) -> Self {
         self.samples = value;
         self
     }
 
     /// Gets vsync.
+    ///
+    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information.
     pub fn get_vsync(&self) -> bool { self.vsync }
 
     /// Sets vsync.
@@ -226,6 +237,17 @@ impl WindowSettings {
     /// Sets opengl.
     pub fn opengl(mut self, value: OpenGL) -> Self {
         self.opengl = Some(value);
+        self
+    }
+
+    /// Gets sRGB.
+    pub fn get_srgb(&self) -> bool { self.srgb }
+
+    /// Sets sRGB.
+    ///
+    /// See https://en.wikipedia.org/wiki/SRGB for more information.
+    pub fn srgb(mut self, value: bool) -> Self {
+        self.srgb = value;
         self
     }
 }
