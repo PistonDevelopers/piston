@@ -107,3 +107,33 @@ pub enum Input {
     /// Window gained or lost cursor.
     Cursor(bool),
 }
+
+impl From<Key> for Button {
+    fn from(key: Key) -> Self {
+        Button::Keyboard(key)
+    }
+}
+
+impl From<MouseButton> for Button {
+    fn from(btn: MouseButton) -> Self {
+        Button::Mouse(btn)
+    }
+}
+
+impl From<JoystickButton> for Button {
+    fn from(btn: JoystickButton) -> Self {
+        Button::Joystick(btn)
+    }
+}
+
+impl From<JoystickAxisArgs> for Motion {
+    fn from(args: JoystickAxisArgs) -> Self {
+        Motion::JoystickAxis(args)
+    }
+}
+
+impl From<Motion> for Input {
+    fn from(motion: Motion) -> Self {
+        Input::Move(motion)
+    }
+}
