@@ -20,3 +20,33 @@ pub enum Event<I = Input> {
     /// Input event.
     Input(I),
 }
+
+impl<I> From<RenderArgs> for Event<I> {
+    fn from(args: RenderArgs) -> Self {
+        Event::Render(args)
+    }
+}
+
+impl<I> From<AfterRenderArgs> for Event<I> {
+    fn from(args: AfterRenderArgs) -> Self {
+        Event::AfterRender(args)
+    }
+}
+
+impl<I> From<UpdateArgs> for Event<I> {
+    fn from(args: UpdateArgs) -> Self {
+        Event::Update(args)
+    }
+}
+
+impl<I> From<IdleArgs> for Event<I> {
+    fn from(args: IdleArgs) -> Self {
+        Event::Idle(args)
+    }
+}
+
+impl From<Input> for Event<Input> {
+    fn from(input: Input) -> Self {
+        Event::Input(input)
+    }
+}
