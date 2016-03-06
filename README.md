@@ -18,6 +18,8 @@ Maintainers of Piston core libraries: @bvssvni
 
 [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 
+[Discussion forum](http://discourse.piston.rs/)
+
 ## Start new project with Piston
 
 You should know how to build "hello world" with Rust, see http://www.rust-lang.org/.
