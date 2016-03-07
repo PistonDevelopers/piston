@@ -2,8 +2,6 @@
 
 A structure for user input.
 
-For generic event programming, use [event](https://github.com/pistondevelopers/event).
-
 This library contains:
 
 * Press and release of buttons
