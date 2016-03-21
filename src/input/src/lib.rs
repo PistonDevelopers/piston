@@ -12,11 +12,11 @@ extern crate viewport;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
-pub use joystick::{ JoystickAxisArgs, JoystickButton };
+pub use controller::{ ControllerAxisArgs, ControllerButton };
 
 pub mod keyboard;
 pub mod mouse;
-pub mod joystick;
+pub mod controller;
 
 pub use generic_event::GenericEvent;
 pub use update::{ UpdateArgs, UpdateEvent };
@@ -27,7 +27,7 @@ pub use event::Event;
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
 pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
-pub use joystick::{ JoystickAxisEvent };
+pub use controller::{ ControllerAxisEvent };
 pub use text::TextEvent;
 pub use resize::ResizeEvent;
 pub use focus::FocusEvent;
@@ -57,7 +57,7 @@ const TEXT: EventId = EventId("piston/text");
 const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
 const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
 const MOUSE_CURSOR: EventId = EventId("piston/mouse_cursor");
-const JOYSTICK_AXIS: EventId = EventId("piston/joystick_axis");
+const CONTROLLER_AXIS: EventId = EventId("piston/controller_axis");
 const RELEASE: EventId = EventId("piston/release");
 const PRESS: EventId = EventId("piston/press");
 const IDLE: EventId = EventId("piston/idle");
@@ -72,8 +72,8 @@ pub enum Button {
     Keyboard(Key),
     /// A mouse button.
     Mouse(MouseButton),
-    /// A joystick button.
-    Joystick(JoystickButton),
+    /// A controller button.
+    Controller(ControllerButton),
 }
 
 /// Models different kinds of motion.
@@ -86,7 +86,7 @@ pub enum Motion {
     /// x and y in scroll ticks.
     MouseScroll(f64, f64),
     /// joystick axis move event.
-    JoystickAxis(JoystickAxisArgs),
+    ControllerAxis(ControllerAxisArgs),
 }
 
 /// Models input events.
@@ -120,15 +120,15 @@ impl From<MouseButton> for Button {
     }
 }
 
-impl From<JoystickButton> for Button {
-    fn from(btn: JoystickButton) -> Self {
-        Button::Joystick(btn)
+impl From<ControllerButton> for Button {
+    fn from(btn: ControllerButton) -> Self {
+        Button::Controller(btn)
     }
 }
 
-impl From<JoystickAxisArgs> for Motion {
-    fn from(args: JoystickAxisArgs) -> Self {
-        Motion::JoystickAxis(args)
+impl From<ControllerAxisArgs> for Motion {
+    fn from(args: ControllerAxisArgs) -> Self {
+        Motion::ControllerAxis(args)
     }
 }
 
