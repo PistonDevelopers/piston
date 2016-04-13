@@ -33,7 +33,7 @@ Add [piston_window](https://crates.io/crates/piston_window) to your Cargo.toml, 
 
 ```
 [dependencies]
-piston_window = "0.32.0"
+piston_window = "0.42.0"
 ```
 
 In "src/main.rs", type the following code:
