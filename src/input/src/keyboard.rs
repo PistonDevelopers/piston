@@ -10,7 +10,7 @@ use Button;
 bitflags!(
     #[allow(missing_docs)]
     #[derive(RustcDecodable, RustcEncodable)]
-    flags ModifierKey: u8 {
+    pub flags ModifierKey: u8 {
         /// No modifier.
         const NO_MODIFIER           = 0b00000000,
         /// Ctrl.
