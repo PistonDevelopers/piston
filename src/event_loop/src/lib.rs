@@ -162,10 +162,9 @@ impl WindowEvents
         where W: Window
     {
         loop {
+            if window.should_close() { return None; }
             self.state = match self.state {
                 State::Render => {
-                    if window.should_close() { return None; }
-
                     if self.bench_mode {
                         // In benchmark mode, pretend FPS is perfect.
                         self.last_frame += self.dt_frame_in_ns;
