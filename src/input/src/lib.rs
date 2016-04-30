@@ -31,7 +31,7 @@ pub use release::ReleaseEvent;
 pub use resize::ResizeEvent;
 pub use render::{ RenderArgs, RenderEvent };
 pub use text::TextEvent;
-pub use touch::TouchArgs;
+pub use touch::{ Touch, TouchArgs, TouchEvent };
 pub use update::{ UpdateArgs, UpdateEvent };
 
 pub mod generic_event;
