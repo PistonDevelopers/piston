@@ -3,33 +3,11 @@
 use std::borrow::ToOwned;
 use std::any::Any;
 
-use controller::ControllerAxisArgs;
-
-use {
-    Button,
-    Event,
-    EventId,
-    UpdateArgs,
-    RenderArgs,
-    AfterRenderArgs,
-    IdleArgs,
-    Input,
-    Motion,
-    IDLE,
-    AFTER_RENDER,
-    RENDER,
-    UPDATE,
-    TEXT,
-    RESIZE,
-    RELEASE,
-    PRESS,
-    MOUSE_SCROLL,
-    MOUSE_RELATIVE,
-    MOUSE_CURSOR,
-    CONTROLLER_AXIS,
-    FOCUS,
-    CURSOR,
-};
+use {AfterRenderArgs, ControllerAxisArgs, Button, Event, EventId, IdleArgs, Input,
+     Motion, RenderArgs, TouchArgs, UpdateArgs};
+use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
+     MOUSE_RELATIVE, MOUSE_SCROLL, PRESS, RENDER, RELEASE, RESIZE,
+     TEXT, TOUCH, UPDATE};
 
 /// Implemented by all events
 pub trait GenericEvent: Sized {
@@ -46,16 +24,17 @@ pub trait GenericEvent: Sized {
 impl GenericEvent for Input {
     fn event_id(&self) -> EventId {
         match self {
-            &Input::Focus(_) => FOCUS,
             &Input::Cursor(_) => CURSOR,
-            &Input::Press(_) => PRESS,
-            &Input::Release(_) => RELEASE,
+            &Input::Focus(_) => FOCUS,
             &Input::Move(Motion::MouseCursor(_, _)) => MOUSE_CURSOR,
             &Input::Move(Motion::MouseRelative(_, _)) => MOUSE_RELATIVE,
             &Input::Move(Motion::MouseScroll(_, _)) => MOUSE_SCROLL,
             &Input::Move(Motion::ControllerAxis(_)) => CONTROLLER_AXIS,
-            &Input::Text(_) => TEXT,
+            &Input::Move(Motion::Touch(_)) => TOUCH,
+            &Input::Press(_) => PRESS,
+            &Input::Release(_) => RELEASE,
             &Input::Resize(_, _) => RESIZE,
+            &Input::Text(_) => TEXT,
         }
     }
 
@@ -63,51 +42,50 @@ impl GenericEvent for Input {
         where F: FnMut(&Any) -> U
     {
         match self {
-            &Input::Focus(focused) => {
-                f(&focused as &Any)
-            }
-            &Input::Cursor(cursor) => {
-                f(&cursor as &Any)
-            }
-            &Input::Press(button) => {
-                f(&button as &Any)
-            }
-            &Input::Release(button) => {
-                f(&button as &Any)
-            }
-            &Input::Move(Motion::MouseCursor(x, y)) => {
-                f(&(x, y) as &Any)
-            }
-            &Input::Move(Motion::MouseRelative(x, y)) => {
-                f(&(x, y) as &Any)
-            }
-            &Input::Move(Motion::MouseScroll(x, y)) => {
-                f(&(x, y) as &Any)
-            }
-            &Input::Move(Motion::ControllerAxis(args)) => {
-                f(&args as &Any)
-            }
-            &Input::Text(ref text) => {
-                f(text as &Any)
-            }
-            &Input::Resize(w, h) => {
-                f(&(w, h) as &Any)
-            }
+            &Input::Cursor(cursor) =>
+                f(&cursor as &Any),
+            &Input::Focus(focused) =>
+                f(&focused as &Any),
+            &Input::Move(Motion::ControllerAxis(args)) =>
+                f(&args as &Any),
+            &Input::Move(Motion::MouseCursor(x, y)) =>
+                f(&(x, y) as &Any),
+            &Input::Move(Motion::MouseRelative(x, y)) =>
+                f(&(x, y) as &Any),
+            &Input::Move(Motion::MouseScroll(x, y)) =>
+                f(&(x, y) as &Any),
+            &Input::Move(Motion::Touch(args)) =>
+                f(&args as &Any),
+            &Input::Press(button) =>
+                f(&button as &Any),
+            &Input::Release(button) =>
+                f(&button as &Any),
+            &Input::Resize(w, h) =>
+                f(&(w, h) as &Any),
+            &Input::Text(ref text) =>
+                f(text as &Any),
         }
     }
 
     fn from_args(event_id: EventId, any: &Any, _old_event: &Self) -> Option<Self> {
         match event_id {
-            x if x == FOCUS => {
-                if let Some(&focused) = any.downcast_ref::<bool>() {
-                    Some(Input::Focus(focused))
+            x if x == CONTROLLER_AXIS => {
+                if let Some(&args) = any.downcast_ref::<ControllerAxisArgs>() {
+                    Some(Input::Move(Motion::ControllerAxis(args)))
                 } else {
-                    panic!("Expected bool")
+                    panic!("Expected ControllerAxisArgs")
                 }
             }
             x if x == CURSOR => {
                 if let Some(&cursor) = any.downcast_ref::<bool>() {
                     Some(Input::Cursor(cursor))
+                } else {
+                    panic!("Expected bool")
+                }
+            }
+            x if x == FOCUS => {
+                if let Some(&focused) = any.downcast_ref::<bool>() {
+                    Some(Input::Focus(focused))
                 } else {
                     panic!("Expected bool")
                 }
@@ -131,13 +109,6 @@ impl GenericEvent for Input {
                     Some(Input::Move(Motion::MouseScroll(x, y)))
                 } else {
                     panic!("Expected (f64, f64)")
-                }
-            }
-            x if x == CONTROLLER_AXIS => {
-                if let Some(&args) = any.downcast_ref::<ControllerAxisArgs>() {
-                    Some(Input::Move(Motion::ControllerAxis(args)))
-                } else {
-                    panic!("Expected ControllerAxisArgs")
                 }
             }
             x if x == PRESS => {
@@ -166,6 +137,13 @@ impl GenericEvent for Input {
                     Some(Input::Text(text.to_owned()))
                 } else {
                     panic!("Expected &str")
+                }
+            }
+            x if x == TOUCH => {
+                if let Some(&args) = any.downcast_ref::<TouchArgs>() {
+                    Some(Input::Move(Motion::Touch(args)))
+                } else {
+                    panic!("Expected TouchArgs")
                 }
             }
             _ => { return None; }

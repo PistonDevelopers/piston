@@ -14,55 +14,59 @@ pub use mouse::MouseButton;
 pub use keyboard::Key;
 pub use controller::{ ControllerAxisArgs, ControllerButton };
 
+pub mod controller;
 pub mod keyboard;
 pub mod mouse;
-pub mod controller;
 
-pub use generic_event::GenericEvent;
-pub use update::{ UpdateArgs, UpdateEvent };
-pub use render::{ RenderArgs, RenderEvent };
 pub use after_render::{ AfterRenderArgs, AfterRenderEvent };
-pub use idle::{ IdleArgs, IdleEvent };
+pub use controller::{ ControllerAxisEvent };
+pub use cursor::CursorEvent;
 pub use event::Event;
+pub use focus::FocusEvent;
+pub use generic_event::GenericEvent;
+pub use idle::{ IdleArgs, IdleEvent };
+pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
 pub use press::PressEvent;
 pub use release::ReleaseEvent;
-pub use mouse::{ MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent };
-pub use controller::{ ControllerAxisEvent };
-pub use text::TextEvent;
 pub use resize::ResizeEvent;
-pub use focus::FocusEvent;
-pub use cursor::CursorEvent;
+pub use render::{ RenderArgs, RenderEvent };
+pub use text::TextEvent;
+pub use touch::TouchArgs;
+pub use update::{ UpdateArgs, UpdateEvent };
 
 pub mod generic_event;
-mod update;
-mod render;
+
 mod after_render;
-mod idle;
+mod cursor;
 mod event;
+mod focus;
+mod idle;
 mod press;
 mod release;
-mod text;
+mod render;
 mod resize;
-mod focus;
-mod cursor;
+mod text;
+mod touch;
+mod update;
 
 /// Used to identify events arguments provided by traits.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct EventId(pub &'static str);
 
-const FOCUS: EventId = EventId("piston/focus");
+const AFTER_RENDER: EventId = EventId("piston/after_render");
+const CONTROLLER_AXIS: EventId = EventId("piston/controller_axis");
 const CURSOR: EventId = EventId("piston/cursor");
-const RESIZE: EventId = EventId("piston/resize");
-const TEXT: EventId = EventId("piston/text");
+const FOCUS: EventId = EventId("piston/focus");
+const IDLE: EventId = EventId("piston/idle");
 const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
 const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
 const MOUSE_CURSOR: EventId = EventId("piston/mouse_cursor");
-const CONTROLLER_AXIS: EventId = EventId("piston/controller_axis");
-const RELEASE: EventId = EventId("piston/release");
 const PRESS: EventId = EventId("piston/press");
-const IDLE: EventId = EventId("piston/idle");
-const AFTER_RENDER: EventId = EventId("piston/after_render");
+const RELEASE: EventId = EventId("piston/release");
 const RENDER: EventId = EventId("piston/render");
+const RESIZE: EventId = EventId("piston/resize");
+const TEXT: EventId = EventId("piston/text");
+const TOUCH: EventId = EventId("piston/touch");
 const UPDATE: EventId = EventId("piston/update");
 
 /// Models different kinds of buttons.
@@ -85,8 +89,10 @@ pub enum Motion {
     MouseRelative(f64, f64),
     /// x and y in scroll ticks.
     MouseScroll(f64, f64),
-    /// joystick axis move event.
+    /// controller axis move event.
     ControllerAxis(ControllerAxisArgs),
+    /// touch event.
+    Touch(TouchArgs),
 }
 
 /// Models input events.
