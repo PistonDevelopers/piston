@@ -23,9 +23,12 @@ pub enum Touch {
 ///
 /// The `id` might be reused for different touches that do not overlap in time.
 ///
-/// - Coordinates are normalized to support both touch screens and touch pads
+/// - Coordinates are normalized to support both touch screens and trackpads
 /// - Supports both 2D and 3D touch
 /// - The pressure direction vector should have maximum length 1
+///
+/// For 2D touch the pressure is pointed the z direction.
+/// Use `.pressure()` to get the pressure magnitude.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
 pub struct TouchArgs {
     /// A unique identifier for touch device.
