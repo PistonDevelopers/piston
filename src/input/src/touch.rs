@@ -103,7 +103,7 @@ impl TouchArgs {
     }
 
     /// The position of the touch in 3D.
-    pub fn position3d(&self) -> [f64; 3] {
+    pub fn position_3d(&self) -> [f64; 3] {
         [self.x, self.y, self.z]
     }
 
@@ -113,7 +113,7 @@ impl TouchArgs {
     }
 
     /// The pressure vector in 3D.
-    pub fn pressure3d(&self) -> [f64; 3] {
+    pub fn pressure_3d(&self) -> [f64; 3] {
         [self.px, self.py, self.pz]
     }
 }
