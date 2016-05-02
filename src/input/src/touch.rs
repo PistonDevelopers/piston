@@ -204,7 +204,7 @@ mod tests {
             &TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start), &e);
         let b: Option<Input> = a.clone().unwrap().touch(|t|
             TouchEvent::from_touch_args(
-                &TouchArgs::new_3d(t.device, t.id, t.position3d(), t.pressure3d(), Touch::Start),
+                &TouchArgs::new_3d(t.device, t.id, t.position_3d(), t.pressure_3d(), Touch::Start),
                 a.as_ref().unwrap())).unwrap();
         assert_eq!(a, b);
     }
@@ -222,7 +222,7 @@ mod tests {
             &TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start), &e);
         let b: Option<Event> = a.clone().unwrap().touch(|t|
             TouchEvent::from_touch_args(
-                &TouchArgs::new_3d(t.device, t.id, t.position3d(), t.pressure3d(), Touch::Start),
+                &TouchArgs::new_3d(t.device, t.id, t.position_3d(), t.pressure_3d(), Touch::Start),
                 a.as_ref().unwrap())).unwrap();
         assert_eq!(a, b);
     }
