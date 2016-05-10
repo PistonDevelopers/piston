@@ -194,11 +194,9 @@ impl WindowEvents
                 State::SwapBuffers => {
                     if self.swap_buffers {
                         window.swap_buffers();
-                        self.state = State::UpdateLoop(Idle::No);
-                        return Some(Event::AfterRender(AfterRenderArgs));
-                    } else {
-                        State::UpdateLoop(Idle::No)
                     }
+                    self.state = State::UpdateLoop(Idle::No);
+                    return Some(Event::AfterRender(AfterRenderArgs));
                 }
                 State::UpdateLoop(ref mut idle) => {
                     if self.bench_mode {
