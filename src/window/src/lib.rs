@@ -38,7 +38,7 @@ impl From<(u32, u32)> for Size {
 /// Builds window from window settings.
 pub trait BuildFromWindowSettings: Sized {
     /// Builds window from window settings.
-    fn build_from_window_settings(settings: WindowSettings)
+    fn build_from_window_settings(settings: &WindowSettings)
     -> Result<Self, String>;
 }
 
@@ -119,6 +119,7 @@ pub trait OpenGLWindow: Window {
 }
 
 /// Settings for window behavior.
+#[derive(Clone)]
 pub struct WindowSettings {
     /// Title of the window.
     title: String,
@@ -162,7 +163,7 @@ impl WindowSettings {
     }
 
     /// Builds window.
-    pub fn build<W: BuildFromWindowSettings>(self) -> Result<W, String> {
+    pub fn build<W: BuildFromWindowSettings>(&self) -> Result<W, String> {
         BuildFromWindowSettings::build_from_window_settings(self)
     }
 
@@ -261,11 +262,11 @@ pub struct NoWindow {
 
 impl NoWindow {
     /// Returns a new `NoWindow`.
-    pub fn new(settings: WindowSettings) -> NoWindow {
+    pub fn new(settings: &WindowSettings) -> NoWindow {
         NoWindow {
             should_close: false,
-            title: settings.title,
-            size: settings.size,
+            title: settings.get_title(),
+            size: settings.get_size(),
         }
     }
 }
@@ -281,7 +282,7 @@ impl Window for NoWindow {
 }
 
 impl BuildFromWindowSettings for NoWindow {
-    fn build_from_window_settings(settings: WindowSettings)
+    fn build_from_window_settings(settings: &WindowSettings)
     -> Result<Self, String> {
         Ok(NoWindow::new(settings))
     }
