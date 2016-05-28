@@ -171,8 +171,13 @@ impl WindowSettings {
     pub fn get_title(&self) -> String { self.title.clone() }
 
     /// Sets title.
-    pub fn title(mut self, value: String) -> Self {
+    pub fn set_title(&mut self, value: String) {
         self.title = value;
+    }
+
+    /// Sets title.
+    pub fn title(mut self, value: String) -> Self {
+        self.set_title(value);
         self
     }
 
@@ -180,8 +185,13 @@ impl WindowSettings {
     pub fn get_size(&self) -> Size { self.size }
 
     /// Sets size.
-    pub fn size(mut self, value: Size) -> Self {
+    pub fn set_size(&mut self, value: Size) {
         self.size = value;
+    }
+
+    /// Sets size.
+    pub fn size(mut self, value: Size) -> Self {
+        self.set_size(value);
         self
     }
 
@@ -189,8 +199,13 @@ impl WindowSettings {
     pub fn get_fullscreen(&self) -> bool { self.fullscreen }
 
     /// Sets fullscreen.
-    pub fn fullscreen(mut self, value: bool) -> Self {
+    pub fn set_fullscreen(&mut self, value: bool) {
         self.fullscreen = value;
+    }
+
+    /// Sets fullscreen.
+    pub fn fullscreen(mut self, value: bool) -> Self {
+        self.set_fullscreen(value);
         self
     }
 
@@ -198,20 +213,30 @@ impl WindowSettings {
     pub fn get_exit_on_esc(&self) -> bool { self.exit_on_esc }
 
     /// Sets exit on esc.
-    pub fn exit_on_esc(mut self, value: bool) -> Self {
+    pub fn set_exit_on_esc(&mut self, value: bool) {
         self.exit_on_esc = value;
+    }
+
+    /// Sets exit on esc.
+    pub fn exit_on_esc(mut self, value: bool) -> Self {
+        self.set_exit_on_esc(value);
         self
     }
 
     /// Gets samples.
-    pub fn get_samples(&self) -> u8 { self.samples }
-
-    /// Sets samples.
     ///
     /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
     /// for more information.
-    pub fn samples(mut self, value: u8) -> Self {
+    pub fn get_samples(&self) -> u8 { self.samples }
+
+    /// Sets samples.
+    pub fn set_samples(&mut self, value: u8) {
         self.samples = value;
+    }
+
+    /// Sets samples.
+    pub fn samples(mut self, value: u8) -> Self {
+        self.set_samples(value);
         self
     }
 
@@ -221,34 +246,54 @@ impl WindowSettings {
     pub fn get_vsync(&self) -> bool { self.vsync }
 
     /// Sets vsync.
-    pub fn vsync(mut self, value: bool) -> Self {
+    pub fn set_vsync(&mut self, value: bool) {
         self.vsync = value;
+    }
+
+    /// Sets vsync.
+    pub fn vsync(mut self, value: bool) -> Self {
+        self.set_vsync(value);
         self
     }
 
-    /// Gets opengl.
+    /// Gets OpenGL version.
     pub fn get_maybe_opengl(&self) -> Option<OpenGL> { self.opengl }
 
-    /// Sets opengl.
-    pub fn maybe_opengl(mut self, value: Option<OpenGL>) -> Self {
+    /// Sets OpenGL version.
+    pub fn set_maybe_opengl(&mut self, value: Option<OpenGL>) {
         self.opengl = value;
+    }
+
+    /// Sets OpenGL version.
+    pub fn maybe_opengl(mut self, value: Option<OpenGL>) -> Self {
+        self.set_maybe_opengl(value);
         self
     }
 
-    /// Sets opengl.
-    pub fn opengl(mut self, value: OpenGL) -> Self {
+    /// Sets OpenGL version.
+    pub fn set_opengl(&mut self, value: OpenGL) {
         self.opengl = Some(value);
+    }
+
+    /// Sets OpenGL version.
+    pub fn opengl(mut self, value: OpenGL) -> Self {
+        self.set_opengl(value);
         self
     }
 
     /// Gets sRGB.
+    ///
+    /// See https://en.wikipedia.org/wiki/SRGB for more information.
     pub fn get_srgb(&self) -> bool { self.srgb }
 
     /// Sets sRGB.
-    ///
-    /// See https://en.wikipedia.org/wiki/SRGB for more information.
-    pub fn srgb(mut self, value: bool) -> Self {
+    pub fn set_srgb(&mut self, value: bool) {
         self.srgb = value;
+    }
+
+    /// Sets sRGB.
+    pub fn srgb(mut self, value: bool) -> Self {
+        self.set_srgb(value);
         self
     }
 }
