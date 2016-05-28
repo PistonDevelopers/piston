@@ -121,22 +121,16 @@ pub trait OpenGLWindow: Window {
 /// Settings for window behavior.
 #[derive(Clone)]
 pub struct WindowSettings {
-    /// Title of the window.
     title: String,
-    /// The size of the window.
     size: Size,
-    /// Number samples per pixel (anti-aliasing).
     samples: u8,
-    /// If true, the window is fullscreen.
     fullscreen: bool,
-    /// If true, exit when pressing Esc.
     exit_on_esc: bool,
-    /// If true, enable vsync.
     vsync: bool,
-    /// An optional OpenGL version.
     opengl: Option<OpenGL>,
-    /// Whether sRGB is enabled.
     srgb: bool,
+    resizable: bool,
+    decorated: bool,
 }
 
 impl WindowSettings {
@@ -147,6 +141,8 @@ impl WindowSettings {
     /// - exit_on_esc: false
     /// - vsync: false
     /// - srgb: true
+    /// - resizable: true
+    /// - decorated: true
     pub fn new<T: Into<String>, S: Into<Size>>(
         title: T, size: S) -> WindowSettings
     {
@@ -159,6 +155,8 @@ impl WindowSettings {
             vsync: false,
             opengl: None,
             srgb: true,
+            resizable: true,
+            decorated: true,
         }
     }
 
@@ -294,6 +292,34 @@ impl WindowSettings {
     /// Sets sRGB.
     pub fn srgb(mut self, value: bool) -> Self {
         self.set_srgb(value);
+        self
+    }
+
+    /// Gets whether window should be resizable.
+    pub fn get_resizable(&self) -> bool { self.resizable }
+
+    /// Sets whether window should be resizable.
+    pub fn set_resizable(&mut self, value: bool) {
+        self.resizable = value;
+    }
+
+    /// Sets whether window should be resizable.
+    pub fn resizable(mut self, value: bool) -> Self {
+        self.set_resizable(value);
+        self
+    }
+
+    /// Gets whether window should be decorated.
+    pub fn get_decorated(&self) -> bool { self.decorated }
+
+    /// Sets whether window should be decorated.
+    pub fn set_decorated(&mut self, value: bool) {
+        self.decorated = value;
+    }
+
+    /// Sets whether window should be decorated.
+    pub fn decorated(mut self, value: bool) -> Self {
+        self.set_decorated(value);
         self
     }
 }
