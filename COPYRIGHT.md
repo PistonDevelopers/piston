@@ -17,6 +17,7 @@ Default votes apply for contributions before this date.
 
 Here is a diagram explaining when copyright holder is for person or group:
 
+```
            _____________________________________________________________
           | 100% agreement | > 95% agreement | > 3 months               |
           |----------------|-----------------|--------------------------|
@@ -29,6 +30,7 @@ lend vote | 1 per person   | 1 for group     | if 100% agreement:       |
           |                |                 | else:                    |
           |                |                 |       1 per person       |
           |----------------|-----------------|--------------------------|
+```
 
 A vote for group counts as 1 copyright holder, to not reduce the rights of
 copyright holders who made contributions before this date.
