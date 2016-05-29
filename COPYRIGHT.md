@@ -2,7 +2,7 @@
 
 By contributing to this project after
 
-    29-05-2016
+    2016-05-29
 
 you lend your vote to the majority of
 
