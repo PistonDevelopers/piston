@@ -1,18 +1,41 @@
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
 
-//! Window abstraction
+//! Window storage and interfacing traits.
+//!
+//! The Window trait is the minimum interface required to create and
+//! interact with a window. All backends must support this trait.
+//!
+//! The Advanced Window trait is the maximum interface that can be provided,
+//! while still staying consistent between backnends. Not all backends implement
+//! advanced window; check your backend's documentation to see whether it implements
+//! this trait.
+//!
+//! The WindowSettings structure is the preferred way of building
+//! new windows in Piston. It uses the BuildFromWindowSettings trait,
+//! which backends implement to handle window creation and setup.
+//!
+//! The OpenGLWindow trait is used for windows that are based on OpenGL, to
+//! provide the Piston API with some extra information.
+//!
+//! The Size structure is used throughout Piston to store window sizes.
+//! A few convenience conversions are included. 
 
-extern crate input;
 extern crate shader_version;
 
+use std::convert::From;
 use shader_version::OpenGL;
-use input::Input;
+
+pub use no_window::NoWindow;
+
+mod no_window;
 
 /// The type of an OpenGL function address.
+///
+/// Note: This is a raw pointer. It can be null!
 pub type ProcAddress = *const ();
 
-/// Size in pixels.
+/// Structure to store the window size.
 #[derive(Debug, Copy, Clone)]
 pub struct Size {
     /// The width in pixels.
@@ -35,19 +58,40 @@ impl From<(u32, u32)> for Size {
     }
 }
 
-/// Builds window from window settings.
+/// Constructs a window from a WindowSettings object.
+///
+/// It is used by [`WindowSettings::build`](struct.WindowSettings.html#method.build).
+/// Note that the backend's implementation of this may differ from its implementation
+/// of `::new()`.
 pub trait BuildFromWindowSettings: Sized {
-    /// Builds window from window settings.
-    fn build_from_window_settings(settings: &WindowSettings)
+    /// Builds the window from a window settings object.
+    ///
+    /// # Errors
+    ///
+    /// See your backend's documentation for details about what kind of
+    /// error strings can be returned, and the conditions for error.
+    fn build_from_window_settings(settings: WindowSettings)
     -> Result<Self, String>;
 }
 
-/// Required to use the event loop.
+/// Trait representing the minimum requirements for defining a window.
+///
+/// This trait defines all the behavior needed for making an event loop.
+///
+/// An example of a working event loop can be found in the Piston-Tutorials
+/// repository under getting-started, or in the event loop examples.
 pub trait Window {
-    /// The event type emitted by `poll_event`
+    /// The event type the window uses for incoming input.
+    /// 
+    /// Usually, this will be event_loop::Input, but may vary
+    /// between implementations if more or less information is available.
+    ///
+    /// For example, if a backend does not support mouse input because it is
+    /// designed to be sent over a network, then it might use a different
+    /// event type. 
     type Event;
 
-    /// Tells the window to close or stay open.
+    /// Tells the window to close or stay open. 
     fn set_should_close(&mut self, value: bool);
 
     /// Returns true if window should close.
@@ -57,18 +101,32 @@ pub trait Window {
     fn size(&self) -> Size;
 
     /// Swaps render buffers.
+    ///
+    /// When `WindowSettings::swap_buffers` is set to false,
+    /// this method must be called manually or through the window
+    /// backend. By default it is set to true, so usually it is
+    /// not needed in application code.
     fn swap_buffers(&mut self);
 
     /// Polls event from window.
+    ///
+    /// To read events in application code, look at the
+    /// [`Events`](../event_loop/trait.Events.html) trait instaed.
     fn poll_event(&mut self) -> Option<Self::Event>;
 
     /// Gets draw size of the window.
+    ///
     /// This is equal to the size of the frame buffer of the inner window,
     /// excluding the title bar and borders.
+    /// This information is given to the client code through the 
+    /// [`Render`](../input/enum.Event.html) event.
     fn draw_size(&self) -> Size;
 }
 
-/// Implemented by fully supported window back-ends.
+/// Trait representing a window with the most features that are still generic.
+///
+/// This trait is implemented by fully featured window back-ends. When possible,
+/// reduce the trait constraint to `Window` to make the code more portable.
 pub trait AdvancedWindow: Window + Sized {
     /// Gets a copy of the title of the window.
     fn get_title(&self) -> String;
@@ -77,29 +135,48 @@ pub trait AdvancedWindow: Window + Sized {
     fn set_title(&mut self, value: String);
 
     /// Sets title on window.
+    ///
+    /// This method moves the current window data, 
+    /// unlike [`set_title()`](#method.set_title), so 
+    /// that it can be used in method chaining.
     fn title(mut self, value: String) -> Self {
         self.set_title(value);
         self
     }
 
     /// Gets whether to exit when pressing esc.
+    ///
+    /// Useful when prototyping.
     fn get_exit_on_esc(&self) -> bool;
 
     /// Sets whether to exit when pressing esc.
+    ///
+    /// Useful when prototyping.
     fn set_exit_on_esc(&mut self, value: bool);
 
-    /// Sets whether to exit when pressing esc.
+    /// Sets whether to exit when pressing the Esc button.
+    ///
+    /// Useful when prototyping.
+    /// 
+    /// This method moves the current window data, 
+    /// unlike [`set_exit_on_esc()`](#method.set_exit_on_esc), so 
+    /// that it can be used in method chaining.
     fn exit_on_esc(mut self, value: bool) -> Self {
         self.set_exit_on_esc(value);
         self
     }
 
-    /// Sets whether to capture/grab cursor.
+    /// Sets whether to capture/grab the cursor.
+    ///
     /// This is used to lock and hide cursor to the window,
     /// for example in a first-person shooter game.
     fn set_capture_cursor(&mut self, value: bool);
 
-    /// Sets whether to capture/grab cursor (see `set_capture_cursor`).
+    /// Sets whether to capture/grab the cursor.
+    ///
+    /// This method moves the current window data, 
+    /// unlike [`set_capture_cursor()`](#method.set_capture_cursor), so
+    /// that it can be used in method chaining.
     fn capture_cursor(mut self, value: bool) -> Self {
         self.set_capture_cursor(value);
         self
@@ -107,18 +184,37 @@ pub trait AdvancedWindow: Window + Sized {
 }
 
 /// Trait for OpenGL specific operations.
+///
+/// OpenGL uses a strategy called "function pointer loading"
+/// to hook up the higher level graphics APIs with the OpenGL
+/// driver. Which function pointers to load depends on the
+/// hardware capabilities and version of OpenGL. By using the
+/// [`OpenGLWindow`](trait.OpenGLWindow.html)
+/// trait, the higher level graphics API can load
+/// functions from the window backend with the version set up
+/// using the `WindowSettings` structure.
+///
+/// For more information about function pointer loading, see
+/// https://www.opengl.org/wiki/Load_OpenGL_Functions
 pub trait OpenGLWindow: Window {
-    /// Returns the address of an OpenGL function if it exist, else returns null pointer.
+    /// Returns the address of the specified OpenGL function if it exists.
+    ///
+    /// If the function does not exist, it returns a null pointer.
     fn get_proc_address(&mut self, proc_name: &str) -> ProcAddress;
 
-    /// Returns true if this context is the current context.
+    /// Returns true if this window's gl context is the current gl context.
     fn is_current(&self) -> bool;
 
-    /// Make this context current.
+    /// Make the window's gl context the current gl context.
     fn make_current(&mut self);
 }
 
-/// Settings for window behavior.
+/// Settings structure for window behavior.
+///
+/// It stores everything that needs to be customized when constructing most
+/// windows. This structure makes it easy to create multiple windows with the
+/// same settings, and it also makes piston's multiple backends easier to
+/// implement for piston devs.
 #[derive(Clone)]
 pub struct WindowSettings {
     title: String,
@@ -159,210 +255,299 @@ impl WindowSettings {
             decorated: true,
         }
     }
-
-    /// Builds window.
-    pub fn build<W: BuildFromWindowSettings>(&self) -> Result<W, String> {
+	
+    /// Builds window from the given settings.
+    ///
+    /// The return value is ambiguous, to allow for operation on multiple
+    /// backends. Clients should explicitly name the return type. See the
+    /// Guide to using Piston Windows for more info and examples.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if your backend returns an error.
+    /// See your backend's documentation on `build_from_window_settings()`
+    /// for more details.
+    pub fn build<W: BuildFromWindowSettings>(self) -> Result<W, String> {
         BuildFromWindowSettings::build_from_window_settings(self)
     }
 
-    /// Gets title.
+    /// Gets the title of built windows.
     pub fn get_title(&self) -> String { self.title.clone() }
 
-    /// Sets title.
+    /// Sets the title of built windows.
     pub fn set_title(&mut self, value: String) {
         self.title = value;
     }
 
-    /// Sets title.
+    /// Sets the title of built windows.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_title()`](#method.set_title),
+    /// so that it can be used in method chaining.
     pub fn title(mut self, value: String) -> Self {
         self.set_title(value);
         self
     }
-
-    /// Gets size.
+    
+    /// Gets the size of built windows.
     pub fn get_size(&self) -> Size { self.size }
 
-    /// Sets size.
+    /// Sets the size of built windows.
     pub fn set_size(&mut self, value: Size) {
         self.size = value;
     }
 
-    /// Sets size.
+    /// Sets the size of built windows.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_size()`](#method.set_size),
+    /// so that it can be used in method chaining.
     pub fn size(mut self, value: Size) -> Self {
         self.set_size(value);
         self
     }
-
-    /// Gets fullscreen.
+    
+    /// Gets whether built windows will be fullscreen.
     pub fn get_fullscreen(&self) -> bool { self.fullscreen }
 
-    /// Sets fullscreen.
+    /// Sets whether built windows will be fullscreen.
     pub fn set_fullscreen(&mut self, value: bool) {
         self.fullscreen = value;
     }
 
-    /// Sets fullscreen.
+    /// Sets whether built windows will be fullscreen.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_fullscreen()`](#method.set_fullscreen),
+    /// so that it can be used in method chaining.
     pub fn fullscreen(mut self, value: bool) -> Self {
         self.set_fullscreen(value);
         self
     }
-
-    /// Gets exit on esc.
+    
+    /// Gets whether built windows should exit when the Esc key is pressed.
     pub fn get_exit_on_esc(&self) -> bool { self.exit_on_esc }
 
-    /// Sets exit on esc.
+    /// Sets whether built windows should exit when the Esc key is pressed.
     pub fn set_exit_on_esc(&mut self, value: bool) {
         self.exit_on_esc = value;
     }
 
-    /// Sets exit on esc.
+    /// Sets whether built windows should exit when the Esc key is pressed. 
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_exit_on_esc()`](#method.set_exit_on_esc),
+    /// so that it can be used in method chaining.
     pub fn exit_on_esc(mut self, value: bool) -> Self {
         self.set_exit_on_esc(value);
         self
     }
-
-    /// Gets samples.
+    
+    /// Gets the number of samples to use for anti-aliasing.
     ///
     /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
     /// for more information.
     pub fn get_samples(&self) -> u8 { self.samples }
 
-    /// Sets samples.
+	/// Sets the number of samples to use for anti-aliasing.
+	///
+	/// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// for more information.
     pub fn set_samples(&mut self, value: u8) {
         self.samples = value;
     }
 
-    /// Sets samples.
+    /// Sets the number of samples to use for anti-aliasing.
+    ///
+    /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// for more information.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_samples()`](#method.set_samples)
+    /// so that it can be used in method chaining.
     pub fn samples(mut self, value: u8) -> Self {
         self.set_samples(value);
         self
     }
 
-    /// Gets vsync.
+    /// Gets whether built windows should use vsync.
     ///
-    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information.
+    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
+    /// about vsync.
     pub fn get_vsync(&self) -> bool { self.vsync }
 
-    /// Sets vsync.
+    /// Sets whether built windows should use vsync.
+    ///
+    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
+    /// about vsync.
     pub fn set_vsync(&mut self, value: bool) {
         self.vsync = value;
     }
 
-    /// Sets vsync.
+    /// Sets whether built windows should use vsync.
+    ///
+    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
+    /// about vsync.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_vsync()`](#method.set_vsync),
+    /// so that it can be used in method chaining.
     pub fn vsync(mut self, value: bool) -> Self {
         self.set_vsync(value);
         self
     }
-
-    /// Gets OpenGL version.
+	
+    /// Gets the OpenGL version of built windows.
+    ///
+    /// If None is returned, the default OpenGL version is being used. This
+    /// is often a forward compatible version of OpenGL::V3_2 or
+    /// higher that works with newer versions of graphics libraries.
+    ///
+    /// For more information about the OpenGL setting, see the
+    /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
     pub fn get_maybe_opengl(&self) -> Option<OpenGL> { self.opengl }
-
-    /// Sets OpenGL version.
+	
+	/// Sets OpenGL version of built windows.
+	///
+	/// If None is passed, the default OpenGL version is used. This
+    /// is often a forward compatible version of OpenGL::V3_2 or
+    /// higher that works with newer versions of graphics libraries.
+    ///
+	/// For more information about the OpenGL setting, see the
+    /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
     pub fn set_maybe_opengl(&mut self, value: Option<OpenGL>) {
         self.opengl = value;
     }
-
-    /// Sets OpenGL version.
+	
+    /// Sets OpenGL version of built windows.
+    ///
+    /// If None is passed, the default OpenGL version is used. This
+    /// is often a forward compatible version of OpenGL::V3_2 or
+    /// higher that works with newer versions of graphics libraries.
+    ///
+    /// For more information about the OpenGL setting, see the
+	/// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
+	///
+    /// This method moves the current window data,
+    /// unlike [`set_maybe_opengl()`](#method.set_maybe_opengl),
+    /// so that it can be used in method chaining.
     pub fn maybe_opengl(mut self, value: Option<OpenGL>) -> Self {
         self.set_maybe_opengl(value);
         self
     }
-
-    /// Sets OpenGL version.
+	
+    /// Sets OpenGL version of built windows.
+    ///
+    /// For setting the OpenGL version back to default, see
+    /// [`set_maybe_opengl()`)(#method.set_maybe_opengl).
+    ///
+    /// For more information about the opengl setting, see the
+	/// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
     pub fn set_opengl(&mut self, value: OpenGL) {
         self.opengl = Some(value);
     }
-
-    /// Sets OpenGL version.
+    
+    /// Sets the OpenGL version of built windows.
+    ///
+    /// For setting the OpenGL version back to default, see
+    /// [`maybe_opengl()`](#method.maybe_opengl).
+    ///
+    /// For more information about the opengl setting, see the
+	/// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_opengl()`](#method.set_opengl),
+    /// so that it can be used in method chaining.
     pub fn opengl(mut self, value: OpenGL) -> Self {
         self.set_opengl(value);
         self
     }
 
-    /// Gets sRGB.
+    /// Gets whether built windows should use hardware accelerated color conversion.
+    ///
+    /// If true, the graphics hardware uses customized circuitry
+    /// to convert colors from sRGB to linear color space in graphics
+    /// shaders, and then converts pixel fragments back to sRGB
+    /// depending on the color format of the frame buffer. This feature
+    /// is supported by most graphics hardware and set to true by
+    /// default.
     ///
     /// See https://en.wikipedia.org/wiki/SRGB for more information.
     pub fn get_srgb(&self) -> bool { self.srgb }
 
-    /// Sets sRGB.
+    /// Sets whether built windows should use hardware accelerated color conversion.
+    ///
+    /// See [`get_srgb()`](#method.get_srgb) for more information about
+    /// the srgb setting.
     pub fn set_srgb(&mut self, value: bool) {
         self.srgb = value;
     }
 
-    /// Sets sRGB.
+    /// Sets whether built windows should use hardware accelerated color conversion.
+    ///
+    /// See [`get_srgb()`](#method.get_srgb) for more information about
+    /// the srgb setting.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_srgb()`](#method.set_srgb),
+    /// so that it can be used in method chaining.
     pub fn srgb(mut self, value: bool) -> Self {
         self.set_srgb(value);
         self
     }
 
-    /// Gets whether window should be resizable.
+    /// Gets whether built windows should be resizable.
     pub fn get_resizable(&self) -> bool { self.resizable }
 
-    /// Sets whether window should be resizable.
+    /// Sets whether built windows should be resizable.
     pub fn set_resizable(&mut self, value: bool) {
         self.resizable = value;
     }
 
-    /// Sets whether window should be resizable.
+    /// Sets whether built windows should be resizable.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_resizable()`](#method.set_resizable),
+    /// so that it can be used in method chaining.
     pub fn resizable(mut self, value: bool) -> Self {
         self.set_resizable(value);
         self
     }
 
-    /// Gets whether window should be decorated.
+    /// Gets whether built windows should be decorated.
+    ///
+    /// Decoration on a window refers to the Operating System's
+    /// header above the window, and the window boarder.
+    ///
+    /// For more information, see
+    /// https://en.wikipedia.org/wiki/Window_decoration
     pub fn get_decorated(&self) -> bool { self.decorated }
 
-    /// Sets whether window should be decorated.
+    /// Sets whether built windows should be decorated.
+    ///
+    /// Decoration on a window refers to the Operating System's
+    /// header above the window, and the window boarder.
+    ///
+    /// For more information, see
+    /// https://en.wikipedia.org/wiki/Window_decoration
     pub fn set_decorated(&mut self, value: bool) {
         self.decorated = value;
     }
 
-    /// Sets whether window should be decorated.
+    /// Sets whether built windows should be decorated.
+    ///
+    /// Decoration on a window refers to the Operating System's
+    /// header above the window, and the window boarder.
+    ///
+    /// For more information, see
+    /// https://en.wikipedia.org/wiki/Window_decoration
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_decorated()`](#method.set_decorated),
+    /// so that it can be used in method chaining.
     pub fn decorated(mut self, value: bool) -> Self {
         self.set_decorated(value);
         self
     }
 }
 
-/// An implementation of Window that runs without a window at all.
-pub struct NoWindow {
-    should_close: bool,
-    title: String,
-    size: Size
-}
-
-impl NoWindow {
-    /// Returns a new `NoWindow`.
-    pub fn new(settings: &WindowSettings) -> NoWindow {
-        NoWindow {
-            should_close: false,
-            title: settings.get_title(),
-            size: settings.get_size(),
-        }
-    }
-}
-
-impl Window for NoWindow {
-    type Event = Input;
-    fn should_close(&self) -> bool { self.should_close }
-    fn set_should_close(&mut self, value: bool) { self.should_close = value; }
-    fn size(&self) -> Size { self.size }
-    fn swap_buffers(&mut self) {}
-    fn poll_event(&mut self) -> Option<Input> { None }
-    fn draw_size(&self) -> Size { self.size() }
-}
-
-impl BuildFromWindowSettings for NoWindow {
-    fn build_from_window_settings(settings: &WindowSettings)
-    -> Result<Self, String> {
-        Ok(NoWindow::new(settings))
-    }
-}
-
-impl AdvancedWindow for NoWindow {
-    fn get_title(&self) -> String { self.title.clone() }
-    fn set_title(&mut self, value: String) { self.title = value; }
-    fn get_exit_on_esc(&self) -> bool { false }
-    fn set_exit_on_esc(&mut self, _value: bool) {}
-    fn set_capture_cursor(&mut self, _value: bool) {}
-}
