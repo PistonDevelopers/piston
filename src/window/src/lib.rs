@@ -3,23 +3,23 @@
 
 //! Window storage and interfacing traits.
 //!
-//! The Window trait is the minimum interface required to create and
-//! interact with a window. All backends must support this trait.
+//! The [Window](./trait.Window.html) trait is the minimum interface required for event loop.
+//! All backends usually supports this trait.
 //!
-//! The Advanced Window trait is the maximum interface that can be provided,
-//! while still staying consistent between backnends. Not all backends implement
+//! The [AdvancedWindow](./trait.AdvancedWindow.html) trait is the maximum interface that can be provided,
+//! while still staying consistent between backends. Not all backends implement
 //! advanced window; check your backend's documentation to see whether it implements
 //! this trait.
 //!
-//! The WindowSettings structure is the preferred way of building
+//! The [WindowSettings](./struct.WindowSettings.html) structure is the preferred way of building
 //! new windows in Piston. It uses the BuildFromWindowSettings trait,
 //! which backends implement to handle window creation and setup.
 //!
-//! The OpenGLWindow trait is used for windows that are based on OpenGL, to
+//! The [OpenGLWindow](./trait.OpenGLWindow.html) trait is used for windows that are based on OpenGL, to
 //! provide the Piston API with some extra information.
 //!
-//! The Size structure is used throughout Piston to store window sizes.
-//! A few convenience conversions are included. 
+//! The [Size](./struct.Size.html) structure is used throughout Piston to store window sizes.
+//! It implements some conversion traits for convenience.
 
 extern crate shader_version;
 
@@ -82,16 +82,16 @@ pub trait BuildFromWindowSettings: Sized {
 /// repository under getting-started, or in the event loop examples.
 pub trait Window {
     /// The event type the window uses for incoming input.
-    /// 
+    ///
     /// Usually, this will be event_loop::Input, but may vary
     /// between implementations if more or less information is available.
     ///
     /// For example, if a backend does not support mouse input because it is
     /// designed to be sent over a network, then it might use a different
-    /// event type. 
+    /// event type.
     type Event;
 
-    /// Tells the window to close or stay open. 
+    /// Tells the window to close or stay open.
     fn set_should_close(&mut self, value: bool);
 
     /// Returns true if window should close.
@@ -118,7 +118,7 @@ pub trait Window {
     ///
     /// This is equal to the size of the frame buffer of the inner window,
     /// excluding the title bar and borders.
-    /// This information is given to the client code through the 
+    /// This information is given to the client code through the
     /// [`Render`](../input/enum.Event.html) event.
     fn draw_size(&self) -> Size;
 }
@@ -136,8 +136,8 @@ pub trait AdvancedWindow: Window + Sized {
 
     /// Sets title on window.
     ///
-    /// This method moves the current window data, 
-    /// unlike [`set_title()`](#method.set_title), so 
+    /// This method moves the current window data,
+    /// unlike [`set_title()`](#method.set_title), so
     /// that it can be used in method chaining.
     fn title(mut self, value: String) -> Self {
         self.set_title(value);
@@ -157,9 +157,9 @@ pub trait AdvancedWindow: Window + Sized {
     /// Sets whether to exit when pressing the Esc button.
     ///
     /// Useful when prototyping.
-    /// 
-    /// This method moves the current window data, 
-    /// unlike [`set_exit_on_esc()`](#method.set_exit_on_esc), so 
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_exit_on_esc()`](#method.set_exit_on_esc), so
     /// that it can be used in method chaining.
     fn exit_on_esc(mut self, value: bool) -> Self {
         self.set_exit_on_esc(value);
@@ -174,7 +174,7 @@ pub trait AdvancedWindow: Window + Sized {
 
     /// Sets whether to capture/grab the cursor.
     ///
-    /// This method moves the current window data, 
+    /// This method moves the current window data,
     /// unlike [`set_capture_cursor()`](#method.set_capture_cursor), so
     /// that it can be used in method chaining.
     fn capture_cursor(mut self, value: bool) -> Self {
@@ -255,7 +255,7 @@ impl WindowSettings {
             decorated: true,
         }
     }
-	
+
     /// Builds window from the given settings.
     ///
     /// The return value is ambiguous, to allow for operation on multiple
@@ -288,7 +288,7 @@ impl WindowSettings {
         self.set_title(value);
         self
     }
-    
+
     /// Gets the size of built windows.
     pub fn get_size(&self) -> Size { self.size }
 
@@ -306,7 +306,7 @@ impl WindowSettings {
         self.set_size(value);
         self
     }
-    
+
     /// Gets whether built windows will be fullscreen.
     pub fn get_fullscreen(&self) -> bool { self.fullscreen }
 
@@ -324,7 +324,7 @@ impl WindowSettings {
         self.set_fullscreen(value);
         self
     }
-    
+
     /// Gets whether built windows should exit when the Esc key is pressed.
     pub fn get_exit_on_esc(&self) -> bool { self.exit_on_esc }
 
@@ -333,7 +333,7 @@ impl WindowSettings {
         self.exit_on_esc = value;
     }
 
-    /// Sets whether built windows should exit when the Esc key is pressed. 
+    /// Sets whether built windows should exit when the Esc key is pressed.
     ///
     /// This method moves the current window data,
     /// unlike [`set_exit_on_esc()`](#method.set_exit_on_esc),
@@ -342,7 +342,7 @@ impl WindowSettings {
         self.set_exit_on_esc(value);
         self
     }
-    
+
     /// Gets the number of samples to use for anti-aliasing.
     ///
     /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
@@ -396,7 +396,7 @@ impl WindowSettings {
         self.set_vsync(value);
         self
     }
-	
+
     /// Gets the OpenGL version of built windows.
     ///
     /// If None is returned, the default OpenGL version is being used. This
@@ -406,7 +406,7 @@ impl WindowSettings {
     /// For more information about the OpenGL setting, see the
     /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
     pub fn get_maybe_opengl(&self) -> Option<OpenGL> { self.opengl }
-	
+
 	/// Sets OpenGL version of built windows.
 	///
 	/// If None is passed, the default OpenGL version is used. This
@@ -418,7 +418,7 @@ impl WindowSettings {
     pub fn set_maybe_opengl(&mut self, value: Option<OpenGL>) {
         self.opengl = value;
     }
-	
+
     /// Sets OpenGL version of built windows.
     ///
     /// If None is passed, the default OpenGL version is used. This
@@ -435,7 +435,7 @@ impl WindowSettings {
         self.set_maybe_opengl(value);
         self
     }
-	
+
     /// Sets OpenGL version of built windows.
     ///
     /// For setting the OpenGL version back to default, see
@@ -446,7 +446,7 @@ impl WindowSettings {
     pub fn set_opengl(&mut self, value: OpenGL) {
         self.opengl = Some(value);
     }
-    
+
     /// Sets the OpenGL version of built windows.
     ///
     /// For setting the OpenGL version back to default, see
@@ -517,7 +517,7 @@ impl WindowSettings {
     /// Gets whether built windows should be decorated.
     ///
     /// Decoration on a window refers to the Operating System's
-    /// header above the window, and the window boarder.
+    /// header above the window, and the window border.
     ///
     /// For more information, see
     /// https://en.wikipedia.org/wiki/Window_decoration
@@ -526,7 +526,7 @@ impl WindowSettings {
     /// Sets whether built windows should be decorated.
     ///
     /// Decoration on a window refers to the Operating System's
-    /// header above the window, and the window boarder.
+    /// header above the window, and the window border.
     ///
     /// For more information, see
     /// https://en.wikipedia.org/wiki/Window_decoration
@@ -537,7 +537,7 @@ impl WindowSettings {
     /// Sets whether built windows should be decorated.
     ///
     /// Decoration on a window refers to the Operating System's
-    /// header above the window, and the window boarder.
+    /// header above the window, and the window border.
     ///
     /// For more information, see
     /// https://en.wikipedia.org/wiki/Window_decoration
@@ -550,4 +550,3 @@ impl WindowSettings {
         self
     }
 }
-
