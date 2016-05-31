@@ -3,22 +3,22 @@
 
 //! Window storage and interfacing traits.
 //!
-//! The [Window](./trait.Window.html) trait is the minimum interface required for event loop.
-//! All backends usually supports this trait.
+//! The [`Window`](./trait.Window.html) trait is the minimum interface required for event loop.
+//! All backends usually support this trait.
 //!
-//! The [AdvancedWindow](./trait.AdvancedWindow.html) trait is the maximum interface that can be provided,
+//! The [`AdvancedWindow`](./trait.AdvancedWindow.html) trait is the maximum interface that can be provided,
 //! while still staying consistent between backends. Not all backends implement
-//! advanced window; check your backend's documentation to see whether it implements
+//! `AdvancedWindow`; check your backend's documentation to see whether it implements
 //! this trait.
 //!
-//! The [WindowSettings](./struct.WindowSettings.html) structure is the preferred way of building
-//! new windows in Piston. It uses the BuildFromWindowSettings trait,
+//! The [`WindowSettings`](./struct.WindowSettings.html) structure is the preferred way of building
+//! new windows in Piston. It uses the `BuildFromWindowSettings` trait,
 //! which backends implement to handle window creation and setup.
 //!
-//! The [OpenGLWindow](./trait.OpenGLWindow.html) trait is used for windows that are based on OpenGL, to
-//! provide the Piston API with some extra information.
+//! The [`OpenGLWindow`](./trait.OpenGLWindow.html) trait is used to provide low-level
+//! access to OpenGL through the abstract Piston API.
 //!
-//! The [Size](./struct.Size.html) structure is used throughout Piston to store window sizes.
+//! The [`Size`](./struct.Size.html) structure is used throughout Piston to store window sizes.
 //! It implements some conversion traits for convenience.
 
 extern crate shader_version;
@@ -33,14 +33,23 @@ mod no_window;
 /// The type of an OpenGL function address.
 ///
 /// Note: This is a raw pointer. It can be null!
+///
+/// See [`OpenGLWindow`](./trait.OpenGLWindow.html) for more information.
 pub type ProcAddress = *const ();
 
 /// Structure to store the window size.
+///
+/// The width and height are in *points*. On most computers, a point
+/// is 1:1 with a pixel. However, this is not universally true. For example,
+/// the Apple Retina Display defines 1 point to be a 2x2 square of pixels.
+///
+/// Normally, the consideration of points vs pixels should be left to the
+/// host operating system.
 #[derive(Debug, Copy, Clone)]
 pub struct Size {
-    /// The width in pixels.
+    /// The width.
     pub width: u32,
-    /// The height in pixels.
+    /// The height.
     pub height: u32,
 }
 
@@ -58,13 +67,14 @@ impl From<(u32, u32)> for Size {
     }
 }
 
-/// Constructs a window from a WindowSettings object.
+/// Constructs a window from a [`WindowSettings`](./struct.WindowSettings.html)
+/// object.
 ///
-/// It is used by [`WindowSettings::build`](struct.WindowSettings.html#method.build).
+/// It is used by [`WindowSettings::build`](./struct.WindowSettings.html#method.build).
 /// Note that the backend's implementation of this may differ from its implementation
 /// of `::new()`.
 pub trait BuildFromWindowSettings: Sized {
-    /// Builds the window from a window settings object.
+    /// Builds the window from a `WindowSettings` object.
     ///
     /// # Errors
     ///
@@ -83,8 +93,9 @@ pub trait BuildFromWindowSettings: Sized {
 pub trait Window {
     /// The event type the window uses for incoming input.
     ///
-    /// Usually, this will be event_loop::Input, but may vary
-    /// between implementations if more or less information is available.
+    /// Usually, this will be [`event_loop::Input`](../input/enum.Input.html),
+    /// but may vary between implementations if more or less information
+    /// is available.
     ///
     /// For example, if a backend does not support mouse input because it is
     /// designed to be sent over a network, then it might use a different
@@ -94,30 +105,30 @@ pub trait Window {
     /// Tells the window to close or stay open.
     fn set_should_close(&mut self, value: bool);
 
-    /// Returns true if window should close.
+    /// Returns true if the window should close.
     fn should_close(&self) -> bool;
 
-    /// Gets the size of the window in user coordinates.
+    /// Gets the size of the window.
     fn size(&self) -> Size;
 
     /// Swaps render buffers.
     ///
-    /// When `WindowSettings::swap_buffers` is set to false,
-    /// this method must be called manually or through the window
-    /// backend. By default it is set to true, so usually it is
-    /// not needed in application code.
+    /// When this is set to false, this method must be called manually
+    /// or through the window backend. By default it is set to true, so
+    /// usually it is not needed in application code.
     fn swap_buffers(&mut self);
 
-    /// Polls event from window.
+    /// Polls an event from the window.
     ///
     /// To read events in application code, look at the
-    /// [`Events`](../event_loop/trait.Events.html) trait instaed.
+    /// [`Events`](../event_loop/trait.Events.html) trait instead.
     fn poll_event(&mut self) -> Option<Self::Event>;
 
-    /// Gets draw size of the window.
+    /// Gets the draw size of the window.
     ///
     /// This is equal to the size of the frame buffer of the inner window,
     /// excluding the title bar and borders.
+    ///
     /// This information is given to the client code through the
     /// [`Render`](../input/enum.Event.html) event.
     fn draw_size(&self) -> Size;
@@ -127,6 +138,8 @@ pub trait Window {
 ///
 /// This trait is implemented by fully featured window back-ends. When possible,
 /// reduce the trait constraint to `Window` to make the code more portable.
+///
+/// The `Sized` trait is required for method chaining.
 pub trait AdvancedWindow: Window + Sized {
     /// Gets a copy of the title of the window.
     fn get_title(&self) -> String;
@@ -183,7 +196,7 @@ pub trait AdvancedWindow: Window + Sized {
     }
 }
 
-/// Trait for OpenGL specific operations.
+/// Trait for OpenGL specific operations on a window.
 ///
 /// OpenGL uses a strategy called "function pointer loading"
 /// to hook up the higher level graphics APIs with the OpenGL
@@ -211,10 +224,10 @@ pub trait OpenGLWindow: Window {
 
 /// Settings structure for window behavior.
 ///
-/// It stores everything that needs to be customized when constructing most
-/// windows. This structure makes it easy to create multiple windows with the
-/// same settings, and it also makes piston's multiple backends easier to
-/// implement for piston devs.
+/// This structure stores everything that needs to be customized when
+/// constructing most windows. This structure makes it easy to create multiple
+/// windows with the same settings, and it also makes piston's multiple backends
+/// easier to implement for piston devs.
 #[derive(Clone)]
 pub struct WindowSettings {
     title: String,
@@ -426,7 +439,7 @@ impl WindowSettings {
     /// higher that works with newer versions of graphics libraries.
     ///
     /// For more information about the OpenGL setting, see the
-	/// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
+	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
 	///
     /// This method moves the current window data,
     /// unlike [`set_maybe_opengl()`](#method.set_maybe_opengl),
@@ -442,7 +455,7 @@ impl WindowSettings {
     /// [`set_maybe_opengl()`)(#method.set_maybe_opengl).
     ///
     /// For more information about the opengl setting, see the
-	/// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
+	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
     pub fn set_opengl(&mut self, value: OpenGL) {
         self.opengl = Some(value);
     }
@@ -453,7 +466,7 @@ impl WindowSettings {
     /// [`maybe_opengl()`](#method.maybe_opengl).
     ///
     /// For more information about the opengl setting, see the
-	/// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
+	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
     ///
     /// This method moves the current window data,
     /// unlike [`set_opengl()`](#method.set_opengl),
