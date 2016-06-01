@@ -21,7 +21,7 @@ use self::input::Input;
 /// A window without user interface, often used in server event loops.
 ///
 /// This structure holds just enough state to return values that were set.
-/// The size can be changed because the event loop does not emit 
+/// The size can be changed because the event loop does not emit
 /// [`Render`](../event_loop/trait.RenderEvent.html)
 /// events when the width or height is zero.
 pub struct NoWindow {
@@ -77,4 +77,8 @@ impl AdvancedWindow for NoWindow {
     fn set_exit_on_esc(&mut self, _value: bool) {}
 
     fn set_capture_cursor(&mut self, _value: bool) {}
+
+	fn show(&mut self) {}
+
+	fn hide(&mut self) {}
 }

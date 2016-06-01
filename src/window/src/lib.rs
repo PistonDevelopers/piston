@@ -194,6 +194,16 @@ pub trait AdvancedWindow: Window + Sized {
         self.set_capture_cursor(value);
         self
     }
+
+    /// Shows the window.
+    ///
+    /// If the platform does not support this, it will have no effect.
+    fn show(&mut self);
+
+    /// Hides the window.
+    ///
+    /// If the platform does not support this, it will have no effect.
+    fn hide(&mut self);
 }
 
 /// Trait for OpenGL specific operations on a window.
