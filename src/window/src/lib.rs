@@ -67,6 +67,36 @@ impl From<(u32, u32)> for Size {
     }
 }
 
+/// Structure to store the window position.
+///
+/// The width and height are in *points*. On most computers, a point
+/// is 1:1 with a pixel. However, this is not universally true. For example,
+/// the Apple Retina Display defines 1 point to be a 2x2 square of pixels.
+///
+/// Normally, the consideration of points vs pixels should be left to the
+/// host operating system.
+#[derive(Debug, Copy, Clone)]
+pub struct Position {
+    /// The x coordinate.
+    pub x: i32,
+    /// The y coordinate.
+    pub y: i32,
+}
+
+impl From<[i32; 2]> for Position {
+    #[inline(always)]
+    fn from(value: [i32; 2]) -> Position {
+        Position { x: value[0], y: value[1] }
+    }
+}
+
+impl From<(i32, i32)> for Position {
+    #[inline(always)]
+    fn from(value: (i32, i32)) -> Position {
+        Position { x: value.0, y: value.1 }
+    }
+}
+
 /// Constructs a window from a [`WindowSettings`](./struct.WindowSettings.html)
 /// object.
 ///
@@ -150,7 +180,7 @@ pub trait AdvancedWindow: Window + Sized {
     /// Sets title on window.
     ///
     /// This method moves the current window data,
-    /// unlike [`set_title()`](#method.set_title), so
+    /// unlike [`set_title()`](#tymethod.set_title), so
     /// that it can be used in method chaining.
     fn title(mut self, value: String) -> Self {
         self.set_title(value);
@@ -172,7 +202,7 @@ pub trait AdvancedWindow: Window + Sized {
     /// Useful when prototyping.
     ///
     /// This method moves the current window data,
-    /// unlike [`set_exit_on_esc()`](#method.set_exit_on_esc), so
+    /// unlike [`set_exit_on_esc()`](#tymethod.set_exit_on_esc), so
     /// that it can be used in method chaining.
     fn exit_on_esc(mut self, value: bool) -> Self {
         self.set_exit_on_esc(value);
@@ -188,7 +218,7 @@ pub trait AdvancedWindow: Window + Sized {
     /// Sets whether to capture/grab the cursor.
     ///
     /// This method moves the current window data,
-    /// unlike [`set_capture_cursor()`](#method.set_capture_cursor), so
+    /// unlike [`set_capture_cursor()`](#tymethod.set_capture_cursor), so
     /// that it can be used in method chaining.
     fn capture_cursor(mut self, value: bool) -> Self {
         self.set_capture_cursor(value);
@@ -204,6 +234,28 @@ pub trait AdvancedWindow: Window + Sized {
     ///
     /// If the platform does not support this, it will have no effect.
     fn hide(&mut self);
+
+    /// Gets the position of window.
+    ///
+    // Returns `None` if the window no longer has a position.
+    fn get_position(&self) -> Option<Position>;
+
+    /// Sets the position of window.
+    ///
+    /// Has no effect if the window no longer has a position.
+    fn set_position<P: Into<Position>>(&mut self, val: P);
+
+    /// Sets the position of window.
+    ///
+    /// Has no effect if the window no longer has a position.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_position()`](#tymethod.set_position), so
+    /// that it can be used in method chaining.
+    fn position<P: Into<Position>>(mut self, val: P) -> Self {
+        self.set_position(val);
+        self
+    }
 }
 
 /// Trait for OpenGL specific operations on a window.

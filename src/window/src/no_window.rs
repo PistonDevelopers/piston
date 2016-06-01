@@ -13,6 +13,7 @@ use {
 	WindowSettings,
 	BuildFromWindowSettings,
 	AdvancedWindow,
+	Position,
 	Size
 };
 
@@ -27,7 +28,8 @@ use self::input::Input;
 pub struct NoWindow {
     should_close: bool,
     title: String,
-    size: Size
+    size: Size,
+	pos: Position
 }
 
 impl NoWindow {
@@ -37,6 +39,7 @@ impl NoWindow {
             should_close: false,
             title: settings.title,
             size: settings.size,
+			pos: Position { x: 0, y: 0 }
         }
     }
 }
@@ -81,4 +84,10 @@ impl AdvancedWindow for NoWindow {
 	fn show(&mut self) {}
 
 	fn hide(&mut self) {}
+
+	fn get_position(&self) -> Option<Position> { Some(self.pos) }
+
+	fn set_position<P: Into<Position>>(&mut self, val: P) {
+		self.pos = val.into();
+	}
 }
