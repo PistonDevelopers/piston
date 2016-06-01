@@ -37,4 +37,4 @@ version = "0.21.0"
 
 [dependencies.pistoncore-event_loop]
 path = "src/event_loop"
-version = "0.23.0"
+version = "0.23.1"
