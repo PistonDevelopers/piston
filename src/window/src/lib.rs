@@ -210,12 +210,10 @@ pub trait AdvancedWindow: Window + Sized {
     }
 
     /// Gets whether built windows should enter fullscreen when F1 key is pressed.
-    pub fn get_fullscreen_on_f1(&self) -> bool {self.fullscreen_on_f1}
+    fn get_fullscreen_on_f1(&self) -> bool;
 
     /// Sets whether built windows should enter fullscreen when F1 key is pressed.
-    pub fn set_fullscreen_on_f1(&mut self, value: bool){
-        self.fullscreen_on_f1 = value;
-    }
+    fn set_fullscreen_on_f1(&mut self, value: bool);
     
     /// Sets whether to capture/grab the cursor.
     ///

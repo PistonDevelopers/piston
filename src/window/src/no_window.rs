@@ -78,6 +78,10 @@ impl AdvancedWindow for NoWindow {
 
     fn set_exit_on_esc(&mut self, _value: bool) {}
 
+    fn get_fullscreen_on_f1(&self) -> bool {false}
+
+    fn set_fullscreen_on_f1(&mut self, _value: bool) {}
+
     fn set_capture_cursor(&mut self, _value: bool) {}
 
 	fn show(&mut self) {}
