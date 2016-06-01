@@ -302,6 +302,7 @@ pub struct WindowSettings {
     srgb: bool,
     resizable: bool,
     decorated: bool,
+    controllers: bool,
 }
 
 impl WindowSettings {
@@ -314,6 +315,7 @@ impl WindowSettings {
     /// - srgb: true
     /// - resizable: true
     /// - decorated: true
+    /// - controllers: true
     pub fn new<T: Into<String>, S: Into<Size>>(
         title: T, size: S) -> WindowSettings
     {
@@ -328,6 +330,7 @@ impl WindowSettings {
             srgb: true,
             resizable: true,
             decorated: true,
+            controllers: true,
         }
     }
 
@@ -622,6 +625,24 @@ impl WindowSettings {
     /// so that it can be used in method chaining.
     pub fn decorated(mut self, value: bool) -> Self {
         self.set_decorated(value);
+        self
+    }
+
+    /// Gets whether built windows should listen to controller input.
+    pub fn get_controllers(&self) -> bool { self.controllers }
+
+    /// Sets whether built windows should listen to controller input.
+    pub fn set_controllers(&mut self, value: bool) {
+        self.controllers = value;
+    }
+
+    /// Sets whether build windows should listen to controller input.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_controllers()`](#method.set_controllers),
+    /// so that it can be used in method chaining.
+    pub fn controllers(mut self, value: bool) -> Self {
+        self.set_controllers(value);
         self
     }
 }
