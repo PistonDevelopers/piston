@@ -297,6 +297,7 @@ pub struct WindowSettings {
     samples: u8,
     fullscreen: bool,
     exit_on_esc: bool,
+    fullscreen_on_f1: bool,
     vsync: bool,
     opengl: Option<OpenGL>,
     srgb: bool,
@@ -325,6 +326,7 @@ impl WindowSettings {
             samples: 0,
             fullscreen: false,
             exit_on_esc: false,
+            fullscreen_on_f1: false,
             vsync: false,
             opengl: None,
             srgb: true,
@@ -411,6 +413,13 @@ impl WindowSettings {
         self.exit_on_esc = value;
     }
 
+    /// Gets whether built windows should enter fullscreen when F1 key is pressed.
+    pub fn get_fullscreen_on_f1(&self) -> bool {self.fullscreen_on_f1}
+
+    /// Sets whether built windows should enter fullscreen when F1 key is pressed.
+    pub fn set_fullscreen_on_f1(&mut self, value: bool){
+        self.fullscreen_on_f1 = value;
+    }
     /// Sets whether built windows should exit when the Esc key is pressed.
     ///
     /// This method moves the current window data,
