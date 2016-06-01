@@ -34,11 +34,11 @@ pub struct NoWindow {
 
 impl NoWindow {
 	/// Creates a new `NoWindow`.
-    pub fn new(settings: WindowSettings) -> NoWindow {
+    pub fn new(settings: &WindowSettings) -> NoWindow {
         NoWindow {
             should_close: false,
-            title: settings.title,
-            size: settings.size,
+            title: settings.get_title(),
+            size: settings.get_size(),
 			pos: Position { x: 0, y: 0 }
         }
     }
@@ -64,8 +64,7 @@ impl BuildFromWindowSettings for NoWindow {
 	/// # Errors
 	///
 	/// This function will always return without error.
-    fn build_from_window_settings(settings: WindowSettings)
-    -> Result<Self, String> {
+    fn build_from_window_settings(settings: &WindowSettings) -> Result<Self, String> {
         Ok(NoWindow::new(settings))
     }
 }

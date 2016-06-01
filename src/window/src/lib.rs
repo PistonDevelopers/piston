@@ -110,7 +110,7 @@ pub trait BuildFromWindowSettings: Sized {
     ///
     /// See your backend's documentation for details about what kind of
     /// error strings can be returned, and the conditions for error.
-    fn build_from_window_settings(settings: WindowSettings)
+    fn build_from_window_settings(settings: &WindowSettings)
     -> Result<Self, String>;
 }
 
@@ -345,7 +345,7 @@ impl WindowSettings {
     /// This function will return an error if your backend returns an error.
     /// See your backend's documentation on `build_from_window_settings()`
     /// for more details.
-    pub fn build<W: BuildFromWindowSettings>(self) -> Result<W, String> {
+    pub fn build<W: BuildFromWindowSettings>(&self) -> Result<W, String> {
         BuildFromWindowSettings::build_from_window_settings(self)
     }
 
