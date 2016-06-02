@@ -26,13 +26,6 @@ impl<W> Events for W where W: Window {
     }
 }
 
-/// Tells whether last emitted event was idle or not.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-enum Idle {
-    No,
-    Yes
-}
-
 // Stores the update state right after sleep.
 // This is used to avoid logic error when changing settings
 // in the event loop followed by an update.
@@ -46,7 +39,8 @@ struct UpdateState {
 enum State {
     Render,
     SwapBuffers,
-    UpdateLoop(Idle),
+    UpdateLoop,
+    Idle(u64),
     HandleEvents(UpdateState),
     Update(UpdateState),
 }
@@ -199,55 +193,43 @@ impl WindowEvents
                         }));
                     }
 
-                    State::UpdateLoop(Idle::No)
+                    State::UpdateLoop
                 }
                 State::SwapBuffers => {
                     if self.swap_buffers {
                         window.swap_buffers();
                     }
-                    self.state = State::UpdateLoop(Idle::No);
+                    self.state = State::UpdateLoop;
                     return Some(Event::AfterRender(AfterRenderArgs));
                 }
-                State::UpdateLoop(ref mut idle) => {
-                    if self.bench_mode {
-                        // In benchmark mode, pick the next event without sleep.
-                        // Idle and input events are ignored.
-                        let next_frame = self.last_frame + self.dt_frame_in_ns;
-                        let next_update = self.last_update + self.dt_update_in_ns;
-                        let next_event = cmp::min(next_frame, next_update);
-                        if next_event == next_frame {
-                            State::Render
+                State::UpdateLoop => {
+	                	let current_time = time::precise_time_ns();
+                    let next_frame = self.last_frame + self.dt_frame_in_ns;
+                    let next_update = self.last_update + self.dt_update_in_ns;
+                    let next_event = cmp::min(next_frame, next_update);
+                    
+                    // In benchmark mode, pick the next event without sleep.
+                    // Idle and input events are ignored.
+                    if !self.bench_mode && next_event > current_time {
+                        if let Some(x) = window.poll_event() {
+                            return Some(Event::Input(x));
                         } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
+                            self.state = State::Idle(next_event);
+                            let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
+                            return Some(Event::Idle(IdleArgs { dt: seconds }))
                         }
+                    } else if next_event == next_frame {
+                        State::Render
                     } else {
-                        let current_time = time::precise_time_ns();
-                        let next_frame = self.last_frame + self.dt_frame_in_ns;
-                        let next_update = self.last_update + self.dt_update_in_ns;
-                        let next_event = cmp::min(next_frame, next_update);
-                        if next_event > current_time {
-                            if let Some(x) = window.poll_event() {
-                                *idle = Idle::No;
-                                return Some(Event::Input(x));
-                            } else if *idle == Idle::No {
-                                *idle = Idle::Yes;
-                                let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
-                                return Some(Event::Idle(IdleArgs { dt: seconds }))
-                            }
-                            sleep(ns_to_duration(next_event - current_time));
-                            State::UpdateLoop(Idle::No)
-                        } else if next_event == next_frame {
-                            State::Render
-                        } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
-                        }
+                        State::HandleEvents(UpdateState {
+                            dt_update_in_ns: self.dt_update_in_ns,
+                            dt: self.dt,
+                        })
                     }
+                }
+                State::Idle(stop_time) => {
+	                	sleep(ns_to_duration(stop_time - time::precise_time_ns()));
+                    State::UpdateLoop
                 }
                 State::HandleEvents(update_state) => {
                     if self.bench_mode {
@@ -265,7 +247,7 @@ impl WindowEvents
                     }
                 }
                 State::Update(update_state) => {
-                    self.state = State::UpdateLoop(Idle::No);
+                    self.state = State::UpdateLoop;
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
                     self.last_update += update_state.dt_update_in_ns;
