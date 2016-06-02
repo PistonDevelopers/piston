@@ -4,7 +4,8 @@ name = "pistoncore-window"
 version = "0.20.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
-    "Coeuvre <coeuvre@gmail.com>"
+    "Coeuvre <coeuvre@gmail.com>",
+    "Phlosioneer <mattmdrr2@gmail.com>"
 ]
 keywords = ["window", "game", "piston"]
 description = "A library for window abstraction"

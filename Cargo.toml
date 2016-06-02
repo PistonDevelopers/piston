@@ -13,7 +13,8 @@ authors = [
     "ccgn",
     "reem",
     "TyOverby <ty@pre-alpha.com>",
-    "eddyb"
+    "eddyb",
+    "Phlosioneer <mattmdrr2@gmail.com"
 ]
 keywords = ["piston", "game", "engine", "core"]
 description = "The Piston game engine core libraries"
