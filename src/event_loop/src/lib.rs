@@ -37,11 +37,12 @@ struct UpdateState {
 
 #[derive(Copy, Clone, Debug)]
 enum State {
+	PrepareRender,
+	PrepareUpdate(UpdateState),
     Render,
     SwapBuffers,
     UpdateLoop,
     Idle(u64),
-    HandleEvents(UpdateState),
     Update(UpdateState),
 }
 
@@ -158,17 +159,20 @@ impl WindowEvents
         loop {
             if window.should_close() { return None; }
             self.state = match self.state {
-                State::Render => {
-                    // Handle input events before rendering,
-                    // because window might be closed and destroy
-                    // the graphics context.
-                    if let Some(e) = window.poll_event() {
-                        return Some(Event::Input(e));
-                    }
-                    if window.should_close() {
-                        return None;
-                    }
-
+				State::PrepareRender => {
+					if self.bench_mode {
+						match window.poll_event() {
+							None => State::Render,
+							Some(_) => State::PrepareRender
+						}
+					} else {
+						match window.poll_event() {
+	                        None => State::Render,
+	                        Some(event) => return Some(Event::Input(event))
+	                    }
+					}
+				}
+				State::Render => {
                     if self.bench_mode {
                         // In benchmark mode, pretend FPS is perfect.
                         self.last_frame += self.dt_frame_in_ns;
@@ -219,9 +223,9 @@ impl WindowEvents
                             return Some(Event::Idle(IdleArgs { dt: seconds }))
                         }
                     } else if next_event == next_frame {
-                        State::Render
+                        State::PrepareRender
                     } else {
-                        State::HandleEvents(UpdateState {
+                        State::PrepareUpdate(UpdateState {
                             dt_update_in_ns: self.dt_update_in_ns,
                             dt: self.dt,
                         })
@@ -231,18 +235,18 @@ impl WindowEvents
 	                	sleep(ns_to_duration(stop_time - time::precise_time_ns()));
                     State::UpdateLoop
                 }
-                State::HandleEvents(update_state) => {
+                State::PrepareUpdate(update_state) => {
                     if self.bench_mode {
                         // Ignore input to prevent it affecting the benchmark.
                         match window.poll_event() {
                             None => State::Update(update_state),
-                            Some(_) => State::HandleEvents(update_state),
+                            Some(_) => State::PrepareUpdate(update_state),
                         }
                     } else {
                         // Handle all events before updating.
                         match window.poll_event() {
                             None => State::Update(update_state),
-                            Some(x) => { return Some(Event::Input(x)); },
+                            Some(event) => { return Some(Event::Input(event)); },
                         }
                     }
                 }
