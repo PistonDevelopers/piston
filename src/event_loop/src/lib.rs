@@ -12,7 +12,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::cmp;
 use window::Window;
-use input::{ AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs };
+use input::{AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs};
 
 /// A trait for create event iterator from window.
 pub trait Events {
@@ -20,17 +20,12 @@ pub trait Events {
     fn events(&self) -> WindowEvents;
 }
 
-impl<W> Events for W where W: Window {
+impl<W> Events for W
+    where W: Window
+{
     fn events(&self) -> WindowEvents {
         WindowEvents::new()
     }
-}
-
-/// Tells whether last emitted event was idle or not.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-enum Idle {
-    No,
-    Yes
 }
 
 // Stores the update state right after sleep.
@@ -44,10 +39,12 @@ struct UpdateState {
 
 #[derive(Copy, Clone, Debug)]
 enum State {
+    PrepareRender,
+    PrepareUpdate(UpdateState),
     Render,
     SwapBuffers,
-    UpdateLoop(Idle),
-    HandleEvents(UpdateState),
+    UpdateLoop,
+    Idle(u64),
     Update(UpdateState),
 }
 
@@ -138,8 +135,7 @@ pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: u64 = 60;
 
-impl WindowEvents
-{
+impl WindowEvents {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new() -> WindowEvents {
         let start = time::precise_time_ns();
@@ -162,19 +158,24 @@ impl WindowEvents
         where W: Window
     {
         loop {
-            if window.should_close() { return None; }
+            if window.should_close() {
+                return None;
+            }
             self.state = match self.state {
+                State::PrepareRender => {
+                    if self.bench_mode {
+                        match window.poll_event() {
+                            None => State::Render,
+                            Some(_) => State::PrepareRender,
+                        }
+                    } else {
+                        match window.poll_event() {
+                            None => State::Render,
+                            Some(event) => return Some(Event::Input(event)),
+                        }
+                    }
+                }
                 State::Render => {
-                    // Handle input events before rendering,
-                    // because window might be closed and destroy
-                    // the graphics context.
-                    if let Some(e) = window.poll_event() {
-                        return Some(Event::Input(e));
-                    }
-                    if window.should_close() {
-                        return None;
-                    }
-
                     if self.bench_mode {
                         // In benchmark mode, pretend FPS is perfect.
                         self.last_frame += self.dt_frame_in_ns;
@@ -190,8 +191,7 @@ impl WindowEvents
                         self.state = State::SwapBuffers;
                         return Some(Event::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (self.last_frame - self.last_update) as f64
-                                    / BILLION as f64,
+                            ext_dt: (self.last_frame - self.last_update) as f64 / BILLION as f64,
                             width: size.width,
                             height: size.height,
                             draw_width: draw_size.width,
@@ -199,77 +199,67 @@ impl WindowEvents
                         }));
                     }
 
-                    State::UpdateLoop(Idle::No)
+                    State::UpdateLoop
                 }
                 State::SwapBuffers => {
                     if self.swap_buffers {
                         window.swap_buffers();
                     }
-                    self.state = State::UpdateLoop(Idle::No);
+                    self.state = State::UpdateLoop;
                     return Some(Event::AfterRender(AfterRenderArgs));
                 }
-                State::UpdateLoop(ref mut idle) => {
-                    if self.bench_mode {
-                        // In benchmark mode, pick the next event without sleep.
-                        // Idle and input events are ignored.
-                        let next_frame = self.last_frame + self.dt_frame_in_ns;
-                        let next_update = self.last_update + self.dt_update_in_ns;
-                        let next_event = cmp::min(next_frame, next_update);
-                        if next_event == next_frame {
-                            State::Render
+                State::UpdateLoop => {
+                    let current_time = time::precise_time_ns();
+                    let next_frame = self.last_frame + self.dt_frame_in_ns;
+                    let next_update = self.last_update + self.dt_update_in_ns;
+                    let next_event = cmp::min(next_frame, next_update);
+
+                    // In benchmark mode, pick the next event without sleep.
+                    // Idle and input events are ignored.
+                    if !self.bench_mode && next_event > current_time {
+                        if let Some(x) = window.poll_event() {
+                            return Some(Event::Input(x));
                         } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
+                            self.state = State::Idle(next_event);
+                            let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
+                            return Some(Event::Idle(IdleArgs { dt: seconds }));
                         }
+                    } else if next_event == next_frame {
+                        State::PrepareRender
                     } else {
-                        let current_time = time::precise_time_ns();
-                        let next_frame = self.last_frame + self.dt_frame_in_ns;
-                        let next_update = self.last_update + self.dt_update_in_ns;
-                        let next_event = cmp::min(next_frame, next_update);
-                        if next_event > current_time {
-                            if let Some(x) = window.poll_event() {
-                                *idle = Idle::No;
-                                return Some(Event::Input(x));
-                            } else if *idle == Idle::No {
-                                *idle = Idle::Yes;
-                                let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
-                                return Some(Event::Idle(IdleArgs { dt: seconds }))
-                            }
-                            sleep(ns_to_duration(next_event - current_time));
-                            State::UpdateLoop(Idle::No)
-                        } else if next_event == next_frame {
-                            State::Render
-                        } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
-                        }
+                        State::PrepareUpdate(UpdateState {
+                            dt_update_in_ns: self.dt_update_in_ns,
+                            dt: self.dt,
+                        })
                     }
                 }
-                State::HandleEvents(update_state) => {
+                State::Idle(stop_time) => {
+                    sleep(ns_to_duration(stop_time - time::precise_time_ns()));
+                    State::UpdateLoop
+                }
+                State::PrepareUpdate(update_state) => {
                     if self.bench_mode {
                         // Ignore input to prevent it affecting the benchmark.
                         match window.poll_event() {
                             None => State::Update(update_state),
-                            Some(_) => State::HandleEvents(update_state),
+                            Some(_) => State::PrepareUpdate(update_state),
                         }
                     } else {
                         // Handle all events before updating.
                         match window.poll_event() {
                             None => State::Update(update_state),
-                            Some(x) => { return Some(Event::Input(x)); },
+                            Some(event) => {
+                                return Some(Event::Input(event));
+                            }
                         }
                     }
                 }
                 State::Update(update_state) => {
-                    self.state = State::UpdateLoop(Idle::No);
+                    self.state = State::UpdateLoop;
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
                     self.last_update += update_state.dt_update_in_ns;
-                    return Some(Event::Update(UpdateArgs{ dt: update_state.dt }));
+                    return Some(Event::Update(UpdateArgs { dt: update_state.dt }));
                 }
             };
         }
