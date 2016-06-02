@@ -12,7 +12,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::cmp;
 use window::Window;
-use input::{ AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs };
+use input::{AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs};
 
 /// A trait for create event iterator from window.
 pub trait Events {
@@ -20,7 +20,9 @@ pub trait Events {
     fn events(&self) -> WindowEvents;
 }
 
-impl<W> Events for W where W: Window {
+impl<W> Events for W
+    where W: Window
+{
     fn events(&self) -> WindowEvents {
         WindowEvents::new()
     }
@@ -37,8 +39,8 @@ struct UpdateState {
 
 #[derive(Copy, Clone, Debug)]
 enum State {
-	PrepareRender,
-	PrepareUpdate(UpdateState),
+    PrepareRender,
+    PrepareUpdate(UpdateState),
     Render,
     SwapBuffers,
     UpdateLoop,
@@ -133,8 +135,7 @@ pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: u64 = 60;
 
-impl WindowEvents
-{
+impl WindowEvents {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new() -> WindowEvents {
         let start = time::precise_time_ns();
@@ -157,22 +158,24 @@ impl WindowEvents
         where W: Window
     {
         loop {
-            if window.should_close() { return None; }
+            if window.should_close() {
+                return None;
+            }
             self.state = match self.state {
-				State::PrepareRender => {
-					if self.bench_mode {
-						match window.poll_event() {
-							None => State::Render,
-							Some(_) => State::PrepareRender
-						}
-					} else {
-						match window.poll_event() {
-	                        None => State::Render,
-	                        Some(event) => return Some(Event::Input(event))
-	                    }
-					}
-				}
-				State::Render => {
+                State::PrepareRender => {
+                    if self.bench_mode {
+                        match window.poll_event() {
+                            None => State::Render,
+                            Some(_) => State::PrepareRender,
+                        }
+                    } else {
+                        match window.poll_event() {
+                            None => State::Render,
+                            Some(event) => return Some(Event::Input(event)),
+                        }
+                    }
+                }
+                State::Render => {
                     if self.bench_mode {
                         // In benchmark mode, pretend FPS is perfect.
                         self.last_frame += self.dt_frame_in_ns;
@@ -188,8 +191,7 @@ impl WindowEvents
                         self.state = State::SwapBuffers;
                         return Some(Event::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (self.last_frame - self.last_update) as f64
-                                    / BILLION as f64,
+                            ext_dt: (self.last_frame - self.last_update) as f64 / BILLION as f64,
                             width: size.width,
                             height: size.height,
                             draw_width: draw_size.width,
@@ -207,11 +209,11 @@ impl WindowEvents
                     return Some(Event::AfterRender(AfterRenderArgs));
                 }
                 State::UpdateLoop => {
-	                	let current_time = time::precise_time_ns();
+                    let current_time = time::precise_time_ns();
                     let next_frame = self.last_frame + self.dt_frame_in_ns;
                     let next_update = self.last_update + self.dt_update_in_ns;
                     let next_event = cmp::min(next_frame, next_update);
-                    
+
                     // In benchmark mode, pick the next event without sleep.
                     // Idle and input events are ignored.
                     if !self.bench_mode && next_event > current_time {
@@ -220,7 +222,7 @@ impl WindowEvents
                         } else {
                             self.state = State::Idle(next_event);
                             let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
-                            return Some(Event::Idle(IdleArgs { dt: seconds }))
+                            return Some(Event::Idle(IdleArgs { dt: seconds }));
                         }
                     } else if next_event == next_frame {
                         State::PrepareRender
@@ -232,7 +234,7 @@ impl WindowEvents
                     }
                 }
                 State::Idle(stop_time) => {
-	                	sleep(ns_to_duration(stop_time - time::precise_time_ns()));
+                    sleep(ns_to_duration(stop_time - time::precise_time_ns()));
                     State::UpdateLoop
                 }
                 State::PrepareUpdate(update_state) => {
@@ -246,7 +248,9 @@ impl WindowEvents
                         // Handle all events before updating.
                         match window.poll_event() {
                             None => State::Update(update_state),
-                            Some(event) => { return Some(Event::Input(event)); },
+                            Some(event) => {
+                                return Some(Event::Input(event));
+                            }
                         }
                     }
                 }
@@ -255,7 +259,7 @@ impl WindowEvents
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
                     self.last_update += update_state.dt_update_in_ns;
-                    return Some(Event::Update(UpdateArgs{ dt: update_state.dt }));
+                    return Some(Event::Update(UpdateArgs { dt: update_state.dt }));
                 }
             };
         }
