@@ -169,7 +169,14 @@ impl WindowEvents
                     // because window might be closed and destroy
                     // the graphics context.
                     if let Some(e) = window.poll_event() {
-                        return Some(Event::Input(e));
+                        if self.bench_mode {
+                            // Ignore input events in benchmark mode.
+                            // This is to avoid the input events affecting
+                            // the application state when benchmarking.
+                            continue
+                        } else {
+                            return Some(Event::Input(e));
+                        }
                     }
                     if window.should_close() {
                         return None;
@@ -212,6 +219,8 @@ impl WindowEvents
                     if self.bench_mode {
                         // In benchmark mode, pick the next event without sleep.
                         // Idle and input events are ignored.
+                        // This is to avoid the input events affecting
+                        // the application state when benchmarking.
                         let next_frame = self.last_frame + self.dt_frame_in_ns;
                         let next_update = self.last_update + self.dt_update_in_ns;
                         let next_event = cmp::min(next_frame, next_update);
@@ -251,7 +260,9 @@ impl WindowEvents
                 }
                 State::HandleEvents(update_state) => {
                     if self.bench_mode {
-                        // Ignore input to prevent it affecting the benchmark.
+                        // Ignore input events.
+                        // This is to avoid the input events affecting
+                        // the application state when benchmarking.
                         match window.poll_event() {
                             None => State::Update(update_state),
                             Some(_) => State::HandleEvents(update_state),
