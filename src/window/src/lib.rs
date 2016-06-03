@@ -214,7 +214,7 @@ pub trait AdvancedWindow: Window + Sized {
 
     /// Sets whether built windows should enter fullscreen when F1 key is pressed.
     fn set_fullscreen_on_f1(&mut self, value: bool);
-    
+   
     /// Sets whether to capture/grab the cursor.
     ///
     /// This is used to lock and hide cursor to the window,
@@ -425,6 +425,16 @@ impl WindowSettings {
     /// Sets whether built windows should enter fullscreen when F1 key is pressed.
     pub fn set_fullscreen_on_f1(&mut self, value: bool){
         self.fullscreen_on_f1 = value;
+    }
+
+    /// Sets whether the built windows should fullscreen when f1 is pressd
+    ///
+    /// This method moves the current window data
+    /// unlike [`set_fullscreen_on_f1`](#method.set_fullscreen_on_f1),
+    /// so that it can be used in method chaining
+    pub fn fullscreen_on_f1(mut self, value: bool) -> Self{
+        self.set_fullscreen_on_f1(value);
+        self
     }
     /// Sets whether built windows should exit when the Esc key is pressed.
     ///
