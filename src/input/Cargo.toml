@@ -15,5 +15,5 @@ path = "src/lib.rs"
 
 [dependencies]
 rustc-serialize = "0.3.16"
-bitflags = "0.6.0"
+bitflags = "0.7.0"
 piston-viewport = "0.2.0"
