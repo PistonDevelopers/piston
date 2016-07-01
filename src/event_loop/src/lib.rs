@@ -6,10 +6,9 @@
 extern crate window;
 extern crate input;
 extern crate viewport;
-extern crate time;
 
 use std::thread::sleep;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use std::cmp;
 use window::Window;
 use input::{ AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs };
@@ -116,8 +115,8 @@ pub trait EventLoop: Sized {
 #[derive(Copy, Clone)]
 pub struct WindowEvents {
     state: State,
-    last_update: u64,
-    last_frame: u64,
+    last_update: Instant,
+    last_frame: Instant,
     dt_update_in_ns: u64,
     dt_frame_in_ns: u64,
     dt: f64,
@@ -133,6 +132,10 @@ fn ns_to_duration(ns: u64) -> Duration {
     Duration::new(secs, nanos)
 }
 
+fn duration_to_f64(dur: Duration) -> f64 {
+    dur.as_secs() as f64 + dur.subsec_nanos() as f64 / 1000_000_000.0
+}
+
 /// The default updates per second.
 pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
@@ -142,7 +145,7 @@ impl WindowEvents
 {
     /// Creates a new event iterator with default UPS and FPS settings.
     pub fn new() -> WindowEvents {
-        let start = time::precise_time_ns();
+        let start = Instant::now();
         let updates_per_second = DEFAULT_UPS;
         let max_frames_per_second = DEFAULT_MAX_FPS;
         WindowEvents {
@@ -184,10 +187,10 @@ impl WindowEvents
 
                     if self.bench_mode {
                         // In benchmark mode, pretend FPS is perfect.
-                        self.last_frame += self.dt_frame_in_ns;
+                        self.last_frame += ns_to_duration(self.dt_frame_in_ns);
                     } else {
                         // In normal mode, let the FPS slip if late.
-                        self.last_frame = time::precise_time_ns();
+                        self.last_frame = Instant::now();
                     }
 
                     let size = window.size();
@@ -197,7 +200,7 @@ impl WindowEvents
                         self.state = State::SwapBuffers;
                         return Some(Event::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: (self.last_frame - self.last_update) as f64
+                            ext_dt: duration_to_f64(self.last_frame.duration_since(self.last_update))
                                     / BILLION as f64,
                             width: size.width,
                             height: size.height,
@@ -221,8 +224,8 @@ impl WindowEvents
                         // Idle and input events are ignored.
                         // This is to avoid the input events affecting
                         // the application state when benchmarking.
-                        let next_frame = self.last_frame + self.dt_frame_in_ns;
-                        let next_update = self.last_update + self.dt_update_in_ns;
+                        let next_frame = self.last_frame + ns_to_duration(self.dt_frame_in_ns);
+                        let next_update = self.last_update + ns_to_duration(self.dt_update_in_ns);
                         let next_event = cmp::min(next_frame, next_update);
                         if next_event == next_frame {
                             State::Render
@@ -233,9 +236,9 @@ impl WindowEvents
                             })
                         }
                     } else {
-                        let current_time = time::precise_time_ns();
-                        let next_frame = self.last_frame + self.dt_frame_in_ns;
-                        let next_update = self.last_update + self.dt_update_in_ns;
+                        let current_time = Instant::now();
+                        let next_frame = self.last_frame + ns_to_duration(self.dt_frame_in_ns);
+                        let next_update = self.last_update + ns_to_duration(self.dt_update_in_ns);
                         let next_event = cmp::min(next_frame, next_update);
                         if next_event > current_time {
                             if let Some(x) = window.poll_event() {
@@ -243,10 +246,10 @@ impl WindowEvents
                                 return Some(Event::Input(x));
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
-                                let seconds = ((next_event - current_time) as f64) / (BILLION as f64);
+                                let seconds = duration_to_f64(next_event - current_time) / (BILLION as f64);
                                 return Some(Event::Idle(IdleArgs { dt: seconds }))
                             }
-                            sleep(ns_to_duration(next_event - current_time));
+                            sleep(next_event - current_time);
                             State::UpdateLoop(Idle::No)
                         } else if next_event == next_frame {
                             State::Render
@@ -279,7 +282,7 @@ impl WindowEvents
                     self.state = State::UpdateLoop(Idle::No);
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
-                    self.last_update += update_state.dt_update_in_ns;
+                    self.last_update += ns_to_duration(update_state.dt_update_in_ns);
                     return Some(Event::Update(UpdateArgs{ dt: update_state.dt }));
                 }
             };

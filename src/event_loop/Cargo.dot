@@ -1,7 +1,0 @@
-digraph dependencies {
-    N0[label="pistoncore-event_loop"];
-    N1[label="quack"];
-    N2[label="clock_ticks"];
-    N0 -> N2[label=""];
-    N0 -> N1[label=""];
-}
