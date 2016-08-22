@@ -4,6 +4,7 @@ use std::borrow::ToOwned;
 use std::any::Any;
 
 use {AfterRenderEvent, CursorEvent, FocusEvent, IdleEvent,
+     MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent,
      PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
      TextEvent, TouchEvent, UpdateEvent};
 use {AfterRenderArgs, ControllerAxisArgs, Button, Event, EventId, IdleArgs, Input,
@@ -15,6 +16,7 @@ use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
 /// Implemented by all events
 pub trait GenericEvent: Sized +
     AfterRenderEvent + CursorEvent + FocusEvent + IdleEvent +
+    MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent +
     PressEvent + ReleaseEvent + RenderEvent + ResizeEvent +
     TextEvent + TouchEvent + UpdateEvent {
     /// The id of this event.

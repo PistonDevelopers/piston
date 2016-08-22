@@ -3,7 +3,7 @@
 
 use std::any::Any;
 
-use { GenericEvent, MOUSE_SCROLL, MOUSE_RELATIVE, MOUSE_CURSOR };
+use { Event, GenericEvent, Input, Motion, MOUSE_SCROLL, MOUSE_RELATIVE, MOUSE_CURSOR };
 
 /// Represent a mouse button.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
@@ -89,7 +89,46 @@ pub trait MouseCursorEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> MouseCursorEvent for T {
+    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(MOUSE_CURSOR, &(x, y) as &Any, old_event)
+    }
+
+    fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        if self.event_id() != MOUSE_CURSOR {
+            return None;
+        }
+        self.with_args(|any| {
+            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
+                Some(f(x, y))
+            } else {
+                panic!("Expected (f64, f64)")
+            }
+        })
+    }
+}
+*/
+
+impl MouseCursorEvent for Input {
+    fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
+        Some(Input::Move(Motion::MouseCursor(x, y)))
+    }
+
+    fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        match *self {
+            Input::Move(Motion::MouseCursor(x, y)) => Some(f(x, y)),
+            _ => None
+        }
+    }
+}
+
+// TODO: Add impl for `Event<Input>` when specialization gets stable.
+impl<I: GenericEvent> MouseCursorEvent for Event<I> {
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(MOUSE_CURSOR, &(x, y) as &Any, old_event)
     }
@@ -123,7 +162,46 @@ pub trait MouseRelativeEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> MouseRelativeEvent for T {
+    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(MOUSE_RELATIVE, &(x, y) as &Any, old_event)
+    }
+
+    fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        if self.event_id() != MOUSE_RELATIVE {
+            return None;
+        }
+        self.with_args(|any| {
+            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
+                Some(f(x, y))
+            } else {
+                panic!("Expected (f64, f64)")
+            }
+        })
+    }
+}
+*/
+
+impl MouseRelativeEvent for Input {
+    fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
+        Some(Input::Move(Motion::MouseRelative(x, y)))
+    }
+
+    fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        match *self {
+            Input::Move(Motion::MouseRelative(x, y)) => Some(f(x, y)),
+            _ => None
+        }
+    }
+}
+
+// TODO: Add impl for `Event<Input>` when specialization gets stable.
+impl<I: GenericEvent> MouseRelativeEvent for Event<I> {
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(MOUSE_RELATIVE, &(x, y) as &Any, old_event)
     }
@@ -157,7 +235,46 @@ pub trait MouseScrollEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> MouseScrollEvent for T {
+    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(MOUSE_SCROLL, &(x, y) as &Any, old_event)
+    }
+
+    fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        if self.event_id() != MOUSE_SCROLL {
+            return None;
+        }
+        self.with_args(|any| {
+            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
+                Some(f(x, y))
+            } else {
+                panic!("Expected (f64, f64)")
+            }
+        })
+    }
+}
+*/
+
+impl MouseScrollEvent for Input {
+    fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
+        Some(Input::Move(Motion::MouseScroll(x, y)))
+    }
+
+    fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(f64, f64) -> U
+    {
+        match *self {
+            Input::Move(Motion::MouseScroll(x, y)) => Some(f(x, y)),
+            _ => None
+        }
+    }
+}
+
+// TODO: Add impl for `Event<Input>` when specialization gets stable.
+impl<I: GenericEvent> MouseScrollEvent for Event<I> {
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(MOUSE_SCROLL, &(x, y) as &Any, old_event)
     }
