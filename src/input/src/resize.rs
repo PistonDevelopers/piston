@@ -1,6 +1,4 @@
-use std::any::Any;
-
-use { Event, GenericEvent, Input, RESIZE };
+use { Event, Input };
 
 /// When the window is resized
 pub trait ResizeEvent: Sized {
@@ -53,25 +51,23 @@ impl ResizeEvent for Input {
     }
 }
 
-// TODO: Add impl for `Event<Input>` when specialization gets stable.
-impl<I: GenericEvent> ResizeEvent for Event<I> {
+impl<I: ResizeEvent> ResizeEvent for Event<I> {
     fn from_width_height(w: u32, h: u32, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(RESIZE, &(w, h) as &Any, old_event)
+        if let &Event::Input(ref old_input) = old_event {
+            <I as ResizeEvent>::from_width_height(w, h, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
     }
 
-    fn resize<U, F>(&self, mut f: F) -> Option<U>
+    fn resize<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(u32, u32) -> U
     {
-        if self.event_id() != RESIZE {
-            return None;
+        match *self {
+            Event::Input(ref x) => x.resize(f),
+            _ => None
         }
-        self.with_args(|any| {
-            if let Some(&(w, h)) = any.downcast_ref::<(u32, u32)>() {
-                Some(f(w, h))
-            } else {
-                panic!("Expected (u32, u32)")
-            }
-        })
     }
 }
 

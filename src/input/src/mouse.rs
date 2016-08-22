@@ -1,9 +1,7 @@
 
 //! Back-end agnostic mouse buttons.
 
-use std::any::Any;
-
-use { Event, GenericEvent, Input, Motion, MOUSE_SCROLL, MOUSE_RELATIVE, MOUSE_CURSOR };
+use { Event, Input, Motion };
 
 /// Represent a mouse button.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
@@ -127,25 +125,23 @@ impl MouseCursorEvent for Input {
     }
 }
 
-// TODO: Add impl for `Event<Input>` when specialization gets stable.
-impl<I: GenericEvent> MouseCursorEvent for Event<I> {
+impl<I: MouseCursorEvent> MouseCursorEvent for Event<I> {
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(MOUSE_CURSOR, &(x, y) as &Any, old_event)
+        if let &Event::Input(ref old_input) = old_event {
+            <I as MouseCursorEvent>::from_xy(x, y, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
     }
 
-    fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
+    fn mouse_cursor<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if self.event_id() != MOUSE_CURSOR {
-            return None;
+        match *self {
+            Event::Input(ref x) => x.mouse_cursor(f),
+            _ => None
         }
-        self.with_args(|any| {
-            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
-                Some(f(x, y))
-            } else {
-                panic!("Expected (f64, f64)")
-            }
-        })
     }
 }
 
@@ -200,25 +196,23 @@ impl MouseRelativeEvent for Input {
     }
 }
 
-// TODO: Add impl for `Event<Input>` when specialization gets stable.
-impl<I: GenericEvent> MouseRelativeEvent for Event<I> {
+impl<I: MouseRelativeEvent> MouseRelativeEvent for Event<I> {
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(MOUSE_RELATIVE, &(x, y) as &Any, old_event)
+        if let &Event::Input(ref old_input) = old_event {
+            <I as MouseRelativeEvent>::from_xy(x, y, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
     }
 
-    fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
+    fn mouse_relative<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if self.event_id() != MOUSE_RELATIVE {
-            return None;
+        match *self {
+            Event::Input(ref x) => x.mouse_relative(f),
+            _ => None
         }
-        self.with_args(|any| {
-            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
-                Some(f(x, y))
-            } else {
-                panic!("Expected (f64, f64)")
-            }
-        })
     }
 }
 
@@ -273,25 +267,23 @@ impl MouseScrollEvent for Input {
     }
 }
 
-// TODO: Add impl for `Event<Input>` when specialization gets stable.
-impl<I: GenericEvent> MouseScrollEvent for Event<I> {
+impl<I: MouseScrollEvent> MouseScrollEvent for Event<I> {
     fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(MOUSE_SCROLL, &(x, y) as &Any, old_event)
+        if let &Event::Input(ref old_input) = old_event {
+            <I as MouseScrollEvent>::from_xy(x, y, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
     }
 
-    fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
+    fn mouse_scroll<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
-        if self.event_id() != MOUSE_SCROLL {
-            return None;
+        match *self {
+            Event::Input(ref x) => x.mouse_scroll(f),
+            _ => None
         }
-        self.with_args(|any| {
-            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
-                Some(f(x, y))
-            } else {
-                panic!("Expected (f64, f64)")
-            }
-        })
     }
 }
 

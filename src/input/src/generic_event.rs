@@ -3,7 +3,7 @@
 use std::borrow::ToOwned;
 use std::any::Any;
 
-use {AfterRenderEvent, CursorEvent, FocusEvent, IdleEvent,
+use {AfterRenderEvent, ControllerAxisEvent, CursorEvent, FocusEvent, IdleEvent,
      MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent,
      PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
      TextEvent, TouchEvent, UpdateEvent};
@@ -15,7 +15,7 @@ use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
 
 /// Implemented by all events
 pub trait GenericEvent: Sized +
-    AfterRenderEvent + CursorEvent + FocusEvent + IdleEvent +
+    AfterRenderEvent + ControllerAxisEvent + CursorEvent + FocusEvent + IdleEvent +
     MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent +
     PressEvent + ReleaseEvent + RenderEvent + ResizeEvent +
     TextEvent + TouchEvent + UpdateEvent {
@@ -25,7 +25,9 @@ pub trait GenericEvent: Sized +
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U
     ;
-    /// Converts from arguments to `Self`
+    /// Converts from arguments to `Self`.
+    ///
+    /// Returns `None` if old event is not same kind.
     fn from_args(event_id: EventId, any: &Any, old_event: &Self) -> Option<Self>;
 }
 

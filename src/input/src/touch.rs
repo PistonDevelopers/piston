@@ -1,6 +1,4 @@
-use std::any::Any;
-
-use { Event, GenericEvent, Input, Motion, TOUCH };
+use { Event, Input, Motion };
 
 /// Stores the touch state.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
@@ -172,25 +170,23 @@ impl TouchEvent for Input {
     }
 }
 
-// TODO: Add impl for `Event<Input>` when specialization gets stable.
-impl<I: GenericEvent> TouchEvent for Event<I> {
+impl<I: TouchEvent> TouchEvent for Event<I> {
     fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(TOUCH, args as &Any, old_event)
+        if let &Event::Input(ref old_input) = old_event {
+            <I as TouchEvent>::from_touch_args(args, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
     }
 
-    fn touch<U, F>(&self, mut f: F) -> Option<U>
+    fn touch<U, F>(&self, f: F) -> Option<U>
         where F: FnMut(&TouchArgs) -> U
     {
-        if self.event_id() != TOUCH {
-            return None;
+        match *self {
+            Event::Input(ref x) => x.touch(f),
+            _ => None
         }
-        self.with_args(|any| {
-            if let Some(args) = any.downcast_ref::<TouchArgs>() {
-                Some(f(args))
-            } else {
-                panic!("Expected TouchArgs")
-            }
-        })
     }
 }
 
