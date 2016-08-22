@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use { GenericEvent, TOUCH };
+use { Event, GenericEvent, Input, Motion, TOUCH };
 
 /// Stores the touch state.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
@@ -134,7 +134,46 @@ pub trait TouchEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T> TouchEvent for T where T: GenericEvent {
+    fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(TOUCH, args as &Any, old_event)
+    }
+
+    fn touch<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&TouchArgs) -> U
+    {
+        if self.event_id() != TOUCH {
+            return None;
+        }
+        self.with_args(|any| {
+            if let Some(args) = any.downcast_ref::<TouchArgs>() {
+                Some(f(args))
+            } else {
+                panic!("Expected TouchArgs")
+            }
+        })
+    }
+}
+*/
+
+impl TouchEvent for Input {
+    fn from_touch_args(args: &TouchArgs, _old_event: &Self) -> Option<Self> {
+        Some(Input::Move(Motion::Touch(*args)))
+    }
+
+    fn touch<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&TouchArgs) -> U
+    {
+        match *self {
+            Input::Move(Motion::Touch(ref args)) => Some(f(args)),
+            _ => None
+        }
+    }
+}
+
+// TODO: Add impl for `Event<Input>` when specialization gets stable.
+impl<I: GenericEvent> TouchEvent for Event<I> {
     fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(TOUCH, args as &Any, old_event)
     }

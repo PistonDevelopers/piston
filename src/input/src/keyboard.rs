@@ -64,8 +64,6 @@ impl ModifierKey {
     ///
     /// If the left or side button is released, it counts as a release.
     pub fn event<E: GenericEvent>(&mut self, e: &E) {
-        use { FocusEvent, PressEvent, ReleaseEvent };
-
         if let Some(button) = e.press_args() {
             match button {
                 Button::Keyboard(Key::LCtrl) |

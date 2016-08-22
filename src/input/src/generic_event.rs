@@ -3,6 +3,9 @@
 use std::borrow::ToOwned;
 use std::any::Any;
 
+use {AfterRenderEvent, CursorEvent, FocusEvent, IdleEvent,
+     PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
+     TextEvent, TouchEvent, UpdateEvent};
 use {AfterRenderArgs, ControllerAxisArgs, Button, Event, EventId, IdleArgs, Input,
      Motion, RenderArgs, TouchArgs, UpdateArgs};
 use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
@@ -10,7 +13,10 @@ use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
      TEXT, TOUCH, UPDATE};
 
 /// Implemented by all events
-pub trait GenericEvent: Sized {
+pub trait GenericEvent: Sized +
+    AfterRenderEvent + CursorEvent + FocusEvent + IdleEvent +
+    PressEvent + ReleaseEvent + RenderEvent + ResizeEvent +
+    TextEvent + TouchEvent + UpdateEvent {
     /// The id of this event.
     fn event_id(&self) -> EventId;
     /// Calls closure with arguments

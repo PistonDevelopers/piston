@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use { Button, GenericEvent, RELEASE };
+use { Button, Event, GenericEvent, Input, RELEASE };
 
 /// The release of a button
 pub trait ReleaseEvent: Sized {
@@ -15,6 +15,7 @@ pub trait ReleaseEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> ReleaseEvent for T {
     fn from_button(button: Button, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(RELEASE, &button as &Any, old_event)
@@ -35,7 +36,44 @@ impl<T: GenericEvent> ReleaseEvent for T {
         })
     }
 }
+*/
 
+impl ReleaseEvent for Input {
+    fn from_button(button: Button, _old_event: &Self) -> Option<Self> {
+        Some(Input::Release(button))
+    }
+
+    fn release<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(Button) -> U
+    {
+        match *self {
+            Input::Release(button) => Some(f(button)),
+            _ => None
+        }
+    }
+}
+
+// TODO: Add impl for `Event<Input>` when specialization gets stable.
+impl<I: GenericEvent> ReleaseEvent for Event<I> {
+    fn from_button(button: Button, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(RELEASE, &button as &Any, old_event)
+    }
+
+    fn release<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(Button) -> U
+    {
+        if self.event_id() != RELEASE {
+            return None;
+        }
+        self.with_args(|any| {
+            if let Some(&button) = any.downcast_ref::<Button>() {
+                Some(f(button))
+            } else {
+                panic!("Expected Button")
+            }
+        })
+    }
+}
 
 #[cfg(test)]
 mod tests {

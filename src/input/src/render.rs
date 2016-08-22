@@ -1,7 +1,6 @@
-use std::any::Any;
 use viewport::Viewport;
 
-use { GenericEvent, RENDER };
+use { Event, GenericEvent, Input };
 
 /// Render arguments
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -42,6 +41,7 @@ pub trait RenderEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> RenderEvent for T {
     fn from_render_args(args: &RenderArgs, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(RENDER, args as &Any, old_event)
@@ -60,6 +60,34 @@ impl<T: GenericEvent> RenderEvent for T {
                 panic!("Expected RenderArgs")
             }
         })
+    }
+}
+*/
+
+impl RenderEvent for Input {
+    fn from_render_args(_args: &RenderArgs, _old_event: &Self) -> Option<Self> {
+        None
+    }
+
+    fn render<U, F>(&self, mut _f: F) -> Option<U>
+        where F: FnMut(&RenderArgs) -> U
+    {
+        None
+    }
+}
+
+impl<I: GenericEvent> RenderEvent for Event<I> {
+    fn from_render_args(args: &RenderArgs, _old_event: &Self) -> Option<Self> {
+        Some(Event::Render(*args))
+    }
+
+    fn render<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&RenderArgs) -> U
+    {
+        match *self {
+            Event::Render(ref args) => Some(f(args)),
+            _ => None
+        }
     }
 }
 

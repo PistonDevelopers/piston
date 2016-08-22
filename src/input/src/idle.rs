@@ -1,6 +1,4 @@
-use std::any::Any;
-
-use { GenericEvent, IDLE };
+use { Event, Input };
 
 /// Idle arguments, such as expected idle time in seconds.
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -26,6 +24,7 @@ pub trait IdleEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T> IdleEvent for T where T: GenericEvent {
     fn from_idle_args(args: &IdleArgs, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(IDLE, args as &Any, old_event)
@@ -44,6 +43,34 @@ impl<T> IdleEvent for T where T: GenericEvent {
                 panic!("Expected IdleArgs")
             }
         })
+    }
+}
+*/
+
+impl IdleEvent for Input {
+    fn from_idle_args(_args: &IdleArgs, _old_event: &Self) -> Option<Self> {
+        None
+    }
+
+    fn idle<U, F>(&self, mut _f: F) -> Option<U>
+        where F: FnMut(&IdleArgs) -> U
+    {
+        None
+    }
+}
+
+impl<I> IdleEvent for Event<I> {
+    fn from_idle_args(args: &IdleArgs, _old_event: &Self) -> Option<Self> {
+        Some(Event::Idle(*args))
+    }
+
+    fn idle<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&IdleArgs) -> U
+    {
+        match *self {
+            Event::Idle(ref args) => Some(f(args)),
+            _ => None
+        }
     }
 }
 

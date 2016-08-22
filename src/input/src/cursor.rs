@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use { GenericEvent, CURSOR };
+use { Event, GenericEvent, Input, CURSOR };
 
 /// When window gets or loses cursor
 pub trait CursorEvent: Sized {
@@ -15,7 +15,46 @@ pub trait CursorEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> CursorEvent for T {
+    fn from_cursor(cursor: bool, old_event: &Self) -> Option<Self> {
+        GenericEvent::from_args(CURSOR, &cursor as &Any, old_event)
+    }
+
+    fn cursor<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(bool) -> U
+    {
+        if self.event_id() != CURSOR {
+            return None;
+        }
+        self.with_args(|any| {
+            if let Some(&cursor) = any.downcast_ref::<bool>() {
+                Some(f(cursor))
+            } else {
+                panic!("Expected bool")
+            }
+        })
+    }
+}
+*/
+
+impl CursorEvent for Input {
+    fn from_cursor(cursor: bool, _old_event: &Self) -> Option<Self> {
+        Some(Input::Cursor(cursor))
+    }
+
+    fn cursor<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(bool) -> U
+    {
+        match *self {
+            Input::Cursor(val) => Some(f(val)),
+            _ => None
+        }
+    }
+}
+
+// TODO: Add impl for `Event<Input>` when specialization gets stable.
+impl<I: GenericEvent> CursorEvent for Event<I> {
     fn from_cursor(cursor: bool, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(CURSOR, &cursor as &Any, old_event)
     }
