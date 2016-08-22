@@ -1,7 +1,6 @@
 use std::borrow::ToOwned;
-use std::any::Any;
 
-use { GenericEvent, TEXT };
+use { Event, Input };
 
 /// When receiving text from user, such as typing a character
 pub trait TextEvent: Sized {
@@ -16,6 +15,7 @@ pub trait TextEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> TextEvent for T {
     fn from_text(text: &str, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(TEXT, &text.to_owned() as &Any, old_event)
@@ -34,6 +34,42 @@ impl<T: GenericEvent> TextEvent for T {
                 panic!("Expected &str")
             }
         })
+    }
+}
+*/
+
+impl TextEvent for Input {
+    fn from_text(text: &str, _old_event: &Self) -> Option<Self> {
+        Some(Input::Text(text.into()))
+    }
+
+    fn text<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&str) -> U
+    {
+        match *self {
+            Input::Text(ref s) => Some(f(s)),
+            _ => None
+        }
+    }
+}
+
+impl<I: TextEvent> TextEvent for Event<I> {
+    fn from_text(text: &str, old_event: &Self) -> Option<Self> {
+        if let &Event::Input(ref old_input) = old_event {
+            <I as TextEvent>::from_text(text, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
+    }
+
+    fn text<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(&str) -> U
+    {
+        match *self {
+            Event::Input(ref x) => x.text(f),
+            _ => None
+        }
     }
 }
 

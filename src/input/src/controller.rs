@@ -1,9 +1,7 @@
 
 //! Back-end agnostic controller events.
 
-use std::any::Any;
-
-use { GenericEvent, CONTROLLER_AXIS };
+use { Event, Input, Motion };
 
 /// Components of a controller button event. Not guaranteed consistent across
 /// backends.
@@ -67,6 +65,7 @@ pub trait ControllerAxisEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> ControllerAxisEvent for T {
     fn from_controller_axis_args(
         args: ControllerAxisArgs,
@@ -88,6 +87,48 @@ impl<T: GenericEvent> ControllerAxisEvent for T {
                 panic!("Expected ControllerAxisArgs")
             }
         })
+    }
+}
+*/
+
+impl ControllerAxisEvent for Input {
+    fn from_controller_axis_args(
+        args: ControllerAxisArgs,
+        _old_event: &Self
+    ) -> Option<Self> {
+        Some(Input::Move(Motion::ControllerAxis(args)))
+    }
+
+    fn controller_axis<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(ControllerAxisArgs) -> U
+    {
+        match *self {
+            Input::Move(Motion::ControllerAxis(args)) => Some(f(args)),
+            _ => None
+        }
+    }
+}
+
+impl<I: ControllerAxisEvent> ControllerAxisEvent for Event<I> {
+    fn from_controller_axis_args(
+        args: ControllerAxisArgs,
+        old_event: &Self
+    ) -> Option<Self> {
+        if let &Event::Input(ref old_input) = old_event {
+            <I as ControllerAxisEvent>::from_controller_axis_args(args, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
+    }
+
+    fn controller_axis<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(ControllerAxisArgs) -> U
+    {
+        match *self {
+            Event::Input(ref x) => x.controller_axis(f),
+            _ => None
+        }
     }
 }
 

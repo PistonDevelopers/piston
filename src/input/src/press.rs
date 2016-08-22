@@ -1,6 +1,4 @@
-use std::any::Any;
-
-use { Button, GenericEvent, PRESS };
+use { Button, Event, Input };
 
 /// The press of a button
 pub trait PressEvent: Sized {
@@ -15,6 +13,7 @@ pub trait PressEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> PressEvent for T {
     fn from_button(button: Button, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(PRESS, &button as &Any, old_event)
@@ -33,6 +32,42 @@ impl<T: GenericEvent> PressEvent for T {
                 panic!("Expected Button")
             }
         })
+    }
+}
+*/
+
+impl PressEvent for Input {
+    fn from_button(button: Button, _old_event: &Self) -> Option<Self> {
+        Some(Input::Press(button))
+    }
+
+    fn press<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(Button) -> U
+    {
+        match *self {
+            Input::Press(button) => Some(f(button)),
+            _ => None
+        }
+    }
+}
+
+impl<I: PressEvent> PressEvent for Event<I> {
+    fn from_button(button: Button, old_event: &Self) -> Option<Self> {
+        if let &Event::Input(ref old_input) = old_event {
+            <I as PressEvent>::from_button(button, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
+    }
+
+    fn press<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(Button) -> U
+    {
+        match *self {
+            Event::Input(ref x) => x.press(f),
+            _ => None
+        }
     }
 }
 

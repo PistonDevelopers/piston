@@ -3,6 +3,10 @@
 use std::borrow::ToOwned;
 use std::any::Any;
 
+use {AfterRenderEvent, ControllerAxisEvent, CursorEvent, FocusEvent, IdleEvent,
+     MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent,
+     PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
+     TextEvent, TouchEvent, UpdateEvent};
 use {AfterRenderArgs, ControllerAxisArgs, Button, Event, EventId, IdleArgs, Input,
      Motion, RenderArgs, TouchArgs, UpdateArgs};
 use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
@@ -10,14 +14,20 @@ use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
      TEXT, TOUCH, UPDATE};
 
 /// Implemented by all events
-pub trait GenericEvent: Sized {
+pub trait GenericEvent: Sized +
+    AfterRenderEvent + ControllerAxisEvent + CursorEvent + FocusEvent + IdleEvent +
+    MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent +
+    PressEvent + ReleaseEvent + RenderEvent + ResizeEvent +
+    TextEvent + TouchEvent + UpdateEvent {
     /// The id of this event.
     fn event_id(&self) -> EventId;
     /// Calls closure with arguments
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U
     ;
-    /// Converts from arguments to `Self`
+    /// Converts from arguments to `Self`.
+    ///
+    /// Returns `None` if old event is not same kind.
     fn from_args(event_id: EventId, any: &Any, old_event: &Self) -> Option<Self>;
 }
 

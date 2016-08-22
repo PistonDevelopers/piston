@@ -1,6 +1,4 @@
-use std::any::Any;
-
-use { GenericEvent, FOCUS };
+use { Event, Input };
 
 /// When window gets or loses focus
 pub trait FocusEvent: Sized {
@@ -15,6 +13,7 @@ pub trait FocusEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T: GenericEvent> FocusEvent for T {
     fn from_focused(focused: bool, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(FOCUS, &focused as &Any, old_event)
@@ -33,6 +32,42 @@ impl<T: GenericEvent> FocusEvent for T {
                 panic!("Expected bool")
             }
         })
+    }
+}
+*/
+
+impl FocusEvent for Input {
+    fn from_focused(focused: bool, _old_event: &Self) -> Option<Self> {
+        Some(Input::Focus(focused))
+    }
+
+    fn focus<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(bool) -> U
+    {
+        match *self {
+            Input::Focus(focused) => Some(f(focused)),
+            _ => None
+        }
+    }
+}
+
+impl<I: FocusEvent> FocusEvent for Event<I> {
+    fn from_focused(focused: bool, old_event: &Self) -> Option<Self> {
+        if let &Event::Input(ref old_input) = old_event {
+            <I as FocusEvent>::from_focused(focused, old_input)
+                .map(|x| Event::Input(x))
+        } else {
+            None
+        }
+    }
+
+    fn focus<U, F>(&self, f: F) -> Option<U>
+        where F: FnMut(bool) -> U
+    {
+        match *self {
+            Event::Input(ref x) => x.focus(f),
+            _ => None
+        }
     }
 }
 

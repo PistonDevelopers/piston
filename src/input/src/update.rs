@@ -1,6 +1,4 @@
-use std::any::Any;
-
-use { GenericEvent, UPDATE };
+use { Event, GenericEvent, Input };
 
 /// Update arguments, such as delta time in seconds
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -26,6 +24,7 @@ pub trait UpdateEvent: Sized {
     }
 }
 
+/* TODO: Enable when specialization gets stable.
 impl<T> UpdateEvent for T where T: GenericEvent {
     fn from_update_args(args: &UpdateArgs, old_event: &Self) -> Option<Self> {
         GenericEvent::from_args(UPDATE, args as &Any, old_event)
@@ -44,6 +43,34 @@ impl<T> UpdateEvent for T where T: GenericEvent {
                 panic!("Expected UpdateArgs")
             }
         })
+    }
+}
+*/
+
+impl UpdateEvent for Input {
+    fn from_update_args(_args: &UpdateArgs, _old_event: &Self) -> Option<Self> {
+        None
+    }
+
+    fn update<U, F>(&self, mut _f: F) -> Option<U>
+        where F: FnMut(&UpdateArgs) -> U
+    {
+        None
+    }
+}
+
+impl<I: GenericEvent> UpdateEvent for Event<I> {
+    fn from_update_args(args: &UpdateArgs, _old_event: &Self) -> Option<Self> {
+        Some(Event::Update(*args))
+    }
+
+    fn update<U, F>(&self, mut f: F) -> Option<U>
+        where F: FnMut(&UpdateArgs) -> U
+    {
+        match *self {
+            Event::Update(ref args) => Some(f(args)),
+            _ => None
+        }
     }
 }
 
