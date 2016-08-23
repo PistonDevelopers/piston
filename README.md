@@ -6,26 +6,18 @@ A modular game engine written in Rust
 
 Maintainers of Piston core libraries: @bvssvni
 
-[Examples](https://github.com/pistondevelopers/piston-examples)
-
-[Overview](https://github.com/PistonDevelopers/piston/wiki/Piston-overview)
-
-[List of features](https://github.com/PistonDevelopers/piston/issues/668)
-
-[List of games made with Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
-
-[Piston online docs](http://docs.piston.rs/piston/piston/)
-
-[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
-
-[Discussion forum](http://discourse.piston.rs/)
+## Dive into the world of Piston
+* [Overview](https://github.com/PistonDevelopers/piston/wiki/Piston-overview)
+* [Examples](https://github.com/pistondevelopers/piston-examples)
+* [List of features](https://github.com/PistonDevelopers/piston/issues/668)
+* [List of games made with Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
+* [Piston online docs](http://docs.piston.rs/piston/piston/)
+* [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
+* [Discussion forum](http://discourse.piston.rs/)
 
 ## Start new project with Piston
 
 You should know how to build "hello world" with Rust, see http://www.rust-lang.org/.
-
-[How to install FreeType](https://github.com/PistonDevelopers/piston/issues/912)
-Piston uses FreeType for font rendering.
 
 ### Drawing a red rectangle
 
@@ -78,12 +70,13 @@ We believe that seeking personal goals and ambitions, while helping each other, 
 
 In addition we do research or plan to in the following areas:
 
-* Graphics, 2D and 3D
+* Graphics, [2D](https://github.com/PistonDevelopers/graphics/) and 3D
+* [GUI](https://github.com/PistonDevelopers/conrod/)
 * Idiomatic Rust game design
 * Interactive applications
-* AI programming
-* Animation
-* Sound and music
+* [AI programming](https://github.com/pistondevelopers/ai_behavior)
+* Animation, [2D](https://github.com/PistonDevelopers/sprite) and [3D](https://github.com/PistonDevelopers/skeletal_animation)
+* Sound and [music](https://github.com/PistonDevelopers/music)
 * Network
 
 ### Dependency graph
