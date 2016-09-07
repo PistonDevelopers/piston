@@ -14,6 +14,7 @@ Maintainers of Piston core libraries: @bvssvni
 * [Piston online docs](http://docs.piston.rs/piston/piston/)
 * [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 * [Discussion forum](http://discourse.piston.rs/)
+* ![Twitter](https://twitter.com/PistonDeveloper)
 
 ## Start new project with Piston
 
