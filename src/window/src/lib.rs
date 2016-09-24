@@ -45,7 +45,7 @@ pub type ProcAddress = *const ();
 ///
 /// Normally, the consideration of points vs pixels should be left to the
 /// host operating system.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Size {
     /// The width.
     pub width: u32,
@@ -75,7 +75,7 @@ impl From<(u32, u32)> for Size {
 ///
 /// Normally, the consideration of points vs pixels should be left to the
 /// host operating system.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Position {
     /// The x coordinate.
     pub x: i32,
