@@ -517,7 +517,7 @@ impl WindowSettings {
     /// Sets OpenGL version of built windows.
     ///
     /// For setting the OpenGL version back to default, see
-    /// [`set_maybe_opengl()`)(#method.set_maybe_opengl).
+    /// [`set_maybe_opengl()`](#method.set_maybe_opengl).
     ///
     /// For more information about the opengl setting, see the
 	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
