@@ -14,7 +14,7 @@ Maintainers of Piston core libraries: @bvssvni
 * [Piston online docs](http://docs.piston.rs/piston/piston/)
 * [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
 * [Discussion forum](http://discourse.piston.rs/)
-* ![Twitter](https://twitter.com/PistonDeveloper)
+* [Twitter - @PistonDeveloper](https://twitter.com/PistonDeveloper)
 * [FAQ - Frequently Asked Questions](https://github.com/PistonDevelopers/piston/wiki/Frequently-Asked-Questions-(FAQ))
 
 ## Start new project with Piston
@@ -25,7 +25,7 @@ You should know how to build "hello world" with Rust, see http://www.rust-lang.o
 
 Add [piston_window](https://crates.io/crates/piston_window) to your Cargo.toml, for example:
 
-```
+```toml
 [dependencies]
 piston_window = "0.44.0"
 ```
