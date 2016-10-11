@@ -18,6 +18,7 @@ use {
 };
 
 use self::input::Input;
+use std::time::Duration;
 
 /// A window without user interface, often used in server event loops.
 ///
@@ -54,6 +55,12 @@ impl Window for NoWindow {
     fn size(&self) -> Size { self.size }
 
     fn swap_buffers(&mut self) {}
+
+    fn wait_event(&mut self) -> Input {
+        panic!("NoWindow will never return an input event");
+    }
+
+    fn wait_event_timeout(&mut self, _timeout: Duration) -> Option<Input> { None }
 
     fn poll_event(&mut self) -> Option<Input> { None }
 

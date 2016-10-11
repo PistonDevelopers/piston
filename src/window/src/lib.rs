@@ -24,6 +24,7 @@
 extern crate shader_version;
 
 use std::convert::From;
+use std::time::Duration;
 use shader_version::OpenGL;
 
 pub use no_window::NoWindow;
@@ -148,7 +149,24 @@ pub trait Window {
     /// usually it is not needed in application code.
     fn swap_buffers(&mut self);
 
+    /// Wait indefinitely for an event to be available from the window.
+    ///
+    /// To read events in application code, look at the
+    /// [`Events`](../event_loop/trait.Events.html) trait instead.
+    fn wait_event(&mut self) -> Self::Event;
+
+    /// Wait for an event to be available from the window or for the
+    /// specified timeout to be reached.
+    ///
+    /// Return None only if there is no event within the timeout.
+    ///
+    /// To read events in application code, look at the
+    /// [`Events`](../event_loop/trait.Events.html) trait instead.
+    fn wait_event_timeout(&mut self, timeout: Duration) -> Option<Self::Event>;
+
     /// Polls an event from the window.
+    ///
+    /// Return None if no events available.
     ///
     /// To read events in application code, look at the
     /// [`Events`](../event_loop/trait.Events.html) trait instead.
