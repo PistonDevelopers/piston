@@ -57,6 +57,7 @@ const AFTER_RENDER: EventId = EventId("piston/after_render");
 const CONTROLLER_AXIS: EventId = EventId("piston/controller_axis");
 const CURSOR: EventId = EventId("piston/cursor");
 const FOCUS: EventId = EventId("piston/focus");
+const CLOSE: EventId = EventId("piston/close");
 const IDLE: EventId = EventId("piston/idle");
 const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
 const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
@@ -112,6 +113,8 @@ pub enum Input {
     Focus(bool),
     /// Window gained or lost cursor.
     Cursor(bool),
+    /// Window closed.
+    Close
 }
 
 impl From<Key> for Button {
