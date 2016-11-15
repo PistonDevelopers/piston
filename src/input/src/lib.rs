@@ -112,6 +112,8 @@ pub enum Input {
     Focus(bool),
     /// Window gained or lost cursor.
     Cursor(bool),
+    /// Window closed.
+    Close
 }
 
 impl From<Key> for Button {
