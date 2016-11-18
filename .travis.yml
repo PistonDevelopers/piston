@@ -3,7 +3,6 @@ rust:
   - stable
   - nightly
 script:
-  - cargo build -v
-  - cargo doc -v
+  - bash ci/script.sh
 after_success:
-  - curl http://docs.piston.rs/travis-doc-upload.sh | sh
+  - curl http://docs.piston.rs/travis-doc-upload.sh > tdu.sh && cat tdu.sh && sh tdu.sh
