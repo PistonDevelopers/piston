@@ -9,7 +9,7 @@ use {AfterRenderEvent, ControllerAxisEvent, CursorEvent, FocusEvent, IdleEvent,
      TextEvent, TouchEvent, UpdateEvent};
 use {AfterRenderArgs, ControllerAxisArgs, Button, Event, EventId, IdleArgs, Input,
      Motion, RenderArgs, TouchArgs, UpdateArgs};
-use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, IDLE, MOUSE_CURSOR,
+use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR,
      MOUSE_RELATIVE, MOUSE_SCROLL, PRESS, RENDER, RELEASE, RESIZE,
      TEXT, TOUCH, UPDATE};
 
@@ -36,6 +36,7 @@ impl GenericEvent for Input {
         match self {
             &Input::Cursor(_) => CURSOR,
             &Input::Focus(_) => FOCUS,
+            &Input::Close => CLOSE,
             &Input::Move(Motion::MouseCursor(_, _)) => MOUSE_CURSOR,
             &Input::Move(Motion::MouseRelative(_, _)) => MOUSE_RELATIVE,
             &Input::Move(Motion::MouseScroll(_, _)) => MOUSE_SCROLL,
@@ -56,6 +57,8 @@ impl GenericEvent for Input {
                 f(&cursor as &Any),
             &Input::Focus(focused) =>
                 f(&focused as &Any),
+            &Input::Close =>
+                f(&(None as Option<()>)),
             &Input::Move(Motion::ControllerAxis(args)) =>
                 f(&args as &Any),
             &Input::Move(Motion::MouseCursor(x, y)) =>
