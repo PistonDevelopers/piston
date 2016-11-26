@@ -132,7 +132,7 @@ fn ns_to_duration(ns: u64) -> Duration {
     Duration::new(secs, nanos)
 }
 
-fn duration_to_f64(dur: Duration) -> f64 {
+fn duration_to_secs(dur: Duration) -> f64 {
     dur.as_secs() as f64 + dur.subsec_nanos() as f64 / 1000_000_000.0
 }
 
@@ -200,8 +200,7 @@ impl WindowEvents
                         self.state = State::SwapBuffers;
                         return Some(Event::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
-                            ext_dt: duration_to_f64(self.last_frame.duration_since(self.last_update))
-                                    / BILLION as f64,
+                            ext_dt: duration_to_secs(self.last_frame.duration_since(self.last_update)),
                             width: size.width,
                             height: size.height,
                             draw_width: draw_size.width,
@@ -246,7 +245,7 @@ impl WindowEvents
                                 return Some(Event::Input(x));
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
-                                let seconds = duration_to_f64(next_event - current_time) / (BILLION as f64);
+                                let seconds = duration_to_secs(next_event - current_time);
                                 return Some(Event::Idle(IdleArgs { dt: seconds }))
                             }
                             sleep(next_event - current_time);
