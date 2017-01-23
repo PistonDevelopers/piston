@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-window"
-version = "0.24.0"
+version = "0.25.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -20,7 +20,7 @@ path = "src/lib.rs"
 
 [dependencies.pistoncore-input]
 path = "../input"
-version = "0.15.0"
+version = "0.16.0"
 
 [dependencies]
 shader_version = "0.2.1"
