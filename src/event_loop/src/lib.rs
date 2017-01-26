@@ -1,4 +1,4 @@
-//! A generic event loop for games and interactive applications
+//! A Piston event loop for games and interactive applications
 
 #![deny(missing_docs)]
 #![deny(missing_copy_implementations)]
@@ -12,18 +12,6 @@ use std::time::{Duration, Instant};
 use std::cmp;
 use window::Window;
 use input::{ AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs };
-
-/// A trait for create event iterator from window.
-pub trait Events {
-    /// Creates event iterator from window.
-    fn events(&self) -> WindowEvents;
-}
-
-impl<W> Events for W where W: Window {
-    fn events(&self) -> WindowEvents {
-        WindowEvents::new()
-    }
-}
 
 /// Tells whether last emitted event was idle or not.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -50,61 +38,42 @@ enum State {
     Update(UpdateState),
 }
 
-/// Methods implements for event loop settings.
-pub trait EventLoop: Sized {
-    /// The number of updates per second
-    ///
-    /// This is the fixed update rate on average over time.
-    /// If the event loop lags, it will try to catch up.
-    fn set_ups(&mut self, frames: u64);
-
-    /// The number of updates per second
-    ///
-    /// This is the fixed update rate on average over time.
-    /// If the event loop lags, it will try to catch up.
-    fn ups(mut self, frames: u64) -> Self {
-        self.set_ups(frames);
-        self
-    }
-
+/// Stores event loop settings.
+#[derive(Copy, Clone, Debug)]
+pub struct EventSettings {
     /// The maximum number of frames per second
     ///
     /// The frame rate can be lower because the
     /// next frame is always scheduled from the previous frame.
     /// This causes the frames to "slip" over time.
-    fn set_max_fps(&mut self, frames: u64);
-
-    /// The maximum number of frames per second
+    pub max_fps: u64,
+    /// The number of updates per second
     ///
-    /// The frame rate can be lower because the
-    /// next frame is always scheduled from the previous frame.
-    /// This causes the frames to "slip" over time.
-    fn max_fps(mut self, frames: u64) -> Self {
-        self.set_max_fps(frames);
-        self
-    }
-
+    /// This is the fixed update rate on average over time.
+    /// If the event loop lags, it will try to catch up.
+    pub ups: u64,
     /// Enable or disable automatic swapping of buffers.
-    fn set_swap_buffers(&mut self, enable: bool);
-
-    /// Enable or disable automatic swapping of buffers.
-    fn swap_buffers(mut self, enable: bool) -> Self {
-        self.set_swap_buffers(enable);
-        self
-    }
-
+    pub swap_buffers: bool,
     /// Enable or disable benchmark mode.
     /// When enabled, it will render and update without sleep and ignore input.
     /// Used to test performance by playing through as fast as possible.
-    fn set_bench_mode(&mut self, enable: bool);
+    pub bench_mode: bool,
+}
 
-    /// Enable or disable benchmark mode.
-    /// When enabled, it will render and update without sleep and ignore input.
-    /// Used to test performance by playing through as fast as possible.
-    fn bench_mode(mut self, enable: bool) -> Self {
-        self.set_bench_mode(enable);
-        self
+impl EventSettings {
+    /// Creates new with default settings.
+    pub fn new() -> EventSettings {
+        EventSettings {
+            max_fps: DEFAULT_MAX_FPS,
+            ups: DEFAULT_UPS,
+            swap_buffers: true,
+            bench_mode: false,
+        }
     }
+}
+
+impl Default for EventSettings {
+    fn default() -> EventSettings { EventSettings::new() }
 }
 
 /// An event loop iterator
@@ -113,15 +82,14 @@ pub trait EventLoop: Sized {
 /// it must be used on the same thread as the window back-end (usually main thread),
 /// unless the window back-end supports multi-thread event polling.*
 #[derive(Copy, Clone)]
-pub struct WindowEvents {
+pub struct Events {
     state: State,
     last_update: Instant,
     last_frame: Instant,
     dt_update_in_ns: u64,
     dt_frame_in_ns: u64,
     dt: f64,
-    swap_buffers: bool,
-    bench_mode: bool,
+    settings: EventSettings,
 }
 
 static BILLION: u64 = 1_000_000_000;
@@ -141,22 +109,19 @@ pub const DEFAULT_UPS: u64 = 120;
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: u64 = 60;
 
-impl WindowEvents
+impl Events
 {
     /// Creates a new event iterator with default UPS and FPS settings.
-    pub fn new() -> WindowEvents {
+    pub fn new(settings: EventSettings) -> Events {
         let start = Instant::now();
-        let updates_per_second = DEFAULT_UPS;
-        let max_frames_per_second = DEFAULT_MAX_FPS;
-        WindowEvents {
+        Events {
             state: State::Render,
             last_update: start,
             last_frame: start,
-            dt_update_in_ns: BILLION / updates_per_second,
-            dt_frame_in_ns: BILLION / max_frames_per_second,
-            dt: 1.0 / updates_per_second as f64,
-            swap_buffers: true,
-            bench_mode: false,
+            dt_update_in_ns: BILLION / settings.ups,
+            dt_frame_in_ns: BILLION / settings.max_fps,
+            dt: 1.0 / settings.ups as f64,
+            settings: settings,
         }
     }
 
@@ -172,7 +137,7 @@ impl WindowEvents
                     // because window might be closed and destroy
                     // the graphics context.
                     if let Some(e) = window.poll_event() {
-                        if self.bench_mode {
+                        if self.settings.bench_mode {
                             // Ignore input events in benchmark mode.
                             // This is to avoid the input events affecting
                             // the application state when benchmarking.
@@ -185,7 +150,7 @@ impl WindowEvents
                         return None;
                     }
 
-                    if self.bench_mode {
+                    if self.settings.bench_mode {
                         // In benchmark mode, pretend FPS is perfect.
                         self.last_frame += ns_to_duration(self.dt_frame_in_ns);
                     } else {
@@ -211,14 +176,14 @@ impl WindowEvents
                     State::UpdateLoop(Idle::No)
                 }
                 State::SwapBuffers => {
-                    if self.swap_buffers {
+                    if self.settings.swap_buffers {
                         window.swap_buffers();
                     }
                     self.state = State::UpdateLoop(Idle::No);
                     return Some(Event::AfterRender(AfterRenderArgs));
                 }
                 State::UpdateLoop(ref mut idle) => {
-                    if self.bench_mode {
+                    if self.settings.bench_mode {
                         // In benchmark mode, pick the next event without sleep.
                         // Idle and input events are ignored.
                         // This is to avoid the input events affecting
@@ -261,7 +226,7 @@ impl WindowEvents
                     }
                 }
                 State::HandleEvents(update_state) => {
-                    if self.bench_mode {
+                    if self.settings.bench_mode {
                         // Ignore input events.
                         // This is to avoid the input events affecting
                         // the application state when benchmarking.
@@ -289,21 +254,97 @@ impl WindowEvents
     }
 }
 
-impl EventLoop for WindowEvents {
+/// Methods implemented for changing event loop settings.
+pub trait EventLoop: Sized {
+    /// Returns event loop settings.
+    fn get_event_settings(&self) -> EventSettings;
+    /// Sets event loop settings.
+    fn set_event_settings(&mut self, settings: EventSettings);
+
+    /// The number of updates per second
+    ///
+    /// This is the fixed update rate on average over time.
+    /// If the event loop lags, it will try to catch up.
     fn set_ups(&mut self, frames: u64) {
-        self.dt_update_in_ns = BILLION / frames;
-        self.dt = 1.0 / frames as f64;
+        let old_settings = self.get_event_settings();
+        self.set_event_settings(EventSettings {
+            ups: frames, ..old_settings
+        });
     }
 
+    /// The number of updates per second
+    ///
+    /// This is the fixed update rate on average over time.
+    /// If the event loop lags, it will try to catch up.
+    fn ups(mut self, frames: u64) -> Self {
+        self.set_ups(frames);
+        self
+    }
+
+    /// The maximum number of frames per second
+    ///
+    /// The frame rate can be lower because the
+    /// next frame is always scheduled from the previous frame.
+    /// This causes the frames to "slip" over time.
     fn set_max_fps(&mut self, frames: u64) {
-        self.dt_frame_in_ns = BILLION / frames;
+        let old_settings = self.get_event_settings();
+        self.set_event_settings(EventSettings {
+            max_fps: frames, ..old_settings
+        })
     }
 
+    /// The maximum number of frames per second
+    ///
+    /// The frame rate can be lower because the
+    /// next frame is always scheduled from the previous frame.
+    /// This causes the frames to "slip" over time.
+    fn max_fps(mut self, frames: u64) -> Self {
+        self.set_max_fps(frames);
+        self
+    }
+
+    /// Enable or disable automatic swapping of buffers.
     fn set_swap_buffers(&mut self, enable: bool) {
-        self.swap_buffers = enable;
+        let old_settings = self.get_event_settings();
+        self.set_event_settings(EventSettings {
+            swap_buffers: enable, ..old_settings
+        })
     }
 
+    /// Enable or disable automatic swapping of buffers.
+    fn swap_buffers(mut self, enable: bool) -> Self {
+        self.set_swap_buffers(enable);
+        self
+    }
+
+    /// Enable or disable benchmark mode.
+    /// When enabled, it will render and update without sleep and ignore input.
+    /// Used to test performance by playing through as fast as possible.
     fn set_bench_mode(&mut self, enable: bool) {
-        self.bench_mode = enable;
+        let old_settings = self.get_event_settings();
+        self.set_event_settings(EventSettings {
+            bench_mode: enable, ..old_settings
+        })
+    }
+
+    /// Enable or disable benchmark mode.
+    /// When enabled, it will render and update without sleep and ignore input.
+    /// Used to test performance by playing through as fast as possible.
+    fn bench_mode(mut self, enable: bool) -> Self {
+        self.set_bench_mode(enable);
+        self
+    }
+}
+
+impl EventLoop for EventSettings {
+    fn get_event_settings(&self) -> Self { *self }
+    fn set_event_settings(&mut self, settings: Self) { *self = settings; }
+}
+
+impl EventLoop for Events {
+    fn get_event_settings(&self) -> EventSettings { self.settings }
+    fn set_event_settings(&mut self, settings: EventSettings) {
+        // Reset event loop to initial state.
+        *self = Events::new(settings);
     }
 }
