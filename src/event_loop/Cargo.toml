@@ -1,7 +1,7 @@
 [package]
 
 name = "pistoncore-event_loop"
-version = "0.28.0"
+version = "0.29.0"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
     "Coeuvre <coeuvre@gmail.com>",
@@ -9,7 +9,7 @@ authors = [
     "bfops",
 ]
 keywords = ["game", "event", "loop", "piston"]
-description = "A generic event loop for games and interactive applications"
+description = "A Piston event loop for games and interactive applications"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/PistonDevelopers/piston.git"
