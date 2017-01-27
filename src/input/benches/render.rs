@@ -5,12 +5,17 @@ extern crate test;
 extern crate input;
 
 use test::Bencher;
-use input::{ Event, RenderArgs, RenderEvent };
+use input::{Input, RenderArgs, RenderEvent};
 
 #[bench]
-fn bench_event_render(bencher: &mut Bencher) {
-    let e = Event::Render(RenderArgs { ext_dt: 0.0, width: 0, height: 0,
-        draw_width: 0, draw_height: 0 });
+fn bench_input_render(bencher: &mut Bencher) {
+    let e = Input::Render(RenderArgs {
+        ext_dt: 0.0,
+        width: 0,
+        height: 0,
+        draw_width: 0,
+        draw_height: 0,
+    });
     let args = RenderArgs {
         ext_dt: 1.0,
         width: 10,
@@ -18,7 +23,5 @@ fn bench_event_render(bencher: &mut Bencher) {
         draw_width: 10,
         draw_height: 10,
     };
-    bencher.iter(|| {
-        let _: Option<Event> = RenderEvent::from_render_args(&args, &e);
-    });
+    bencher.iter(|| { let _: Option<Input> = RenderEvent::from_render_args(&args, &e); });
 }

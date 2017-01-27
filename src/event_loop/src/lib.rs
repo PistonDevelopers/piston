@@ -11,7 +11,7 @@ use std::thread::sleep;
 use std::time::{Duration, Instant};
 use std::cmp;
 use window::Window;
-use input::{AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs};
+use input::{Input, AfterRenderArgs, IdleArgs, RenderArgs, UpdateArgs};
 
 /// Tells whether last emitted event was idle or not.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -20,22 +20,13 @@ enum Idle {
     Yes,
 }
 
-// Stores the update state right after sleep.
-// This is used to avoid logic error when changing settings
-// in the event loop followed by an update.
-#[derive(Copy, Clone, Debug)]
-struct UpdateState {
-    dt_update_in_ns: u64,
-    dt: f64,
-}
-
 #[derive(Copy, Clone, Debug)]
 enum State {
     Render,
     SwapBuffers,
     UpdateLoop(Idle),
-    HandleEvents(UpdateState),
-    Update(UpdateState),
+    HandleEvents,
+    Update,
 }
 
 /// Stores event loop settings.
@@ -127,7 +118,7 @@ impl Events {
     }
 
     /// Returns the next game event.
-    pub fn next<W>(&mut self, window: &mut W) -> Option<Event<W::Event>>
+    pub fn next<W>(&mut self, window: &mut W) -> Option<Input>
         where W: Window
     {
         loop {
@@ -146,7 +137,7 @@ impl Events {
                             // the application state when benchmarking.
                             continue;
                         } else {
-                            return Some(Event::Input(e));
+                            return Some(e);
                         }
                     }
                     if window.should_close() {
@@ -166,7 +157,7 @@ impl Events {
                     if size.width != 0 && size.height != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
-                        return Some(Event::Render(RenderArgs {
+                        return Some(Input::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: duration_to_secs(self.last_frame
                                 .duration_since(self.last_update)),
@@ -184,7 +175,7 @@ impl Events {
                         window.swap_buffers();
                     }
                     self.state = State::UpdateLoop(Idle::No);
-                    return Some(Event::AfterRender(AfterRenderArgs));
+                    return Some(Input::AfterRender(AfterRenderArgs));
                 }
                 State::UpdateLoop(ref mut idle) => {
                     if self.settings.bench_mode {
@@ -198,10 +189,7 @@ impl Events {
                         if next_event == next_frame {
                             State::Render
                         } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
+                            State::HandleEvents
                         }
                     } else {
                         let current_time = Instant::now();
@@ -211,49 +199,46 @@ impl Events {
                         if next_event > current_time {
                             if let Some(x) = window.poll_event() {
                                 *idle = Idle::No;
-                                return Some(Event::Input(x));
+                                return Some(x);
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
                                 let seconds = duration_to_secs(next_event - current_time);
-                                return Some(Event::Idle(IdleArgs { dt: seconds }));
+                                return Some(Input::Idle(IdleArgs { dt: seconds }));
                             }
                             sleep(next_event - current_time);
                             State::UpdateLoop(Idle::No)
                         } else if next_event == next_frame {
                             State::Render
                         } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
+                            State::HandleEvents
                         }
                     }
                 }
-                State::HandleEvents(update_state) => {
+                State::HandleEvents => {
                     if self.settings.bench_mode {
                         // Ignore input events.
                         // This is to avoid the input events affecting
                         // the application state when benchmarking.
                         match window.poll_event() {
-                            None => State::Update(update_state),
-                            Some(_) => State::HandleEvents(update_state),
+                            None => State::Update,
+                            Some(_) => State::HandleEvents,
                         }
                     } else {
                         // Handle all events before updating.
                         match window.poll_event() {
-                            None => State::Update(update_state),
+                            None => State::Update,
                             Some(x) => {
-                                return Some(Event::Input(x));
+                                return Some(x);
                             }
                         }
                     }
                 }
-                State::Update(update_state) => {
+                State::Update => {
                     self.state = State::UpdateLoop(Idle::No);
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
-                    self.last_update += ns_to_duration(update_state.dt_update_in_ns);
-                    return Some(Event::Update(UpdateArgs { dt: update_state.dt }));
+                    self.last_update += ns_to_duration(self.dt_update_in_ns);
+                    return Some(Input::Update(UpdateArgs { dt: self.dt }));
                 }
             };
         }
