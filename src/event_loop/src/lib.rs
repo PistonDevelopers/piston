@@ -20,22 +20,13 @@ enum Idle {
     Yes,
 }
 
-// Stores the update state right after sleep.
-// This is used to avoid logic error when changing settings
-// in the event loop followed by an update.
-#[derive(Copy, Clone, Debug)]
-struct UpdateState {
-    dt_update_in_ns: u64,
-    dt: f64,
-}
-
 #[derive(Copy, Clone, Debug)]
 enum State {
     Render,
     SwapBuffers,
     UpdateLoop(Idle),
-    HandleEvents(UpdateState),
-    Update(UpdateState),
+    HandleEvents,
+    Update,
 }
 
 /// Stores event loop settings.
@@ -198,10 +189,7 @@ impl Events {
                         if next_event == next_frame {
                             State::Render
                         } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
+                            State::HandleEvents
                         }
                     } else {
                         let current_time = Instant::now();
@@ -222,38 +210,35 @@ impl Events {
                         } else if next_event == next_frame {
                             State::Render
                         } else {
-                            State::HandleEvents(UpdateState {
-                                dt_update_in_ns: self.dt_update_in_ns,
-                                dt: self.dt,
-                            })
+                            State::HandleEvents
                         }
                     }
                 }
-                State::HandleEvents(update_state) => {
+                State::HandleEvents => {
                     if self.settings.bench_mode {
                         // Ignore input events.
                         // This is to avoid the input events affecting
                         // the application state when benchmarking.
                         match window.poll_event() {
-                            None => State::Update(update_state),
-                            Some(_) => State::HandleEvents(update_state),
+                            None => State::Update,
+                            Some(_) => State::HandleEvents,
                         }
                     } else {
                         // Handle all events before updating.
                         match window.poll_event() {
-                            None => State::Update(update_state),
+                            None => State::Update,
                             Some(x) => {
                                 return Some(Event::Input(x));
                             }
                         }
                     }
                 }
-                State::Update(update_state) => {
+                State::Update => {
                     self.state = State::UpdateLoop(Idle::No);
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
-                    self.last_update += ns_to_duration(update_state.dt_update_in_ns);
-                    return Some(Event::Update(UpdateArgs { dt: update_state.dt }));
+                    self.last_update += ns_to_duration(self.dt_update_in_ns);
+                    return Some(Event::Update(UpdateArgs { dt: self.dt }));
                 }
             };
         }
