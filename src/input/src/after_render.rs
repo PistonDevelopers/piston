@@ -9,8 +9,7 @@ pub trait AfterRenderEvent: Sized {
     /// Creates an after render event.
     fn from_after_render_args(args: &AfterRenderArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is an after render event.
-    fn after_render<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(&AfterRenderArgs) -> U;
+    fn after_render<U, F>(&self, f: F) -> Option<U> where F: FnMut(&AfterRenderArgs) -> U;
     /// Returns after render arguments.
     fn after_render_args(&self) -> Option<AfterRenderArgs> {
         self.after_render(|args| args.clone())
@@ -27,7 +26,7 @@ impl AfterRenderEvent for Input {
     {
         match *self {
             Input::AfterRender(ref args) => Some(f(args)),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -42,10 +41,14 @@ mod tests {
         use AfterRenderArgs;
 
         let e = Input::AfterRender(AfterRenderArgs);
-        let x: Option<Input> = AfterRenderEvent::from_after_render_args(
-            &AfterRenderArgs, &e);
-        let y: Option<Input> = x.clone().unwrap().after_render(|args|
-            AfterRenderEvent::from_after_render_args(args, x.as_ref().unwrap())).unwrap();
+        let x: Option<Input> = AfterRenderEvent::from_after_render_args(&AfterRenderArgs, &e);
+        let y: Option<Input> =
+            x.clone()
+                .unwrap()
+                .after_render(|args| {
+                    AfterRenderEvent::from_after_render_args(args, x.as_ref().unwrap())
+                })
+                .unwrap();
         assert_eq!(x, y);
     }
 }

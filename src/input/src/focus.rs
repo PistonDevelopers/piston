@@ -5,8 +5,7 @@ pub trait FocusEvent: Sized {
     /// Creates a focus event.
     fn from_focused(focused: bool, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a focus event.
-    fn focus<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(bool) -> U;
+    fn focus<U, F>(&self, f: F) -> Option<U> where F: FnMut(bool) -> U;
     /// Returns focus arguments.
     fn focus_args(&self) -> Option<bool> {
         self.focus(|val| val)
@@ -23,7 +22,7 @@ impl FocusEvent for Input {
     {
         match *self {
             Input::Focus(focused) => Some(f(focused)),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -38,8 +37,10 @@ mod tests {
 
         let e = Input::Focus(false);
         let x: Option<Input> = FocusEvent::from_focused(true, &e);
-        let y: Option<Input> = x.clone().unwrap().focus(|focused|
-            FocusEvent::from_focused(focused, x.as_ref().unwrap())).unwrap();
+        let y: Option<Input> = x.clone()
+            .unwrap()
+            .focus(|focused| FocusEvent::from_focused(focused, x.as_ref().unwrap()))
+            .unwrap();
         assert_eq!(x, y);
     }
 }

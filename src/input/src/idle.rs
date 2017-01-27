@@ -4,7 +4,7 @@ use Input;
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
 pub struct IdleArgs {
     /// Expected idle time in seconds.
-    pub dt: f64
+    pub dt: f64,
 }
 
 /// When background tasks should be performed
@@ -16,8 +16,7 @@ pub trait IdleEvent: Sized {
         IdleEvent::from_idle_args(&IdleArgs { dt: dt }, old_event)
     }
     /// Calls closure if this is an idle event.
-    fn idle<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(&IdleArgs) -> U;
+    fn idle<U, F>(&self, f: F) -> Option<U> where F: FnMut(&IdleArgs) -> U;
     /// Returns idle arguments.
     fn idle_args(&self) -> Option<IdleArgs> {
         self.idle(|args| args.clone())
@@ -35,7 +34,7 @@ impl IdleEvent for Input {
     {
         match *self {
             Input::Idle(ref args) => Some(f(args)),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -50,10 +49,11 @@ mod tests {
         use IdleArgs;
 
         let e = Input::Idle(IdleArgs { dt: 1.0 });
-        let x: Option<Input> = IdleEvent::from_idle_args(
-            &IdleArgs { dt: 1.0 }, &e);
-        let y: Option<Input> = x.clone().unwrap().idle(|args|
-            IdleEvent::from_idle_args(args, x.as_ref().unwrap())).unwrap();
+        let x: Option<Input> = IdleEvent::from_idle_args(&IdleArgs { dt: 1.0 }, &e);
+        let y: Option<Input> = x.clone()
+            .unwrap()
+            .idle(|args| IdleEvent::from_idle_args(args, x.as_ref().unwrap()))
+            .unwrap();
         assert_eq!(x, y);
     }
 }

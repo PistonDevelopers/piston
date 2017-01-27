@@ -16,8 +16,7 @@ pub trait UpdateEvent: Sized {
         UpdateEvent::from_update_args(&UpdateArgs { dt: dt }, old_event)
     }
     /// Calls closure if this is an update event.
-    fn update<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(&UpdateArgs) -> U;
+    fn update<U, F>(&self, f: F) -> Option<U> where F: FnMut(&UpdateArgs) -> U;
     /// Returns update arguments.
     fn update_args(&self) -> Option<UpdateArgs> {
         self.update(|args| args.clone())
@@ -34,7 +33,7 @@ impl UpdateEvent for Input {
     {
         match *self {
             Input::Update(ref args) => Some(f(args)),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -49,10 +48,11 @@ mod tests {
         use UpdateArgs;
 
         let e = Input::Update(UpdateArgs { dt: 0.0 });
-        let x: Option<Input> = UpdateEvent::from_update_args(
-            &UpdateArgs { dt: 1.0 }, &e);
-        let y: Option<Input> = x.clone().unwrap().update(|args|
-            UpdateEvent::from_update_args(args, x.as_ref().unwrap())).unwrap();
+        let x: Option<Input> = UpdateEvent::from_update_args(&UpdateArgs { dt: 1.0 }, &e);
+        let y: Option<Input> = x.clone()
+            .unwrap()
+            .update(|args| UpdateEvent::from_update_args(args, x.as_ref().unwrap()))
+            .unwrap();
         assert_eq!(x, y);
     }
 }

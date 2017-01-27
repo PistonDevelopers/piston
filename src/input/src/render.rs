@@ -33,8 +33,7 @@ pub trait RenderEvent: Sized {
     /// Creates a render event.
     fn from_render_args(args: &RenderArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a render event.
-    fn render<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(&RenderArgs) -> U;
+    fn render<U, F>(&self, f: F) -> Option<U> where F: FnMut(&RenderArgs) -> U;
     /// Returns render arguments.
     fn render_args(&self) -> Option<RenderArgs> {
         self.render(|args| args.clone())
@@ -51,7 +50,7 @@ impl RenderEvent for Input {
     {
         match *self {
             Input::Render(ref args) => Some(f(args)),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -65,19 +64,25 @@ mod tests {
         use Input;
         use RenderArgs;
 
-        let e = Input::Render(RenderArgs { ext_dt: 0.0, width: 0, height: 0,
-            draw_width: 0, draw_height: 0 });
-        let x: Option<Input> = RenderEvent::from_render_args(
-            &RenderArgs {
-                ext_dt: 1.0,
-                width: 10,
-                height: 10,
-                draw_width: 10,
-                draw_height: 10,
-            }, &e
-        );
-        let y: Option<Input> = x.clone().unwrap().render(|args|
-            RenderEvent::from_render_args(args, x.as_ref().unwrap())).unwrap();
+        let e = Input::Render(RenderArgs {
+            ext_dt: 0.0,
+            width: 0,
+            height: 0,
+            draw_width: 0,
+            draw_height: 0,
+        });
+        let x: Option<Input> = RenderEvent::from_render_args(&RenderArgs {
+                                                                 ext_dt: 1.0,
+                                                                 width: 10,
+                                                                 height: 10,
+                                                                 draw_width: 10,
+                                                                 draw_height: 10,
+                                                             },
+                                                             &e);
+        let y: Option<Input> = x.clone()
+            .unwrap()
+            .render(|args| RenderEvent::from_render_args(args, x.as_ref().unwrap()))
+            .unwrap();
         assert_eq!(x, y);
     }
 }

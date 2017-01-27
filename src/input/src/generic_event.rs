@@ -2,14 +2,12 @@
 
 use std::any::Any;
 
-use {AfterRenderEvent, ControllerAxisEvent, CursorEvent, FocusEvent, IdleEvent,
-     MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent,
-     PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
+use {AfterRenderEvent, ControllerAxisEvent, CursorEvent, FocusEvent, IdleEvent, MouseCursorEvent,
+     MouseRelativeEvent, MouseScrollEvent, PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
      TextEvent, TouchEvent, UpdateEvent};
 use {EventId, Input, Motion};
-use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR,
-     MOUSE_RELATIVE, MOUSE_SCROLL, PRESS, RENDER, RELEASE, RESIZE,
-     TEXT, TOUCH, UPDATE};
+use {AFTER_RENDER, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR, MOUSE_RELATIVE,
+     MOUSE_SCROLL, PRESS, RENDER, RELEASE, RESIZE, TEXT, TOUCH, UPDATE};
 
 /// Implemented by all events
 pub trait GenericEvent: Sized +
@@ -17,12 +15,12 @@ pub trait GenericEvent: Sized +
     MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent +
     PressEvent + ReleaseEvent + RenderEvent + ResizeEvent +
     TextEvent + TouchEvent + UpdateEvent + From<Input> {
-    /// The id of this event.
+/// The id of this event.
     fn event_id(&self) -> EventId;
-    /// Calls closure with arguments
+/// Calls closure with arguments
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U
-    ;
+;
 }
 
 impl GenericEvent for Input {
@@ -52,40 +50,23 @@ impl GenericEvent for Input {
         where F: FnMut(&Any) -> U
     {
         match self {
-            &Input::Cursor(cursor) =>
-                f(&cursor as &Any),
-            &Input::Focus(focused) =>
-                f(&focused as &Any),
-            &Input::Close(ref args) =>
-                f(args as &Any),
-            &Input::Move(Motion::ControllerAxis(args)) =>
-                f(&args as &Any),
-            &Input::Move(Motion::MouseCursor(x, y)) =>
-                f(&(x, y) as &Any),
-            &Input::Move(Motion::MouseRelative(x, y)) =>
-                f(&(x, y) as &Any),
-            &Input::Move(Motion::MouseScroll(x, y)) =>
-                f(&(x, y) as &Any),
-            &Input::Move(Motion::Touch(args)) =>
-                f(&args as &Any),
-            &Input::Press(button) =>
-                f(&button as &Any),
-            &Input::Release(button) =>
-                f(&button as &Any),
-            &Input::Resize(w, h) =>
-                f(&(w, h) as &Any),
-            &Input::Text(ref text) =>
-                f(text as &Any),
-            &Input::Update(ref args) =>
-                f(args as &Any),
-            &Input::Render(ref args) =>
-                f(args as &Any),
-            &Input::AfterRender(ref args) =>
-                f(args as &Any),
-            &Input::Idle(ref args) =>
-                f(args as &Any),
-            &Input::Custom(_, ref args) =>
-                f(args),
+            &Input::Cursor(cursor) => f(&cursor as &Any),
+            &Input::Focus(focused) => f(&focused as &Any),
+            &Input::Close(ref args) => f(args as &Any),
+            &Input::Move(Motion::ControllerAxis(args)) => f(&args as &Any),
+            &Input::Move(Motion::MouseCursor(x, y)) => f(&(x, y) as &Any),
+            &Input::Move(Motion::MouseRelative(x, y)) => f(&(x, y) as &Any),
+            &Input::Move(Motion::MouseScroll(x, y)) => f(&(x, y) as &Any),
+            &Input::Move(Motion::Touch(args)) => f(&args as &Any),
+            &Input::Press(button) => f(&button as &Any),
+            &Input::Release(button) => f(&button as &Any),
+            &Input::Resize(w, h) => f(&(w, h) as &Any),
+            &Input::Text(ref text) => f(text as &Any),
+            &Input::Update(ref args) => f(args as &Any),
+            &Input::Render(ref args) => f(args as &Any),
+            &Input::AfterRender(ref args) => f(args as &Any),
+            &Input::Idle(ref args) => f(args as &Any),
+            &Input::Custom(_, ref args) => f(args),
         }
     }
 }
