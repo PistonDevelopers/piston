@@ -1,7 +1,7 @@
 
 //! Back-end agnostic mouse buttons.
 
-use { Event, Input, Motion };
+use { Input, Motion };
 
 /// Represent a mouse button.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
@@ -87,29 +87,6 @@ pub trait MouseCursorEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T: GenericEvent> MouseCursorEvent for T {
-    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(MOUSE_CURSOR, &(x, y) as &Any, old_event)
-    }
-
-    fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        if self.event_id() != MOUSE_CURSOR {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
-                Some(f(x, y))
-            } else {
-                panic!("Expected (f64, f64)")
-            }
-        })
-    }
-}
-*/
-
 impl MouseCursorEvent for Input {
     fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
         Some(Input::Move(Motion::MouseCursor(x, y)))
@@ -120,26 +97,6 @@ impl MouseCursorEvent for Input {
     {
         match *self {
             Input::Move(Motion::MouseCursor(x, y)) => Some(f(x, y)),
-            _ => None
-        }
-    }
-}
-
-impl<I: MouseCursorEvent> MouseCursorEvent for Event<I> {
-    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        if let &Event::Input(ref old_input) = old_event {
-            <I as MouseCursorEvent>::from_xy(x, y, old_input)
-                .map(|x| Event::Input(x))
-        } else {
-            None
-        }
-    }
-
-    fn mouse_cursor<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        match *self {
-            Event::Input(ref x) => x.mouse_cursor(f),
             _ => None
         }
     }
@@ -158,29 +115,6 @@ pub trait MouseRelativeEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T: GenericEvent> MouseRelativeEvent for T {
-    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(MOUSE_RELATIVE, &(x, y) as &Any, old_event)
-    }
-
-    fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        if self.event_id() != MOUSE_RELATIVE {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
-                Some(f(x, y))
-            } else {
-                panic!("Expected (f64, f64)")
-            }
-        })
-    }
-}
-*/
-
 impl MouseRelativeEvent for Input {
     fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
         Some(Input::Move(Motion::MouseRelative(x, y)))
@@ -191,26 +125,6 @@ impl MouseRelativeEvent for Input {
     {
         match *self {
             Input::Move(Motion::MouseRelative(x, y)) => Some(f(x, y)),
-            _ => None
-        }
-    }
-}
-
-impl<I: MouseRelativeEvent> MouseRelativeEvent for Event<I> {
-    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        if let &Event::Input(ref old_input) = old_event {
-            <I as MouseRelativeEvent>::from_xy(x, y, old_input)
-                .map(|x| Event::Input(x))
-        } else {
-            None
-        }
-    }
-
-    fn mouse_relative<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        match *self {
-            Event::Input(ref x) => x.mouse_relative(f),
             _ => None
         }
     }
@@ -229,29 +143,6 @@ pub trait MouseScrollEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T: GenericEvent> MouseScrollEvent for T {
-    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(MOUSE_SCROLL, &(x, y) as &Any, old_event)
-    }
-
-    fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        if self.event_id() != MOUSE_SCROLL {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(&(x, y)) = any.downcast_ref::<(f64, f64)>() {
-                Some(f(x, y))
-            } else {
-                panic!("Expected (f64, f64)")
-            }
-        })
-    }
-}
-*/
-
 impl MouseScrollEvent for Input {
     fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
         Some(Input::Move(Motion::MouseScroll(x, y)))
@@ -262,26 +153,6 @@ impl MouseScrollEvent for Input {
     {
         match *self {
             Input::Move(Motion::MouseScroll(x, y)) => Some(f(x, y)),
-            _ => None
-        }
-    }
-}
-
-impl<I: MouseScrollEvent> MouseScrollEvent for Event<I> {
-    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
-        if let &Event::Input(ref old_input) = old_event {
-            <I as MouseScrollEvent>::from_xy(x, y, old_input)
-                .map(|x| Event::Input(x))
-        } else {
-            None
-        }
-    }
-
-    fn mouse_scroll<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(f64, f64) -> U
-    {
-        match *self {
-            Event::Input(ref x) => x.mouse_scroll(f),
             _ => None
         }
     }
@@ -303,18 +174,6 @@ mod mouse_event_tests {
     }
 
     #[test]
-    fn test_event_mouse_cursor() {
-        use Event;
-        use super::super::{ Input, Motion };
-
-        let e = Event::Input(Input::Move(Motion::MouseCursor(0.0, 0.0)));
-        let a: Option<Event> = MouseCursorEvent::from_xy(1.0, 0.0, &e);
-        let b: Option<Event> = a.clone().unwrap().mouse_cursor(|x, y|
-            MouseCursorEvent::from_xy(x, y, a.as_ref().unwrap())).unwrap();
-        assert_eq!(a, b);
-    }
-
-    #[test]
     fn test_input_mouse_relative() {
         use super::super::{ Input, Motion };
 
@@ -326,36 +185,12 @@ mod mouse_event_tests {
     }
 
     #[test]
-    fn test_event_mouse_relative() {
-        use Event;
-        use super::super::{ Input, Motion };
-
-        let e = Event::Input(Input::Move(Motion::MouseRelative(0.0, 0.0)));
-        let a: Option<Event> = MouseRelativeEvent::from_xy(1.0, 0.0, &e);
-        let b: Option<Event> = a.clone().unwrap().mouse_relative(|x, y|
-            MouseRelativeEvent::from_xy(x, y, a.as_ref().unwrap())).unwrap();
-        assert_eq!(a, b);
-    }
-
-    #[test]
     fn test_input_mouse_scroll() {
         use super::super::{ Input, Motion };
 
         let e = Input::Move(Motion::MouseScroll(0.0, 0.0));
         let a: Option<Input> = MouseScrollEvent::from_xy(1.0, 0.0, &e);
         let b: Option<Input> = a.clone().unwrap().mouse_scroll(|x, y|
-            MouseScrollEvent::from_xy(x, y, a.as_ref().unwrap())).unwrap();
-        assert_eq!(a, b);
-    }
-
-    #[test]
-    fn test_event_mouse_scroll() {
-        use Event;
-        use super::super::{ Input, Motion };
-
-        let e = Event::Input(Input::Move(Motion::MouseScroll(0.0, 0.0)));
-        let a: Option<Event> = MouseScrollEvent::from_xy(1.0, 0.0, &e);
-        let b: Option<Event> = a.clone().unwrap().mouse_scroll(|x, y|
             MouseScrollEvent::from_xy(x, y, a.as_ref().unwrap())).unwrap();
         assert_eq!(a, b);
     }

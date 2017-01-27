@@ -1,7 +1,7 @@
-use { Event, GenericEvent, Input };
+use Input;
 
 /// Update arguments, such as delta time in seconds
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
@@ -24,51 +24,16 @@ pub trait UpdateEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T> UpdateEvent for T where T: GenericEvent {
-    fn from_update_args(args: &UpdateArgs, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(UPDATE, args as &Any, old_event)
-    }
-
-    fn update<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&UpdateArgs) -> U
-    {
-        if self.event_id() != UPDATE {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(args) = any.downcast_ref::<UpdateArgs>() {
-                Some(f(args))
-            } else {
-                panic!("Expected UpdateArgs")
-            }
-        })
-    }
-}
-*/
-
 impl UpdateEvent for Input {
-    fn from_update_args(_args: &UpdateArgs, _old_event: &Self) -> Option<Self> {
-        None
-    }
-
-    fn update<U, F>(&self, mut _f: F) -> Option<U>
-        where F: FnMut(&UpdateArgs) -> U
-    {
-        None
-    }
-}
-
-impl<I: GenericEvent> UpdateEvent for Event<I> {
     fn from_update_args(args: &UpdateArgs, _old_event: &Self) -> Option<Self> {
-        Some(Event::Update(*args))
+        Some(Input::Update(*args))
     }
 
     fn update<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&UpdateArgs) -> U
     {
         match *self {
-            Event::Update(ref args) => Some(f(args)),
+            Input::Update(ref args) => Some(f(args)),
             _ => None
         }
     }
@@ -79,14 +44,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_event_update() {
-        use Event;
+    fn test_input_update() {
+        use Input;
         use UpdateArgs;
 
-        let e = Event::Update(UpdateArgs { dt: 0.0 });
-        let x: Option<Event> = UpdateEvent::from_update_args(
+        let e = Input::Update(UpdateArgs { dt: 0.0 });
+        let x: Option<Input> = UpdateEvent::from_update_args(
             &UpdateArgs { dt: 1.0 }, &e);
-        let y: Option<Event> = x.clone().unwrap().update(|args|
+        let y: Option<Input> = x.clone().unwrap().update(|args|
             UpdateEvent::from_update_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }

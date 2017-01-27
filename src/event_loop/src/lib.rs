@@ -11,7 +11,7 @@ use std::thread::sleep;
 use std::time::{Duration, Instant};
 use std::cmp;
 use window::Window;
-use input::{AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs};
+use input::{Input, AfterRenderArgs, IdleArgs, RenderArgs, UpdateArgs};
 
 /// Tells whether last emitted event was idle or not.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -118,7 +118,7 @@ impl Events {
     }
 
     /// Returns the next game event.
-    pub fn next<W>(&mut self, window: &mut W) -> Option<Event<W::Event>>
+    pub fn next<W>(&mut self, window: &mut W) -> Option<Input>
         where W: Window
     {
         loop {
@@ -137,7 +137,7 @@ impl Events {
                             // the application state when benchmarking.
                             continue;
                         } else {
-                            return Some(Event::Input(e));
+                            return Some(e);
                         }
                     }
                     if window.should_close() {
@@ -157,7 +157,7 @@ impl Events {
                     if size.width != 0 && size.height != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
-                        return Some(Event::Render(RenderArgs {
+                        return Some(Input::Render(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: duration_to_secs(self.last_frame
                                 .duration_since(self.last_update)),
@@ -175,7 +175,7 @@ impl Events {
                         window.swap_buffers();
                     }
                     self.state = State::UpdateLoop(Idle::No);
-                    return Some(Event::AfterRender(AfterRenderArgs));
+                    return Some(Input::AfterRender(AfterRenderArgs));
                 }
                 State::UpdateLoop(ref mut idle) => {
                     if self.settings.bench_mode {
@@ -199,11 +199,11 @@ impl Events {
                         if next_event > current_time {
                             if let Some(x) = window.poll_event() {
                                 *idle = Idle::No;
-                                return Some(Event::Input(x));
+                                return Some(x);
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
                                 let seconds = duration_to_secs(next_event - current_time);
-                                return Some(Event::Idle(IdleArgs { dt: seconds }));
+                                return Some(Input::Idle(IdleArgs { dt: seconds }));
                             }
                             sleep(next_event - current_time);
                             State::UpdateLoop(Idle::No)
@@ -228,7 +228,7 @@ impl Events {
                         match window.poll_event() {
                             None => State::Update,
                             Some(x) => {
-                                return Some(Event::Input(x));
+                                return Some(x);
                             }
                         }
                     }
@@ -238,7 +238,7 @@ impl Events {
                     // Use the update state stored right after sleep.
                     // If there are any changes in settings, these will be applied on next update.
                     self.last_update += ns_to_duration(self.dt_update_in_ns);
-                    return Some(Event::Update(UpdateArgs { dt: self.dt }));
+                    return Some(Input::Update(UpdateArgs { dt: self.dt }));
                 }
             };
         }

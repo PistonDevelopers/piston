@@ -10,6 +10,9 @@ extern crate bitflags;
 extern crate rustc_serialize;
 extern crate viewport;
 
+use std::any::Any;
+use std::sync::Arc;
+
 pub use mouse::MouseButton;
 pub use keyboard::Key;
 pub use controller::{ ControllerAxisArgs, ControllerButton };
@@ -21,7 +24,6 @@ pub mod mouse;
 pub use after_render::{ AfterRenderArgs, AfterRenderEvent };
 pub use controller::{ ControllerAxisEvent };
 pub use cursor::CursorEvent;
-pub use event::Event;
 pub use focus::FocusEvent;
 pub use generic_event::GenericEvent;
 pub use idle::{ IdleArgs, IdleEvent };
@@ -38,7 +40,6 @@ pub mod generic_event;
 
 mod after_render;
 mod cursor;
-mod event;
 mod focus;
 mod idle;
 mod press;
@@ -97,7 +98,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[derive(Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
+#[derive(Clone, Debug)]
 pub enum Input {
     /// Pressed a button.
     Press(Button),
@@ -114,7 +115,42 @@ pub enum Input {
     /// Window gained or lost cursor.
     Cursor(bool),
     /// Window closed.
-    Close
+    Close,
+    /// Render graphics.
+    Render(RenderArgs),
+    /// After rendering and swapping buffers.
+    AfterRender(AfterRenderArgs),
+    /// Update the state of the application.
+    Update(UpdateArgs),
+    /// Do background tasks that can be done incrementally.
+    Idle(IdleArgs),
+    /// Custom event.
+    ///
+    /// When comparing two custom events for equality,
+    /// they always return `false`.
+    Custom(EventId, Arc<Any>),
+}
+
+impl PartialEq for Input {
+    fn eq(&self, other: &Input) -> bool {
+        use Input::*;
+
+        match (self, other) {
+            (&Press(ref a), &Press(ref b)) => a == b,
+            (&Release(ref a), &Release(ref b)) => a == b,
+            (&Move(ref a), &Move(ref b)) => a == b,
+            (&Text(ref a), &Text(ref b)) => a == b,
+            (&Resize(aw, ah), &Resize(bw, bh)) => aw == bw && ah == bh,
+            (&Focus(a), &Focus(b)) => a == b,
+            (&Cursor(a), &Cursor(b)) => a == b,
+            (&Close, &Close) => true,
+            (&Render(ref a), &Render(ref b)) => a == b,
+            (&AfterRender(ref a), &AfterRender(ref b)) => a == b,
+            (&Update(ref a), &Update(ref b)) => a == b,
+            (&Idle(ref a), &Idle(ref b)) => a == b,
+            (_, _) => false,
+        }
+    }
 }
 
 impl From<Key> for Button {
@@ -144,5 +180,29 @@ impl From<ControllerAxisArgs> for Motion {
 impl From<Motion> for Input {
     fn from(motion: Motion) -> Self {
         Input::Move(motion)
+    }
+}
+
+impl From<RenderArgs> for Input {
+    fn from(args: RenderArgs) -> Self {
+        Input::Render(args)
+    }
+}
+
+impl From<AfterRenderArgs> for Input {
+    fn from(args: AfterRenderArgs) -> Self {
+        Input::AfterRender(args)
+    }
+}
+
+impl From<UpdateArgs> for Input {
+    fn from(args: UpdateArgs) -> Self {
+        Input::Update(args)
+    }
+}
+
+impl From<IdleArgs> for Input {
+    fn from(args: IdleArgs) -> Self {
+        Input::Idle(args)
     }
 }

@@ -1,7 +1,7 @@
 
 //! Back-end agnostic controller events.
 
-use { Event, Input, Motion };
+use { Input, Motion };
 
 /// Components of a controller button event. Not guaranteed consistent across
 /// backends.
@@ -65,32 +65,6 @@ pub trait ControllerAxisEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T: GenericEvent> ControllerAxisEvent for T {
-    fn from_controller_axis_args(
-        args: ControllerAxisArgs,
-        old_event: &Self
-    ) -> Option<Self> {
-        GenericEvent::from_args(CONTROLLER_AXIS, &args as &Any, old_event)
-    }
-
-    fn controller_axis<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(ControllerAxisArgs) -> U
-    {
-        if self.event_id() != CONTROLLER_AXIS {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(&args) = any.downcast_ref::<ControllerAxisArgs>() {
-                Some(f(args))
-            } else {
-                panic!("Expected ControllerAxisArgs")
-            }
-        })
-    }
-}
-*/
-
 impl ControllerAxisEvent for Input {
     fn from_controller_axis_args(
         args: ControllerAxisArgs,
@@ -109,29 +83,6 @@ impl ControllerAxisEvent for Input {
     }
 }
 
-impl<I: ControllerAxisEvent> ControllerAxisEvent for Event<I> {
-    fn from_controller_axis_args(
-        args: ControllerAxisArgs,
-        old_event: &Self
-    ) -> Option<Self> {
-        if let &Event::Input(ref old_input) = old_event {
-            <I as ControllerAxisEvent>::from_controller_axis_args(args, old_input)
-                .map(|x| Event::Input(x))
-        } else {
-            None
-        }
-    }
-
-    fn controller_axis<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(ControllerAxisArgs) -> U
-    {
-        match *self {
-            Event::Input(ref x) => x.controller_axis(f),
-            _ => None
-        }
-    }
-}
-
 #[cfg(test)]
 mod controller_axis_tests {
     use super::*;
@@ -145,22 +96,6 @@ mod controller_axis_tests {
         let a: Option<Input> = ControllerAxisEvent::from_controller_axis_args(
             ControllerAxisArgs::new(0, 1, 0.9), &e);
         let b: Option<Input> = a.clone().unwrap().controller_axis(|cnt|
-            ControllerAxisEvent::from_controller_axis_args(
-                ControllerAxisArgs::new(cnt.id, cnt.axis, cnt.position),
-                a.as_ref().unwrap())).unwrap();
-        assert_eq!(a, b);
-    }
-
-    #[test]
-    fn test_event_controller_axis() {
-        use Event;
-        use super::super::{ Input, Motion };
-
-        let e = Event::Input(Input::Move(Motion::ControllerAxis(
-            ControllerAxisArgs::new(0, 1, 0.9))));
-        let a: Option<Event> = ControllerAxisEvent::from_controller_axis_args(
-            ControllerAxisArgs::new(0, 1, 0.9), &e);
-        let b: Option<Event> = a.clone().unwrap().controller_axis(|cnt|
             ControllerAxisEvent::from_controller_axis_args(
                 ControllerAxisArgs::new(cnt.id, cnt.axis, cnt.position),
                 a.as_ref().unwrap())).unwrap();

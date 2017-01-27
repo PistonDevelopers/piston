@@ -6,8 +6,6 @@
 //!
 //! Often used in servers as an event loop.
 
-extern crate input;
-
 use {
 	Window,
 	WindowSettings,
@@ -17,7 +15,7 @@ use {
 	Size
 };
 
-use self::input::Input;
+use input::Input;
 use std::time::Duration;
 
 /// A window without user interface, often used in server event loops.
@@ -46,8 +44,6 @@ impl NoWindow {
 }
 
 impl Window for NoWindow {
-    type Event = Input;
-
     fn should_close(&self) -> bool { self.should_close }
 
     fn set_should_close(&mut self, value: bool) { self.should_close = value; }

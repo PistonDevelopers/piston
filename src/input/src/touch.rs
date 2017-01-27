@@ -1,4 +1,4 @@
-use { Event, Input, Motion };
+use { Input, Motion };
 
 /// Stores the touch state.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
@@ -132,29 +132,6 @@ pub trait TouchEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T> TouchEvent for T where T: GenericEvent {
-    fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(TOUCH, args as &Any, old_event)
-    }
-
-    fn touch<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&TouchArgs) -> U
-    {
-        if self.event_id() != TOUCH {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(args) = any.downcast_ref::<TouchArgs>() {
-                Some(f(args))
-            } else {
-                panic!("Expected TouchArgs")
-            }
-        })
-    }
-}
-*/
-
 impl TouchEvent for Input {
     fn from_touch_args(args: &TouchArgs, _old_event: &Self) -> Option<Self> {
         Some(Input::Move(Motion::Touch(*args)))
@@ -165,26 +142,6 @@ impl TouchEvent for Input {
     {
         match *self {
             Input::Move(Motion::Touch(ref args)) => Some(f(args)),
-            _ => None
-        }
-    }
-}
-
-impl<I: TouchEvent> TouchEvent for Event<I> {
-    fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
-        if let &Event::Input(ref old_input) = old_event {
-            <I as TouchEvent>::from_touch_args(args, old_input)
-                .map(|x| Event::Input(x))
-        } else {
-            None
-        }
-    }
-
-    fn touch<U, F>(&self, f: F) -> Option<U>
-        where F: FnMut(&TouchArgs) -> U
-    {
-        match *self {
-            Event::Input(ref x) => x.touch(f),
             _ => None
         }
     }
@@ -211,23 +168,6 @@ mod tests {
     }
 
     #[test]
-    fn test_event_touch() {
-        use Event;
-        use super::super::{ Input, Motion };
-
-        let pos = [0.0; 2];
-        let e = Event::Input(Input::Move(Motion::Touch(
-            TouchArgs::new(0, 0, pos, 1.0, Touch::Start))));
-        let a: Option<Event> = TouchEvent::from_touch_args(
-            &TouchArgs::new(0, 0, pos, 1.0, Touch::Start), &e);
-        let b: Option<Event> = a.clone().unwrap().touch(|t|
-            TouchEvent::from_touch_args(
-                &TouchArgs::new(t.device, t.id, t.position(), t.pressure(), Touch::Start),
-                a.as_ref().unwrap())).unwrap();
-        assert_eq!(a, b);
-    }
-
-    #[test]
     fn test_input_touch_3d() {
         use super::super::{ Input, Motion };
 
@@ -238,24 +178,6 @@ mod tests {
         let a: Option<Input> = TouchEvent::from_touch_args(
             &TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start), &e);
         let b: Option<Input> = a.clone().unwrap().touch(|t|
-            TouchEvent::from_touch_args(
-                &TouchArgs::new_3d(t.device, t.id, t.position_3d(), t.pressure_3d(), Touch::Start),
-                a.as_ref().unwrap())).unwrap();
-        assert_eq!(a, b);
-    }
-
-    #[test]
-    fn test_event_touch_3d() {
-        use Event;
-        use super::super::{ Input, Motion };
-
-        let pos = [0.0; 3];
-        let pressure = [0.0, 0.0, 1.0];
-        let e = Event::Input(Input::Move(Motion::Touch(
-            TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start))));
-        let a: Option<Event> = TouchEvent::from_touch_args(
-            &TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start), &e);
-        let b: Option<Event> = a.clone().unwrap().touch(|t|
             TouchEvent::from_touch_args(
                 &TouchArgs::new_3d(t.device, t.id, t.position_3d(), t.pressure_3d(), Touch::Start),
                 a.as_ref().unwrap())).unwrap();

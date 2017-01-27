@@ -22,10 +22,12 @@
 //! It implements some conversion traits for convenience.
 
 extern crate shader_version;
+extern crate input;
 
 use std::convert::From;
 use std::time::Duration;
 use shader_version::OpenGL;
+use input::Input;
 
 pub use no_window::NoWindow;
 
@@ -122,17 +124,6 @@ pub trait BuildFromWindowSettings: Sized {
 /// An example of a working event loop can be found in the Piston-Tutorials
 /// repository under getting-started, or in the event loop examples.
 pub trait Window {
-    /// The event type the window uses for incoming input.
-    ///
-    /// Usually, this will be [`event_loop::Input`](../input/enum.Input.html),
-    /// but may vary between implementations if more or less information
-    /// is available.
-    ///
-    /// For example, if a backend does not support mouse input because it is
-    /// designed to be sent over a network, then it might use a different
-    /// event type.
-    type Event;
-
     /// Tells the window to close or stay open.
     fn set_should_close(&mut self, value: bool);
 
@@ -149,28 +140,19 @@ pub trait Window {
     /// usually it is not needed in application code.
     fn swap_buffers(&mut self);
 
-    /// Wait indefinitely for an event to be available from the window.
-    ///
-    /// To read events in application code, look at the
-    /// [`Events`](../event_loop/trait.Events.html) trait instead.
-    fn wait_event(&mut self) -> Self::Event;
+    /// Wait indefinitely for an input event to be available from the window.
+    fn wait_event(&mut self) -> Input;
 
-    /// Wait for an event to be available from the window or for the
+    /// Wait for an input event to be available from the window or for the
     /// specified timeout to be reached.
     ///
-    /// Return None only if there is no event within the timeout.
-    ///
-    /// To read events in application code, look at the
-    /// [`Events`](../event_loop/trait.Events.html) trait instead.
-    fn wait_event_timeout(&mut self, timeout: Duration) -> Option<Self::Event>;
+    /// Returns `None` only if there is no input event within the timeout.
+    fn wait_event_timeout(&mut self, timeout: Duration) -> Option<Input>;
 
-    /// Polls an event from the window.
+    /// Polls an input event from the window.
     ///
-    /// Return None if no events available.
-    ///
-    /// To read events in application code, look at the
-    /// [`Events`](../event_loop/trait.Events.html) trait instead.
-    fn poll_event(&mut self) -> Option<Self::Event>;
+    /// Return `None` if no events available.
+    fn poll_event(&mut self) -> Option<Input>;
 
     /// Gets the draw size of the window.
     ///

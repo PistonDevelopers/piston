@@ -1,7 +1,7 @@
-use { Event, Input };
+use Input;
 
 /// Idle arguments, such as expected idle time in seconds.
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
 pub struct IdleArgs {
     /// Expected idle time in seconds.
     pub dt: f64
@@ -24,51 +24,17 @@ pub trait IdleEvent: Sized {
     }
 }
 
-/* TODO: Enable when specialization gets stable.
-impl<T> IdleEvent for T where T: GenericEvent {
-    fn from_idle_args(args: &IdleArgs, old_event: &Self) -> Option<Self> {
-        GenericEvent::from_args(IDLE, args as &Any, old_event)
-    }
-
-    fn idle<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&IdleArgs) -> U
-    {
-        if self.event_id() != IDLE {
-            return None;
-        }
-        self.with_args(|any| {
-            if let Some(args) = any.downcast_ref::<IdleArgs>() {
-                Some(f(args))
-            } else {
-                panic!("Expected IdleArgs")
-            }
-        })
-    }
-}
-*/
 
 impl IdleEvent for Input {
-    fn from_idle_args(_args: &IdleArgs, _old_event: &Self) -> Option<Self> {
-        None
-    }
-
-    fn idle<U, F>(&self, mut _f: F) -> Option<U>
-        where F: FnMut(&IdleArgs) -> U
-    {
-        None
-    }
-}
-
-impl<I> IdleEvent for Event<I> {
     fn from_idle_args(args: &IdleArgs, _old_event: &Self) -> Option<Self> {
-        Some(Event::Idle(*args))
+        Some(Input::Idle(*args))
     }
 
     fn idle<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&IdleArgs) -> U
     {
         match *self {
-            Event::Idle(ref args) => Some(f(args)),
+            Input::Idle(ref args) => Some(f(args)),
             _ => None
         }
     }
@@ -79,14 +45,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_event_idle() {
-        use Event;
+    fn test_input_idle() {
+        use Input;
         use IdleArgs;
 
-        let e = Event::Idle(IdleArgs { dt: 1.0 });
-        let x: Option<Event> = IdleEvent::from_idle_args(
+        let e = Input::Idle(IdleArgs { dt: 1.0 });
+        let x: Option<Input> = IdleEvent::from_idle_args(
             &IdleArgs { dt: 1.0 }, &e);
-        let y: Option<Event> = x.clone().unwrap().idle(|args|
+        let y: Option<Input> = x.clone().unwrap().idle(|args|
             IdleEvent::from_idle_args(args, x.as_ref().unwrap())).unwrap();
         assert_eq!(x, y);
     }
