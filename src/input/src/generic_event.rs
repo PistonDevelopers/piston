@@ -30,7 +30,7 @@ impl GenericEvent for Input {
         match self {
             &Input::Cursor(_) => CURSOR,
             &Input::Focus(_) => FOCUS,
-            &Input::Close => CLOSE,
+            &Input::Close(_) => CLOSE,
             &Input::Move(Motion::MouseCursor(_, _)) => MOUSE_CURSOR,
             &Input::Move(Motion::MouseRelative(_, _)) => MOUSE_RELATIVE,
             &Input::Move(Motion::MouseScroll(_, _)) => MOUSE_SCROLL,
@@ -56,8 +56,8 @@ impl GenericEvent for Input {
                 f(&cursor as &Any),
             &Input::Focus(focused) =>
                 f(&focused as &Any),
-            &Input::Close =>
-                f(&(None as Option<()>)),
+            &Input::Close(ref args) =>
+                f(args as &Any),
             &Input::Move(Motion::ControllerAxis(args)) =>
                 f(&args as &Any),
             &Input::Move(Motion::MouseCursor(x, y)) =>

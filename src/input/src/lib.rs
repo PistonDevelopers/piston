@@ -24,6 +24,7 @@ pub mod keyboard;
 pub mod mouse;
 
 pub use after_render::{ AfterRenderArgs, AfterRenderEvent };
+pub use close::{ CloseArgs, CloseEvent };
 pub use controller::{ ControllerAxisEvent };
 pub use cursor::CursorEvent;
 pub use focus::FocusEvent;
@@ -41,6 +42,7 @@ pub use update::{ UpdateArgs, UpdateEvent };
 pub mod generic_event;
 
 mod after_render;
+mod close;
 mod cursor;
 mod focus;
 mod idle;
@@ -117,7 +119,7 @@ pub enum Input {
     /// Window gained or lost cursor.
     Cursor(bool),
     /// Window closed.
-    Close,
+    Close(CloseArgs),
     /// Render graphics.
     Render(RenderArgs),
     /// After rendering and swapping buffers.
@@ -145,7 +147,7 @@ impl PartialEq for Input {
             (&Resize(aw, ah), &Resize(bw, bh)) => aw == bw && ah == bh,
             (&Focus(a), &Focus(b)) => a == b,
             (&Cursor(a), &Cursor(b)) => a == b,
-            (&Close, &Close) => true,
+            (&Close(ref a), &Close(ref b)) => a == b,
             (&Render(ref a), &Render(ref b)) => a == b,
             (&AfterRender(ref a), &AfterRender(ref b)) => a == b,
             (&Update(ref a), &Update(ref b)) => a == b,
@@ -172,7 +174,7 @@ impl Decodable for Input {
                         try!(d.read_enum_variant_arg(1, |d| u32::decode(d)))),
                     5 => Input::Focus(try!(d.read_enum_variant_arg(0, |d| bool::decode(d)))),
                     6 => Input::Cursor(try!(d.read_enum_variant_arg(0, |d| bool::decode(d)))),
-                    7 => Input::Close,
+                    7 => Input::Close(try!(d.read_enum_variant_arg(0, |d| CloseArgs::decode(d)))),
                     8 => Input::Render(try!(
                         d.read_enum_variant_arg(0, |d| RenderArgs::decode(d)))),
                     9 => Input::AfterRender(try!(
@@ -215,8 +217,9 @@ impl Encodable for Input {
                 Input::Cursor(cursor) =>
                     s.emit_enum_variant("Cursor", 0, 1, |s|
                         s.emit_enum_variant_arg(0, |s| cursor.encode(s))),
-                Input::Close =>
-                    s.emit_enum_variant("Close", 0, 0, |_s| Ok(())),
+                Input::Close(ref close_args) =>
+                    s.emit_enum_variant("Close", 0, 1, |s|
+                        s.emit_enum_variant_arg(0, |s| close_args.encode(s))),
                 Input::Render(ref render_args) =>
                     s.emit_enum_variant("Render", 0, 1, |s|
                         s.emit_enum_variant_arg(0, |s| render_args.encode(s))),
@@ -309,7 +312,7 @@ mod tests {
         test(Input::Resize(0, 0));
         test(Input::Focus(true));
         test(Input::Cursor(true));
-        test(Input::Close);
+        test(Input::Close(CloseArgs));
         test(Input::Render(RenderArgs {
             width: 0,
             height: 0,
