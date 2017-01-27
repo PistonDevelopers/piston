@@ -6,7 +6,8 @@
 //! The [`Window`](./trait.Window.html) trait is the minimum interface required for event loop.
 //! All backends usually support this trait.
 //!
-//! The [`AdvancedWindow`](./trait.AdvancedWindow.html) trait is the maximum interface that can be provided,
+//! The [`AdvancedWindow`](./trait.AdvancedWindow.html) trait
+//! is the maximum interface that can be provided,
 //! while still staying consistent between backends. Not all backends implement
 //! `AdvancedWindow`; check your backend's documentation to see whether it implements
 //! this trait.
@@ -59,14 +60,20 @@ pub struct Size {
 impl From<[u32; 2]> for Size {
     #[inline(always)]
     fn from(value: [u32; 2]) -> Size {
-        Size { width: value[0], height: value[1] }
+        Size {
+            width: value[0],
+            height: value[1],
+        }
     }
 }
 
 impl From<(u32, u32)> for Size {
     #[inline(always)]
     fn from(value: (u32, u32)) -> Size {
-        Size { width: value.0, height: value.1 }
+        Size {
+            width: value.0,
+            height: value.1,
+        }
     }
 }
 
@@ -89,14 +96,20 @@ pub struct Position {
 impl From<[i32; 2]> for Position {
     #[inline(always)]
     fn from(value: [i32; 2]) -> Position {
-        Position { x: value[0], y: value[1] }
+        Position {
+            x: value[0],
+            y: value[1],
+        }
     }
 }
 
 impl From<(i32, i32)> for Position {
     #[inline(always)]
     fn from(value: (i32, i32)) -> Position {
-        Position { x: value.0, y: value.1 }
+        Position {
+            x: value.0,
+            y: value.1,
+        }
     }
 }
 
@@ -113,8 +126,7 @@ pub trait BuildFromWindowSettings: Sized {
     ///
     /// See your backend's documentation for details about what kind of
     /// error strings can be returned, and the conditions for error.
-    fn build_from_window_settings(settings: &WindowSettings)
-    -> Result<Self, String>;
+    fn build_from_window_settings(settings: &WindowSettings) -> Result<Self, String>;
 }
 
 /// Trait representing the minimum requirements for defining a window.
@@ -316,9 +328,7 @@ impl WindowSettings {
     /// - resizable: true
     /// - decorated: true
     /// - controllers: true
-    pub fn new<T: Into<String>, S: Into<Size>>(
-        title: T, size: S) -> WindowSettings
-    {
+    pub fn new<T: Into<String>, S: Into<Size>>(title: T, size: S) -> WindowSettings {
         WindowSettings {
             title: title.into(),
             size: size.into(),
@@ -350,7 +360,9 @@ impl WindowSettings {
     }
 
     /// Gets the title of built windows.
-    pub fn get_title(&self) -> String { self.title.clone() }
+    pub fn get_title(&self) -> String {
+        self.title.clone()
+    }
 
     /// Sets the title of built windows.
     pub fn set_title(&mut self, value: String) {
@@ -368,7 +380,9 @@ impl WindowSettings {
     }
 
     /// Gets the size of built windows.
-    pub fn get_size(&self) -> Size { self.size }
+    pub fn get_size(&self) -> Size {
+        self.size
+    }
 
     /// Sets the size of built windows.
     pub fn set_size(&mut self, value: Size) {
@@ -386,7 +400,9 @@ impl WindowSettings {
     }
 
     /// Gets whether built windows will be fullscreen.
-    pub fn get_fullscreen(&self) -> bool { self.fullscreen }
+    pub fn get_fullscreen(&self) -> bool {
+        self.fullscreen
+    }
 
     /// Sets whether built windows will be fullscreen.
     pub fn set_fullscreen(&mut self, value: bool) {
@@ -404,7 +420,9 @@ impl WindowSettings {
     }
 
     /// Gets whether built windows should exit when the Esc key is pressed.
-    pub fn get_exit_on_esc(&self) -> bool { self.exit_on_esc }
+    pub fn get_exit_on_esc(&self) -> bool {
+        self.exit_on_esc
+    }
 
     /// Sets whether built windows should exit when the Esc key is pressed.
     pub fn set_exit_on_esc(&mut self, value: bool) {
@@ -425,11 +443,13 @@ impl WindowSettings {
     ///
     /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
     /// for more information.
-    pub fn get_samples(&self) -> u8 { self.samples }
+    pub fn get_samples(&self) -> u8 {
+        self.samples
+    }
 
-	/// Sets the number of samples to use for anti-aliasing.
-	///
-	/// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// Sets the number of samples to use for anti-aliasing.
+    ///
+    /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
     /// for more information.
     pub fn set_samples(&mut self, value: u8) {
         self.samples = value;
@@ -452,7 +472,9 @@ impl WindowSettings {
     ///
     /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
     /// about vsync.
-    pub fn get_vsync(&self) -> bool { self.vsync }
+    pub fn get_vsync(&self) -> bool {
+        self.vsync
+    }
 
     /// Sets whether built windows should use vsync.
     ///
@@ -483,15 +505,17 @@ impl WindowSettings {
     ///
     /// For more information about the OpenGL setting, see the
     /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
-    pub fn get_maybe_opengl(&self) -> Option<OpenGL> { self.opengl }
+    pub fn get_maybe_opengl(&self) -> Option<OpenGL> {
+        self.opengl
+    }
 
-	/// Sets OpenGL version of built windows.
-	///
-	/// If None is passed, the default OpenGL version is used. This
+    /// Sets OpenGL version of built windows.
+    ///
+    /// If None is passed, the default OpenGL version is used. This
     /// is often a forward compatible version of OpenGL::V3_2 or
     /// higher that works with newer versions of graphics libraries.
     ///
-	/// For more information about the OpenGL setting, see the
+    /// For more information about the OpenGL setting, see the
     /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
     pub fn set_maybe_opengl(&mut self, value: Option<OpenGL>) {
         self.opengl = value;
@@ -504,8 +528,8 @@ impl WindowSettings {
     /// higher that works with newer versions of graphics libraries.
     ///
     /// For more information about the OpenGL setting, see the
-	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
-	///
+    /// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
+    ///
     /// This method moves the current window data,
     /// unlike [`set_maybe_opengl()`](#method.set_maybe_opengl),
     /// so that it can be used in method chaining.
@@ -520,7 +544,7 @@ impl WindowSettings {
     /// [`set_maybe_opengl()`](#method.set_maybe_opengl).
     ///
     /// For more information about the opengl setting, see the
-	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
+    /// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
     pub fn set_opengl(&mut self, value: OpenGL) {
         self.opengl = Some(value);
     }
@@ -531,7 +555,7 @@ impl WindowSettings {
     /// [`maybe_opengl()`](#method.maybe_opengl).
     ///
     /// For more information about the opengl setting, see the
-	/// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
+    /// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
     ///
     /// This method moves the current window data,
     /// unlike [`set_opengl()`](#method.set_opengl),
@@ -551,7 +575,9 @@ impl WindowSettings {
     /// default.
     ///
     /// See https://en.wikipedia.org/wiki/SRGB for more information.
-    pub fn get_srgb(&self) -> bool { self.srgb }
+    pub fn get_srgb(&self) -> bool {
+        self.srgb
+    }
 
     /// Sets whether built windows should use hardware accelerated color conversion.
     ///
@@ -575,7 +601,9 @@ impl WindowSettings {
     }
 
     /// Gets whether built windows should be resizable.
-    pub fn get_resizable(&self) -> bool { self.resizable }
+    pub fn get_resizable(&self) -> bool {
+        self.resizable
+    }
 
     /// Sets whether built windows should be resizable.
     pub fn set_resizable(&mut self, value: bool) {
@@ -599,7 +627,9 @@ impl WindowSettings {
     ///
     /// For more information, see
     /// https://en.wikipedia.org/wiki/Window_decoration
-    pub fn get_decorated(&self) -> bool { self.decorated }
+    pub fn get_decorated(&self) -> bool {
+        self.decorated
+    }
 
     /// Sets whether built windows should be decorated.
     ///
@@ -629,7 +659,9 @@ impl WindowSettings {
     }
 
     /// Gets whether built windows should listen to controller input.
-    pub fn get_controllers(&self) -> bool { self.controllers }
+    pub fn get_controllers(&self) -> bool {
+        self.controllers
+    }
 
     /// Sets whether built windows should listen to controller input.
     pub fn set_controllers(&mut self, value: bool) {
