@@ -42,13 +42,22 @@ pub struct EventSettings {
     ///
     /// This is the fixed update rate on average over time.
     /// If the event loop lags, it will try to catch up.
+    /// When set to `0`, update events are disabled.
     pub ups: u64,
+    /// The number of delayed updates before skipping them to catch up.
+    /// When set to `0`, it will always try to catch up.
+    pub ups_reset: u64,
     /// Enable or disable automatic swapping of buffers.
     pub swap_buffers: bool,
     /// Enable or disable benchmark mode.
     /// When enabled, it will render and update without sleep and ignore input.
     /// Used to test performance by playing through as fast as possible.
+    /// Requires `lazy` to be set to `false`.
     pub bench_mode: bool,
+    /// Enable or disable rendering only when receiving input.
+    /// When enabled, update events are disabled.
+    /// Idle events are emitted while receiving input.
+    pub lazy: bool,
 }
 
 impl EventSettings {
@@ -59,6 +68,8 @@ impl EventSettings {
             ups: DEFAULT_UPS,
             swap_buffers: true,
             bench_mode: false,
+            lazy: false,
+            ups_reset: DEFAULT_UPS_RESET,
         }
     }
 }
@@ -83,6 +94,7 @@ pub struct Events {
     dt_frame_in_ns: u64,
     dt: f64,
     settings: EventSettings,
+    first_frame: bool,
 }
 
 static BILLION: u64 = 1_000_000_000;
@@ -99,6 +111,8 @@ fn duration_to_secs(dur: Duration) -> f64 {
 
 /// The default updates per second.
 pub const DEFAULT_UPS: u64 = 120;
+/// The default delayed updates reset.
+pub const DEFAULT_UPS_RESET: u64 = 2;
 /// The default maximum frames per second.
 pub const DEFAULT_MAX_FPS: u64 = 60;
 
@@ -110,10 +124,19 @@ impl Events {
             state: State::Render,
             last_update: start,
             last_frame: start,
-            dt_update_in_ns: BILLION / settings.ups,
+            dt_update_in_ns: if settings.ups == 0 {
+                0
+            } else {
+                BILLION / settings.ups
+            },
             dt_frame_in_ns: BILLION / settings.max_fps,
-            dt: 1.0 / settings.ups as f64,
+            dt: if settings.ups == 0 {
+                0.0
+            } else {
+                1.0 / settings.ups as f64
+            },
             settings: settings,
+            first_frame: true,
         }
     }
 
@@ -121,6 +144,69 @@ impl Events {
     pub fn next<W>(&mut self, window: &mut W) -> Option<Input>
         where W: Window
     {
+        if self.settings.lazy || self.settings.ups == 0 {
+            // This mode does not emit update events.
+            // More commonly used in UI applications.
+            if window.should_close() {
+                return None;
+            }
+            match self.state {
+                State::SwapBuffers => {
+                    if self.settings.swap_buffers {
+                        window.swap_buffers();
+                    }
+                    // This mode needs no `Render` state.
+                    self.state = State::UpdateLoop(Idle::Yes);
+                    return Some(Input::AfterRender(AfterRenderArgs));
+                }
+                _ => {}
+            }
+            loop {
+                let current_time = Instant::now();
+                let next_frame = self.last_frame + ns_to_duration(self.dt_frame_in_ns);
+
+                if !self.first_frame && next_frame > current_time {
+                    if let State::UpdateLoop(Idle::Yes) = self.state {
+                        // Emit idle event with time until next frame,
+                        // in case the application wants to do some background work.
+                        self.state = State::UpdateLoop(Idle::No);
+                        let seconds = duration_to_secs(next_frame - current_time);
+                        return Some(Input::Idle(IdleArgs { dt: seconds }));
+                    }
+                    self.state = State::UpdateLoop(Idle::Yes);
+                    if self.settings.lazy {
+                        let ev = window.wait_event();
+                        return Some(ev);
+                    } else {
+                        match window.wait_event_timeout(next_frame - current_time) {
+                            None => {}
+                            x => return x,
+                        }
+                    }
+                }
+
+                self.first_frame = false;
+
+                // In normal mode, let the FPS slip if late.
+                self.last_frame = Instant::now();
+
+                let size = window.size();
+                let draw_size = window.draw_size();
+                if size.width != 0 && size.height != 0 {
+                    // Swap buffers next time.
+                    self.state = State::SwapBuffers;
+                    return Some(Input::Render(RenderArgs {
+                        // Extrapolate time forward to allow smooth motion.
+                        ext_dt: 0.0,
+                        width: size.width,
+                        height: size.height,
+                        draw_width: draw_size.width,
+                        draw_height: draw_size.height,
+                    }));
+                }
+            }
+        }
+
         loop {
             if window.should_close() {
                 return None;
@@ -235,9 +321,15 @@ impl Events {
                 }
                 State::Update => {
                     self.state = State::UpdateLoop(Idle::No);
-                    // Use the update state stored right after sleep.
-                    // If there are any changes in settings, these will be applied on next update.
-                    self.last_update += ns_to_duration(self.dt_update_in_ns);
+                    if self.settings.ups_reset > 0 &&
+                       Instant::now() - self.last_update >
+                       ns_to_duration(self.settings.ups_reset * self.dt_update_in_ns) {
+                        // Skip updates because CPU is too busy.
+                        self.last_update = Instant::now();
+                    } else {
+                        // Use the update state stored right after sleep.
+                        self.last_update += ns_to_duration(self.dt_update_in_ns);
+                    }
                     return Some(Input::Update(UpdateArgs { dt: self.dt }));
                 }
             };
@@ -256,6 +348,7 @@ pub trait EventLoop: Sized {
     ///
     /// This is the fixed update rate on average over time.
     /// If the event loop lags, it will try to catch up.
+    /// When set to `0`, update events are disabled.
     fn set_ups(&mut self, frames: u64) {
         let old_settings = self.get_event_settings();
         self.set_event_settings(EventSettings { ups: frames, ..old_settings });
@@ -265,8 +358,23 @@ pub trait EventLoop: Sized {
     ///
     /// This is the fixed update rate on average over time.
     /// If the event loop lags, it will try to catch up.
+    /// When set to `0`, update events are disabled.
     fn ups(mut self, frames: u64) -> Self {
         self.set_ups(frames);
+        self
+    }
+
+    /// The number of delayed updates before skipping them to catch up.
+    /// When set to `0`, it will always try to catch up.
+    fn set_ups_reset(&mut self, frames: u64) {
+        let old_settings = self.get_event_settings();
+        self.set_event_settings(EventSettings { ups_reset: frames, ..old_settings });
+    }
+
+    /// The number of delayed updates before skipping them to catch up.
+    /// When set to `0`, it will always try to catch up.
+    fn ups_reset(mut self, frames: u64) -> Self {
+        self.set_ups_reset(frames);
         self
     }
 
@@ -305,6 +413,7 @@ pub trait EventLoop: Sized {
     /// Enable or disable benchmark mode.
     /// When enabled, it will render and update without sleep and ignore input.
     /// Used to test performance by playing through as fast as possible.
+    /// Requires `lazy` to be set to `false`.
     fn set_bench_mode(&mut self, enable: bool) {
         let old_settings = self.get_event_settings();
         self.set_event_settings(EventSettings { bench_mode: enable, ..old_settings })
@@ -313,8 +422,25 @@ pub trait EventLoop: Sized {
     /// Enable or disable benchmark mode.
     /// When enabled, it will render and update without sleep and ignore input.
     /// Used to test performance by playing through as fast as possible.
+    /// Requires `lazy` to be set to `false`.
     fn bench_mode(mut self, enable: bool) -> Self {
         self.set_bench_mode(enable);
+        self
+    }
+
+    /// Enable or disable rendering only when receiving input.
+    /// When enabled, update events are disabled.
+    /// Idle events are emitted while receiving input.
+    fn set_lazy(&mut self, enable: bool) {
+        let old_settings = self.get_event_settings();
+        self.set_event_settings(EventSettings { lazy: enable, ..old_settings })
+    }
+
+    /// Enable or disable rendering only when receiving input.
+    /// When enabled, update events are disabled.
+    /// Idle events are emitted while receiving input.
+    fn lazy(mut self, enable: bool) -> Self {
+        self.set_lazy(enable);
         self
     }
 }
