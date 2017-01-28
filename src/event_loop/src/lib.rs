@@ -321,7 +321,7 @@ impl Events {
                 }
                 State::Update => {
                     self.state = State::UpdateLoop(Idle::No);
-                    if self.settings.ups_reset > 0 &&
+                    if !self.settings.bench_mode && self.settings.ups_reset > 0 &&
                        Instant::now() - self.last_update >
                        ns_to_duration(self.settings.ups_reset * self.dt_update_in_ns) {
                         // Skip updates because CPU is too busy.
