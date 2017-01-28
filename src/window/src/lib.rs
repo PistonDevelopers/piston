@@ -77,6 +77,20 @@ impl From<(u32, u32)> for Size {
     }
 }
 
+impl From<Size> for [u32; 2] {
+    #[inline(always)]
+    fn from(value: Size) -> [u32; 2] {
+        [value.width, value.height]
+    }
+}
+
+impl From<Size> for (u32, u32) {
+    #[inline(always)]
+    fn from(value: Size) -> (u32, u32) {
+        (value.width, value.height)
+    }
+}
+
 /// Structure to store the window position.
 ///
 /// The width and height are in *points*. On most computers, a point
@@ -110,6 +124,20 @@ impl From<(i32, i32)> for Position {
             x: value.0,
             y: value.1,
         }
+    }
+}
+
+impl From<Position> for [i32; 2] {
+    #[inline(always)]
+    fn from(value: Position) -> [i32; 2] {
+        [value.x, value.y]
+    }
+}
+
+impl From<Position> for (i32, i32) {
+    #[inline(always)]
+    fn from(value: Position) -> (i32, i32) {
+        (value.x, value.y)
     }
 }
 
