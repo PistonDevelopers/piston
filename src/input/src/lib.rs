@@ -10,6 +10,7 @@ extern crate bitflags;
 extern crate rustc_serialize;
 extern crate viewport;
 
+use std::fmt;
 use std::any::Any;
 use std::sync::Arc;
 
@@ -102,7 +103,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum Input {
     /// Pressed a button.
     Press(Button),
@@ -132,7 +133,27 @@ pub enum Input {
     ///
     /// When comparing two custom events for equality,
     /// they always return `false`.
-    Custom(EventId, Arc<Any>),
+    Custom(EventId, Arc<Any + Send + Sync>),
+}
+
+impl fmt::Debug for Input {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Input::Press(ref button) => write!(f, "Press({:?})", button),
+            Input::Release(ref button) => write!(f, "Release({:?})", button),
+            Input::Move(ref motion) => write!(f, "Move({:?})", motion),
+            Input::Text(ref text) => write!(f, "Text({:?})", text),
+            Input::Resize(w, h) => write!(f, "Resize({}, {})", w, h),
+            Input::Focus(focus) => write!(f, "Focus({})", focus),
+            Input::Cursor(cursor) => write!(f, "Cursor({})", cursor),
+            Input::Close(ref args) => write!(f, "Close({:?})", args),
+            Input::Render(ref args) => write!(f, "Render({:?})", args),
+            Input::AfterRender(ref args) => write!(f, "AfterRender({:?})", args),
+            Input::Update(ref args) => write!(f, "Update({:?})", args),
+            Input::Idle(ref args) => write!(f, "Idle({:?})", args),
+            Input::Custom(ref id, _) => write!(f, "Custom({:?}, _)", id),
+        }
+    }
 }
 
 impl PartialEq for Input {
@@ -367,5 +388,12 @@ mod tests {
         test(Input::AfterRender(AfterRenderArgs));
         test(Input::Update(UpdateArgs { dt: 0.0 }));
         test(Input::Idle(IdleArgs { dt: 0.0 }));
+    }
+
+    #[test]
+    fn test_input_sync_send() {
+        fn chk<T: Sync + Send>() {}
+
+        chk::<Input>();
     }
 }
