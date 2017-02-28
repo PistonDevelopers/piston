@@ -29,5 +29,4 @@ path = "../input"
 version = "0.17.1"
 
 [dependencies]
-time = "0.1.33"
 piston-viewport = "0.3.0"
