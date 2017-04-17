@@ -706,3 +706,61 @@ impl WindowSettings {
         self
     }
 }
+
+#[cfg(test)]
+#[allow(unused_variables)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn test_zero_size() {
+        let both_zero = Size { height: 0, width: 1 };
+        let height_zero = Size { height: 0, width: 1 };
+        let width_zero = Size { height: 1, width: 0 };
+    }
+
+    // QUESTION: fn test_overflow_size() should we add this?
+
+    // QUESTION: how do I test the `from` method? I'm not sure how From<[]> is different from
+    // From<()>
+    
+    #[test]
+    #[should_panic]
+    fn test_zero_size_window_settings() {
+        let both_zero = Size { height: 0, width: 1 };
+        let both_zero_window = WindowSettings {
+            title: "".to_string(),
+            size: both_zero,
+            samples: 0,
+            fullscreen: false,
+            exit_on_esc: false,
+            vsync: false,
+            opengl: None,
+        };
+
+        let height_zero = Size { height: 0, width: 1 };
+        let height_zero_window = WindowSettings {
+            title: "".to_string(),
+            size: height_zero,
+            samples: 0,
+            fullscreen: false,
+            exit_on_esc: false,
+            vsync: false,
+            opengl: None,
+        };
+
+        let width_zero = Size { height: 1, width: 0 };
+        let width_zero_window = WindowSettings {
+            title: "".to_string(),
+            size: width_zero,
+            samples: 0,
+            fullscreen: false,
+            exit_on_esc: false,
+            vsync: false,
+            opengl: None,
+        };
+    }
+
+    
+}
