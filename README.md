@@ -78,7 +78,7 @@ In addition we do research or plan to in the following areas:
 * Interactive applications
 * [AI programming](https://github.com/pistondevelopers/ai_behavior)
 * Animation, [2D](https://github.com/PistonDevelopers/sprite) and [3D](https://github.com/PistonDevelopers/skeletal_animation)
-* Sound and [music](https://github.com/PistonDevelopers/music)
+* [Sound and music](https://github.com/PistonDevelopers/music)
 * Network
 
 ### Dependency graph
