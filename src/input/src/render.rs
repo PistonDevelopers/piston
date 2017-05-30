@@ -5,7 +5,7 @@ use Input;
 /// Render arguments
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
 pub struct RenderArgs {
-    /// Extrapolated time in seconds, used to do smooth animation.
+    /// Extrapolated time in nanoseconds, used to do smooth animation.
     pub ext_dt: f64,
     /// The width of rendered area in points.
     pub width: u32,
