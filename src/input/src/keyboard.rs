@@ -10,52 +10,52 @@ use Button;
 bitflags!(
     #[allow(missing_docs)]
     #[derive(RustcDecodable, RustcEncodable)]
-    pub flags ModifierKey: u8 {
+    pub struct ModifierKey: u8 {
         /// No modifier.
-        const NO_MODIFIER           = 0b00000000,
+        const NO_MODIFIER           = 0b00000000;
         /// Ctrl.
-        const CTRL                  = 0b00000001,
+        const CTRL                  = 0b00000001;
         /// Shift.
-        const SHIFT                 = 0b00000010,
+        const SHIFT                 = 0b00000010;
         /// Alt.
-        const ALT                   = 0b00000100,
+        const ALT                   = 0b00000100;
         /// Gui.
-        const GUI                   = 0b00001000,
+        const GUI                   = 0b00001000;
         /// Ctrl + Shift.
         const CTRL_SHIFT            = CTRL.bits
-                                    | SHIFT.bits,
+                                    | SHIFT.bits;
         /// Ctrl + Alt.
         const CTRL_ALT              = CTRL.bits
-                                    | ALT.bits,
+                                    | ALT.bits;
         /// Ctrl + Gui.
         const CTRL_GUI              = CTRL.bits
-                                    | GUI.bits,
+                                    | GUI.bits;
         /// Ctrl + Shift + Alt.
         const CTRL_SHIFT_ALT        = CTRL.bits
                                     | SHIFT.bits
-                                    | ALT.bits,
+                                    | ALT.bits;
         /// Ctrl + Shift + Gui.
         const CTRL_SHIFT_GUI        = CTRL.bits
                                     | SHIFT.bits
-                                    | GUI.bits,
+                                    | GUI.bits;
         /// Ctrl + Shift + Alt + Gui.
         const CTRL_SHIFT_ALT_GUI    = CTRL.bits
                                     | SHIFT.bits
                                     | ALT.bits
-                                    | GUI.bits,
+                                    | GUI.bits;
         /// Shift + Alt.
         const SHIFT_ALT             = SHIFT.bits
-                                    | ALT.bits,
+                                    | ALT.bits;
         /// Shift + Gui.
         const SHIFT_GUI             = SHIFT.bits
-                                    | GUI.bits,
+                                    | GUI.bits;
         /// Shift + Alt + Gui.
         const SHIFT_ALT_GUI         = SHIFT.bits
                                     | ALT.bits
-                                    | GUI.bits,
+                                    | GUI.bits;
         /// Alt + Gui.
         const ALT_GUI               = ALT.bits
-                                    | GUI.bits
+                                    | GUI.bits;
     }
 );
 
