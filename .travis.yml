@@ -5,5 +5,3 @@ rust:
   - nightly
 script:
   - bash ci/script.sh
-after_success:
-  - curl http://docs.piston.rs/travis-doc-upload.sh > tdu.sh && cat tdu.sh && sh tdu.sh
