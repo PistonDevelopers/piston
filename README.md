@@ -7,6 +7,7 @@ A modular game engine written in Rust
 Maintainers of Piston core libraries: @bvssvni
 
 ## Dive into the world of Piston
+* [Guide](./GUIDE.md)
 * [Overview](https://github.com/PistonDevelopers/piston/wiki/Piston-overview)
 * [Examples](https://github.com/pistondevelopers/piston-examples)
 * [Tutorials](https://github.com/pistondevelopers/piston-tutorials)

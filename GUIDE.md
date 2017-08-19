@@ -36,10 +36,9 @@ Some of the things that make Rust suitable for game development:
 
 ## Installing Rust and Cargo
 
-To install Rust and Cargo (Rust's package manager) on your machine visit these pages and install the appropriate nightlies for your platform.
+To install Rust and Cargo (Rust's package manager) on your machine visit this page and install the appropriate package for your platform.
 
-* [Rust Nightlies](http://www.rust-lang.org/install.html)
-* [Cargo Nightlies](https://github.com/rust-lang/cargo#installing-cargo-from-nightlies)
+* [Install Rust](https://www.rust-lang.org/en-US/install.html)
 
 Once you're done, try these commands to confirm that each have been installed correctly.
 
@@ -77,6 +76,8 @@ Check out How To Contribute [How To Contribute](https://github.com/PistonDevelop
 ### Show Us Your Games
 
 [Games Made With Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
-We'd love to add whatever you make with Piston to the examples.
-[TODO] Explain how to submit a game.
 
+We'd love to add whatever you make with Piston to the examples.
+
+You can edit the page when you are added as a collaborator to the Piston project.
+Alternatively, you can also open up an issue to get your game submitted.
