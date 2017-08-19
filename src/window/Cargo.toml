@@ -13,6 +13,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/PistonDevelopers/piston.git"
 homepage = "https://github.com/PistonDevelopers/piston"
+documentation = "https://docs.rs/pistoncore-window"
 
 [lib]
 name = "window"
