@@ -1,4 +1,4 @@
-use Input;
+use {Event, Loop};
 
 /// Update arguments, such as delta time in seconds
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
@@ -23,16 +23,16 @@ pub trait UpdateEvent: Sized {
     }
 }
 
-impl UpdateEvent for Input {
+impl UpdateEvent for Event {
     fn from_update_args(args: &UpdateArgs, _old_event: &Self) -> Option<Self> {
-        Some(Input::Update(*args))
+        Some(Event::Loop(Loop::Update(*args)))
     }
 
     fn update<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&UpdateArgs) -> U
     {
         match *self {
-            Input::Update(ref args) => Some(f(args)),
+            Event::Loop(Loop::Update(ref args)) => Some(f(args)),
             _ => None,
         }
     }
@@ -44,12 +44,12 @@ mod tests {
 
     #[test]
     fn test_input_update() {
-        use Input;
+        use Event;
         use UpdateArgs;
 
-        let e = Input::Update(UpdateArgs { dt: 0.0 });
-        let x: Option<Input> = UpdateEvent::from_update_args(&UpdateArgs { dt: 1.0 }, &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = UpdateArgs { dt: 0.0 }.into();
+        let x: Option<Event> = UpdateEvent::from_update_args(&UpdateArgs { dt: 1.0 }, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .update(|args| UpdateEvent::from_update_args(args, x.as_ref().unwrap()))
             .unwrap();

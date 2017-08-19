@@ -1,6 +1,6 @@
 use viewport::Viewport;
 
-use Input;
+use {Event, Loop};
 
 /// Render arguments
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
@@ -40,16 +40,16 @@ pub trait RenderEvent: Sized {
     }
 }
 
-impl RenderEvent for Input {
+impl RenderEvent for Event {
     fn from_render_args(args: &RenderArgs, _old_event: &Self) -> Option<Self> {
-        Some(Input::Render(*args))
+        Some(Event::Loop(Loop::Render(*args)))
     }
 
     fn render<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&RenderArgs) -> U
     {
         match *self {
-            Input::Render(ref args) => Some(f(args)),
+            Event::Loop(Loop::Render(ref args)) => Some(f(args)),
             _ => None,
         }
     }
@@ -61,17 +61,16 @@ mod tests {
 
     #[test]
     fn test_input_render() {
-        use Input;
         use RenderArgs;
 
-        let e = Input::Render(RenderArgs {
+        let e: Event = RenderArgs {
             ext_dt: 0.0,
             width: 0,
             height: 0,
             draw_width: 0,
             draw_height: 0,
-        });
-        let x: Option<Input> = RenderEvent::from_render_args(&RenderArgs {
+        }.into();
+        let x: Option<Event> = RenderEvent::from_render_args(&RenderArgs {
                                                                  ext_dt: 1.0,
                                                                  width: 10,
                                                                  height: 10,
@@ -79,7 +78,7 @@ mod tests {
                                                                  draw_height: 10,
                                                              },
                                                              &e);
-        let y: Option<Input> = x.clone()
+        let y: Option<Event> = x.clone()
             .unwrap()
             .render(|args| RenderEvent::from_render_args(args, x.as_ref().unwrap()))
             .unwrap();

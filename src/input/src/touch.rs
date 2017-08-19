@@ -1,4 +1,4 @@
-use {Input, Motion};
+use {Event, Input, Motion};
 
 /// Stores the touch state.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
@@ -124,16 +124,16 @@ pub trait TouchEvent: Sized {
     }
 }
 
-impl TouchEvent for Input {
+impl TouchEvent for Event {
     fn from_touch_args(args: &TouchArgs, _old_event: &Self) -> Option<Self> {
-        Some(Input::Move(Motion::Touch(*args)))
+        Some(Event::Input(Input::Move(Motion::Touch(*args))))
     }
 
     fn touch<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&TouchArgs) -> U
     {
         match *self {
-            Input::Move(Motion::Touch(ref args)) => Some(f(args)),
+            Event::Input(Input::Move(Motion::Touch(ref args))) => Some(f(args)),
             _ => None,
         }
     }
@@ -145,13 +145,11 @@ mod tests {
 
     #[test]
     fn test_input_touch() {
-        use super::super::{Input, Motion};
-
         let pos = [0.0; 2];
-        let e = Input::Move(Motion::Touch(TouchArgs::new(0, 0, pos, 1.0, Touch::Start)));
-        let a: Option<Input> =
+        let e: Event = TouchArgs::new(0, 0, pos, 1.0, Touch::Start).into();
+        let a: Option<Event> =
             TouchEvent::from_touch_args(&TouchArgs::new(0, 0, pos, 1.0, Touch::Start), &e);
-        let b: Option<Input> = a.clone()
+        let b: Option<Event> = a.clone()
             .unwrap()
             .touch(|t| {
                 TouchEvent::from_touch_args(&TouchArgs::new(t.device,
@@ -167,14 +165,14 @@ mod tests {
 
     #[test]
     fn test_input_touch_3d() {
-        use super::super::{Input, Motion};
+        use super::super::Event;
 
         let pos = [0.0; 3];
         let pressure = [0.0, 0.0, 1.0];
-        let e = Input::Move(Motion::Touch(TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start)));
-        let a: Option<Input> =
+        let e: Event = TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start).into();
+        let a: Option<Event> =
             TouchEvent::from_touch_args(&TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start), &e);
-        let b: Option<Input> = a.clone()
+        let b: Option<Event> = a.clone()
             .unwrap()
             .touch(|t| {
                 TouchEvent::from_touch_args(&TouchArgs::new_3d(t.device,

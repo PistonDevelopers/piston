@@ -1,7 +1,7 @@
 
 //! Back-end agnostic mouse buttons.
 
-use {Input, Motion};
+use {Event, Input, Motion};
 
 /// Represent a mouse button.
 #[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
@@ -86,16 +86,16 @@ pub trait MouseCursorEvent: Sized {
     }
 }
 
-impl MouseCursorEvent for Input {
+impl MouseCursorEvent for Event {
     fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
-        Some(Input::Move(Motion::MouseCursor(x, y)))
+        Some(Event::Input(Input::Move(Motion::MouseCursor(x, y))))
     }
 
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Input::Move(Motion::MouseCursor(x, y)) => Some(f(x, y)),
+            Event::Input(Input::Move(Motion::MouseCursor(x, y))) => Some(f(x, y)),
             _ => None,
         }
     }
@@ -113,16 +113,16 @@ pub trait MouseRelativeEvent: Sized {
     }
 }
 
-impl MouseRelativeEvent for Input {
+impl MouseRelativeEvent for Event {
     fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
-        Some(Input::Move(Motion::MouseRelative(x, y)))
+        Some(Event::Input(Input::Move(Motion::MouseRelative(x, y))))
     }
 
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Input::Move(Motion::MouseRelative(x, y)) => Some(f(x, y)),
+            Event::Input(Input::Move(Motion::MouseRelative(x, y))) => Some(f(x, y)),
             _ => None,
         }
     }
@@ -140,16 +140,16 @@ pub trait MouseScrollEvent: Sized {
     }
 }
 
-impl MouseScrollEvent for Input {
+impl MouseScrollEvent for Event {
     fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
-        Some(Input::Move(Motion::MouseScroll(x, y)))
+        Some(Event::Input(Input::Move(Motion::MouseScroll(x, y))))
     }
 
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Input::Move(Motion::MouseScroll(x, y)) => Some(f(x, y)),
+            Event::Input(Input::Move(Motion::MouseScroll(x, y))) => Some(f(x, y)),
             _ => None,
         }
     }
@@ -161,11 +161,11 @@ mod mouse_event_tests {
 
     #[test]
     fn test_input_mouse_cursor() {
-        use super::super::{Input, Motion};
+        use super::super::Motion;
 
-        let e = Input::Move(Motion::MouseCursor(0.0, 0.0));
-        let a: Option<Input> = MouseCursorEvent::from_xy(1.0, 0.0, &e);
-        let b: Option<Input> = a.clone()
+        let e: Event = Motion::MouseCursor(0.0, 0.0).into();
+        let a: Option<Event> = MouseCursorEvent::from_xy(1.0, 0.0, &e);
+        let b: Option<Event> = a.clone()
             .unwrap()
             .mouse_cursor(|x, y| MouseCursorEvent::from_xy(x, y, a.as_ref().unwrap()))
             .unwrap();
@@ -174,11 +174,11 @@ mod mouse_event_tests {
 
     #[test]
     fn test_input_mouse_relative() {
-        use super::super::{Input, Motion};
+        use super::super::Motion;
 
-        let e = Input::Move(Motion::MouseRelative(0.0, 0.0));
-        let a: Option<Input> = MouseRelativeEvent::from_xy(1.0, 0.0, &e);
-        let b: Option<Input> = a.clone()
+        let e: Event = Motion::MouseRelative(0.0, 0.0).into();
+        let a: Option<Event> = MouseRelativeEvent::from_xy(1.0, 0.0, &e);
+        let b: Option<Event> = a.clone()
             .unwrap()
             .mouse_relative(|x, y| MouseRelativeEvent::from_xy(x, y, a.as_ref().unwrap()))
             .unwrap();
@@ -187,11 +187,11 @@ mod mouse_event_tests {
 
     #[test]
     fn test_input_mouse_scroll() {
-        use super::super::{Input, Motion};
+        use super::super::Motion;
 
-        let e = Input::Move(Motion::MouseScroll(0.0, 0.0));
-        let a: Option<Input> = MouseScrollEvent::from_xy(1.0, 0.0, &e);
-        let b: Option<Input> = a.clone()
+        let e: Event = Motion::MouseScroll(0.0, 0.0).into();
+        let a: Option<Event> = MouseScrollEvent::from_xy(1.0, 0.0, &e);
+        let b: Option<Event> = a.clone()
             .unwrap()
             .mouse_scroll(|x, y| MouseScrollEvent::from_xy(x, y, a.as_ref().unwrap()))
             .unwrap();

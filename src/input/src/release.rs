@@ -1,4 +1,4 @@
-use {Button, Input};
+use {Button, Event, Input};
 
 /// The release of a button
 pub trait ReleaseEvent: Sized {
@@ -12,16 +12,16 @@ pub trait ReleaseEvent: Sized {
     }
 }
 
-impl ReleaseEvent for Input {
+impl ReleaseEvent for Event {
     fn from_button(button: Button, _old_event: &Self) -> Option<Self> {
-        Some(Input::Release(button))
+        Some(Event::Input(Input::Release(button)))
     }
 
     fn release<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(Button) -> U
     {
         match *self {
-            Input::Release(button) => Some(f(button)),
+            Event::Input(Input::Release(button)) => Some(f(button)),
             _ => None,
         }
     }
@@ -35,10 +35,10 @@ mod tests {
     fn test_input_release() {
         use super::super::{Button, Key, Input};
 
-        let e = Input::Release(Button::Keyboard(Key::S));
+        let e: Event = Input::Release(Key::S.into()).into();
         let button = Button::Keyboard(Key::A);
-        let x: Option<Input> = ReleaseEvent::from_button(button, &e);
-        let y: Option<Input> = x.clone()
+        let x: Option<Event> = ReleaseEvent::from_button(button, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .release(|button| ReleaseEvent::from_button(button, x.as_ref().unwrap()))
             .unwrap();

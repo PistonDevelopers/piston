@@ -1,7 +1,7 @@
 
 //! Back-end agnostic controller events.
 
-use {Input, Motion};
+use {Event, Input, Motion};
 
 /// Components of a controller button event. Not guaranteed consistent across
 /// backends.
@@ -61,16 +61,16 @@ pub trait ControllerAxisEvent: Sized {
     }
 }
 
-impl ControllerAxisEvent for Input {
+impl ControllerAxisEvent for Event {
     fn from_controller_axis_args(args: ControllerAxisArgs, _old_event: &Self) -> Option<Self> {
-        Some(Input::Move(Motion::ControllerAxis(args)))
+        Some(Event::Input(Input::Move(Motion::ControllerAxis(args))))
     }
 
     fn controller_axis<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(ControllerAxisArgs) -> U
     {
         match *self {
-            Input::Move(Motion::ControllerAxis(args)) => Some(f(args)),
+            Event::Input(Input::Move(Motion::ControllerAxis(args))) => Some(f(args)),
             _ => None,
         }
     }
@@ -82,12 +82,10 @@ mod controller_axis_tests {
 
     #[test]
     fn test_input_controller_axis() {
-        use super::super::{Input, Motion};
-
-        let e = Input::Move(Motion::ControllerAxis(ControllerAxisArgs::new(0, 1, 0.9)));
-        let a: Option<Input> =
+        let e: Event = ControllerAxisArgs::new(0, 1, 0.9).into();
+        let a: Option<Event> =
             ControllerAxisEvent::from_controller_axis_args(ControllerAxisArgs::new(0, 1, 0.9), &e);
-        let b: Option<Input> = a.clone()
+        let b: Option<Event> = a.clone()
             .unwrap()
             .controller_axis(|cnt| {
                 ControllerAxisEvent::from_controller_axis_args(

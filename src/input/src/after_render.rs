@@ -1,4 +1,4 @@
-use Input;
+use {Event, Loop};
 
 /// After render arguments.
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
@@ -16,16 +16,16 @@ pub trait AfterRenderEvent: Sized {
     }
 }
 
-impl AfterRenderEvent for Input {
-    fn from_after_render_args(args: &AfterRenderArgs, _old_event: &Input) -> Option<Self> {
-        Some(Input::AfterRender(*args))
+impl AfterRenderEvent for Event {
+    fn from_after_render_args(args: &AfterRenderArgs, _old_event: &Self) -> Option<Self> {
+        Some(Event::Loop(Loop::AfterRender(*args)))
     }
 
     fn after_render<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&AfterRenderArgs) -> U
     {
         match *self {
-            Input::AfterRender(ref args) => Some(f(args)),
+            Event::Loop(Loop::AfterRender(ref args)) => Some(f(args)),
             _ => None,
         }
     }
@@ -37,12 +37,11 @@ mod tests {
 
     #[test]
     fn test_input_after_render() {
-        use Input;
         use AfterRenderArgs;
 
-        let e = Input::AfterRender(AfterRenderArgs);
-        let x: Option<Input> = AfterRenderEvent::from_after_render_args(&AfterRenderArgs, &e);
-        let y: Option<Input> =
+        let e: Event = AfterRenderArgs.into();
+        let x: Option<Event> = AfterRenderEvent::from_after_render_args(&AfterRenderArgs, &e);
+        let y: Option<Event> =
             x.clone()
                 .unwrap()
                 .after_render(|args| {

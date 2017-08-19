@@ -1,4 +1,4 @@
-use Input;
+use {Event, Input};
 
 /// When the window is resized
 pub trait ResizeEvent: Sized {
@@ -12,16 +12,16 @@ pub trait ResizeEvent: Sized {
     }
 }
 
-impl ResizeEvent for Input {
+impl ResizeEvent for Event {
     fn from_width_height(w: u32, h: u32, _old_event: &Self) -> Option<Self> {
-        Some(Input::Resize(w, h))
+        Some(Event::Input(Input::Resize(w, h)))
     }
 
     fn resize<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(u32, u32) -> U
     {
         match *self {
-            Input::Resize(w, h) => Some(f(w, h)),
+            Event::Input(Input::Resize(w, h)) => Some(f(w, h)),
             _ => None,
         }
     }
@@ -35,9 +35,9 @@ mod tests {
     fn test_input_resize() {
         use super::super::Input;
 
-        let e = Input::Resize(0, 0);
-        let x: Option<Input> = ResizeEvent::from_width_height(100, 100, &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = Input::Resize(0, 0).into();
+        let x: Option<Event> = ResizeEvent::from_width_height(100, 100, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .resize(|w, h| ResizeEvent::from_width_height(w, h, x.as_ref().unwrap()))
             .unwrap();

@@ -11,7 +11,7 @@ use std::thread::sleep;
 use std::time::{Duration, Instant};
 use std::cmp;
 use window::Window;
-use input::{Input, AfterRenderArgs, IdleArgs, RenderArgs, UpdateArgs};
+use input::{Event, AfterRenderArgs, IdleArgs, RenderArgs, UpdateArgs};
 
 /// Tells whether last emitted event was idle or not.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -141,7 +141,7 @@ impl Events {
     }
 
     /// Returns the next game event.
-    pub fn next<W>(&mut self, window: &mut W) -> Option<Input>
+    pub fn next<W>(&mut self, window: &mut W) -> Option<Event>
         where W: Window
     {
         if self.settings.lazy || self.settings.ups == 0 {
@@ -157,7 +157,7 @@ impl Events {
                     }
                     // This mode needs no `Render` state.
                     self.state = State::UpdateLoop(Idle::Yes);
-                    return Some(Input::AfterRender(AfterRenderArgs));
+                    return Some(AfterRenderArgs.into());
                 }
                 _ => {}
             }
@@ -171,16 +171,16 @@ impl Events {
                         // in case the application wants to do some background work.
                         self.state = State::UpdateLoop(Idle::No);
                         let seconds = duration_to_secs(next_frame - current_time);
-                        return Some(Input::Idle(IdleArgs { dt: seconds }));
+                        return Some(IdleArgs { dt: seconds }.into());
                     }
                     self.state = State::UpdateLoop(Idle::Yes);
                     if self.settings.lazy {
                         let ev = window.wait_event();
-                        return Some(ev);
+                        return Some(Event::Input(ev));
                     } else {
                         match window.wait_event_timeout(next_frame - current_time) {
                             None => {}
-                            x => return x,
+                            Some(x) => return Some(Event::Input(x)),
                         }
                     }
                 }
@@ -195,14 +195,14 @@ impl Events {
                 if size.width != 0 && size.height != 0 {
                     // Swap buffers next time.
                     self.state = State::SwapBuffers;
-                    return Some(Input::Render(RenderArgs {
+                    return Some(RenderArgs {
                         // Extrapolate time forward to allow smooth motion.
                         ext_dt: 0.0,
                         width: size.width,
                         height: size.height,
                         draw_width: draw_size.width,
                         draw_height: draw_size.height,
-                    }));
+                    }.into());
                 }
             }
         }
@@ -223,7 +223,7 @@ impl Events {
                             // the application state when benchmarking.
                             continue;
                         } else {
-                            return Some(e);
+                            return Some(Event::Input(e));
                         }
                     }
                     if window.should_close() {
@@ -243,7 +243,7 @@ impl Events {
                     if size.width != 0 && size.height != 0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
-                        return Some(Input::Render(RenderArgs {
+                        return Some(RenderArgs {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: duration_to_secs(self.last_frame
                                 .duration_since(self.last_update)),
@@ -251,7 +251,7 @@ impl Events {
                             height: size.height,
                             draw_width: draw_size.width,
                             draw_height: draw_size.height,
-                        }));
+                        }.into());
                     }
 
                     State::UpdateLoop(Idle::No)
@@ -261,7 +261,7 @@ impl Events {
                         window.swap_buffers();
                     }
                     self.state = State::UpdateLoop(Idle::No);
-                    return Some(Input::AfterRender(AfterRenderArgs));
+                    return Some(AfterRenderArgs.into());
                 }
                 State::UpdateLoop(ref mut idle) => {
                     if self.settings.bench_mode {
@@ -285,11 +285,11 @@ impl Events {
                         if next_event > current_time {
                             if let Some(x) = window.poll_event() {
                                 *idle = Idle::No;
-                                return Some(x);
+                                return Some(Event::Input(x));
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
                                 let seconds = duration_to_secs(next_event - current_time);
-                                return Some(Input::Idle(IdleArgs { dt: seconds }));
+                                return Some(IdleArgs { dt: seconds }.into());
                             }
                             sleep(next_event - current_time);
                             State::UpdateLoop(Idle::No)
@@ -314,7 +314,7 @@ impl Events {
                         match window.poll_event() {
                             None => State::Update,
                             Some(x) => {
-                                return Some(x);
+                                return Some(Event::Input(x));
                             }
                         }
                     }
@@ -330,7 +330,7 @@ impl Events {
                         // Use the update state stored right after sleep.
                         self.last_update += ns_to_duration(self.dt_update_in_ns);
                     }
-                    return Some(Input::Update(UpdateArgs { dt: self.dt }));
+                    return Some(UpdateArgs { dt: self.dt }.into());
                 }
             };
         }

@@ -1,6 +1,6 @@
 use std::borrow::ToOwned;
 
-use Input;
+use {Event, Input};
 
 /// When receiving text from user, such as typing a character
 pub trait TextEvent: Sized {
@@ -14,16 +14,16 @@ pub trait TextEvent: Sized {
     }
 }
 
-impl TextEvent for Input {
+impl TextEvent for Event {
     fn from_text(text: &str, _old_event: &Self) -> Option<Self> {
-        Some(Input::Text(text.into()))
+        Some(Event::Input(Input::Text(text.into())))
     }
 
     fn text<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&str) -> U
     {
         match *self {
-            Input::Text(ref s) => Some(f(s)),
+            Event::Input(Input::Text(ref s)) => Some(f(s)),
             _ => None,
         }
     }
@@ -37,9 +37,9 @@ mod tests {
     fn test_input_text() {
         use super::super::Input;
 
-        let e = Input::Text("".to_string());
-        let x: Option<Input> = TextEvent::from_text("hello", &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = Input::Text("".to_string()).into();
+        let x: Option<Event> = TextEvent::from_text("hello", &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .text(|text| TextEvent::from_text(text, x.as_ref().unwrap()))
             .unwrap();

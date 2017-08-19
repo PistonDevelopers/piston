@@ -1,4 +1,4 @@
-use Input;
+use {Event, Input};
 
 /// Close arguments.
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
@@ -16,16 +16,16 @@ pub trait CloseEvent: Sized {
     }
 }
 
-impl CloseEvent for Input {
-    fn from_close_args(args: &CloseArgs, _old_event: &Input) -> Option<Self> {
-        Some(Input::Close(*args))
+impl CloseEvent for Event {
+    fn from_close_args(args: &CloseArgs, _old_event: &Self) -> Option<Self> {
+        Some(Event::Input(Input::Close(*args)))
     }
 
     fn close<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&CloseArgs) -> U
     {
         match *self {
-            Input::Close(ref args) => Some(f(args)),
+            Event::Input(Input::Close(ref args)) => Some(f(args)),
             _ => None,
         }
     }
@@ -37,12 +37,12 @@ mod tests {
 
     #[test]
     fn test_input_close() {
-        use Input;
         use CloseArgs;
+        use Event;
 
-        let e = Input::Close(CloseArgs);
-        let x: Option<Input> = CloseEvent::from_close_args(&CloseArgs, &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = CloseArgs.into();
+        let x: Option<Event> = CloseEvent::from_close_args(&CloseArgs, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .close(|args| CloseEvent::from_close_args(args, x.as_ref().unwrap()))
             .unwrap();

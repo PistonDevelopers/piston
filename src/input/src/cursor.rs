@@ -1,4 +1,4 @@
-use Input;
+use {Event, Input};
 
 /// When window gets or loses cursor
 pub trait CursorEvent: Sized {
@@ -12,16 +12,16 @@ pub trait CursorEvent: Sized {
     }
 }
 
-impl CursorEvent for Input {
+impl CursorEvent for Event {
     fn from_cursor(cursor: bool, _old_event: &Self) -> Option<Self> {
-        Some(Input::Cursor(cursor))
+        Some(Event::Input(Input::Cursor(cursor)))
     }
 
     fn cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
         match *self {
-            Input::Cursor(val) => Some(f(val)),
+            Event::Input(Input::Cursor(val)) => Some(f(val)),
             _ => None,
         }
     }
@@ -35,9 +35,9 @@ mod tests {
     fn test_input_cursor() {
         use super::super::Input;
 
-        let e = Input::Cursor(false);
-        let x: Option<Input> = CursorEvent::from_cursor(true, &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = Input::Cursor(false).into();
+        let x: Option<Event> = CursorEvent::from_cursor(true, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .cursor(|cursor| CursorEvent::from_cursor(cursor, x.as_ref().unwrap()))
             .unwrap();
