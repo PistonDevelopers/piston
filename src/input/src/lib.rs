@@ -30,8 +30,7 @@ pub use focus::FocusEvent;
 pub use generic_event::GenericEvent;
 pub use idle::{IdleArgs, IdleEvent};
 pub use mouse::{MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent};
-pub use press::PressEvent;
-pub use release::ReleaseEvent;
+pub use button::{ButtonState, ButtonArgs, ButtonEvent, PressEvent, ReleaseEvent};
 pub use resize::ResizeEvent;
 pub use render::{RenderArgs, RenderEvent};
 pub use text::TextEvent;
@@ -41,12 +40,11 @@ pub use update::{UpdateArgs, UpdateEvent};
 pub mod generic_event;
 
 mod after_render;
+mod button;
 mod close;
 mod cursor;
 mod focus;
 mod idle;
-mod press;
-mod release;
 mod render;
 mod resize;
 mod text;
@@ -66,8 +64,7 @@ const IDLE: EventId = EventId("piston/idle");
 const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
 const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
 const MOUSE_CURSOR: EventId = EventId("piston/mouse_cursor");
-const PRESS: EventId = EventId("piston/press");
-const RELEASE: EventId = EventId("piston/release");
+const BUTTON: EventId = EventId("piston/button");
 const RENDER: EventId = EventId("piston/render");
 const RESIZE: EventId = EventId("piston/resize");
 const TEXT: EventId = EventId("piston/text");
@@ -103,10 +100,8 @@ pub enum Motion {
 /// Models input events.
 #[derive(Clone, Debug, PartialEq, RustcDecodable, RustcEncodable)]
 pub enum Input {
-    /// Pressed a button.
-    Press(Button),
-    /// Released a button.
-    Release(Button),
+    /// Changed button state.
+    Button(ButtonArgs),
     /// Moved mouse cursor.
     Move(Motion),
     /// Text (usually from keyboard).
@@ -185,6 +180,12 @@ impl From<MouseButton> for Button {
 impl From<ControllerButton> for Button {
     fn from(btn: ControllerButton) -> Self {
         Button::Controller(btn)
+    }
+}
+
+impl From<ButtonArgs> for Input {
+    fn from(args: ButtonArgs) -> Self {
+        Input::Button(args)
     }
 }
 
@@ -319,8 +320,16 @@ mod tests {
             assert_eq!(decoded, input);
         };
 
-        test(Input::Press(Button::Keyboard(Key::A)));
-        test(Input::Release(Button::Keyboard(Key::A)));
+        test(Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Keyboard(Key::A),
+            scancode: None,
+        }));
+        test(Input::Button(ButtonArgs {
+            state: ButtonState::Release,
+            button: Button::Keyboard(Key::A),
+            scancode: None,
+        }));
         test(Input::Move(Motion::MouseCursor(0.0, 0.0)));
         test(Input::Text("hello".into()));
         test(Input::Resize(0, 0));
