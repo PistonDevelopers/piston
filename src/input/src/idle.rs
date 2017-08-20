@@ -1,4 +1,4 @@
-use Input;
+use {Event, Loop};
 
 /// Idle arguments, such as expected idle time in seconds.
 #[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
@@ -23,17 +23,16 @@ pub trait IdleEvent: Sized {
     }
 }
 
-
-impl IdleEvent for Input {
+impl IdleEvent for Event {
     fn from_idle_args(args: &IdleArgs, _old_event: &Self) -> Option<Self> {
-        Some(Input::Idle(*args))
+        Some(Event::Loop(Loop::Idle(*args)))
     }
 
     fn idle<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&IdleArgs) -> U
     {
         match *self {
-            Input::Idle(ref args) => Some(f(args)),
+            Event::Loop(Loop::Idle(ref args)) => Some(f(args)),
             _ => None,
         }
     }
@@ -45,12 +44,11 @@ mod tests {
 
     #[test]
     fn test_input_idle() {
-        use Input;
         use IdleArgs;
 
-        let e = Input::Idle(IdleArgs { dt: 1.0 });
-        let x: Option<Input> = IdleEvent::from_idle_args(&IdleArgs { dt: 1.0 }, &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = IdleArgs { dt: 1.0 }.into();
+        let x: Option<Event> = IdleEvent::from_idle_args(&IdleArgs { dt: 1.0 }, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .idle(|args| IdleEvent::from_idle_args(args, x.as_ref().unwrap()))
             .unwrap();

@@ -1,4 +1,4 @@
-use Input;
+use {Event, Input};
 
 /// When window gets or loses focus
 pub trait FocusEvent: Sized {
@@ -12,16 +12,16 @@ pub trait FocusEvent: Sized {
     }
 }
 
-impl FocusEvent for Input {
+impl FocusEvent for Event {
     fn from_focused(focused: bool, _old_event: &Self) -> Option<Self> {
-        Some(Input::Focus(focused))
+        Some(Event::Input(Input::Focus(focused)))
     }
 
     fn focus<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
         match *self {
-            Input::Focus(focused) => Some(f(focused)),
+            Event::Input(Input::Focus(focused)) => Some(f(focused)),
             _ => None,
         }
     }
@@ -35,9 +35,9 @@ mod tests {
     fn test_input_focus() {
         use super::super::Input;
 
-        let e = Input::Focus(false);
-        let x: Option<Input> = FocusEvent::from_focused(true, &e);
-        let y: Option<Input> = x.clone()
+        let e: Event = Input::Focus(false).into();
+        let x: Option<Event> = FocusEvent::from_focused(true, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .focus(|focused| FocusEvent::from_focused(focused, x.as_ref().unwrap()))
             .unwrap();

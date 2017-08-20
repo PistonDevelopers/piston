@@ -14,8 +14,6 @@ use std::fmt;
 use std::any::Any;
 use std::sync::Arc;
 
-use rustc_serialize::{Decoder, Decodable, Encoder, Encodable};
-
 pub use mouse::MouseButton;
 pub use keyboard::Key;
 pub use controller::{ControllerAxisArgs, ControllerButton};
@@ -103,7 +101,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, RustcDecodable, RustcEncodable)]
 pub enum Input {
     /// Pressed a button.
     Press(Button),
@@ -121,6 +119,11 @@ pub enum Input {
     Cursor(bool),
     /// Window closed.
     Close(CloseArgs),
+}
+
+/// Models loop events.
+#[derive(Copy, Clone, Debug, PartialEq, RustcDecodable, RustcEncodable)]
+pub enum Loop {
     /// Render graphics.
     Render(RenderArgs),
     /// After rendering and swapping buffers.
@@ -129,6 +132,15 @@ pub enum Input {
     Update(UpdateArgs),
     /// Do background tasks that can be done incrementally.
     Idle(IdleArgs),
+}
+
+/// Models all events.
+#[derive(Clone)]
+pub enum Event {
+    /// Input events.
+    Input(Input),
+    /// Events that commonly used by event loops.
+    Loop(Loop),
     /// Custom event.
     ///
     /// When comparing two custom events for equality,
@@ -136,170 +148,25 @@ pub enum Input {
     Custom(EventId, Arc<Any + Send + Sync>),
 }
 
-impl fmt::Debug for Input {
+impl fmt::Debug for Event {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Input::Press(ref button) => write!(f, "Press({:?})", button),
-            Input::Release(ref button) => write!(f, "Release({:?})", button),
-            Input::Move(ref motion) => write!(f, "Move({:?})", motion),
-            Input::Text(ref text) => write!(f, "Text({:?})", text),
-            Input::Resize(w, h) => write!(f, "Resize({}, {})", w, h),
-            Input::Focus(focus) => write!(f, "Focus({})", focus),
-            Input::Cursor(cursor) => write!(f, "Cursor({})", cursor),
-            Input::Close(ref args) => write!(f, "Close({:?})", args),
-            Input::Render(ref args) => write!(f, "Render({:?})", args),
-            Input::AfterRender(ref args) => write!(f, "AfterRender({:?})", args),
-            Input::Update(ref args) => write!(f, "Update({:?})", args),
-            Input::Idle(ref args) => write!(f, "Idle({:?})", args),
-            Input::Custom(ref id, _) => write!(f, "Custom({:?}, _)", id),
+            Event::Input(ref input) => write!(f, "{:?}", input),
+            Event::Loop(ref l) => write!(f, "{:?}", l),
+            Event::Custom(ref id, _) => write!(f, "Custom({:?}, _)", id),
         }
     }
 }
 
-impl PartialEq for Input {
-    fn eq(&self, other: &Input) -> bool {
-        use Input::*;
+impl PartialEq for Event {
+    fn eq(&self, other: &Event) -> bool {
+        use Event::*;
 
         match (self, other) {
-            (&Press(ref a), &Press(ref b)) => a == b,
-            (&Release(ref a), &Release(ref b)) => a == b,
-            (&Move(ref a), &Move(ref b)) => a == b,
-            (&Text(ref a), &Text(ref b)) => a == b,
-            (&Resize(aw, ah), &Resize(bw, bh)) => aw == bw && ah == bh,
-            (&Focus(a), &Focus(b)) => a == b,
-            (&Cursor(a), &Cursor(b)) => a == b,
-            (&Close(ref a), &Close(ref b)) => a == b,
-            (&Render(ref a), &Render(ref b)) => a == b,
-            (&AfterRender(ref a), &AfterRender(ref b)) => a == b,
-            (&Update(ref a), &Update(ref b)) => a == b,
-            (&Idle(ref a), &Idle(ref b)) => a == b,
+            (&Input(ref a), &Input(ref b)) => a == b,
+            (&Loop(ref a), &Loop(ref b)) => a == b,
             (_, _) => false,
         }
-    }
-}
-
-impl Decodable for Input {
-    fn decode<D: Decoder>(d: &mut D) -> Result<Input, D::Error> {
-        d.read_enum("Input", |d| {
-            d.read_enum_variant(&["Press",
-                                  "Release",
-                                  "Move",
-                                  "Text",
-                                  "Resize",
-                                  "Focus",
-                                  "Cursor",
-                                  "Close",
-                                  "Render",
-                                  "AfterRender",
-                                  "Update",
-                                  "Idle"],
-                                |d, ind| {
-                Ok(match ind {
-                    0 => Input::Press(try!(d.read_enum_variant_arg(0, |d| Button::decode(d)))),
-                    1 => Input::Release(try!(d.read_enum_variant_arg(0, |d| Button::decode(d)))),
-                    2 => Input::Move(try!(d.read_enum_variant_arg(0, |d| Motion::decode(d)))),
-                    3 => Input::Text(try!(d.read_enum_variant_arg(0, |d| String::decode(d)))),
-                    4 => {
-                        Input::Resize(try!(d.read_enum_variant_arg(0, |d| u32::decode(d))),
-                                      try!(d.read_enum_variant_arg(1, |d| u32::decode(d))))
-                    }
-                    5 => Input::Focus(try!(d.read_enum_variant_arg(0, |d| bool::decode(d)))),
-                    6 => Input::Cursor(try!(d.read_enum_variant_arg(0, |d| bool::decode(d)))),
-                    7 => Input::Close(try!(d.read_enum_variant_arg(0, |d| CloseArgs::decode(d)))),
-                    8 => Input::Render(try!(d.read_enum_variant_arg(0, |d| RenderArgs::decode(d)))),
-                    9 => {
-                        Input::AfterRender(try!(
-                        d.read_enum_variant_arg(0, |d| AfterRenderArgs::decode(d))))
-                    }
-                    10 => {
-                        Input::Update(try!(d.read_enum_variant_arg(0, |d| UpdateArgs::decode(d))))
-                    }
-                    11 => Input::Idle(try!(d.read_enum_variant_arg(0, |d| IdleArgs::decode(d)))),
-                    _ => unimplemented!(),
-                })
-            })
-        })
-    }
-}
-
-impl Encodable for Input {
-    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
-        s.emit_enum("Input", |s| match *self {
-            Input::Press(ref button) => {
-                s.emit_enum_variant("Press",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| button.encode(s)))
-            }
-            Input::Release(ref button) => {
-                s.emit_enum_variant("Release",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| button.encode(s)))
-            }
-            Input::Move(ref motion) => {
-                s.emit_enum_variant("Move",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| motion.encode(s)))
-            }
-            Input::Text(ref text) => {
-                s.emit_enum_variant("Text",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| text.encode(s)))
-            }
-            Input::Resize(w, h) => {
-                s.emit_enum_variant("Resize", 0, 2, |s| {
-                    try!(s.emit_enum_variant_arg(0, |s| w.encode(s)));
-                    try!(s.emit_enum_variant_arg(1, |s| h.encode(s)));
-                    Ok(())
-                })
-            }
-            Input::Focus(focus) => {
-                s.emit_enum_variant("Focus",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| focus.encode(s)))
-            }
-            Input::Cursor(cursor) => {
-                s.emit_enum_variant("Cursor",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| cursor.encode(s)))
-            }
-            Input::Close(ref close_args) => {
-                s.emit_enum_variant("Close",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| close_args.encode(s)))
-            }
-            Input::Render(ref render_args) => {
-                s.emit_enum_variant("Render",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| render_args.encode(s)))
-            }
-            Input::AfterRender(ref after_render_args) => {
-                s.emit_enum_variant("AfterRender",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| after_render_args.encode(s)))
-            }
-            Input::Update(ref update_args) => {
-                s.emit_enum_variant("Update",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| update_args.encode(s)))
-            }
-            Input::Idle(ref idle_args) => {
-                s.emit_enum_variant("Idle",
-                                    0,
-                                    1,
-                                    |s| s.emit_enum_variant_arg(0, |s| idle_args.encode(s)))
-            }
-            Input::Custom(_, _) => Ok(()),
-        })
     }
 }
 
@@ -327,33 +194,115 @@ impl From<ControllerAxisArgs> for Motion {
     }
 }
 
+impl From<ControllerAxisArgs> for Input {
+    fn from(args: ControllerAxisArgs) -> Self {
+        Input::Move(Motion::ControllerAxis(args))
+    }
+}
+
+impl From<TouchArgs> for Motion {
+    fn from(args: TouchArgs) -> Self {
+        Motion::Touch(args)
+    }
+}
+
+impl From<TouchArgs> for Input {
+    fn from(args: TouchArgs) -> Self {
+        Input::Move(Motion::Touch(args))
+    }
+}
+
 impl From<Motion> for Input {
     fn from(motion: Motion) -> Self {
         Input::Move(motion)
     }
 }
 
-impl From<RenderArgs> for Input {
+impl From<RenderArgs> for Loop {
     fn from(args: RenderArgs) -> Self {
-        Input::Render(args)
+        Loop::Render(args)
     }
 }
 
-impl From<AfterRenderArgs> for Input {
+impl From<RenderArgs> for Event {
+    fn from(args: RenderArgs) -> Self {
+        Event::Loop(Loop::Render(args))
+    }
+}
+
+impl From<AfterRenderArgs> for Loop {
     fn from(args: AfterRenderArgs) -> Self {
-        Input::AfterRender(args)
+        Loop::AfterRender(args)
     }
 }
 
-impl From<UpdateArgs> for Input {
+impl From<AfterRenderArgs> for Event {
+    fn from(args: AfterRenderArgs) -> Self {
+        Event::Loop(Loop::AfterRender(args))
+    }
+}
+
+impl From<UpdateArgs> for Loop {
     fn from(args: UpdateArgs) -> Self {
-        Input::Update(args)
+        Loop::Update(args)
     }
 }
 
-impl From<IdleArgs> for Input {
+impl From<UpdateArgs> for Event {
+    fn from(args: UpdateArgs) -> Self {
+        Event::Loop(Loop::Update(args))
+    }
+}
+
+impl From<IdleArgs> for Loop {
     fn from(args: IdleArgs) -> Self {
-        Input::Idle(args)
+        Loop::Idle(args)
+    }
+}
+
+impl From<IdleArgs> for Event {
+    fn from(args: IdleArgs) -> Self {
+        Event::Loop(Loop::Idle(args))
+    }
+}
+
+impl From<CloseArgs> for Input {
+    fn from(args: CloseArgs) -> Self {
+        Input::Close(args)
+    }
+}
+
+impl<T> From<T> for Event
+    where Input: From<T>
+{
+    fn from(args: T) -> Self {
+        Event::Input(args.into())
+    }
+}
+
+impl From<Loop> for Event {
+    fn from(l: Loop) -> Self {
+        Event::Loop(l)
+    }
+}
+
+impl Into<Option<Input>> for Event {
+    fn into(self) -> Option<Input> {
+        if let Event::Input(input) = self {
+            Some(input)
+        } else {
+            None
+        }
+    }
+}
+
+impl Into<Option<Loop>> for Event {
+    fn into(self) -> Option<Loop> {
+        if let Event::Loop(l) = self {
+            Some(l)
+        } else {
+            None
+        }
     }
 }
 
@@ -378,16 +327,22 @@ mod tests {
         test(Input::Focus(true));
         test(Input::Cursor(true));
         test(Input::Close(CloseArgs));
-        test(Input::Render(RenderArgs {
+
+        let test = |l| {
+            let encoded = json::encode(&l).unwrap().to_string();
+            let decoded: Loop = json::decode(&encoded).unwrap();
+            assert_eq!(decoded, l);
+        };
+        test(Loop::Render(RenderArgs {
             width: 0,
             height: 0,
             draw_width: 0,
             draw_height: 0,
             ext_dt: 0.0,
         }));
-        test(Input::AfterRender(AfterRenderArgs));
-        test(Input::Update(UpdateArgs { dt: 0.0 }));
-        test(Input::Idle(IdleArgs { dt: 0.0 }));
+        test(Loop::AfterRender(AfterRenderArgs));
+        test(Loop::Update(UpdateArgs { dt: 0.0 }));
+        test(Loop::Idle(IdleArgs { dt: 0.0 }));
     }
 
     #[test]

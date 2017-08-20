@@ -1,4 +1,4 @@
-use {Button, Input};
+use {Button, Event, Input};
 
 /// The press of a button
 pub trait PressEvent: Sized {
@@ -12,16 +12,16 @@ pub trait PressEvent: Sized {
     }
 }
 
-impl PressEvent for Input {
+impl PressEvent for Event {
     fn from_button(button: Button, _old_event: &Self) -> Option<Self> {
-        Some(Input::Press(button))
+        Some(Event::Input(Input::Press(button)))
     }
 
     fn press<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(Button) -> U
     {
         match *self {
-            Input::Press(button) => Some(f(button)),
+            Event::Input(Input::Press(button)) => Some(f(button)),
             _ => None,
         }
     }
@@ -35,10 +35,10 @@ mod tests {
     fn test_input_press() {
         use super::super::{Button, Key, Input};
 
-        let e = Input::Press(Button::Keyboard(Key::S));
+        let e: Event = Input::Press(Key::S.into()).into();
         let button = Button::Keyboard(Key::A);
-        let x: Option<Input> = PressEvent::from_button(button, &e);
-        let y: Option<Input> = x.clone()
+        let x: Option<Event> = PressEvent::from_button(button, &e);
+        let y: Option<Event> = x.clone()
             .unwrap()
             .press(|button| PressEvent::from_button(button, x.as_ref().unwrap()))
             .unwrap();
