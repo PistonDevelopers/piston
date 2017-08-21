@@ -9,7 +9,7 @@ use Button;
 // Defining every combination to allow assignment in static expressions.
 bitflags!(
     #[allow(missing_docs)]
-    #[derive(RustcDecodable, RustcEncodable)]
+    #[derive(Deserialize, Serialize)]
     pub struct ModifierKey: u8 {
         /// No modifier.
         const NO_MODIFIER           = 0b00000000;
@@ -105,7 +105,7 @@ impl Default for ModifierKey {
 /// Represent a keyboard key.
 /// Keycodes follows SDL http://wiki.libsdl.org/SDLKeycodeLookup
 #[allow(missing_docs)]
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, Debug, Hash)]
+#[derive(Copy, Clone, Deserialize, Serialize, Debug, Hash)]
 pub enum Key {
     Unknown = 0x00,
     Backspace = 0x08,

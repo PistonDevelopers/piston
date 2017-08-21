@@ -4,7 +4,7 @@
 use {Event, Input, Motion};
 
 /// Represent a mouse button.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq,
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq,
     Eq, Ord, PartialOrd, Hash, Debug)]
 pub enum MouseButton {
     /// Unknown mouse button.

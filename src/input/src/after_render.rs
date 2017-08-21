@@ -1,7 +1,7 @@
 use {Event, Loop};
 
 /// After render arguments.
-#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct AfterRenderArgs;
 
 /// After rendering and buffers are swapped.
