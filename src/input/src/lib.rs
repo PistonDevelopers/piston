@@ -7,7 +7,9 @@
 
 #[macro_use]
 extern crate bitflags;
-extern crate rustc_serialize;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde;
 extern crate viewport;
 
 use std::fmt;
@@ -72,7 +74,7 @@ const TOUCH: EventId = EventId("piston/touch");
 const UPDATE: EventId = EventId("piston/update");
 
 /// Models different kinds of buttons.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Eq, Hash, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(Key),
@@ -83,7 +85,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
 pub enum Motion {
     /// x and y in window coordinates.
     MouseCursor(f64, f64),
@@ -98,7 +100,7 @@ pub enum Motion {
 }
 
 /// Models input events.
-#[derive(Clone, Debug, PartialEq, RustcDecodable, RustcEncodable)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum Input {
     /// Changed button state.
     Button(ButtonArgs),
@@ -117,7 +119,7 @@ pub enum Input {
 }
 
 /// Models loop events.
-#[derive(Copy, Clone, Debug, PartialEq, RustcDecodable, RustcEncodable)]
+#[derive(Copy, Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum Loop {
     /// Render graphics.
     Render(RenderArgs),
@@ -309,50 +311,7 @@ impl Into<Option<Loop>> for Event {
 
 #[cfg(test)]
 mod tests {
-    use rustc_serialize::json;
     use super::*;
-
-    #[test]
-    fn test_encode_decode() {
-        let test = |input| {
-            let encoded = json::encode(&input).unwrap().to_string();
-            let decoded: Input = json::decode(&encoded).unwrap();
-            assert_eq!(decoded, input);
-        };
-
-        test(Input::Button(ButtonArgs {
-            state: ButtonState::Press,
-            button: Button::Keyboard(Key::A),
-            scancode: None,
-        }));
-        test(Input::Button(ButtonArgs {
-            state: ButtonState::Release,
-            button: Button::Keyboard(Key::A),
-            scancode: None,
-        }));
-        test(Input::Move(Motion::MouseCursor(0.0, 0.0)));
-        test(Input::Text("hello".into()));
-        test(Input::Resize(0, 0));
-        test(Input::Focus(true));
-        test(Input::Cursor(true));
-        test(Input::Close(CloseArgs));
-
-        let test = |l| {
-            let encoded = json::encode(&l).unwrap().to_string();
-            let decoded: Loop = json::decode(&encoded).unwrap();
-            assert_eq!(decoded, l);
-        };
-        test(Loop::Render(RenderArgs {
-            width: 0,
-            height: 0,
-            draw_width: 0,
-            draw_height: 0,
-            ext_dt: 0.0,
-        }));
-        test(Loop::AfterRender(AfterRenderArgs));
-        test(Loop::Update(UpdateArgs { dt: 0.0 }));
-        test(Loop::Idle(IdleArgs { dt: 0.0 }));
-    }
 
     #[test]
     fn test_input_sync_send() {

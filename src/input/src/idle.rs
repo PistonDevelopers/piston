@@ -1,7 +1,7 @@
 use {Event, Loop};
 
 /// Idle arguments, such as expected idle time in seconds.
-#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct IdleArgs {
     /// Expected idle time in seconds.
     pub dt: f64,

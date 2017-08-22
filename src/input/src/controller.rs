@@ -5,7 +5,7 @@ use {Event, Input, Motion};
 
 /// Components of a controller button event. Not guaranteed consistent across
 /// backends.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Eq, Debug, Hash)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
 pub struct ControllerButton {
     /// Which controller was the button on.
     pub id: i32,
@@ -26,7 +26,7 @@ impl ControllerButton {
 
 /// Components of a controller axis move event. Not guaranteed consistent across
 /// backends.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
 pub struct ControllerAxisArgs {
     /// Which controller moved.
     pub id: i32,

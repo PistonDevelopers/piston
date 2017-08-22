@@ -3,7 +3,7 @@ use viewport::Viewport;
 use {Event, Loop};
 
 /// Render arguments
-#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,

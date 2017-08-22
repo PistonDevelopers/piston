@@ -1,7 +1,7 @@
 use {Event, Loop};
 
 /// Update arguments, such as delta time in seconds
-#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,

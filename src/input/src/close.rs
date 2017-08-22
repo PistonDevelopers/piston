@@ -1,7 +1,7 @@
 use {Event, Input};
 
 /// Close arguments.
-#[derive(Copy, Clone, PartialEq, Debug, RustcDecodable, RustcEncodable)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct CloseArgs;
 
 /// Window is closing.

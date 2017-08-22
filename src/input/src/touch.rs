@@ -1,7 +1,7 @@
 use {Event, Input, Motion};
 
 /// Stores the touch state.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
 pub enum Touch {
     /// The start of touch, for example
     /// a finger pressed down on a touch screen.
@@ -27,7 +27,7 @@ pub enum Touch {
 ///
 /// For 2D touch the pressure is pointed the z direction.
 /// Use `.pressure()` to get the pressure magnitude.
-#[derive(Copy, Clone, RustcDecodable, RustcEncodable, PartialEq, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
 pub struct TouchArgs {
     /// A unique identifier for touch device.
     pub device: i64,
