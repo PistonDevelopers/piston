@@ -55,8 +55,7 @@ pub struct EventSettings {
     /// Requires `lazy` to be set to `false`.
     pub bench_mode: bool,
     /// Enable or disable rendering only when receiving input.
-    /// When enabled, update events are disabled.
-    /// Idle events are emitted while receiving input.
+    /// When enabled, update and idle events are disabled.
     pub lazy: bool,
 }
 
@@ -140,7 +139,7 @@ impl Events {
         }
     }
 
-    /// Returns the next game event.
+    /// Returns the next event.
     pub fn next<W>(&mut self, window: &mut W) -> Option<Event>
         where W: Window
     {
@@ -156,31 +155,67 @@ impl Events {
                         window.swap_buffers();
                     }
                     // This mode needs no `Render` state.
-                    self.state = State::UpdateLoop(Idle::Yes);
+                    self.state = State::UpdateLoop(Idle::No);
                     return Some(AfterRenderArgs.into());
+                }
+                State::HandleEvents => {
+                    if !self.settings.bench_mode {
+                        // Poll input events until event queue is empty.
+                        if let Some(ev) = window.poll_event() {
+                            return Some(Event::Input(ev));
+                        }
+                    }
+                    self.state = State::Render;
                 }
                 _ => {}
             }
             loop {
-                let current_time = Instant::now();
-                let next_frame = self.last_frame + ns_to_duration(self.dt_frame_in_ns);
-
-                if !self.first_frame && next_frame > current_time {
-                    if let State::UpdateLoop(Idle::Yes) = self.state {
-                        // Emit idle event with time until next frame,
-                        // in case the application wants to do some background work.
-                        self.state = State::UpdateLoop(Idle::No);
-                        let seconds = duration_to_secs(next_frame - current_time);
-                        return Some(IdleArgs { dt: seconds }.into());
-                    }
-                    self.state = State::UpdateLoop(Idle::Yes);
-                    if self.settings.lazy {
-                        let ev = window.wait_event();
-                        return Some(Event::Input(ev));
+                // Handle input events before rendering,
+                // because window might be closed and destroy
+                // the graphics context.
+                if let Some(e) = window.poll_event() {
+                    if self.settings.bench_mode {
+                        // Ignore input events in benchmark mode.
+                        // This is to avoid the input events affecting
+                        // the application state when benchmarking.
+                        continue;
                     } else {
-                        match window.wait_event_timeout(next_frame - current_time) {
-                            None => {}
-                            Some(x) => return Some(Event::Input(x)),
+                        return Some(Event::Input(e));
+                    }
+                }
+                if window.should_close() {
+                    return None;
+                }
+
+                if !self.settings.bench_mode {
+                    if self.settings.lazy {
+                        // A lazy event loop always waits until next event, ignoring time to render.
+                        if let State::UpdateLoop(_) = self.state {
+                            // Wait for next input event.
+                            let ev = window.wait_event();
+                            // Handle rest of events before rendering.
+                            self.state = State::HandleEvents;
+                            return Some(Event::Input(ev));
+                        }
+                    } else {
+                        let current_time = Instant::now();
+                        let next_frame = self.last_frame + ns_to_duration(self.dt_frame_in_ns);
+                        if !self.first_frame && next_frame > current_time {
+                            if let State::UpdateLoop(Idle::No) = self.state {
+                                // Emit idle event with time until next frame,
+                                // in case the application wants to do some background work.
+                                self.state = State::UpdateLoop(Idle::Yes);
+                                let seconds = duration_to_secs(next_frame - current_time);
+                                return Some(IdleArgs { dt: seconds }.into());
+                            }
+                            match window.wait_event_timeout(next_frame - current_time) {
+                                None => {}
+                                Some(x) => {
+                                    // Handle rest of events before rendering.
+                                    self.state = State::HandleEvents;
+                                    return Some(Event::Input(x))
+                                }
+                            }
                         }
                     }
                 }
@@ -196,13 +231,15 @@ impl Events {
                     // Swap buffers next time.
                     self.state = State::SwapBuffers;
                     return Some(RenderArgs {
-                        // Extrapolate time forward to allow smooth motion.
                         ext_dt: 0.0,
                         width: size.width,
                         height: size.height,
                         draw_width: draw_size.width,
                         draw_height: draw_size.height,
                     }.into());
+                } else {
+                    // Can not render at this time.
+                    self.state = State::UpdateLoop(Idle::No);
                 }
             }
         }
