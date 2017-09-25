@@ -5,7 +5,6 @@
 
 extern crate window;
 extern crate input;
-extern crate viewport;
 
 use std::thread::sleep;
 use std::time::{Duration, Instant};
