@@ -2,19 +2,18 @@
 
 use std::any::Any;
 
-use {AfterRenderEvent, ButtonEvent, ControllerAxisEvent, CursorEvent, FocusEvent, IdleEvent, MouseCursorEvent,
-     MouseRelativeEvent, MouseScrollEvent, PressEvent, ReleaseEvent, RenderEvent, ResizeEvent,
-     TextEvent, TouchEvent, UpdateEvent};
+use {AfterRenderEvent, ButtonEvent, CloseEvent, ControllerAxisEvent, CursorEvent, FocusEvent,
+     IdleEvent, MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent, PressEvent, ReleaseEvent,
+     RenderEvent, ResizeEvent, TextEvent, TouchEvent, UpdateEvent};
 use {Event, EventId, Input, Loop, Motion};
 use {AFTER_RENDER, BUTTON, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR, MOUSE_RELATIVE,
      MOUSE_SCROLL, RENDER, RESIZE, TEXT, TOUCH, UPDATE};
 
 /// Implemented by all events
 pub trait GenericEvent: Sized +
-    AfterRenderEvent + ControllerAxisEvent + CursorEvent + FocusEvent + IdleEvent +
-    MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent +
-    ButtonEvent + PressEvent + ReleaseEvent + RenderEvent + ResizeEvent +
-    TextEvent + TouchEvent + UpdateEvent +
+    AfterRenderEvent + CloseEvent + ControllerAxisEvent + CursorEvent + FocusEvent + IdleEvent +
+    MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent + ButtonEvent + PressEvent +
+    ReleaseEvent + RenderEvent + ResizeEvent + TextEvent + TouchEvent + UpdateEvent +
     From<Input> + From<Loop> + Into<Option<Input>> + Into<Option<Loop>>
 {
 /// The id of this event.
