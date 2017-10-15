@@ -22,40 +22,40 @@ bitflags!(
         /// Gui.
         const GUI                   = 0b00001000;
         /// Ctrl + Shift.
-        const CTRL_SHIFT            = CTRL.bits
-                                    | SHIFT.bits;
+        const CTRL_SHIFT            = ModifierKey::CTRL.bits
+                                    | ModifierKey::SHIFT.bits;
         /// Ctrl + Alt.
-        const CTRL_ALT              = CTRL.bits
-                                    | ALT.bits;
+        const CTRL_ALT              = ModifierKey::CTRL.bits
+                                    | ModifierKey::ALT.bits;
         /// Ctrl + Gui.
-        const CTRL_GUI              = CTRL.bits
-                                    | GUI.bits;
+        const CTRL_GUI              = ModifierKey::CTRL.bits
+                                    | ModifierKey::GUI.bits;
         /// Ctrl + Shift + Alt.
-        const CTRL_SHIFT_ALT        = CTRL.bits
-                                    | SHIFT.bits
-                                    | ALT.bits;
+        const CTRL_SHIFT_ALT        = ModifierKey::CTRL.bits
+                                    | ModifierKey::SHIFT.bits
+                                    | ModifierKey::ALT.bits;
         /// Ctrl + Shift + Gui.
-        const CTRL_SHIFT_GUI        = CTRL.bits
-                                    | SHIFT.bits
-                                    | GUI.bits;
+        const CTRL_SHIFT_GUI        = ModifierKey::CTRL.bits
+                                    | ModifierKey::SHIFT.bits
+                                    | ModifierKey::GUI.bits;
         /// Ctrl + Shift + Alt + Gui.
-        const CTRL_SHIFT_ALT_GUI    = CTRL.bits
-                                    | SHIFT.bits
-                                    | ALT.bits
-                                    | GUI.bits;
+        const CTRL_SHIFT_ALT_GUI    = ModifierKey::CTRL.bits
+                                    | ModifierKey::SHIFT.bits
+                                    | ModifierKey::ALT.bits
+                                    | ModifierKey::GUI.bits;
         /// Shift + Alt.
-        const SHIFT_ALT             = SHIFT.bits
-                                    | ALT.bits;
+        const SHIFT_ALT             = ModifierKey::SHIFT.bits
+                                    | ModifierKey::ALT.bits;
         /// Shift + Gui.
-        const SHIFT_GUI             = SHIFT.bits
-                                    | GUI.bits;
+        const SHIFT_GUI             = ModifierKey::SHIFT.bits
+                                    | ModifierKey::GUI.bits;
         /// Shift + Alt + Gui.
-        const SHIFT_ALT_GUI         = SHIFT.bits
-                                    | ALT.bits
-                                    | GUI.bits;
+        const SHIFT_ALT_GUI         = ModifierKey::SHIFT.bits
+                                    | ModifierKey::ALT.bits
+                                    | ModifierKey::GUI.bits;
         /// Alt + Gui.
-        const ALT_GUI               = ALT.bits
-                                    | GUI.bits;
+        const ALT_GUI               = ModifierKey::ALT.bits
+                                    | ModifierKey::GUI.bits;
     }
 );
 
@@ -67,38 +67,38 @@ impl ModifierKey {
         if let Some(button) = e.press_args() {
             match button {
                 Button::Keyboard(Key::LCtrl) |
-                Button::Keyboard(Key::RCtrl) => self.insert(CTRL),
+                Button::Keyboard(Key::RCtrl) => self.insert(ModifierKey::CTRL),
                 Button::Keyboard(Key::LShift) |
-                Button::Keyboard(Key::RShift) => self.insert(SHIFT),
+                Button::Keyboard(Key::RShift) => self.insert(ModifierKey::SHIFT),
                 Button::Keyboard(Key::LAlt) |
-                Button::Keyboard(Key::RAlt) => self.insert(ALT),
+                Button::Keyboard(Key::RAlt) => self.insert(ModifierKey::ALT),
                 Button::Keyboard(Key::LGui) |
-                Button::Keyboard(Key::RGui) => self.insert(GUI),
+                Button::Keyboard(Key::RGui) => self.insert(ModifierKey::GUI),
                 _ => {}
             }
         }
         if let Some(button) = e.release_args() {
             match button {
                 Button::Keyboard(Key::LCtrl) |
-                Button::Keyboard(Key::RCtrl) => self.remove(CTRL),
+                Button::Keyboard(Key::RCtrl) => self.remove(ModifierKey::CTRL),
                 Button::Keyboard(Key::LShift) |
-                Button::Keyboard(Key::RShift) => self.remove(SHIFT),
+                Button::Keyboard(Key::RShift) => self.remove(ModifierKey::SHIFT),
                 Button::Keyboard(Key::LAlt) |
-                Button::Keyboard(Key::RAlt) => self.remove(ALT),
+                Button::Keyboard(Key::RAlt) => self.remove(ModifierKey::ALT),
                 Button::Keyboard(Key::LGui) |
-                Button::Keyboard(Key::RGui) => self.remove(GUI),
+                Button::Keyboard(Key::RGui) => self.remove(ModifierKey::GUI),
                 _ => {}
             }
         }
         if let Some(false) = e.focus_args() {
-            *self = NO_MODIFIER;
+            *self = ModifierKey::NO_MODIFIER;
         }
     }
 }
 
 impl Default for ModifierKey {
     fn default() -> ModifierKey {
-        NO_MODIFIER
+        ModifierKey::NO_MODIFIER
     }
 }
 
