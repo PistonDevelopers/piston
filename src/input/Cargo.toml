@@ -1,6 +1,6 @@
 [package]
 name = "pistoncore-input"
-version = "0.19.0"
+version = "0.20.0"
 authors = ["bvssvni <bvssvni@gmail.com>"]
 keywords = ["keyboard", "mouse", "input", "piston"]
 description = "A structure for user input"
@@ -17,7 +17,7 @@ path = "src/lib.rs"
 [dependencies]
 serde_derive = "1.0"
 serde = "1.0"
-bitflags = "0.9.1"
+bitflags = "1.0.0"
 piston-viewport = "0.3.0"
 
 [dev-dependencies]
