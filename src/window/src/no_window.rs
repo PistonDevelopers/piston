@@ -105,4 +105,8 @@ impl AdvancedWindow for NoWindow {
     fn set_position<P: Into<Position>>(&mut self, val: P) {
         self.pos = val.into();
     }
+
+    fn set_size<S: Into<Size>>(&mut self, val: S) {
+        self.size = val.into();
+    }
 }

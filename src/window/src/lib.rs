@@ -285,6 +285,11 @@ pub trait AdvancedWindow: Window + Sized {
     /// Has no effect if the window no longer has a position.
     fn set_position<P: Into<Position>>(&mut self, val: P);
 
+    /// Sets the window size.
+    ///
+    /// Has no effect if the window no longer has a size.
+    fn set_size<S: Into<Size>>(&mut self, val: S);
+
     /// Sets the position of window.
     ///
     /// Has no effect if the window no longer has a position.
