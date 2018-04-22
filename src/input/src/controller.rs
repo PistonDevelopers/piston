@@ -36,8 +36,8 @@ pub struct ControllerHat {
 }
 
 impl ControllerHat {
-    /// Create a new ControllerButton object. Intended for use by backends when
-    /// emitting events.
+  /// Create a new ControllerButton object. Intended for use by backends when
+  /// emitting events.
   pub fn new(id: i32, which: u8, state: ::HatState) -> Self {
     ControllerHat {
       id, state, which,
