@@ -18,7 +18,7 @@ use std::sync::Arc;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
-pub use controller::{ControllerAxisArgs, ControllerButton};
+pub use controller::{ControllerAxisArgs, ControllerButton, ControllerHat};
 
 pub mod controller;
 pub mod keyboard;
@@ -82,6 +82,8 @@ pub enum Button {
     Mouse(MouseButton),
     /// A controller button.
     Controller(ControllerButton),
+    /// A controller hat (d-Pad)
+    Hat(ControllerHat),
 }
 
 /// Models different kinds of motion.
@@ -97,6 +99,20 @@ pub enum Motion {
     ControllerAxis(ControllerAxisArgs),
     /// touch event.
     Touch(TouchArgs),
+}
+
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
+#[allow(missing_docs)]
+pub enum HatState {
+  Centered,
+  Up,
+  Right,
+  Down,
+  Left,
+  RightUp,
+  RightDown,
+  LeftUp,
+  LeftDown,
 }
 
 /// Models input events.

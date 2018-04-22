@@ -24,6 +24,27 @@ impl ControllerButton {
     }
 }
 
+/// Components of a controller hat move event (d-Pad).
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
+pub struct ControllerHat {
+  /// Which Controller was the button on.
+  pub id: i32,
+  /// Which button was pressed.
+  pub state: ::HatState,
+  /// Which hat on the controller was changed
+  pub which: u8,
+}
+
+impl ControllerHat {
+    /// Create a new ControllerButton object. Intended for use by backends when
+    /// emitting events.
+  pub fn new(id: i32, which: u8, state: ::HatState) -> Self {
+    ControllerHat {
+      id, state, which,
+    }
+  }
+}
+
 /// Components of a controller axis move event. Not guaranteed consistent across
 /// backends.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
