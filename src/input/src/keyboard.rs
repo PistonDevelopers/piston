@@ -19,43 +19,19 @@ bitflags!(
         const SHIFT                 = 0b00000010;
         /// Alt.
         const ALT                   = 0b00000100;
-        /// Gui.
-        const GUI                   = 0b00001000;
         /// Ctrl + Shift.
         const CTRL_SHIFT            = ModifierKey::CTRL.bits
                                     | ModifierKey::SHIFT.bits;
         /// Ctrl + Alt.
         const CTRL_ALT              = ModifierKey::CTRL.bits
                                     | ModifierKey::ALT.bits;
-        /// Ctrl + Gui.
-        const CTRL_GUI              = ModifierKey::CTRL.bits
-                                    | ModifierKey::GUI.bits;
         /// Ctrl + Shift + Alt.
         const CTRL_SHIFT_ALT        = ModifierKey::CTRL.bits
                                     | ModifierKey::SHIFT.bits
                                     | ModifierKey::ALT.bits;
-        /// Ctrl + Shift + Gui.
-        const CTRL_SHIFT_GUI        = ModifierKey::CTRL.bits
-                                    | ModifierKey::SHIFT.bits
-                                    | ModifierKey::GUI.bits;
-        /// Ctrl + Shift + Alt + Gui.
-        const CTRL_SHIFT_ALT_GUI    = ModifierKey::CTRL.bits
-                                    | ModifierKey::SHIFT.bits
-                                    | ModifierKey::ALT.bits
-                                    | ModifierKey::GUI.bits;
         /// Shift + Alt.
         const SHIFT_ALT             = ModifierKey::SHIFT.bits
                                     | ModifierKey::ALT.bits;
-        /// Shift + Gui.
-        const SHIFT_GUI             = ModifierKey::SHIFT.bits
-                                    | ModifierKey::GUI.bits;
-        /// Shift + Alt + Gui.
-        const SHIFT_ALT_GUI         = ModifierKey::SHIFT.bits
-                                    | ModifierKey::ALT.bits
-                                    | ModifierKey::GUI.bits;
-        /// Alt + Gui.
-        const ALT_GUI               = ModifierKey::ALT.bits
-                                    | ModifierKey::GUI.bits;
     }
 );
 
@@ -72,8 +48,6 @@ impl ModifierKey {
                 Button::Keyboard(Key::RShift) => self.insert(ModifierKey::SHIFT),
                 Button::Keyboard(Key::LAlt) |
                 Button::Keyboard(Key::RAlt) => self.insert(ModifierKey::ALT),
-                Button::Keyboard(Key::LGui) |
-                Button::Keyboard(Key::RGui) => self.insert(ModifierKey::GUI),
                 _ => {}
             }
         }
@@ -85,8 +59,6 @@ impl ModifierKey {
                 Button::Keyboard(Key::RShift) => self.remove(ModifierKey::SHIFT),
                 Button::Keyboard(Key::LAlt) |
                 Button::Keyboard(Key::RAlt) => self.remove(ModifierKey::ALT),
-                Button::Keyboard(Key::LGui) |
-                Button::Keyboard(Key::RGui) => self.remove(ModifierKey::GUI),
                 _ => {}
             }
         }
@@ -312,11 +284,9 @@ pub enum Key {
     LCtrl = 0x400000E0,
     LShift = 0x400000E1,
     LAlt = 0x400000E2,
-    LGui = 0x400000E3,
     RCtrl = 0x400000E4,
     RShift = 0x400000E5,
     RAlt = 0x400000E6,
-    RGui = 0x400000E7,
     Mode = 0x40000101,
     AudioNext = 0x40000102,
     AudioPrev = 0x40000103,
@@ -553,11 +523,9 @@ impl From<u32> for Key {
             0x400000E0 => Key::LCtrl,
             0x400000E1 => Key::LShift,
             0x400000E2 => Key::LAlt,
-            0x400000E3 => Key::LGui,
             0x400000E4 => Key::RCtrl,
             0x400000E5 => Key::RShift,
             0x400000E6 => Key::RAlt,
-            0x400000E7 => Key::RGui,
             0x40000101 => Key::Mode,
             0x40000102 => Key::AudioNext,
             0x40000103 => Key::AudioPrev,
@@ -839,11 +807,9 @@ mod tests {
                         LCtrl,
                         LShift,
                         LAlt,
-                        LGui,
                         RCtrl,
                         RShift,
                         RAlt,
-                        RGui,
                         Mode,
                         AudioNext,
                         AudioPrev,
