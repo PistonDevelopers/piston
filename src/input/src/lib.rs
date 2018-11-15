@@ -125,7 +125,7 @@ pub enum Input {
     /// Text (usually from keyboard).
     Text(String),
     /// Window got resized.
-    Resize(u32, u32),
+    Resize(f64, f64),
     /// Window gained or lost focus.
     Focus(bool),
     /// Window gained or lost cursor.

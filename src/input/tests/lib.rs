@@ -23,7 +23,7 @@ fn test_encode_decode() {
     }));
     test(Input::Move(Motion::MouseCursor(0.0, 0.0)));
     test(Input::Text("hello".into()));
-    test(Input::Resize(0, 0));
+    test(Input::Resize(0.0, 0.0));
     test(Input::Focus(true));
     test(Input::Cursor(true));
     test(Input::Close(CloseArgs));
@@ -34,8 +34,8 @@ fn test_encode_decode() {
         assert_eq!(decoded, l);
     };
     test(Loop::Render(RenderArgs {
-        width: 0,
-        height: 0,
+        width: 0.0,
+        height: 0.0,
         draw_width: 0,
         draw_height: 0,
         ext_dt: 0.0,
