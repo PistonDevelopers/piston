@@ -49,17 +49,27 @@ pub type ProcAddress = *const ();
 ///
 /// Normally, the consideration of points vs pixels should be left to the
 /// host operating system.
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Size {
     /// The width.
-    pub width: u32,
+    pub width: f64,
     /// The height.
-    pub height: u32,
+    pub height: f64,
 }
 
 impl From<[u32; 2]> for Size {
     #[inline(always)]
     fn from(value: [u32; 2]) -> Size {
+        Size {
+            width: value[0] as f64,
+            height: value[1] as f64,
+        }
+    }
+}
+
+impl From<[f64; 2]> for Size {
+    #[inline(always)]
+    fn from(value: [f64; 2]) -> Size {
         Size {
             width: value[0],
             height: value[1],
@@ -71,6 +81,16 @@ impl From<(u32, u32)> for Size {
     #[inline(always)]
     fn from(value: (u32, u32)) -> Size {
         Size {
+            width: value.0 as f64,
+            height: value.1 as f64,
+        }
+    }
+}
+
+impl From<(f64, f64)> for Size {
+    #[inline(always)]
+    fn from(value: (f64, f64)) -> Size {
+        Size {
             width: value.0,
             height: value.1,
         }
@@ -80,6 +100,13 @@ impl From<(u32, u32)> for Size {
 impl From<Size> for [u32; 2] {
     #[inline(always)]
     fn from(value: Size) -> [u32; 2] {
+        [value.width as u32, value.height as u32]
+    }
+}
+
+impl From<Size> for [f64; 2] {
+    #[inline(always)]
+    fn from(value: Size) -> [f64; 2] {
         [value.width, value.height]
     }
 }
@@ -87,6 +114,13 @@ impl From<Size> for [u32; 2] {
 impl From<Size> for (u32, u32) {
     #[inline(always)]
     fn from(value: Size) -> (u32, u32) {
+        (value.width as u32, value.height as u32)
+    }
+}
+
+impl From<Size> for (f64, f64) {
+    #[inline(always)]
+    fn from(value: Size) -> (f64, f64) {
         (value.width, value.height)
     }
 }

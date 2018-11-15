@@ -226,15 +226,15 @@ impl Events {
 
                 let size = window.size();
                 let draw_size = window.draw_size();
-                if size.width != 0 && size.height != 0 {
+                if size.width != 0.0 && size.height != 0.0 {
                     // Swap buffers next time.
                     self.state = State::SwapBuffers;
                     return Some(RenderArgs {
                         ext_dt: 0.0,
                         width: size.width,
                         height: size.height,
-                        draw_width: draw_size.width,
-                        draw_height: draw_size.height,
+                        draw_width: draw_size.width as u32,
+                        draw_height: draw_size.height as u32,
                     }.into());
                 } else {
                     // Can not render at this time.
@@ -276,7 +276,7 @@ impl Events {
 
                     let size = window.size();
                     let draw_size = window.draw_size();
-                    if size.width != 0 && size.height != 0 {
+                    if size.width != 0.0 && size.height != 0.0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
                         return Some(RenderArgs {
@@ -285,8 +285,8 @@ impl Events {
                                 .duration_since(self.last_update)),
                             width: size.width,
                             height: size.height,
-                            draw_width: draw_size.width,
-                            draw_height: draw_size.height,
+                            draw_width: draw_size.width as u32,
+                            draw_height: draw_size.height as u32,
                         }.into());
                     }
 

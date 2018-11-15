@@ -8,9 +8,9 @@ pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,
     /// The width of rendered area in points.
-    pub width: u32,
+    pub width: f64,
     /// The height of rendered area in points.
-    pub height: u32,
+    pub height: f64,
     /// The width of rendered area in pixels.
     pub draw_width: u32,
     /// The height of rendered area in pixels.
@@ -65,15 +65,15 @@ mod tests {
 
         let e: Event = RenderArgs {
             ext_dt: 0.0,
-            width: 0,
-            height: 0,
+            width: 0.0,
+            height: 0.0,
             draw_width: 0,
             draw_height: 0,
         }.into();
         let x: Option<Event> = RenderEvent::from_render_args(&RenderArgs {
                                                                  ext_dt: 1.0,
-                                                                 width: 10,
-                                                                 height: 10,
+                                                                 width: 10.0,
+                                                                 height: 10.0,
                                                                  draw_width: 10,
                                                                  draw_height: 10,
                                                              },
