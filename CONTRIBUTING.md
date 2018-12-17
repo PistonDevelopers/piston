@@ -22,12 +22,12 @@ Feel free to open issues, post comments about progress, questions, new ideas, br
 
 If you have an idea how to make collaboration better, open an issue.
 
-<a name="donate_money" />
 ### How to donate money
+<a name="donate_money" />
 
 If you feel charitable, these fine people accept donations:
 
 | nick name | first name | last name | Transfer Options | comment |
 |---------------|---------------|---------------|-------------------|--------------|
-| bvssvni | Sven | Nilsen | PayPal: post@cutoutpro.com | I work on the core engine of Piston, general graphics, various smaller libraries and help administering repos and the Rust gamedev subreddit |
+| bvssvni | Sven | Nilsen | PayPal: post at cutoutpro.com | I work on the core engine of Piston, Dyon, Turbine, general graphics, various smaller libraries and help administering repos and the Rust gamedev subreddit |
 | mitchmindtree | Mitchell | Nordine | PayPal: mitchell.nordine at gmail.com | I work primarily on user-interface [(see Conrod)](https://github.com/PistonDevelopers/conrod) and audio/dsp [(see rust-dsp)](https://github.com/PistonDevelopers/rust-dsp) while contributing to the other crates where I can. |
