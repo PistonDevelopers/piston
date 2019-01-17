@@ -10,6 +10,7 @@ use {Window, WindowSettings, BuildFromWindowSettings, AdvancedWindow, Position, 
 
 use input::Input;
 use std::time::Duration;
+use std::error::Error;
 
 /// A window without user interface, often used in server event loops.
 ///
@@ -72,7 +73,7 @@ impl BuildFromWindowSettings for NoWindow {
     /// # Errors
     ///
     /// This function will always return without error.
-    fn build_from_window_settings(settings: &WindowSettings) -> Result<Self, String> {
+    fn build_from_window_settings(settings: &WindowSettings) -> Result<Self, Box<Error>> {
         Ok(NoWindow::new(settings))
     }
 }
