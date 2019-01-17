@@ -27,6 +27,7 @@ extern crate input;
 
 use std::convert::From;
 use std::time::Duration;
+use std::error::Error;
 use shader_version::OpenGL;
 use input::Input;
 
@@ -188,7 +189,7 @@ pub trait BuildFromWindowSettings: Sized {
     ///
     /// See your backend's documentation for details about what kind of
     /// error strings can be returned, and the conditions for error.
-    fn build_from_window_settings(settings: &WindowSettings) -> Result<Self, String>;
+    fn build_from_window_settings(settings: &WindowSettings) -> Result<Self, Box<Error>>;
 }
 
 /// Trait representing the minimum requirements for defining a window.
@@ -422,7 +423,7 @@ impl WindowSettings {
     /// This function will return an error if your backend returns an error.
     /// See your backend's documentation on `build_from_window_settings()`
     /// for more details.
-    pub fn build<W: BuildFromWindowSettings>(&self) -> Result<W, String> {
+    pub fn build<W: BuildFromWindowSettings>(&self) -> Result<W, Box<Error>> {
         BuildFromWindowSettings::build_from_window_settings(self)
     }
 
