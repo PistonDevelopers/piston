@@ -121,11 +121,11 @@ pub enum HatState {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum FileDrag {
     /// A file is being hovered over the window.
-    Hovered(PathBuf),
+    Hover(PathBuf),
     /// A file has been dropped into the window.
-    Dropped(PathBuf),
+    Drop(PathBuf),
     /// A file was hovered, but has exited the window.
-    Cancelled,
+    Cancel,
 }
 
 /// Models input events.
