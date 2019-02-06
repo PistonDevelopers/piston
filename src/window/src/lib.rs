@@ -284,6 +284,37 @@ pub trait AdvancedWindow: Window + Sized {
         self
     }
 
+    /// Gets whether the window will automatically close when attempting
+    /// to close it.
+    ///
+    /// Useful when prototyping.
+    fn get_automatic_close(&self) -> bool;
+
+    /// Sets whether the window will automatically close when attempting
+    /// to close it. If this is disabled, attempts to close the window
+    /// can be detected via an `Input::Close(..)` event, and
+    /// [`Window::set_should_close()`](trait.Window.html#tymethod.set_should_close)
+    /// can be called to actually close the window.
+    ///
+    /// Useful when prototyping.
+    fn set_automatic_close(&mut self, value: bool);
+
+    /// Sets whether the window will automatically close when attempting
+    /// to close it. If this is disabled, attempts to close the window
+    /// can be detected via an `Input::Close(..)` event, and
+    /// [`Window::set_should_close()`](trait.Window.html#tymethod.set_should_close)
+    /// can be called to actually close the window.
+    ///
+    /// Useful when prototyping.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_automatic_close()`](#tymethod.set_automatic_close), so
+    /// that it can be used in method chaining.
+    fn automatic_close(mut self, value: bool) -> Self {
+        self.set_automatic_close(value);
+        self
+    }
+
     /// Sets whether to capture/grab the cursor.
     ///
     /// This is used to lock and hide cursor to the window,
@@ -377,6 +408,7 @@ pub struct WindowSettings {
     samples: u8,
     fullscreen: bool,
     exit_on_esc: bool,
+    automatic_close: bool,
     vsync: bool,
     opengl: Option<OpenGL>,
     srgb: bool,
@@ -403,6 +435,7 @@ impl WindowSettings {
             samples: 0,
             fullscreen: false,
             exit_on_esc: false,
+            automatic_close: true,
             vsync: false,
             opengl: None,
             srgb: true,
@@ -504,6 +537,35 @@ impl WindowSettings {
     /// so that it can be used in method chaining.
     pub fn exit_on_esc(mut self, value: bool) -> Self {
         self.set_exit_on_esc(value);
+        self
+    }
+
+    /// Gets whether built windows should automatically close when the X or
+    /// ALT+F4 are pressed.
+    pub fn get_automatic_close(&self) -> bool {
+        self.automatic_close
+    }
+
+    /// Sets whether built windows should automatically close when the X or
+    /// ALT+F4 are pressed. If this is disabled, attempts to close the window
+    /// can be detected via an `Input::Close(..)` event, and
+    /// [`Window::set_should_close()`](trait.Window.html#tymethod.set_should_close)
+    /// can be called to actually close the window.
+    pub fn set_automatic_close(&mut self, value: bool) {
+        self.automatic_close = value;
+    }
+
+    /// Sets whether built windows should automatically close when the X or
+    /// ALT+F4 are pressed. If this is disabled, attempts to close the window
+    /// can be detected via an `Input::Close(..)` event, and
+    /// [`Window::set_should_close()`](trait.Window.html#tymethod.set_should_close)
+    /// can be called to actually close the window.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_automatic_close()`](#method.set_automatic_close),
+    /// so that it can be used in method chaining.
+    pub fn automatic_close(mut self, value: bool) -> Self {
+        self.set_automatic_close(value);
         self
     }
 

@@ -20,6 +20,7 @@ use std::error::Error;
 /// events when the width or height is zero.
 pub struct NoWindow {
     should_close: bool,
+    automatic_close: bool,
     title: String,
     size: Size,
     pos: Position,
@@ -30,6 +31,7 @@ impl NoWindow {
     pub fn new(settings: &WindowSettings) -> NoWindow {
         NoWindow {
             should_close: false,
+            automatic_close: settings.automatic_close,
             title: settings.get_title(),
             size: settings.get_size(),
             pos: Position { x: 0, y: 0 },
@@ -92,6 +94,14 @@ impl AdvancedWindow for NoWindow {
     }
 
     fn set_exit_on_esc(&mut self, _value: bool) {}
+
+    fn get_automatic_close(&self) -> bool {
+        self.automatic_close
+    }
+
+    fn set_automatic_close(&mut self, value: bool) {
+        self.automatic_close = value;
+    }
 
     fn set_capture_cursor(&mut self, _value: bool) {}
 
