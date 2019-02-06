@@ -7,7 +7,7 @@ use {AfterRenderEvent, ButtonEvent, CloseEvent, ControllerAxisEvent, CursorEvent
      RenderEvent, ResizeEvent, TextEvent, TouchEvent, UpdateEvent};
 use {Event, EventId, Input, Loop, Motion};
 use {AFTER_RENDER, BUTTON, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR, MOUSE_RELATIVE,
-     MOUSE_SCROLL, RENDER, RESIZE, TEXT, TOUCH, UPDATE};
+     MOUSE_SCROLL, RENDER, RESIZE, TEXT, TOUCH, UPDATE, FILE_DRAG};
 
 /// Implemented by all events
 pub trait GenericEvent: Sized +
@@ -38,6 +38,7 @@ impl GenericEvent for Event {
             Event::Input(Input::Button(_)) => BUTTON,
             Event::Input(Input::Resize(_, _)) => RESIZE,
             Event::Input(Input::Text(_)) => TEXT,
+            Event::Input(Input::FileDrag(_)) => FILE_DRAG,
             Event::Loop(Loop::Update(_)) => UPDATE,
             Event::Loop(Loop::Render(_)) => RENDER,
             Event::Loop(Loop::AfterRender(_)) => AFTER_RENDER,
@@ -61,6 +62,7 @@ impl GenericEvent for Event {
             Event::Input(Input::Button(ref args)) => f(args as &Any),
             Event::Input(Input::Resize(w, h)) => f(&(w, h) as &Any),
             Event::Input(Input::Text(ref text)) => f(text as &Any),
+            Event::Input(Input::FileDrag(ref file_drag)) => f(file_drag as &Any),
             Event::Loop(Loop::Update(ref args)) => f(args as &Any),
             Event::Loop(Loop::Render(ref args)) => f(args as &Any),
             Event::Loop(Loop::AfterRender(ref args)) => f(args as &Any),

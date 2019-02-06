@@ -15,6 +15,7 @@ extern crate viewport;
 use std::fmt;
 use std::any::Any;
 use std::sync::Arc;
+use std::path::PathBuf;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
@@ -72,6 +73,7 @@ const RESIZE: EventId = EventId("piston/resize");
 const TEXT: EventId = EventId("piston/text");
 const TOUCH: EventId = EventId("piston/touch");
 const UPDATE: EventId = EventId("piston/update");
+const FILE_DRAG: EventId = EventId("piston/file_drag");
 
 /// Models different kinds of buttons.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
@@ -115,6 +117,17 @@ pub enum HatState {
   LeftDown,
 }
 
+/// Models dragging and dropping files.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub enum FileDrag {
+    /// A file is being hovered over the window.
+    Hovered(PathBuf),
+    /// A file has been dropped into the window.
+    Dropped(PathBuf),
+    /// A file was hovered, but has exited the window.
+    Cancelled,
+}
+
 /// Models input events.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum Input {
@@ -130,6 +143,8 @@ pub enum Input {
     Focus(bool),
     /// Window gained or lost cursor.
     Cursor(bool),
+    /// A file is being dragged or dropped over the window.
+    FileDrag(FileDrag),
     /// Window closed.
     Close(CloseArgs),
 }
