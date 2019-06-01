@@ -22,13 +22,13 @@
 //! The [`Size`](./struct.Size.html) structure is used throughout Piston to store window sizes.
 //! It implements some conversion traits for convenience.
 
-extern crate shader_version;
+extern crate graphics_api_version;
 extern crate input;
 
 use std::convert::From;
 use std::time::Duration;
 use std::error::Error;
-use shader_version::OpenGL;
+use graphics_api_version::Version;
 use input::Input;
 
 pub use no_window::NoWindow;
@@ -410,7 +410,7 @@ pub struct WindowSettings {
     exit_on_esc: bool,
     automatic_close: bool,
     vsync: bool,
-    opengl: Option<OpenGL>,
+    graphics_api: Option<Version>,
     srgb: bool,
     resizable: bool,
     decorated: bool,
@@ -437,7 +437,7 @@ impl WindowSettings {
             exit_on_esc: false,
             automatic_close: true,
             vsync: false,
-            opengl: None,
+            graphics_api: None,
             srgb: true,
             resizable: true,
             decorated: true,
@@ -627,71 +627,56 @@ impl WindowSettings {
         self
     }
 
-    /// Gets the OpenGL version of built windows.
+    /// Gets the graphics API version of built windows.
     ///
-    /// If None is returned, the default OpenGL version is being used. This
-    /// is often a forward compatible version of OpenGL::V3_2 or
+    /// If None is returned, the default graphics API version is being used. This
+    /// is often a forward compatible version of OpenGL 3.2 or
     /// higher that works with newer versions of graphics libraries.
-    ///
-    /// For more information about the OpenGL setting, see the
-    /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
-    pub fn get_maybe_opengl(&self) -> Option<OpenGL> {
-        self.opengl
+    pub fn get_maybe_graphics_api(&self) -> Option<Version> {
+        self.graphics_api.clone()
     }
 
-    /// Sets OpenGL version of built windows.
+    /// Sets graphics API version of built windows.
     ///
-    /// If None is passed, the default OpenGL version is used. This
-    /// is often a forward compatible version of OpenGL::V3_2 or
+    /// If None is passed, the default graphics API version is used. This
+    /// is often a forward compatible version of OpenGL 3.2 or
     /// higher that works with newer versions of graphics libraries.
-    ///
-    /// For more information about the OpenGL setting, see the
-    /// [`OpenGLWindow`](trait.OpenGLWindow.html) trait.
-    pub fn set_maybe_opengl(&mut self, value: Option<OpenGL>) {
-        self.opengl = value;
+    pub fn set_maybe_graphics_api<V: Into<Version>>(&mut self, value: Option<V>) {
+        self.graphics_api = value.map(|v| v.into());
     }
 
-    /// Sets OpenGL version of built windows.
+    /// Sets graphics API version of built windows.
     ///
-    /// If None is passed, the default OpenGL version is used. This
-    /// is often a forward compatible version of OpenGL::V3_2 or
+    /// If None is passed, the default graphics API version is used. This
+    /// is often a forward compatible version of OpenGL 3.2 or
     /// higher that works with newer versions of graphics libraries.
-    ///
-    /// For more information about the OpenGL setting, see the
-    /// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
     ///
     /// This method moves the current window data,
-    /// unlike [`set_maybe_opengl()`](#method.set_maybe_opengl),
+    /// unlike [`set_maybe_graphics_api()`](#method.set_maybe_graphics_api),
     /// so that it can be used in method chaining.
-    pub fn maybe_opengl(mut self, value: Option<OpenGL>) -> Self {
-        self.set_maybe_opengl(value);
+    pub fn maybe_graphics_api<V: Into<Version>>(mut self, value: Option<V>) -> Self {
+        self.set_maybe_graphics_api(value.map(|v| v.into()));
         self
     }
 
-    /// Sets OpenGL version of built windows.
+    /// Sets graphics API version of built windows.
     ///
-    /// For setting the OpenGL version back to default, see
-    /// [`set_maybe_opengl()`](#method.set_maybe_opengl).
-    ///
-    /// For more information about the opengl setting, see the
-    /// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
-    pub fn set_opengl(&mut self, value: OpenGL) {
-        self.opengl = Some(value);
+    /// For setting the graphics API version back to default, see
+    /// [`set_maybe_graphics_api()`](#method.set_maybe_graphics_api).
+    pub fn set_graphics_api<V: Into<Version>>(&mut self, value: V) {
+        self.graphics_api = Some(value.into());
     }
 
-    /// Sets the OpenGL version of built windows.
+    /// Sets the graphics API version of built windows.
     ///
-    /// For setting the OpenGL version back to default, see
-    /// [`maybe_opengl()`](#method.maybe_opengl).
-    ///
-    /// For more information about the opengl setting, see the
-    /// [`OpenGLWindow`](./trait.OpenGLWindow.html) trait.
+    /// For setting the graphics API version back to default, see
+    /// [`maybe_graphics_api()`](#method.maybe_graphics_api).
     ///
     /// This method moves the current window data,
-    /// unlike [`set_opengl()`](#method.set_opengl),
+    /// unlike [`set_graphics_api()`](#method.set_graphics_api),
     /// so that it can be used in method chaining.
-    pub fn opengl(mut self, value: OpenGL) -> Self {
-        self.set_opengl(value);
+    pub fn graphics_api<V: Into<Version>>(mut self, value: V) -> Self {
+        self.set_graphics_api(value);
         self
     }
 
