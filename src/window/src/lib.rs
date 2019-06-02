@@ -28,9 +28,9 @@ extern crate input;
 use std::convert::From;
 use std::time::Duration;
 use std::error::Error;
-use graphics_api_version::Version;
 use input::Input;
 
+pub use graphics_api_version::Version as Api;
 pub use no_window::NoWindow;
 
 mod no_window;
@@ -410,7 +410,7 @@ pub struct WindowSettings {
     exit_on_esc: bool,
     automatic_close: bool,
     vsync: bool,
-    graphics_api: Option<Version>,
+    graphics_api: Option<Api>,
     srgb: bool,
     resizable: bool,
     decorated: bool,
@@ -632,7 +632,7 @@ impl WindowSettings {
     /// If None is returned, the default graphics API version is being used. This
     /// is often a forward compatible version of OpenGL 3.2 or
     /// higher that works with newer versions of graphics libraries.
-    pub fn get_maybe_graphics_api(&self) -> Option<Version> {
+    pub fn get_maybe_graphics_api(&self) -> Option<Api> {
         self.graphics_api.clone()
     }
 
@@ -641,7 +641,7 @@ impl WindowSettings {
     /// If None is passed, the default graphics API version is used. This
     /// is often a forward compatible version of OpenGL 3.2 or
     /// higher that works with newer versions of graphics libraries.
-    pub fn set_maybe_graphics_api<V: Into<Version>>(&mut self, value: Option<V>) {
+    pub fn set_maybe_graphics_api<V: Into<Api>>(&mut self, value: Option<V>) {
         self.graphics_api = value.map(|v| v.into());
     }
 
@@ -654,7 +654,7 @@ impl WindowSettings {
     /// This method moves the current window data,
     /// unlike [`set_maybe_graphics_api()`](#method.set_maybe_graphics_api),
     /// so that it can be used in method chaining.
-    pub fn maybe_graphics_api<V: Into<Version>>(mut self, value: Option<V>) -> Self {
+    pub fn maybe_graphics_api<V: Into<Api>>(mut self, value: Option<V>) -> Self {
         self.set_maybe_graphics_api(value.map(|v| v.into()));
         self
     }
@@ -663,7 +663,7 @@ impl WindowSettings {
     ///
     /// For setting the graphics API version back to default, see
     /// [`set_maybe_graphics_api()`](#method.set_maybe_graphics_api).
-    pub fn set_graphics_api<V: Into<Version>>(&mut self, value: V) {
+    pub fn set_graphics_api<V: Into<Api>>(&mut self, value: V) {
         self.graphics_api = Some(value.into());
     }
 
@@ -675,7 +675,7 @@ impl WindowSettings {
     /// This method moves the current window data,
     /// unlike [`set_graphics_api()`](#method.set_graphics_api),
     /// so that it can be used in method chaining.
-    pub fn graphics_api<V: Into<Version>>(mut self, value: V) -> Self {
+    pub fn graphics_api<V: Into<Api>>(mut self, value: V) -> Self {
         self.set_graphics_api(value);
         self
     }
