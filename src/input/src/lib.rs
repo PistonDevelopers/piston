@@ -103,18 +103,27 @@ pub enum Motion {
     Touch(TouchArgs),
 }
 
+/// Stores controller hat state.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
-#[allow(missing_docs)]
 pub enum HatState {
-  Centered,
-  Up,
-  Right,
-  Down,
-  Left,
-  RightUp,
-  RightDown,
-  LeftUp,
-  LeftDown,
+    /// Centered (no direction).
+    Centered,
+    /// Up direction.
+    Up,
+    /// Right direction.
+    Right,
+    /// Down direction.
+    Down,
+    /// Left direction.
+    Left,
+    /// Right-up direction.
+    RightUp,
+    /// Right-down direction.
+    RightDown,
+    /// Left-up direction.
+    LeftUp,
+    /// Left-down direction.
+    LeftDown,
 }
 
 /// Models dragging and dropping files.
