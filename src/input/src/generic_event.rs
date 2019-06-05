@@ -6,8 +6,6 @@ use {AfterRenderEvent, ButtonEvent, CloseEvent, ControllerAxisEvent, CursorEvent
      IdleEvent, MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent, PressEvent, ReleaseEvent,
      RenderEvent, ResizeEvent, TextEvent, TouchEvent, UpdateEvent};
 use {Event, EventId, Input, Loop, Motion};
-use {AFTER_RENDER, BUTTON, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR, MOUSE_RELATIVE,
-     MOUSE_SCROLL, RENDER, RESIZE, TEXT, TOUCH, UPDATE, FILE_DRAG};
 
 /// Implemented by all events.
 ///
@@ -34,6 +32,8 @@ pub trait GenericEvent: Sized +
 
 impl GenericEvent for Event {
     fn event_id(&self) -> EventId {
+        use event_id::*;
+
         match *self {
             Event::Input(Input::Cursor(_)) => CURSOR,
             Event::Input(Input::Focus(_)) => FOCUS,
