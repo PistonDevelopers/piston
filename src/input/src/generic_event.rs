@@ -9,19 +9,27 @@ use {Event, EventId, Input, Loop, Motion};
 use {AFTER_RENDER, BUTTON, CONTROLLER_AXIS, CURSOR, FOCUS, CLOSE, IDLE, MOUSE_CURSOR, MOUSE_RELATIVE,
      MOUSE_SCROLL, RENDER, RESIZE, TEXT, TOUCH, UPDATE, FILE_DRAG};
 
-/// Implemented by all events
+/// Implemented by all events.
+///
+/// Use this trait when you need to handle events, e.g. `fn event(&mut self, e: &impl GenericEvent)`.
+/// Events are usually handles by controllers (in the Model-View-Controller programming pattern).
+/// There is no requirement that you need to implement some trait for controllers,
+/// just that the standard convention for handling events is through a `event` method.
+/// For more information about Model-View-Controller, see [Wikipedia article](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller).
+///
+/// This trait makes it possible to auto impl new events for all types that implements `GenericEvent`.
+/// This way, you can define your own event types without breaking compatibility with Piston.
 pub trait GenericEvent: Sized +
     AfterRenderEvent + CloseEvent + ControllerAxisEvent + CursorEvent + FocusEvent + IdleEvent +
     MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent + ButtonEvent + PressEvent +
     ReleaseEvent + RenderEvent + ResizeEvent + TextEvent + TouchEvent + UpdateEvent +
     From<Input> + From<Loop> + Into<Option<Input>> + Into<Option<Loop>>
 {
-/// The id of this event.
+    /// The id of this event.
     fn event_id(&self) -> EventId;
-/// Calls closure with arguments
+    /// Calls closure with arguments
     fn with_args<'a, F, U>(&'a self, f: F) -> U
-        where F: FnMut(&Any) -> U
-;
+        where F: FnMut(&Any) -> U;
 }
 
 impl GenericEvent for Event {
