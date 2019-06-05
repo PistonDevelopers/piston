@@ -40,6 +40,9 @@ pub use text::TextEvent;
 pub use touch::{Touch, TouchArgs, TouchEvent};
 pub use update::{UpdateArgs, UpdateEvent};
 
+use event_id::EventId;
+
+pub mod event_id;
 pub mod generic_event;
 
 mod after_render;
@@ -53,27 +56,6 @@ mod resize;
 mod text;
 mod touch;
 mod update;
-
-/// Used to identify events arguments provided by traits.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct EventId(pub &'static str);
-
-const AFTER_RENDER: EventId = EventId("piston/after_render");
-const CONTROLLER_AXIS: EventId = EventId("piston/controller_axis");
-const CURSOR: EventId = EventId("piston/cursor");
-const FOCUS: EventId = EventId("piston/focus");
-const CLOSE: EventId = EventId("piston/close");
-const IDLE: EventId = EventId("piston/idle");
-const MOUSE_SCROLL: EventId = EventId("piston/mouse_scroll");
-const MOUSE_RELATIVE: EventId = EventId("piston/mouse_relative");
-const MOUSE_CURSOR: EventId = EventId("piston/mouse_cursor");
-const BUTTON: EventId = EventId("piston/button");
-const RENDER: EventId = EventId("piston/render");
-const RESIZE: EventId = EventId("piston/resize");
-const TEXT: EventId = EventId("piston/text");
-const TOUCH: EventId = EventId("piston/touch");
-const UPDATE: EventId = EventId("piston/update");
-const FILE_DRAG: EventId = EventId("piston/file_drag");
 
 /// Models different kinds of buttons.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
