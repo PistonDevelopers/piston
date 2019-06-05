@@ -14,6 +14,40 @@
 //!
 //! For more information and an overview, see [Piston's README in the core repository](https://github.com/pistondevelopers/piston).
 //!
+//! ### Design
+//!
+//! The Piston core is a thin and modular abstraction for user input, window and event loop.
+//! This functionality is separated into 3 core modules.
+//!
+//! The core modules are intended to be used directly by generic libraries.
+//! By depending directly on core modules, it is easier to maintain the ecosystem.
+//!
+//! This library is intended to be used in application code.
+//! When you write application code, it is common to separate reusable code,
+//! which depends on various abstractions, from platform specific code.
+//! The reusable code that you write for applications might use the Piston core.
+//!
+//! The default programming pattern in Piston is Model-View-Controller:
+//!
+//! - A controller handles events and manipulates a model
+//! - A view renders a model on the screen
+//!
+//! For more information about this pattern, see [Model-View-Controller (Wikipedia)](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller).
+//!
+//! The most important traits in Piston are the following:
+//!
+//! - [GenericEvent](input::GenericEvent) (allows handling of events for controllers)
+//! - [Window](window::Window) (allows polling of events)
+//!
+//! ### Link to documentation for core modules
+//!
+//! - [pistoncore-input](https://docs.rs/pistoncore-input)
+//!   (User input and event handling)
+//! - [pistoncore-window](https://docs.rs/pistoncore-window)
+//!   (Window abstraction)
+//! - [pistoncore-event_loop](https://docs.rs/pistoncore-event_loop)
+//!   (Event loop)
+//!
 //! ### About Piston as a Game Engine
 //!
 //! Piston is a modular game engine with a minimal core abstraction.
@@ -86,3 +120,7 @@
 pub extern crate input;
 pub extern crate event_loop;
 pub extern crate window;
+
+pub use input::*;
+pub use event_loop::*;
+pub use window::*;
