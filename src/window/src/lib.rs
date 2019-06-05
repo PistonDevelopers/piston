@@ -31,6 +31,7 @@ use std::error::Error;
 use input::Input;
 
 pub use graphics_api_version::Version as Api;
+pub use graphics_api_version::UnsupportedGraphicsApiError;
 pub use no_window::NoWindow;
 
 mod no_window;
