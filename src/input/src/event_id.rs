@@ -34,5 +34,7 @@ pub const UPDATE: EventId = EventId("piston/update");
 pub const FILE_DRAG: EventId = EventId("piston/file_drag");
 
 /// Used to identify events arguments provided by traits.
+///
+/// Use format `<api>/<event>` to avoid naming collision.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct EventId(pub &'static str);
