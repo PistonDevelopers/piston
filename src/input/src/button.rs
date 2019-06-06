@@ -41,14 +41,15 @@ pub trait ButtonEvent: Sized {
 }
 
 impl ButtonEvent for Event {
-    fn from_button_args(args: ButtonArgs, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Button(args)))
+    fn from_button_args(args: ButtonArgs, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Button(args), timestamp))
     }
     fn button<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(ButtonArgs) -> U
     {
         match *self {
-            Event::Input(Input::Button(args)) => Some(f(args)),
+            Event::Input(Input::Button(args), _) => Some(f(args)),
             _ => None,
         }
     }

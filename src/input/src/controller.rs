@@ -83,15 +83,16 @@ pub trait ControllerAxisEvent: Sized {
 }
 
 impl ControllerAxisEvent for Event {
-    fn from_controller_axis_args(args: ControllerAxisArgs, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Move(Motion::ControllerAxis(args))))
+    fn from_controller_axis_args(args: ControllerAxisArgs, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Move(Motion::ControllerAxis(args)), timestamp))
     }
 
     fn controller_axis<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(ControllerAxisArgs) -> U
     {
         match *self {
-            Event::Input(Input::Move(Motion::ControllerAxis(args))) => Some(f(args)),
+            Event::Input(Input::Move(Motion::ControllerAxis(args)), _) => Some(f(args)),
             _ => None,
         }
     }

@@ -87,15 +87,16 @@ pub trait MouseCursorEvent: Sized {
 }
 
 impl MouseCursorEvent for Event {
-    fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Move(Motion::MouseCursor(x, y))))
+    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Move(Motion::MouseCursor(x, y)), timestamp))
     }
 
     fn mouse_cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Event::Input(Input::Move(Motion::MouseCursor(x, y))) => Some(f(x, y)),
+            Event::Input(Input::Move(Motion::MouseCursor(x, y)), _) => Some(f(x, y)),
             _ => None,
         }
     }
@@ -114,15 +115,16 @@ pub trait MouseRelativeEvent: Sized {
 }
 
 impl MouseRelativeEvent for Event {
-    fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Move(Motion::MouseRelative(x, y))))
+    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Move(Motion::MouseRelative(x, y)), timestamp))
     }
 
     fn mouse_relative<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Event::Input(Input::Move(Motion::MouseRelative(x, y))) => Some(f(x, y)),
+            Event::Input(Input::Move(Motion::MouseRelative(x, y)), _) => Some(f(x, y)),
             _ => None,
         }
     }
@@ -141,15 +143,16 @@ pub trait MouseScrollEvent: Sized {
 }
 
 impl MouseScrollEvent for Event {
-    fn from_xy(x: f64, y: f64, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Move(Motion::MouseScroll(x, y))))
+    fn from_xy(x: f64, y: f64, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Move(Motion::MouseScroll(x, y)), timestamp))
     }
 
     fn mouse_scroll<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Event::Input(Input::Move(Motion::MouseScroll(x, y))) => Some(f(x, y)),
+            Event::Input(Input::Move(Motion::MouseScroll(x, y)), _) => Some(f(x, y)),
             _ => None,
         }
     }

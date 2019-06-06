@@ -35,23 +35,23 @@ impl GenericEvent for Event {
         use event_id::*;
 
         match *self {
-            Event::Input(Input::Cursor(_)) => CURSOR,
-            Event::Input(Input::Focus(_)) => FOCUS,
-            Event::Input(Input::Close(_)) => CLOSE,
-            Event::Input(Input::Move(Motion::MouseCursor(_, _))) => MOUSE_CURSOR,
-            Event::Input(Input::Move(Motion::MouseRelative(_, _))) => MOUSE_RELATIVE,
-            Event::Input(Input::Move(Motion::MouseScroll(_, _))) => MOUSE_SCROLL,
-            Event::Input(Input::Move(Motion::ControllerAxis(_))) => CONTROLLER_AXIS,
-            Event::Input(Input::Move(Motion::Touch(_))) => TOUCH,
-            Event::Input(Input::Button(_)) => BUTTON,
-            Event::Input(Input::Resize(_, _)) => RESIZE,
-            Event::Input(Input::Text(_)) => TEXT,
-            Event::Input(Input::FileDrag(_)) => FILE_DRAG,
+            Event::Input(Input::Cursor(_), _) => CURSOR,
+            Event::Input(Input::Focus(_), _) => FOCUS,
+            Event::Input(Input::Close(_), _) => CLOSE,
+            Event::Input(Input::Move(Motion::MouseCursor(_, _)), _) => MOUSE_CURSOR,
+            Event::Input(Input::Move(Motion::MouseRelative(_, _)), _) => MOUSE_RELATIVE,
+            Event::Input(Input::Move(Motion::MouseScroll(_, _)), _) => MOUSE_SCROLL,
+            Event::Input(Input::Move(Motion::ControllerAxis(_)), _) => CONTROLLER_AXIS,
+            Event::Input(Input::Move(Motion::Touch(_)), _) => TOUCH,
+            Event::Input(Input::Button(_), _) => BUTTON,
+            Event::Input(Input::Resize(_, _), _) => RESIZE,
+            Event::Input(Input::Text(_), _) => TEXT,
+            Event::Input(Input::FileDrag(_), _) => FILE_DRAG,
             Event::Loop(Loop::Update(_)) => UPDATE,
             Event::Loop(Loop::Render(_)) => RENDER,
             Event::Loop(Loop::AfterRender(_)) => AFTER_RENDER,
             Event::Loop(Loop::Idle(_)) => IDLE,
-            Event::Custom(event_id, _) => event_id,
+            Event::Custom(event_id, _, _) => event_id,
         }
     }
 
@@ -59,23 +59,23 @@ impl GenericEvent for Event {
         where F: FnMut(&Any) -> U
     {
         match *self {
-            Event::Input(Input::Cursor(cursor)) => f(&cursor as &Any),
-            Event::Input(Input::Focus(focused)) => f(&focused as &Any),
-            Event::Input(Input::Close(ref args)) => f(args as &Any),
-            Event::Input(Input::Move(Motion::ControllerAxis(args))) => f(&args as &Any),
-            Event::Input(Input::Move(Motion::MouseCursor(x, y))) => f(&(x, y) as &Any),
-            Event::Input(Input::Move(Motion::MouseRelative(x, y))) => f(&(x, y) as &Any),
-            Event::Input(Input::Move(Motion::MouseScroll(x, y))) => f(&(x, y) as &Any),
-            Event::Input(Input::Move(Motion::Touch(args))) => f(&args as &Any),
-            Event::Input(Input::Button(ref args)) => f(args as &Any),
-            Event::Input(Input::Resize(w, h)) => f(&(w, h) as &Any),
-            Event::Input(Input::Text(ref text)) => f(text as &Any),
-            Event::Input(Input::FileDrag(ref file_drag)) => f(file_drag as &Any),
+            Event::Input(Input::Cursor(cursor), _) => f(&cursor as &Any),
+            Event::Input(Input::Focus(focused), _) => f(&focused as &Any),
+            Event::Input(Input::Close(ref args), _) => f(args as &Any),
+            Event::Input(Input::Move(Motion::ControllerAxis(args)), _) => f(&args as &Any),
+            Event::Input(Input::Move(Motion::MouseCursor(x, y)), _) => f(&(x, y) as &Any),
+            Event::Input(Input::Move(Motion::MouseRelative(x, y)), _) => f(&(x, y) as &Any),
+            Event::Input(Input::Move(Motion::MouseScroll(x, y)), _) => f(&(x, y) as &Any),
+            Event::Input(Input::Move(Motion::Touch(args)), _) => f(&args as &Any),
+            Event::Input(Input::Button(ref args), _) => f(args as &Any),
+            Event::Input(Input::Resize(w, h), _) => f(&(w, h) as &Any),
+            Event::Input(Input::Text(ref text), _) => f(text as &Any),
+            Event::Input(Input::FileDrag(ref file_drag), _) => f(file_drag as &Any),
             Event::Loop(Loop::Update(ref args)) => f(args as &Any),
             Event::Loop(Loop::Render(ref args)) => f(args as &Any),
             Event::Loop(Loop::AfterRender(ref args)) => f(args as &Any),
             Event::Loop(Loop::Idle(ref args)) => f(args as &Any),
-            Event::Custom(_, ref args) => f(args),
+            Event::Custom(_, ref args, _) => f(args),
         }
     }
 }

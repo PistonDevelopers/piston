@@ -13,15 +13,16 @@ pub trait CursorEvent: Sized {
 }
 
 impl CursorEvent for Event {
-    fn from_cursor(cursor: bool, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Cursor(cursor)))
+    fn from_cursor(cursor: bool, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Cursor(cursor), timestamp))
     }
 
     fn cursor<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
         match *self {
-            Event::Input(Input::Cursor(val)) => Some(f(val)),
+            Event::Input(Input::Cursor(val), _) => Some(f(val)),
             _ => None,
         }
     }

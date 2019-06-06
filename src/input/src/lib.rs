@@ -57,6 +57,9 @@ mod text;
 mod touch;
 mod update;
 
+/// The type of time stamp.
+pub type TimeStamp = u32;
+
 /// Models different kinds of buttons.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
 pub enum Button {
@@ -157,22 +160,22 @@ pub enum Loop {
 #[derive(Clone)]
 pub enum Event {
     /// Input events.
-    Input(Input),
+    Input(Input, Option<TimeStamp>),
     /// Events that commonly used by event loops.
     Loop(Loop),
     /// Custom event.
     ///
     /// When comparing two custom events for equality,
     /// they always return `false`.
-    Custom(EventId, Arc<Any + Send + Sync>),
+    Custom(EventId, Arc<Any + Send + Sync>, Option<TimeStamp>),
 }
 
 impl fmt::Debug for Event {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Event::Input(ref input) => write!(f, "{:?}", input),
+            Event::Input(ref input, _) => write!(f, "{:?}", input),
             Event::Loop(ref l) => write!(f, "{:?}", l),
-            Event::Custom(ref id, _) => write!(f, "Custom({:?}, _)", id),
+            Event::Custom(ref id, _, _) => write!(f, "Custom({:?}, _)", id),
         }
     }
 }
@@ -182,7 +185,7 @@ impl PartialEq for Event {
         use Event::*;
 
         match (self, other) {
-            (&Input(ref a), &Input(ref b)) => a == b,
+            (&Input(ref a, _), &Input(ref b, _)) => a == b,
             (&Loop(ref a), &Loop(ref b)) => a == b,
             (_, _) => false,
         }
@@ -301,7 +304,7 @@ impl<T> From<T> for Event
     where Input: From<T>
 {
     fn from(args: T) -> Self {
-        Event::Input(args.into())
+        Event::Input(args.into(), None)
     }
 }
 
@@ -313,7 +316,7 @@ impl From<Loop> for Event {
 
 impl Into<Option<Input>> for Event {
     fn into(self) -> Option<Input> {
-        if let Event::Input(input) = self {
+        if let Event::Input(input, _) = self {
             Some(input)
         } else {
             None

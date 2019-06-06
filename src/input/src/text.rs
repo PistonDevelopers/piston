@@ -15,15 +15,16 @@ pub trait TextEvent: Sized {
 }
 
 impl TextEvent for Event {
-    fn from_text(text: &str, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Text(text.into())))
+    fn from_text(text: &str, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Text(text.into()), timestamp))
     }
 
     fn text<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&str) -> U
     {
         match *self {
-            Event::Input(Input::Text(ref s)) => Some(f(s)),
+            Event::Input(Input::Text(ref s), _) => Some(f(s)),
             _ => None,
         }
     }
