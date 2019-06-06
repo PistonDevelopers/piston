@@ -4,7 +4,7 @@ use std::any::Any;
 
 use {AfterRenderEvent, ButtonEvent, CloseEvent, ControllerAxisEvent, CursorEvent, FocusEvent,
      IdleEvent, MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent, PressEvent, ReleaseEvent,
-     RenderEvent, ResizeEvent, TextEvent, TouchEvent, UpdateEvent};
+     RenderEvent, ResizeEvent, TextEvent, TimeStamp, TouchEvent, UpdateEvent};
 use {Event, EventId, Input, Loop, Motion};
 
 /// Implemented by all events.
@@ -28,6 +28,8 @@ pub trait GenericEvent: Sized +
     /// Calls closure with arguments
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U;
+    /// Gets the time stamp of this event.
+    fn time_stamp(&self) -> Option<TimeStamp>;
 }
 
 impl GenericEvent for Event {
@@ -76,6 +78,14 @@ impl GenericEvent for Event {
             Event::Loop(Loop::AfterRender(ref args)) => f(args as &Any),
             Event::Loop(Loop::Idle(ref args)) => f(args as &Any),
             Event::Custom(_, ref args, _) => f(args),
+        }
+    }
+
+    fn time_stamp(&self) -> Option<TimeStamp> {
+        match self {
+            Event::Input(_, x) => *x,
+            Event::Loop(_) => None,
+            Event::Custom(_, _, x) => *x,
         }
     }
 }
