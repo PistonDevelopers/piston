@@ -125,15 +125,16 @@ pub trait TouchEvent: Sized {
 }
 
 impl TouchEvent for Event {
-    fn from_touch_args(args: &TouchArgs, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Move(Motion::Touch(*args))))
+    fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Move(Motion::Touch(*args)), timestamp))
     }
 
     fn touch<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&TouchArgs) -> U
     {
         match *self {
-            Event::Input(Input::Move(Motion::Touch(ref args))) => Some(f(args)),
+            Event::Input(Input::Move(Motion::Touch(ref args)), _) => Some(f(args)),
             _ => None,
         }
     }

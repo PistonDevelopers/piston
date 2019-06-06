@@ -17,15 +17,16 @@ pub trait CloseEvent: Sized {
 }
 
 impl CloseEvent for Event {
-    fn from_close_args(args: &CloseArgs, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Close(*args)))
+    fn from_close_args(args: &CloseArgs, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Close(*args), timestamp))
     }
 
     fn close<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(&CloseArgs) -> U
     {
         match *self {
-            Event::Input(Input::Close(ref args)) => Some(f(args)),
+            Event::Input(Input::Close(ref args), _) => Some(f(args)),
             _ => None,
         }
     }

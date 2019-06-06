@@ -13,15 +13,16 @@ pub trait ResizeEvent: Sized {
 }
 
 impl ResizeEvent for Event {
-    fn from_width_height(w: f64, h: f64, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Resize(w, h)))
+    fn from_width_height(w: f64, h: f64, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Resize(w, h), timestamp))
     }
 
     fn resize<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(f64, f64) -> U
     {
         match *self {
-            Event::Input(Input::Resize(w, h)) => Some(f(w, h)),
+            Event::Input(Input::Resize(w, h), _) => Some(f(w, h)),
             _ => None,
         }
     }

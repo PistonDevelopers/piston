@@ -13,15 +13,16 @@ pub trait FocusEvent: Sized {
 }
 
 impl FocusEvent for Event {
-    fn from_focused(focused: bool, _old_event: &Self) -> Option<Self> {
-        Some(Event::Input(Input::Focus(focused)))
+    fn from_focused(focused: bool, old_event: &Self) -> Option<Self> {
+        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        Some(Event::Input(Input::Focus(focused), timestamp))
     }
 
     fn focus<U, F>(&self, mut f: F) -> Option<U>
         where F: FnMut(bool) -> U
     {
         match *self {
-            Event::Input(Input::Focus(focused)) => Some(f(focused)),
+            Event::Input(Input::Focus(focused), _) => Some(f(focused)),
             _ => None,
         }
     }
