@@ -1,7 +1,7 @@
 use {Event, Input};
 
 /// Close arguments.
-#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize, Hash)]
 pub struct CloseArgs;
 
 /// Window is closing.
