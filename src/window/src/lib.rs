@@ -28,7 +28,7 @@ extern crate input;
 use std::convert::From;
 use std::time::Duration;
 use std::error::Error;
-use input::Input;
+use input::{Input, TimeStamp};
 
 pub use graphics_api_version::Version as Api;
 pub use graphics_api_version::UnsupportedGraphicsApiError;
@@ -217,18 +217,18 @@ pub trait Window {
     fn swap_buffers(&mut self);
 
     /// Wait indefinitely for an input event to be available from the window.
-    fn wait_event(&mut self) -> Input;
+    fn wait_event(&mut self) -> (Input, Option<TimeStamp>);
 
     /// Wait for an input event to be available from the window or for the
     /// specified timeout to be reached.
     ///
     /// Returns `None` only if there is no input event within the timeout.
-    fn wait_event_timeout(&mut self, timeout: Duration) -> Option<Input>;
+    fn wait_event_timeout(&mut self, timeout: Duration) -> Option<(Input, Option<TimeStamp>)>;
 
     /// Polls an input event from the window.
     ///
     /// Return `None` if no events available.
-    fn poll_event(&mut self) -> Option<Input>;
+    fn poll_event(&mut self) -> Option<(Input, Option<TimeStamp>)>;
 
     /// Gets the draw size of the window.
     ///
