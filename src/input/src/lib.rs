@@ -308,6 +308,14 @@ impl<T> From<T> for Event
     }
 }
 
+impl<T> From<(T, Option<TimeStamp>)> for Event
+    where Input: From<T>
+{
+    fn from(args: (T, Option<TimeStamp>)) -> Self {
+        Event::Input(args.0.into(), args.1)
+    }
+}
+
 impl From<Loop> for Event {
     fn from(l: Loop) -> Self {
         Event::Loop(l)
