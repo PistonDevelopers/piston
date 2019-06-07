@@ -34,7 +34,7 @@ pub use generic_event::GenericEvent;
 pub use idle::{IdleArgs, IdleEvent};
 pub use mouse::{MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent};
 pub use button::{ButtonState, ButtonArgs, ButtonEvent, PressEvent, ReleaseEvent};
-pub use resize::ResizeEvent;
+pub use resize::{ResizeArgs, ResizeEvent};
 pub use render::{RenderArgs, RenderEvent};
 pub use text::TextEvent;
 pub use touch::{Touch, TouchArgs, TouchEvent};
@@ -132,7 +132,7 @@ pub enum Input {
     /// Text (usually from keyboard).
     Text(String),
     /// Window got resized.
-    Resize(f64, f64),
+    Resize(ResizeArgs),
     /// Window gained or lost focus.
     Focus(bool),
     /// Window gained or lost cursor.
