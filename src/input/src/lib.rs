@@ -76,15 +76,15 @@ pub enum Button {
 /// Models different kinds of motion.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
 pub enum Motion {
-    /// x and y in window coordinates.
-    MouseCursor(f64, f64),
-    /// x and y in relative coordinates.
-    MouseRelative(f64, f64),
-    /// x and y in scroll ticks.
-    MouseScroll(f64, f64),
-    /// controller axis move event.
+    /// Position in window coordinates.
+    MouseCursor([f64; 2]),
+    /// Position in relative coordinates.
+    MouseRelative([f64; 2]),
+    /// Position in scroll ticks.
+    MouseScroll([f64; 2]),
+    /// Controller axis move event.
     ControllerAxis(ControllerAxisArgs),
-    /// touch event.
+    /// Touch event.
     Touch(TouchArgs),
 }
 
