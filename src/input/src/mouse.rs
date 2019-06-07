@@ -77,6 +77,8 @@ mod mouse_button_tests {
 /// The position of the mouse cursor.
 pub trait MouseCursorEvent: Sized {
     /// Creates a mouse cursor event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_pos(pos: [f64; 2], old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a mouse cursor event.
     fn mouse_cursor<U, F>(&self, f: F) -> Option<U> where F: FnMut([f64; 2]) -> U;
@@ -107,6 +109,8 @@ impl MouseCursorEvent for Event {
 /// These events might be emitted even the cursor is captured by the window.
 pub trait MouseRelativeEvent: Sized {
     /// Creates a mouse relative event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_pos(x: [f64; 2], old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a mouse relative event.
     fn mouse_relative<U, F>(&self, f: F) -> Option<U> where F: FnMut([f64; 2]) -> U;
@@ -135,6 +139,8 @@ impl MouseRelativeEvent for Event {
 /// The scroll of the mouse wheel.
 pub trait MouseScrollEvent: Sized {
     /// Creates a mouse scroll event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_pos(pos: [f64; 2], old_event: &Self) -> Option<Self>;
     /// Calls a closure if this is a mouse scroll event.
     fn mouse_scroll<U, F>(&self, f: F) -> Option<U> where F: FnMut([f64; 2]) -> U;

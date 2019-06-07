@@ -7,6 +7,8 @@ pub struct CloseArgs;
 /// Window is closing.
 pub trait CloseEvent: Sized {
     /// Creates a close event from arguments.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_close_args(args: &CloseArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a close event.
     fn close<U, F>(&self, f: F) -> Option<U> where F: FnMut(&CloseArgs) -> U;

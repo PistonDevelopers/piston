@@ -31,6 +31,8 @@ pub struct ButtonArgs {
 /// Changed button state.
 pub trait ButtonEvent: Sized {
     /// Creates a button event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_button_args(args: ButtonArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a button event.
     fn button<U, F>(&self, f: F) -> Option<U> where F: FnMut(ButtonArgs) -> U;
@@ -55,11 +57,12 @@ impl ButtonEvent for Event {
     }
 }
 
-/// The press of a button
+/// The press of a button.
 pub trait PressEvent: Sized {
     /// Creates a press event.
     ///
     /// Preserves scancode from original button event, if any.
+    /// Preserves time stamp from original input event, if any.
     fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a press event.
     fn press<U, F>(&self, f: F) -> Option<U> where F: FnMut(Button) -> U;
@@ -97,11 +100,12 @@ impl<T> PressEvent for T where T: ButtonEvent {
     }
 }
 
-/// The release of a button
+/// The release of a button.
 pub trait ReleaseEvent: Sized {
     /// Creates a release event.
     ///
     /// Preserves scancode from original button event, if any.
+    /// Preserves time stamp from original input event, if any.
     fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a release event.
     fn release<U, F>(&self, f: F) -> Option<U> where F: FnMut(Button) -> U;

@@ -3,6 +3,8 @@ use {Event, Input};
 /// When window gets or loses cursor
 pub trait CursorEvent: Sized {
     /// Creates a cursor event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_cursor(cursor: bool, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a cursor event.
     fn cursor<U, F>(&self, f: F) -> Option<U> where F: FnMut(bool) -> U;
