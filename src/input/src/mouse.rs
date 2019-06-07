@@ -103,6 +103,8 @@ impl MouseCursorEvent for Event {
 }
 
 /// The relative movement of mouse cursor.
+///
+/// These events might be emitted even the cursor is captured by the window.
 pub trait MouseRelativeEvent: Sized {
     /// Creates a mouse relative event.
     fn from_pos(x: [f64; 2], old_event: &Self) -> Option<Self>;
