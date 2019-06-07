@@ -23,7 +23,12 @@ fn test_encode_decode() {
     }));
     test(Input::Move(Motion::MouseCursor(0.0, 0.0)));
     test(Input::Text("hello".into()));
-    test(Input::Resize(0.0, 0.0));
+    test(Input::Resize(ResizeArgs {
+        width: 0.0,
+        height: 0.0,
+        draw_width: 0,
+        draw_height: 0,
+    }));
     test(Input::Focus(true));
     test(Input::Cursor(true));
     test(Input::Close(CloseArgs));
