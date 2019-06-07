@@ -1,6 +1,6 @@
 use {Event, Input};
 
-/// When window gets or loses focus
+/// When window gets or loses focus.
 pub trait FocusEvent: Sized {
     /// Creates a focus event.
     fn from_focused(focused: bool, old_event: &Self) -> Option<Self>;
