@@ -1,7 +1,7 @@
 use {Button, Event, Input};
 
 /// Stores button state.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum ButtonState {
     /// Button was pressed.
     Press,
@@ -9,8 +9,8 @@ pub enum ButtonState {
     Release,
 }
 
-/// Button arguments
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
+/// Button arguments.
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub struct ButtonArgs {
     /// New state of the button.
     pub state: ButtonState,

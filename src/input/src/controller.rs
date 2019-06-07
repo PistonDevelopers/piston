@@ -5,7 +5,7 @@ use {Event, Input, Motion};
 
 /// Components of a controller button event. Not guaranteed consistent across
 /// backends.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct ControllerButton {
     /// Which controller was the button on.
     pub id: i32,
@@ -25,7 +25,7 @@ impl ControllerButton {
 }
 
 /// Components of a controller hat move event (d-Pad).
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct ControllerHat {
   /// Which Controller was the button on.
   pub id: i32,

@@ -61,7 +61,7 @@ mod update;
 pub type TimeStamp = u32;
 
 /// Models different kinds of buttons.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Ord, Eq, Hash, Debug)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(Key),
@@ -89,7 +89,7 @@ pub enum Motion {
 }
 
 /// Stores controller hat state.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Debug, Hash)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub enum HatState {
     /// Centered (no direction).
     Centered,
