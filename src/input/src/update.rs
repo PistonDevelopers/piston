@@ -1,13 +1,13 @@
 use {Event, Loop};
 
-/// Update arguments, such as delta time in seconds
-#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
+/// Update arguments, such as delta time in seconds.
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,
 }
 
-/// When the application state should be updated
+/// When the application state should be updated.
 pub trait UpdateEvent: Sized {
     /// Creates an update event.
     fn from_update_args(args: &UpdateArgs, old_event: &Self) -> Option<Self>;

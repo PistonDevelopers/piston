@@ -7,7 +7,7 @@ pub struct IdleArgs {
     pub dt: f64,
 }
 
-/// When background tasks should be performed
+/// When background tasks should be performed.
 pub trait IdleEvent: Sized {
     /// Creates an idle event.
     fn from_idle_args(args: &IdleArgs, old_event: &Self) -> Option<Self>;
