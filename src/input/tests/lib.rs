@@ -21,7 +21,7 @@ fn test_encode_decode() {
         button: Button::Keyboard(Key::A),
         scancode: None,
     }));
-    test(Input::Move(Motion::MouseCursor(0.0, 0.0)));
+    test(Input::Move(Motion::MouseCursor([0.0, 0.0])));
     test(Input::Text("hello".into()));
     test(Input::Resize(ResizeArgs {
         width: 0.0,
