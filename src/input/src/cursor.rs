@@ -1,6 +1,6 @@
 use {Event, Input};
 
-/// When window gets or loses cursor
+/// When window gets or loses cursor.
 pub trait CursorEvent: Sized {
     /// Creates a cursor event.
     ///

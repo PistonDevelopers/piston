@@ -76,7 +76,7 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Debug)]
 pub enum Motion {
     /// Position in window coordinates.
     MouseCursor([f64; 2]),
@@ -114,7 +114,7 @@ pub enum HatState {
 }
 
 /// Models dragging and dropping files.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Hash)]
 pub enum FileDrag {
     /// A file is being hovered over the window.
     Hover(PathBuf),
@@ -125,7 +125,7 @@ pub enum FileDrag {
 }
 
 /// Models input events.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub enum Input {
     /// Changed button state.
     Button(ButtonArgs),
@@ -146,7 +146,7 @@ pub enum Input {
 }
 
 /// Models loop events.
-#[derive(Copy, Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Deserialize, Serialize)]
 pub enum Loop {
     /// Render graphics.
     Render(RenderArgs),
@@ -353,5 +353,7 @@ mod tests {
         fn chk<T: Sync + Send>() {}
 
         chk::<Input>();
+        chk::<Loop>();
+        chk::<Event>();
     }
 }
