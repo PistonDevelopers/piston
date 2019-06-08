@@ -47,7 +47,7 @@ impl ControllerHat {
 
 /// Components of a controller axis move event. Not guaranteed consistent across
 /// backends.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Debug)]
+#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Debug)]
 pub struct ControllerAxisArgs {
     /// Which controller moved.
     pub id: i32,
