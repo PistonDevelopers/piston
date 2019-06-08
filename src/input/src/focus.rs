@@ -3,6 +3,8 @@ use {Event, Input};
 /// When window gets or loses focus.
 pub trait FocusEvent: Sized {
     /// Creates a focus event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_focused(focused: bool, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a focus event.
     fn focus<U, F>(&self, f: F) -> Option<U> where F: FnMut(bool) -> U;

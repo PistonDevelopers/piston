@@ -115,6 +115,8 @@ impl TouchArgs {
 /// When a touch is started, moved, ended or cancelled.
 pub trait TouchEvent: Sized {
     /// Creates a touch event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a touch event.
     fn touch<U, F>(&self, f: F) -> Option<U> where F: FnMut(&TouchArgs) -> U;

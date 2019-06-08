@@ -5,6 +5,8 @@ use {Event, Input};
 /// When receiving text from user, such as typing a character.
 pub trait TextEvent: Sized {
     /// Creates a text event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_text(text: &str, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a text event.
     fn text<U, F>(&self, f: F) -> Option<U> where F: FnMut(&str) -> U;

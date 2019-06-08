@@ -73,6 +73,8 @@ impl ControllerAxisArgs {
 /// The position of a controller axis changed.
 pub trait ControllerAxisEvent: Sized {
     /// Creates a controller axis event.
+    ///
+    /// Preserves time stamp from original input event, if any.
     fn from_controller_axis_args(args: ControllerAxisArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a controller axis event.
     fn controller_axis<U, F>(&self, f: F) -> Option<U> where F: FnMut(ControllerAxisArgs) -> U;
