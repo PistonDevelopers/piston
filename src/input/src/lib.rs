@@ -58,6 +58,8 @@ mod touch;
 mod update;
 
 /// The type of time stamp.
+///
+/// Measured in milliseconds since initialization of window.
 pub type TimeStamp = u32;
 
 /// Models different kinds of buttons.

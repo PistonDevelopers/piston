@@ -29,6 +29,8 @@ pub trait GenericEvent: Sized +
     fn with_args<'a, F, U>(&'a self, f: F) -> U
         where F: FnMut(&Any) -> U;
     /// Gets the time stamp of this event.
+    ///
+    /// Measured in milliseconds since initialization of window.
     fn time_stamp(&self) -> Option<TimeStamp>;
 }
 
