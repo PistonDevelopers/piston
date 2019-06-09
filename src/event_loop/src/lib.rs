@@ -231,10 +231,8 @@ impl Events {
                     self.state = State::SwapBuffers;
                     return Some(RenderArgs {
                         ext_dt: 0.0,
-                        width: size.width,
-                        height: size.height,
-                        draw_width: draw_size.width as u32,
-                        draw_height: draw_size.height as u32,
+                        window_size: size.into(),
+                        draw_size: draw_size.into(),
                     }.into());
                 } else {
                     // Can not render at this time.
@@ -283,10 +281,8 @@ impl Events {
                             // Extrapolate time forward to allow smooth motion.
                             ext_dt: duration_to_secs(self.last_frame
                                 .duration_since(self.last_update)),
-                            width: size.width,
-                            height: size.height,
-                            draw_width: draw_size.width as u32,
-                            draw_height: draw_size.height as u32,
+                            window_size: size.into(),
+                            draw_size: draw_size.into(),
                         }.into());
                     }
 
