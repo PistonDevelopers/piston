@@ -16,6 +16,7 @@ use std::fmt;
 use std::any::Any;
 use std::sync::Arc;
 use std::path::PathBuf;
+use std::cmp::Ordering;
 
 pub use mouse::MouseButton;
 pub use keyboard::Key;
@@ -162,6 +163,8 @@ pub enum Loop {
 #[derive(Clone)]
 pub enum Event {
     /// Input events.
+    ///
+    /// Time stamp is ignored when comparing input events for equality and order.
     Input(Input, Option<TimeStamp>),
     /// Events that commonly used by event loops.
     Loop(Loop),
@@ -169,6 +172,11 @@ pub enum Event {
     ///
     /// When comparing two custom events for equality,
     /// they always return `false`.
+    ///
+    /// When comparing partial order of two custom events,
+    /// the event ids are checked and if they are equal it returns `None`.
+    ///
+    /// Time stamp is ignored both when comparing custom events for equality and order.
     Custom(EventId, Arc<Any + Send + Sync>, Option<TimeStamp>),
 }
 
@@ -190,6 +198,26 @@ impl PartialEq for Event {
             (&Input(ref a, _), &Input(ref b, _)) => a == b,
             (&Loop(ref a), &Loop(ref b)) => a == b,
             (_, _) => false,
+        }
+    }
+}
+
+impl PartialOrd for Event {
+    fn partial_cmp(&self, other: &Event) -> Option<Ordering> {
+        use Event::*;
+
+        match (self, other) {
+            (&Input(ref a, _), &Input(ref b, _)) => a.partial_cmp(b),
+            (&Loop(ref a), &Loop(ref b)) => a.partial_cmp(b),
+            (&Custom(ref a_id, _, _), &Custom(ref b_id, _, _)) => {
+                let res = a_id.partial_cmp(b_id);
+                if res == Some(Ordering::Equal) {None}
+                else {res}
+            }
+            (&Input(_, _), _) => Some(Ordering::Less),
+            (_, &Input(_, _)) => Some(Ordering::Greater),
+            (&Loop(_), &Custom(_, _, _)) => Some(Ordering::Less),
+            (&Custom(_, _, _), &Loop(_)) => Some(Ordering::Greater),
         }
     }
 }
