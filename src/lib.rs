@@ -48,6 +48,20 @@
 //! - [pistoncore-event_loop](https://docs.rs/pistoncore-event_loop)
 //!   (Event loop)
 //!
+//! ### Points vs Pixels
+//!
+//! Since some computer screens have higher resolution than others,
+//! it is convenient to use two kinds of coordinate systems:
+//!
+//! - A pixel is a single square on the screen
+//! - A point is a unit used by window events and 2D graphics
+//!
+//! For example, the mouse cursor position events are measured in points.
+//!
+//! It is common to use points for 2D graphics to match window coordinates.
+//!
+//! Unintentional blurring, e.g. of rendered text, might be a side effect incorrect sampling.
+//!
 //! ### About Piston as a Game Engine
 //!
 //! Piston is a modular game engine with a minimal core abstraction.
