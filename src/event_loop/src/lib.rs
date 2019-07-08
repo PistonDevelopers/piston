@@ -161,7 +161,7 @@ impl Events {
                     if !self.settings.bench_mode {
                         // Poll input events until event queue is empty.
                         if let Some(ev) = window.poll_event() {
-                            return Some(Event::Input(ev.0, ev.1));
+                            return Some(ev);
                         }
                     }
                     self.state = State::Render;
@@ -179,7 +179,7 @@ impl Events {
                         // the application state when benchmarking.
                         continue;
                     } else {
-                        return Some(Event::Input(e.0, e.1));
+                        return Some(e);
                     }
                 }
                 if window.should_close() {
@@ -194,7 +194,7 @@ impl Events {
                             let ev = window.wait_event();
                             // Handle rest of events before rendering.
                             self.state = State::HandleEvents;
-                            return Some(Event::Input(ev.0, ev.1));
+                            return Some(ev);
                         }
                     } else {
                         let current_time = Instant::now();
@@ -212,7 +212,7 @@ impl Events {
                                 Some(x) => {
                                     // Handle rest of events before rendering.
                                     self.state = State::HandleEvents;
-                                    return Some(Event::Input(x.0, x.1))
+                                    return Some(x)
                                 }
                             }
                         }
@@ -257,7 +257,7 @@ impl Events {
                             // the application state when benchmarking.
                             continue;
                         } else {
-                            return Some(Event::Input(e.0, e.1));
+                            return Some(e);
                         }
                     }
                     if window.should_close() {
@@ -317,7 +317,7 @@ impl Events {
                         if next_event > current_time {
                             if let Some(x) = window.poll_event() {
                                 *idle = Idle::No;
-                                return Some(Event::Input(x.0, x.1));
+                                return Some(x);
                             } else if *idle == Idle::No {
                                 *idle = Idle::Yes;
                                 let seconds = duration_to_secs(next_event - current_time);
@@ -345,9 +345,7 @@ impl Events {
                         // Handle all events before updating.
                         match window.poll_event() {
                             None => State::Update,
-                            Some(x) => {
-                                return Some(Event::Input(x.0, x.1));
-                            }
+                            x => return x,
                         }
                     }
                 }

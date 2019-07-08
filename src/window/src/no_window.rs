@@ -8,7 +8,7 @@
 
 use {Window, WindowSettings, BuildFromWindowSettings, AdvancedWindow, Position, Size};
 
-use input::{Input, TimeStamp};
+use input::Event;
 use std::time::Duration;
 use std::error::Error;
 
@@ -54,15 +54,15 @@ impl Window for NoWindow {
 
     fn swap_buffers(&mut self) {}
 
-    fn wait_event(&mut self) -> (Input, Option<TimeStamp>) {
+    fn wait_event(&mut self) -> Event {
         panic!("NoWindow will never return an input event");
     }
 
-    fn wait_event_timeout(&mut self, _timeout: Duration) -> Option<(Input, Option<TimeStamp>)> {
+    fn wait_event_timeout(&mut self, _timeout: Duration) -> Option<Event> {
         None
     }
 
-    fn poll_event(&mut self) -> Option<(Input, Option<TimeStamp>)> {
+    fn poll_event(&mut self) -> Option<Event> {
         None
     }
 
