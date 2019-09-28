@@ -25,8 +25,6 @@ You should know how to build "hello world" with Rust, see http://www.rust-lang.o
 
 ### Drawing a red rectangle
 
-**Note;** Being under active development, we use Rust nightly. If your compilation fails, try building with Rust nightly.
-
 Add [piston_window](https://crates.io/crates/piston_window) to your Cargo.toml, for example:
 
 ```toml
