@@ -41,3 +41,10 @@ version = "0.44.0"
 [dependencies.pistoncore-event_loop]
 path = "src/event_loop"
 version = "0.49.0"
+
+[workspace]
+members = [
+  "src/input",
+  "src/window",
+  "src/event_loop"
+]
