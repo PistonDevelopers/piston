@@ -111,34 +111,24 @@ pub trait Audio {
 
 /// A simplified graphics interface.
 pub trait Canvas {
-    /// Specify a point type.
-    type Point: Into<[f64; 2]>;
-    /// Specify a color type.
-    type Color: Into<[f32; 2]>;
-    /// Specify a matrix type.
-    type Matrix: Into<[[f64; 3]; 2]>;
-    /// Specify a radius type.
-    type Radius: Into<f64>;
-    /// Specify a font size type.
-    type FontSize: Into<u32>;
     /// Clear the screen.
     fn clear(&mut self);
     /// Draw a line.
-    fn line(&mut self, from: Self::Point, to: Self::Point);
+    fn line<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Draw a rectangle.
-    fn rectangle(&mut self, from: Self::Point, to: Self::Point);
+    fn rectangle<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Draw rectangle border.
-    fn rectangle_border(&mut self, from: Self::Point, to: Self::Point);
+    fn rectangle_border<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Draw ellipse.
-    fn ellipse(&mut self, from: Self::Point, to: Self::Point);
+    fn ellipse<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Draw ellipse border.
-    fn ellipse_border(&mut self, from: Self::Point, to: Self::Point);
+    fn ellipse_border<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Draw filled polygon.
-    fn polygon(&mut self, ps: &[Self::Point]);
+    fn polygon<P: Into<[f64; 2]>>(&mut self, ps: &[P]);
     /// Draw text.
-    fn text(&mut self, text: &str);
+    fn text<P: Into<[f64; 2]>>(&mut self, text: &str, pos: P);
     /// Draw image.
-    fn image(&mut self, pos: Self::Point);
+    fn image<P: Into<[f64; 2]>>(&mut self, pos: P);
     /// Set clip region state.
     fn clip(&mut self);
     /// Draw inside clip region.
@@ -146,21 +136,21 @@ pub trait Canvas {
     /// Draw outside clip region.
     fn outside(&mut self);
     /// Set color.
-    fn color(&mut self, color: Self::Color);
+    fn color<C: Into<[f32; 4]>>(&mut self, color: C);
     /// Set radius;
-    fn radius(&mut self, radius: Self::Radius);
+    fn radius<R: Into<f64>>(&mut self, radius: R);
     /// Set source rectangle in texture for images.
-    fn src_rect(&mut self, from: Self::Point, to: Self::Point);
+    fn src_rect<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Set full source rectangle in texture for images.
     fn src_rect_full(&mut self);
     /// Set transform.
-    fn transform(&mut self, mat: Self::Matrix);
+    fn transform<M: Into<[[f64; 3]; 2]>>(&mut self, mat: M);
     /// Set font.
     ///
     /// The font id is the index in the list of fonts loaded by `Game::fonts`.
     fn font(&mut self, id: usize);
     /// Set font size.
-    fn font_size(&mut self, font_size: Self::FontSize);
+    fn font_size<S: Into<u32>>(&mut self, font_size: S);
     /// Set texture.
     ///
     /// The texture id is the index in the list of textures loaded by `Game::textures`.
