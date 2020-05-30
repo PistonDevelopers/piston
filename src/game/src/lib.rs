@@ -145,6 +145,8 @@ pub trait Canvas {
     fn src_rect_full(&mut self);
     /// Sets image color (filter).
     fn image_color<C: Into<[f32; 4]>>(&mut self, color: C);
+    /// Sets image color to white (no filter).
+    fn image_color_white(&mut self);
     /// Set transform.
     fn transform<M: Into<[[f64; 3]; 2]>>(&mut self, mat: M);
     /// Set font.
