@@ -27,7 +27,7 @@ pub trait GenericEvent: Sized +
     fn event_id(&self) -> EventId;
     /// Calls closure with arguments
     fn with_args<'a, F, U>(&'a self, f: F) -> U
-        where F: FnMut(&Any) -> U;
+        where F: FnMut(&dyn Any) -> U;
     /// Gets the time stamp of this event.
     ///
     /// Measured in milliseconds since initialization of window.
@@ -60,25 +60,25 @@ impl GenericEvent for Event {
     }
 
     fn with_args<'a, F, U>(&'a self, mut f: F) -> U
-        where F: FnMut(&Any) -> U
+        where F: FnMut(&dyn Any) -> U
     {
         match *self {
-            Event::Input(Input::Cursor(cursor), _) => f(&cursor as &Any),
-            Event::Input(Input::Focus(focused), _) => f(&focused as &Any),
-            Event::Input(Input::Close(ref args), _) => f(args as &Any),
-            Event::Input(Input::Move(Motion::ControllerAxis(args)), _) => f(&args as &Any),
-            Event::Input(Input::Move(Motion::MouseCursor(pos)), _) => f(&pos as &Any),
-            Event::Input(Input::Move(Motion::MouseRelative(pos)), _) => f(&pos as &Any),
-            Event::Input(Input::Move(Motion::MouseScroll(pos)), _) => f(&pos as &Any),
-            Event::Input(Input::Move(Motion::Touch(args)), _) => f(&args as &Any),
-            Event::Input(Input::Button(ref args), _) => f(args as &Any),
-            Event::Input(Input::Resize(ref args), _) => f(args as &Any),
-            Event::Input(Input::Text(ref text), _) => f(text as &Any),
-            Event::Input(Input::FileDrag(ref file_drag), _) => f(file_drag as &Any),
-            Event::Loop(Loop::Update(ref args)) => f(args as &Any),
-            Event::Loop(Loop::Render(ref args)) => f(args as &Any),
-            Event::Loop(Loop::AfterRender(ref args)) => f(args as &Any),
-            Event::Loop(Loop::Idle(ref args)) => f(args as &Any),
+            Event::Input(Input::Cursor(cursor), _) => f(&cursor as &dyn Any),
+            Event::Input(Input::Focus(focused), _) => f(&focused as &dyn Any),
+            Event::Input(Input::Close(ref args), _) => f(args as &dyn Any),
+            Event::Input(Input::Move(Motion::ControllerAxis(args)), _) => f(&args as &dyn Any),
+            Event::Input(Input::Move(Motion::MouseCursor(pos)), _) => f(&pos as &dyn Any),
+            Event::Input(Input::Move(Motion::MouseRelative(pos)), _) => f(&pos as &dyn Any),
+            Event::Input(Input::Move(Motion::MouseScroll(pos)), _) => f(&pos as &dyn Any),
+            Event::Input(Input::Move(Motion::Touch(args)), _) => f(&args as &dyn Any),
+            Event::Input(Input::Button(ref args), _) => f(args as &dyn Any),
+            Event::Input(Input::Resize(ref args), _) => f(args as &dyn Any),
+            Event::Input(Input::Text(ref text), _) => f(text as &dyn Any),
+            Event::Input(Input::FileDrag(ref file_drag), _) => f(file_drag as &dyn Any),
+            Event::Loop(Loop::Update(ref args)) => f(args as &dyn Any),
+            Event::Loop(Loop::Render(ref args)) => f(args as &dyn Any),
+            Event::Loop(Loop::AfterRender(ref args)) => f(args as &dyn Any),
+            Event::Loop(Loop::Idle(ref args)) => f(args as &dyn Any),
             Event::Custom(_, ref args, _) => f(args),
         }
     }
