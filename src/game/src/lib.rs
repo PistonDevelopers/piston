@@ -124,9 +124,9 @@ pub trait Canvas {
     /// Draw ellipse border.
     fn ellipse_border<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Draw circle.
-    fn circle<P: Into<[f64; 2]>, R: Into<f64>>(&mut self, center: P, radius: R);
+    fn circle<P: Into<[f64; 2]>>(&mut self, center: P, radius: f64);
     /// Draw circle border.
-    fn circle_border<P: Into<[f64; 2]>, R: Into<f64>>(&mut self, center: P, radius: R);
+    fn circle_border<P: Into<[f64; 2]>>(&mut self, center: P, radius: f64);
     /// Draw circle arc.
     fn circle_arc<P: Into<[f64; 2]>>(&mut self, from: P, to: P, start: f64, end: f64);
     /// Draw filled polygon.
@@ -144,7 +144,7 @@ pub trait Canvas {
     /// Set color.
     fn color<C: Into<[f32; 4]>>(&mut self, color: C);
     /// Set radius;
-    fn radius<R: Into<f64>>(&mut self, radius: R);
+    fn radius(&mut self, radius: f64);
     /// Set source rectangle in texture for images.
     fn src_rect<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Set full source rectangle in texture for images.
@@ -160,7 +160,7 @@ pub trait Canvas {
     /// The font id is the index in the list of fonts loaded by `Game::fonts`.
     fn font(&mut self, id: usize);
     /// Set font size.
-    fn font_size<S: Into<u32>>(&mut self, font_size: S);
+    fn font_size(&mut self, font_size: u32);
     /// Set texture.
     ///
     /// The texture id is the index in the list of textures loaded by `Game::textures`.
