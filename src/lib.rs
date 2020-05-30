@@ -18,6 +18,7 @@
 //!
 //! The Piston core is a thin and modular abstraction for user input, window and event loop.
 //! This functionality is separated into 3 core modules.
+//! An optional core module for game abstractions is included behind a Cargo feature flag.
 //!
 //! The core modules are intended to be used directly by generic libraries.
 //! By depending directly on core modules, it is easier to maintain the ecosystem.
@@ -47,6 +48,7 @@
 //!   (Window abstraction)
 //! - [pistoncore-event_loop](https://docs.rs/pistoncore-event_loop)
 //!   (Event loop)
+//! - [pistoncore-game](https:://docs.rs/pistoncore-game) (Game abstraction)
 //!
 //! ### Points vs Pixels
 //!
@@ -134,7 +136,11 @@
 pub extern crate input;
 pub extern crate event_loop;
 pub extern crate window;
+#[cfg(feature = "game")]
+pub extern crate game;
 
 pub use input::*;
 pub use event_loop::*;
 pub use window::*;
+#[cfg(feature = "game")]
+pub use game::*;
