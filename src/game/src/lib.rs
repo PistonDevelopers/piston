@@ -143,6 +143,8 @@ pub trait Canvas {
     fn src_rect<P: Into<[f64; 2]>>(&mut self, from: P, to: P);
     /// Set full source rectangle in texture for images.
     fn src_rect_full(&mut self);
+    /// Sets image color (filter).
+    fn image_color<C: Into<[f32; 4]>>(&mut self, color: C);
     /// Set transform.
     fn transform<M: Into<[[f64; 3]; 2]>>(&mut self, mat: M);
     /// Set font.
