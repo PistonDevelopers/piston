@@ -151,6 +151,8 @@ pub trait Canvas {
     fn radius(&mut self, radius: Self::Radius);
     /// Set source rectangle in texture for images.
     fn src_rect(&mut self, from: Self::Point, to: Self::Point);
+    /// Set full source rectangle in texture for images.
+    fn src_rect_full(&mut self);
     /// Set transform.
     fn transform(&mut self, mat: Self::Matrix);
     /// Set font.
