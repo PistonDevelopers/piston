@@ -177,7 +177,7 @@ pub enum Event {
     /// the event ids are checked and if they are equal it returns `None`.
     ///
     /// Time stamp is ignored both when comparing custom events for equality and order.
-    Custom(EventId, Arc<Any + Send + Sync>, Option<TimeStamp>),
+    Custom(EventId, Arc<dyn Any + Send + Sync>, Option<TimeStamp>),
 }
 
 impl fmt::Debug for Event {
