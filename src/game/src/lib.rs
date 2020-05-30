@@ -127,6 +127,8 @@ pub trait Canvas {
     fn circle<P: Into<[f64; 2]>, R: Into<f64>>(&mut self, center: P, radius: R);
     /// Draw circle border.
     fn circle_border<P: Into<[f64; 2]>, R: Into<f64>>(&mut self, center: P, radius: R);
+    /// Draw circle arc.
+    fn circle_arc<P: Into<[f64; 2]>>(&mut self, from: P, to: P, start: f64, end: f64);
     /// Draw filled polygon.
     fn polygon<P: Into<[f64; 2]>>(&mut self, ps: &[P]);
     /// Draw text.
