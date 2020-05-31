@@ -790,7 +790,7 @@ impl WindowSettings {
         self.controllers = value;
     }
 
-    /// Sets whether build windows should listen to controller input.
+    /// Sets whether built windows should listen to controller input.
     ///
     /// This method moves the current window data,
     /// unlike [`set_controllers()`](#method.set_controllers),
