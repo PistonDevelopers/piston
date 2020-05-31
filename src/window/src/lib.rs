@@ -420,6 +420,7 @@ pub struct WindowSettings {
     resizable: bool,
     decorated: bool,
     controllers: bool,
+    transparent: bool,
 }
 
 impl WindowSettings {
@@ -447,6 +448,7 @@ impl WindowSettings {
             resizable: true,
             decorated: true,
             controllers: true,
+            transparent: false,
         }
     }
 
@@ -795,6 +797,26 @@ impl WindowSettings {
     /// so that it can be used in method chaining.
     pub fn controllers(mut self, value: bool) -> Self {
         self.set_controllers(value);
+        self
+    }
+
+    /// Gets whether built windows should be transparent.
+    pub fn get_transparent(&self) -> bool {
+        self.transparent
+    }
+
+    /// Sets whether built windows should be transparent.
+    pub fn set_transparent(&mut self, value: bool) {
+        self.transparent = value;
+    }
+
+    /// Sets whether built windows should be transparent.
+    ///
+    /// This method moves the current window data,
+    /// unlike [`set_transparent()`](#method.set_transparent),
+    /// so that it can be used in method chaining.
+    pub fn transparent(mut self, value: bool) -> Self {
+        self.set_transparent(value);
         self
     }
 }
