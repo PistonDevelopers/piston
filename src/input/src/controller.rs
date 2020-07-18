@@ -8,7 +8,7 @@ use {Event, Input, Motion};
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct ControllerButton {
     /// Which controller was the button on.
-    pub id: i32,
+    pub id: u32,
     /// Which button was pressed.
     pub button: u8,
 }
@@ -16,7 +16,7 @@ pub struct ControllerButton {
 impl ControllerButton {
     /// Create a new ControllerButton object. Intended for use by backends when
     /// emitting events.
-    pub fn new(id: i32, button: u8) -> Self {
+    pub fn new(id: u32, button: u8) -> Self {
         ControllerButton {
             id: id,
             button: button,
@@ -28,7 +28,7 @@ impl ControllerButton {
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct ControllerHat {
   /// Which Controller was the button on.
-  pub id: i32,
+  pub id: u32,
   /// Which button was pressed.
   pub state: ::HatState,
   /// Which hat on the controller was changed
@@ -38,7 +38,7 @@ pub struct ControllerHat {
 impl ControllerHat {
   /// Create a new ControllerButton object. Intended for use by backends when
   /// emitting events.
-  pub fn new(id: i32, which: u8, state: ::HatState) -> Self {
+  pub fn new(id: u32, which: u8, state: ::HatState) -> Self {
     ControllerHat {
       id, state, which,
     }
@@ -50,7 +50,7 @@ impl ControllerHat {
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Debug)]
 pub struct ControllerAxisArgs {
     /// Which controller moved.
-    pub id: i32,
+    pub id: u32,
     /// The axis that moved.
     pub axis: u8,
     /// Position of the controller. Usually [-1.0, 1.0], though backends may use
@@ -61,7 +61,7 @@ pub struct ControllerAxisArgs {
 impl ControllerAxisArgs {
     /// Create a new ControllerAxisArgs object. Intended for use by backends when
     /// emitting events.
-    pub fn new(id: i32, axis: u8, position: f64) -> Self {
+    pub fn new(id: u32, axis: u8, position: f64) -> Self {
         ControllerAxisArgs {
             id: id,
             axis: axis,
