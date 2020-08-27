@@ -15,6 +15,7 @@ Maintainers of Piston core libraries: @bvssvni
 * [List of games made with Piston](https://github.com/PistonDevelopers/piston/wiki/Games-Made-With-Piston)
 * [Piston online docs](https://docs.piston.rs/piston/piston/)
 * [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
+* [Discord channel](https://discord.gg/XNpF2j)
 * [Discussion forum](http://discourse.piston.rs/)
 * [Twitter - @PistonDeveloper](https://twitter.com/PistonDeveloper)
 * [FAQ - Frequently Asked Questions](https://github.com/PistonDevelopers/piston/wiki/Frequently-Asked-Questions-(FAQ))
