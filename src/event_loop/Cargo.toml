@@ -21,6 +21,9 @@ documentation = "https://docs.rs/pistoncore-event_loop"
 name = "event_loop"
 path = "src/lib.rs"
 
+[dependencies]
+spin_sleep = "1.0.0"
+
 [dependencies.pistoncore-window]
 path = "../window"
 version = "0.47.0"

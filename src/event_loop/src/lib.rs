@@ -6,7 +6,8 @@
 extern crate window;
 extern crate input;
 
-use std::thread::sleep;
+extern crate spin_sleep;
+
 use std::time::{Duration, Instant};
 use std::cmp;
 use window::Window;
@@ -323,7 +324,7 @@ impl Events {
                                 let seconds = duration_to_secs(next_event - current_time);
                                 return Some(IdleArgs { dt: seconds }.into());
                             }
-                            sleep(next_event - current_time);
+                            spin_sleep::sleep(next_event - current_time);
                             State::UpdateLoop(Idle::No)
                         } else if next_event == next_frame {
                             State::Render
