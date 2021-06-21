@@ -47,12 +47,12 @@ impl TouchArgs {
     /// Creates arguments for 2D touch.
     pub fn new(device: i64, id: i64, position: [f64; 2], pressure: f64, touch: Touch) -> TouchArgs {
         TouchArgs {
-            device: device,
-            id: id,
+            device,
+            id,
             position_3d: [position[0], position[1], 0.0],
             pressure_3d: [0.0, 0.0, pressure],
             is_3d: false,
-            touch: touch,
+            touch,
         }
     }
 
@@ -66,12 +66,12 @@ impl TouchArgs {
                   touch: Touch)
                   -> TouchArgs {
         TouchArgs {
-            device: device,
-            id: id,
+            device,
+            id,
             position_3d,
             pressure_3d,
             is_3d: true,
-            touch: touch,
+            touch,
         }
     }
 
@@ -105,7 +105,7 @@ pub trait TouchEvent: Sized {
     fn touch<U, F>(&self, f: F) -> Option<U> where F: FnMut(&TouchArgs) -> U;
     /// Returns touch arguments.
     fn touch_args(&self) -> Option<TouchArgs> {
-        self.touch(|args| args.clone())
+        self.touch(|args| *args)
     }
 }
 

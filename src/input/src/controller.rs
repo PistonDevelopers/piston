@@ -18,8 +18,8 @@ impl ControllerButton {
     /// emitting events.
     pub fn new(id: u32, button: u8) -> Self {
         ControllerButton {
-            id: id,
-            button: button,
+            id,
+            button,
         }
     }
 }
@@ -63,9 +63,9 @@ impl ControllerAxisArgs {
     /// emitting events.
     pub fn new(id: u32, axis: u8, position: f64) -> Self {
         ControllerAxisArgs {
-            id: id,
-            axis: axis,
-            position: position,
+            id,
+            axis,
+            position,
         }
     }
 }

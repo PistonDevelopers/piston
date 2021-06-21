@@ -32,7 +32,7 @@ pub trait RenderEvent: Sized {
     fn render<U, F>(&self, f: F) -> Option<U> where F: FnMut(&RenderArgs) -> U;
     /// Returns render arguments.
     fn render_args(&self) -> Option<RenderArgs> {
-        self.render(|args| args.clone())
+        self.render(|args| *args)
     }
 }
 

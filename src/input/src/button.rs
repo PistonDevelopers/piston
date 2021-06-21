@@ -81,7 +81,7 @@ impl<T> PressEvent for T where T: ButtonEvent {
         } else {
             ButtonEvent::from_button_args(ButtonArgs {
                 state: ButtonState::Press,
-                button: button,
+                button,
                 scancode: None
             }, old_event)
         }
@@ -124,7 +124,7 @@ impl<T> ReleaseEvent for T where T: ButtonEvent {
         } else {
             ButtonEvent::from_button_args(ButtonArgs {
                 state: ButtonState::Release,
-                button: button,
+                button,
                 scancode: None
             }, old_event)
         }

@@ -14,7 +14,7 @@ pub trait CloseEvent: Sized {
     fn close<U, F>(&self, f: F) -> Option<U> where F: FnMut(&CloseArgs) -> U;
     /// Returns close arguments.
     fn close_args(&self) -> Option<CloseArgs> {
-        self.close(|args| args.clone())
+        self.close(|args| *args)
     }
 }
 

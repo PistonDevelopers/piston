@@ -32,7 +32,7 @@ pub trait ResizeEvent: Sized {
     fn resize<U, F>(&self, f: F) -> Option<U> where F: FnMut(&ResizeArgs) -> U;
     /// Returns resize arguments.
     fn resize_args(&self) -> Option<ResizeArgs> {
-        self.resize(|args| args.clone())
+        self.resize(|args| *args)
     }
 }
 
