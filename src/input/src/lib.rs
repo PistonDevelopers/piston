@@ -352,9 +352,9 @@ impl From<Loop> for Event {
     }
 }
 
-impl Into<Option<Input>> for Event {
-    fn into(self) -> Option<Input> {
-        if let Event::Input(input, _) = self {
+impl From<Event> for Option<Input> {
+    fn from(event: Event) -> Option<Input> {
+        if let Event::Input(input, _) = event {
             Some(input)
         } else {
             None
@@ -362,9 +362,9 @@ impl Into<Option<Input>> for Event {
     }
 }
 
-impl Into<Option<Loop>> for Event {
-    fn into(self) -> Option<Loop> {
-        if let Event::Loop(l) = self {
+impl From<Event> for Option<Loop> {
+    fn from(event: Event) -> Option<Loop> {
+        if let Event::Loop(l) = event {
             Some(l)
         } else {
             None
