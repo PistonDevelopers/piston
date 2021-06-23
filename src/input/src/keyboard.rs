@@ -592,7 +592,7 @@ impl From<u32> for Key {
 
 impl PartialEq for Key {
     fn eq(&self, other: &Key) -> bool {
-        return (*self as i32) == (*other as i32);
+        (*self as i32) == (*other as i32)
     }
 }
 

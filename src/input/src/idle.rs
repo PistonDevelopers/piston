@@ -13,13 +13,13 @@ pub trait IdleEvent: Sized {
     fn from_idle_args(args: &IdleArgs, old_event: &Self) -> Option<Self>;
     /// Creates an update event with delta time.
     fn from_dt(dt: f64, old_event: &Self) -> Option<Self> {
-        IdleEvent::from_idle_args(&IdleArgs { dt: dt }, old_event)
+        IdleEvent::from_idle_args(&IdleArgs { dt }, old_event)
     }
     /// Calls closure if this is an idle event.
     fn idle<U, F>(&self, f: F) -> Option<U> where F: FnMut(&IdleArgs) -> U;
     /// Returns idle arguments.
     fn idle_args(&self) -> Option<IdleArgs> {
-        self.idle(|args| args.clone())
+        self.idle(|args| *args)
     }
 }
 

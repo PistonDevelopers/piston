@@ -26,7 +26,7 @@ pub trait GenericEvent: Sized +
     /// The id of this event.
     fn event_id(&self) -> EventId;
     /// Calls closure with arguments
-    fn with_args<'a, F, U>(&'a self, f: F) -> U
+    fn with_args<F, U>(&'_ self, f: F) -> U
         where F: FnMut(&dyn Any) -> U;
     /// Gets the time stamp of this event.
     ///
@@ -59,7 +59,7 @@ impl GenericEvent for Event {
         }
     }
 
-    fn with_args<'a, F, U>(&'a self, mut f: F) -> U
+    fn with_args<F, U>(&'_ self, mut f: F) -> U
         where F: FnMut(&dyn Any) -> U
     {
         match *self {
