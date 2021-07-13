@@ -40,12 +40,12 @@ impl NoWindow {
 }
 
 impl Window for NoWindow {
-    fn should_close(&self) -> bool {
-        self.should_close
-    }
-
     fn set_should_close(&mut self, value: bool) {
         self.should_close = value;
+    }
+
+    fn should_close(&self) -> bool {
+        self.should_close
     }
 
     fn size(&self) -> Size {

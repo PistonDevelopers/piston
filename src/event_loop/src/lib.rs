@@ -134,7 +134,7 @@ impl Events {
             } else {
                 1.0 / settings.ups as f64
             },
-            settings: settings,
+            settings,
             first_frame: true,
         }
     }
