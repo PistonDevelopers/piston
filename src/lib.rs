@@ -116,17 +116,17 @@
 //! The Piston project is a huge collaboration across many projects,
 //! mainly focused on maintenance of libraries and research.
 //! Since this has been going on since 2014, there is too much out there
-//! to summarize here, but rougly the project is organized into two open source organizations:
+//! to summarize here, but roughly the project is organized into two open source organizations:
 //!
 //! - [PistonDevelopers](https://github.com/pistondevelopers/) - everything game engine related
 //! - [AdvancedResearch](https://github.com/advancedresearch/) - everything advanced math related
 //!
-//! In addition we collaborate across organizations with other projects, mainly:
+//! In addition, we collaborate across organizations with other projects, mainly:
 //!
 //! - [Gfx-rs](https://github.com/gfx-rs/) - everything 3D graphics related
 //! - [RustAudio](https://github.com/rustaudio) - everything audio related
 //!
-//! In addition there are many other projects and organizations.
+//! In addition, there are many other projects and organizations.
 //!
 //! For more information and an overview, see [Piston's README in the core repository](https://github.com/pistondevelopers/piston).
 
