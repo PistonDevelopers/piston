@@ -1,5 +1,4 @@
-#![deny(missing_docs)]
-#![deny(missing_copy_implementations)]
+#![deny(missing_docs, missing_copy_implementations, missing_debug_implementations)]
 
 //! Window storage and interfacing traits.
 //!
@@ -406,7 +405,7 @@ pub trait OpenGLWindow: Window {
 /// constructing most windows. This structure makes it easy to create multiple
 /// windows with the same settings, and it also makes piston's multiple backends
 /// easier to implement for piston devs.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WindowSettings {
     title: String,
     size: Size,

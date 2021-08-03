@@ -1,7 +1,6 @@
 //! A Piston event loop for games and interactive applications
 
-#![deny(missing_docs)]
-#![deny(missing_copy_implementations)]
+#![deny(missing_docs, missing_copy_implementations, missing_debug_implementations)]
 
 extern crate window;
 extern crate input;
@@ -84,7 +83,7 @@ impl Default for EventSettings {
 /// *Warning: Because the iterator polls events from the window back-end,
 /// it must be used on the same thread as the window back-end (usually main thread),
 /// unless the window back-end supports multi-thread event polling.*
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Events {
     state: State,
     last_update: Instant,

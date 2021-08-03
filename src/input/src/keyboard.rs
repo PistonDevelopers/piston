@@ -1,7 +1,6 @@
 //! Back-end agnostic keyboard keys.
 
 use std::default::Default;
-use std::cmp::Ordering;
 
 use GenericEvent;
 use Button;
@@ -97,7 +96,7 @@ impl Default for ModifierKey {
 /// Represent a keyboard key.
 /// Keycodes follows SDL http://wiki.libsdl.org/SDLKeycodeLookup
 #[allow(missing_docs)]
-#[derive(Copy, Clone, Deserialize, Serialize, Debug, Hash)]
+#[derive(Copy, Clone, Deserialize, Serialize, Debug, PartialOrd, PartialEq, Ord, Eq, Hash)]
 pub enum Key {
     Unknown = 0x00,
     Backspace = 0x08,
@@ -579,28 +578,6 @@ impl From<u32> for Key {
 
             _ => Key::Unknown,
         }
-    }
-}
-
-impl PartialEq for Key {
-    fn eq(&self, other: &Key) -> bool {
-        (*self as i32) == (*other as i32)
-    }
-}
-
-impl Eq for Key {}
-
-impl PartialOrd for Key {
-    fn partial_cmp(&self, other: &Key) -> Option<Ordering> {
-        let (s_id, o_id) = (*self as i32, *other as i32);
-        s_id.partial_cmp(&o_id)
-    }
-}
-
-impl Ord for Key {
-    fn cmp(&self, other: &Key) -> Ordering {
-        let (s_id, o_id) = (*self as i32, *other as i32);
-        s_id.cmp(&o_id)
     }
 }
 

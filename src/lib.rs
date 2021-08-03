@@ -1,5 +1,5 @@
 #![crate_name = "piston"]
-#![deny(missing_docs)]
+#![deny(clippy::doc_markdown, missing_docs)]
 #![warn(dead_code)]
 
 //! A modular game engine written in Rust.
@@ -8,7 +8,7 @@
 //! The `Piston` core library reexports the core modules.
 //!
 //! If you are looking for a convenient window wrapper,
-//! see [piston_window](https://github.com/pistondevelopers/piston_window).
+//! see [`piston_window`](https://github.com/pistondevelopers/piston_window).
 //!
 //! For examples, see [piston-examples](https://github.com/pistondevelopers/piston-examples).
 //!
@@ -36,7 +36,7 @@
 //!
 //! The most important traits in Piston are the following:
 //!
-//! - [GenericEvent](input::GenericEvent) (allows handling of events for controllers)
+//! - [`GenericEvent`](input::GenericEvent) (allows handling of events for controllers)
 //! - [Window](window::Window) (allows polling of events)
 //!
 //! ### Link to documentation for core modules
@@ -118,13 +118,13 @@
 //! Since this has been going on since 2014, there is too much out there
 //! to summarize here, but roughly the project is organized into two open source organizations:
 //!
-//! - [PistonDevelopers](https://github.com/pistondevelopers/) - everything game engine related
-//! - [AdvancedResearch](https://github.com/advancedresearch/) - everything advanced math related
+//! - [`PistonDevelopers`](https://github.com/pistondevelopers/) - everything game engine related
+//! - [`AdvancedResearch`](https://github.com/advancedresearch/) - everything advanced math related
 //!
 //! In addition, we collaborate across organizations with other projects, mainly:
 //!
 //! - [Gfx-rs](https://github.com/gfx-rs/) - everything 3D graphics related
-//! - [RustAudio](https://github.com/rustaudio) - everything audio related
+//! - [`RustAudio`](https://github.com/rustaudio) - everything audio related
 //!
 //! In addition, there are many other projects and organizations.
 //!
