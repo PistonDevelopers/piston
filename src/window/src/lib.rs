@@ -216,7 +216,7 @@ pub trait Window {
     /// Swaps render buffers.
     ///
     /// When this is set to false, this method must be called manually
-    /// or through the window backend. By default it is set to true, so
+    /// or through the window backend. By default, it is set to true, so
     /// usually it is not needed in application code.
     fn swap_buffers(&mut self);
 

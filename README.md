@@ -70,11 +70,11 @@ Piston is as much a community project as it is a collection of libraries.
 Writing and maintaining code is expensive, and by sharing this cost we reach our goals faster.
 We believe that seeking personal goals and ambitions, while helping each other, results in higher quality.
 
-* Our main goal is to free up time for maintainers and the people involved
+* Our main goal is to free up time for maintainers, and the people involved
 * ... such that we can create new amazing stuff and reach our personal goals
 * ... by making more people use Rust for game development and become engaged in open source
 
-In addition we do research or plan to in the following areas:
+In addition, we do research or plan to in the following areas:
 
 * Graphics, [2D](https://github.com/PistonDevelopers/graphics/) and 3D
 * [GUI](https://github.com/PistonDevelopers/conrod/)
