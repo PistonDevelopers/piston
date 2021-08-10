@@ -1,4 +1,4 @@
-use {Event, Loop};
+use crate::{Event, Loop};
 
 /// Idle arguments, such as expected idle time in seconds.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
@@ -16,7 +16,9 @@ pub trait IdleEvent: Sized {
         IdleEvent::from_idle_args(&IdleArgs { dt }, old_event)
     }
     /// Calls closure if this is an idle event.
-    fn idle<U, F>(&self, f: F) -> Option<U> where F: FnMut(&IdleArgs) -> U;
+    fn idle<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(&IdleArgs) -> U;
     /// Returns idle arguments.
     fn idle_args(&self) -> Option<IdleArgs> {
         self.idle(|args| *args)
@@ -29,7 +31,8 @@ impl IdleEvent for Event {
     }
 
     fn idle<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&IdleArgs) -> U
+    where
+        F: FnMut(&IdleArgs) -> U,
     {
         match *self {
             Event::Loop(Loop::Idle(ref args)) => Some(f(args)),
@@ -48,7 +51,8 @@ mod tests {
 
         let e: Event = IdleArgs { dt: 1.0 }.into();
         let x: Option<Event> = IdleEvent::from_idle_args(&IdleArgs { dt: 1.0 }, &e);
-        let y: Option<Event> = x.clone()
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .idle(|args| IdleEvent::from_idle_args(args, x.as_ref().unwrap()))
             .unwrap();

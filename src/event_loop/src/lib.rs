@@ -1,16 +1,25 @@
 //! A Piston event loop for games and interactive applications
 
-#![deny(missing_docs, missing_copy_implementations, missing_debug_implementations)]
+#![deny(
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    future_incompatible,
+    nonstandard_style,
+    unused,
+    clippy::all,
+    clippy::doc_markdown,
+    missing_docs,
+    missing_copy_implementations,
+    missing_debug_implementations
+)]
 
-extern crate window;
-extern crate input;
+use std::{
+    cmp,
+    time::{Duration, Instant},
+};
 
-extern crate spin_sleep;
-
-use std::time::{Duration, Instant};
-use std::cmp;
+use input::{AfterRenderArgs, Event, IdleArgs, RenderArgs, UpdateArgs};
 use window::Window;
-use input::{Event, AfterRenderArgs, IdleArgs, RenderArgs, UpdateArgs};
 
 /// Tells whether last emitted event was idle or not.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -140,7 +149,8 @@ impl Events {
 
     /// Returns the next event.
     pub fn next<W>(&mut self, window: &mut W) -> Option<Event>
-        where W: Window
+    where
+        W: Window,
     {
         if self.settings.lazy || self.settings.ups == 0 {
             // This mode does not emit update events.
@@ -212,7 +222,7 @@ impl Events {
                                 Some(x) => {
                                     // Handle rest of events before rendering.
                                     self.state = State::HandleEvents;
-                                    return Some(x)
+                                    return Some(x);
                                 }
                             }
                         }
@@ -229,11 +239,14 @@ impl Events {
                 if size.width != 0.0 && size.height != 0.0 {
                     // Swap buffers next time.
                     self.state = State::SwapBuffers;
-                    return Some(RenderArgs {
-                        ext_dt: 0.0,
-                        window_size: size.into(),
-                        draw_size: draw_size.into(),
-                    }.into());
+                    return Some(
+                        RenderArgs {
+                            ext_dt: 0.0,
+                            window_size: size.into(),
+                            draw_size: draw_size.into(),
+                        }
+                        .into(),
+                    );
                 } else {
                     // Can not render at this time.
                     self.state = State::UpdateLoop(Idle::No);
@@ -277,13 +290,17 @@ impl Events {
                     if size.width != 0.0 && size.height != 0.0 {
                         // Swap buffers next time.
                         self.state = State::SwapBuffers;
-                        return Some(RenderArgs {
-                            // Extrapolate time forward to allow smooth motion.
-                            ext_dt: duration_to_secs(self.last_frame
-                                .duration_since(self.last_update)),
-                            window_size: size.into(),
-                            draw_size: draw_size.into(),
-                        }.into());
+                        return Some(
+                            RenderArgs {
+                                // Extrapolate time forward to allow smooth motion.
+                                ext_dt: duration_to_secs(
+                                    self.last_frame.duration_since(self.last_update),
+                                ),
+                                window_size: size.into(),
+                                draw_size: draw_size.into(),
+                            }
+                            .into(),
+                        );
                     }
 
                     State::UpdateLoop(Idle::No)
@@ -351,9 +368,11 @@ impl Events {
                 }
                 State::Update => {
                     self.state = State::UpdateLoop(Idle::No);
-                    if !self.settings.bench_mode && self.settings.ups_reset > 0 &&
-                       Instant::now() - self.last_update >
-                       ns_to_duration(self.settings.ups_reset * self.dt_update_in_ns) {
+                    if !self.settings.bench_mode
+                        && self.settings.ups_reset > 0
+                        && Instant::now() - self.last_update
+                            > ns_to_duration(self.settings.ups_reset * self.dt_update_in_ns)
+                    {
                         // Skip updates because CPU is too busy.
                         self.last_update = Instant::now();
                     } else {
@@ -381,7 +400,10 @@ pub trait EventLoop: Sized {
     /// When set to `0`, update events are disabled.
     fn set_ups(&mut self, frames: u64) {
         let old_settings = self.get_event_settings();
-        self.set_event_settings(EventSettings { ups: frames, ..old_settings });
+        self.set_event_settings(EventSettings {
+            ups: frames,
+            ..old_settings
+        });
     }
 
     /// The number of updates per second
@@ -398,7 +420,10 @@ pub trait EventLoop: Sized {
     /// When set to `0`, it will always try to catch up.
     fn set_ups_reset(&mut self, frames: u64) {
         let old_settings = self.get_event_settings();
-        self.set_event_settings(EventSettings { ups_reset: frames, ..old_settings });
+        self.set_event_settings(EventSettings {
+            ups_reset: frames,
+            ..old_settings
+        });
     }
 
     /// The number of delayed updates before skipping them to catch up.
@@ -415,7 +440,10 @@ pub trait EventLoop: Sized {
     /// This causes the frames to "slip" over time.
     fn set_max_fps(&mut self, frames: u64) {
         let old_settings = self.get_event_settings();
-        self.set_event_settings(EventSettings { max_fps: frames, ..old_settings })
+        self.set_event_settings(EventSettings {
+            max_fps: frames,
+            ..old_settings
+        })
     }
 
     /// The maximum number of frames per second
@@ -431,7 +459,10 @@ pub trait EventLoop: Sized {
     /// Enable or disable automatic swapping of buffers.
     fn set_swap_buffers(&mut self, enable: bool) {
         let old_settings = self.get_event_settings();
-        self.set_event_settings(EventSettings { swap_buffers: enable, ..old_settings })
+        self.set_event_settings(EventSettings {
+            swap_buffers: enable,
+            ..old_settings
+        })
     }
 
     /// Enable or disable automatic swapping of buffers.
@@ -446,7 +477,10 @@ pub trait EventLoop: Sized {
     /// Requires `lazy` to be set to `false`.
     fn set_bench_mode(&mut self, enable: bool) {
         let old_settings = self.get_event_settings();
-        self.set_event_settings(EventSettings { bench_mode: enable, ..old_settings })
+        self.set_event_settings(EventSettings {
+            bench_mode: enable,
+            ..old_settings
+        })
     }
 
     /// Enable or disable benchmark mode.
@@ -463,7 +497,10 @@ pub trait EventLoop: Sized {
     /// Idle events are emitted while receiving input.
     fn set_lazy(&mut self, enable: bool) {
         let old_settings = self.get_event_settings();
-        self.set_event_settings(EventSettings { lazy: enable, ..old_settings })
+        self.set_event_settings(EventSettings {
+            lazy: enable,
+            ..old_settings
+        })
     }
 
     /// Enable or disable rendering only when receiving input.

@@ -1,11 +1,10 @@
-
 #![feature(test)]
 
-extern crate test;
 extern crate input;
+extern crate test;
 
-use test::Bencher;
 use input::{Input, RenderArgs, RenderEvent};
+use test::Bencher;
 
 #[bench]
 fn bench_input_render(bencher: &mut Bencher) {
@@ -23,5 +22,7 @@ fn bench_input_render(bencher: &mut Bencher) {
         draw_width: 10,
         draw_height: 10,
     };
-    bencher.iter(|| { let _: Option<Input> = RenderEvent::from_render_args(&args, &e); });
+    bencher.iter(|| {
+        let _: Option<Input> = RenderEvent::from_render_args(&args, &e);
+    });
 }

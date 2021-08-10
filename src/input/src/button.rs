@@ -1,4 +1,4 @@
-use {Button, Event, Input};
+use crate::{Button, Event, Input};
 
 /// Stores button state.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
@@ -35,7 +35,9 @@ pub trait ButtonEvent: Sized {
     /// Preserves time stamp from original input event, if any.
     fn from_button_args(args: ButtonArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a button event.
-    fn button<U, F>(&self, f: F) -> Option<U> where F: FnMut(ButtonArgs) -> U;
+    fn button<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(ButtonArgs) -> U;
     /// Returns button arguments.
     fn button_args(&self) -> Option<ButtonArgs> {
         self.button(|args| args)
@@ -44,11 +46,16 @@ pub trait ButtonEvent: Sized {
 
 impl ButtonEvent for Event {
     fn from_button_args(args: ButtonArgs, old_event: &Self) -> Option<Self> {
-        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        let timestamp = if let Event::Input(_, x) = old_event {
+            *x
+        } else {
+            None
+        };
         Some(Event::Input(Input::Button(args), timestamp))
     }
     fn button<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(ButtonArgs) -> U
+    where
+        F: FnMut(ButtonArgs) -> U,
     {
         match *self {
             Event::Input(Input::Button(args), _) => Some(f(args)),
@@ -65,34 +72,46 @@ pub trait PressEvent: Sized {
     /// Preserves time stamp from original input event, if any.
     fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a press event.
-    fn press<U, F>(&self, f: F) -> Option<U> where F: FnMut(Button) -> U;
+    fn press<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(Button) -> U;
     /// Returns press arguments.
     fn press_args(&self) -> Option<Button> {
         self.press(|button| button)
     }
 }
 
-impl<T> PressEvent for T where T: ButtonEvent {
+impl<T> PressEvent for T
+where
+    T: ButtonEvent,
+{
     fn from_button(button: Button, old_event: &Self) -> Option<Self> {
         if let Some(mut args) = old_event.button_args() {
             args.state = ButtonState::Press;
             args.button = button;
             ButtonEvent::from_button_args(args, old_event)
         } else {
-            ButtonEvent::from_button_args(ButtonArgs {
-                state: ButtonState::Press,
-                button,
-                scancode: None
-            }, old_event)
+            ButtonEvent::from_button_args(
+                ButtonArgs {
+                    state: ButtonState::Press,
+                    button,
+                    scancode: None,
+                },
+                old_event,
+            )
         }
     }
 
     fn press<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(Button) -> U
+    where
+        F: FnMut(Button) -> U,
     {
         if let Some(ButtonArgs {
-            state: ButtonState::Press, button, ..
-        }) = self.button_args() {
+            state: ButtonState::Press,
+            button,
+            ..
+        }) = self.button_args()
+        {
             Some(f(button))
         } else {
             None
@@ -108,34 +127,46 @@ pub trait ReleaseEvent: Sized {
     /// Preserves time stamp from original input event, if any.
     fn from_button(button: Button, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a release event.
-    fn release<U, F>(&self, f: F) -> Option<U> where F: FnMut(Button) -> U;
+    fn release<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(Button) -> U;
     /// Returns release arguments.
     fn release_args(&self) -> Option<Button> {
         self.release(|button| button)
     }
 }
 
-impl<T> ReleaseEvent for T where T: ButtonEvent {
+impl<T> ReleaseEvent for T
+where
+    T: ButtonEvent,
+{
     fn from_button(button: Button, old_event: &Self) -> Option<Self> {
         if let Some(mut args) = old_event.button_args() {
             args.state = ButtonState::Release;
             args.button = button;
             ButtonEvent::from_button_args(args, old_event)
         } else {
-            ButtonEvent::from_button_args(ButtonArgs {
-                state: ButtonState::Release,
-                button,
-                scancode: None
-            }, old_event)
+            ButtonEvent::from_button_args(
+                ButtonArgs {
+                    state: ButtonState::Release,
+                    button,
+                    scancode: None,
+                },
+                old_event,
+            )
         }
     }
 
     fn release<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(Button) -> U
+    where
+        F: FnMut(Button) -> U,
     {
         if let Some(ButtonArgs {
-            state: ButtonState::Release, button, ..
-        }) = self.button_args() {
+            state: ButtonState::Release,
+            button,
+            ..
+        }) = self.button_args()
+        {
             Some(f(button))
         } else {
             None
@@ -155,10 +186,12 @@ mod tests {
             state: ButtonState::Press,
             button: Key::S.into(),
             scancode: None,
-        }.into();
+        }
+        .into();
         let button = Button::Keyboard(Key::A);
         let x: Option<Event> = PressEvent::from_button(button, &e);
-        let y: Option<Event> = x.clone()
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .press(|button| PressEvent::from_button(button, x.as_ref().unwrap()))
             .unwrap();
@@ -173,10 +206,12 @@ mod tests {
             state: ButtonState::Release,
             button: Key::S.into(),
             scancode: None,
-        }.into();
+        }
+        .into();
         let button = Button::Keyboard(Key::A);
         let x: Option<Event> = ReleaseEvent::from_button(button, &e);
-        let y: Option<Event> = x.clone()
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .release(|button| ReleaseEvent::from_button(button, x.as_ref().unwrap()))
             .unwrap();

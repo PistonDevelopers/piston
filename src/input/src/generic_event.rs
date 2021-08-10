@@ -2,10 +2,12 @@
 
 use std::any::Any;
 
-use {AfterRenderEvent, ButtonEvent, CloseEvent, ControllerAxisEvent, CursorEvent, FocusEvent,
-     IdleEvent, MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent, PressEvent, ReleaseEvent,
-     RenderEvent, ResizeEvent, TextEvent, TimeStamp, TouchEvent, UpdateEvent};
-use {Event, EventId, Input, Loop, Motion};
+use crate::{
+    AfterRenderEvent, ButtonEvent, CloseEvent, ControllerAxisEvent, CursorEvent, Event, EventId,
+    FocusEvent, IdleEvent, Input, Loop, Motion, MouseCursorEvent, MouseRelativeEvent,
+    MouseScrollEvent, PressEvent, ReleaseEvent, RenderEvent, ResizeEvent, TextEvent, TimeStamp,
+    TouchEvent, UpdateEvent,
+};
 
 /// Implemented by all events.
 ///
@@ -17,17 +19,36 @@ use {Event, EventId, Input, Loop, Motion};
 ///
 /// This trait makes it possible to auto impl new events for all types that implements `GenericEvent`.
 /// This way, you can define your own event types without breaking compatibility with Piston.
-pub trait GenericEvent: Sized +
-    AfterRenderEvent + CloseEvent + ControllerAxisEvent + CursorEvent + FocusEvent + IdleEvent +
-    MouseCursorEvent + MouseRelativeEvent + MouseScrollEvent + ButtonEvent + PressEvent +
-    ReleaseEvent + RenderEvent + ResizeEvent + TextEvent + TouchEvent + UpdateEvent +
-    From<Input> + From<Loop> + Into<Option<Input>> + Into<Option<Loop>>
+pub trait GenericEvent:
+    Sized
+    + AfterRenderEvent
+    + CloseEvent
+    + ControllerAxisEvent
+    + CursorEvent
+    + FocusEvent
+    + IdleEvent
+    + MouseCursorEvent
+    + MouseRelativeEvent
+    + MouseScrollEvent
+    + ButtonEvent
+    + PressEvent
+    + ReleaseEvent
+    + RenderEvent
+    + ResizeEvent
+    + TextEvent
+    + TouchEvent
+    + UpdateEvent
+    + From<Input>
+    + From<Loop>
+    + Into<Option<Input>>
+    + Into<Option<Loop>>
 {
     /// The id of this event.
     fn event_id(&self) -> EventId;
     /// Calls closure with arguments
     fn with_args<F, U>(&'_ self, f: F) -> U
-        where F: FnMut(&dyn Any) -> U;
+    where
+        F: FnMut(&dyn Any) -> U;
     /// Gets the time stamp of this event.
     ///
     /// Measured in milliseconds since initialization of window.
@@ -36,7 +57,7 @@ pub trait GenericEvent: Sized +
 
 impl GenericEvent for Event {
     fn event_id(&self) -> EventId {
-        use event_id::*;
+        use crate::event_id::*;
 
         match *self {
             Event::Input(Input::Cursor(_), _) => CURSOR,
@@ -60,7 +81,8 @@ impl GenericEvent for Event {
     }
 
     fn with_args<F, U>(&'_ self, mut f: F) -> U
-        where F: FnMut(&dyn Any) -> U
+    where
+        F: FnMut(&dyn Any) -> U,
     {
         match *self {
             Event::Input(Input::Cursor(cursor), _) => f(&cursor as &dyn Any),

@@ -1,6 +1,6 @@
 use std::borrow::ToOwned;
 
-use {Event, Input};
+use crate::{Event, Input};
 
 /// When receiving text from user, such as typing a character.
 pub trait TextEvent: Sized {
@@ -9,7 +9,9 @@ pub trait TextEvent: Sized {
     /// Preserves time stamp from original input event, if any.
     fn from_text(text: &str, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a text event.
-    fn text<U, F>(&self, f: F) -> Option<U> where F: FnMut(&str) -> U;
+    fn text<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(&str) -> U;
     /// Returns text arguments.
     fn text_args(&self) -> Option<String> {
         self.text(|text| text.to_owned())
@@ -18,12 +20,17 @@ pub trait TextEvent: Sized {
 
 impl TextEvent for Event {
     fn from_text(text: &str, old_event: &Self) -> Option<Self> {
-        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        let timestamp = if let Event::Input(_, x) = old_event {
+            *x
+        } else {
+            None
+        };
         Some(Event::Input(Input::Text(text.into()), timestamp))
     }
 
     fn text<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&str) -> U
+    where
+        F: FnMut(&str) -> U,
     {
         match *self {
             Event::Input(Input::Text(ref s), _) => Some(f(s)),
@@ -42,7 +49,8 @@ mod tests {
 
         let e: Event = Input::Text("".to_string()).into();
         let x: Option<Event> = TextEvent::from_text("hello", &e);
-        let y: Option<Event> = x.clone()
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .text(|text| TextEvent::from_text(text, x.as_ref().unwrap()))
             .unwrap();

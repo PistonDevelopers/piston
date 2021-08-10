@@ -1,4 +1,4 @@
-use {Event, Loop};
+use crate::{Event, Loop};
 
 /// Update arguments, such as delta time in seconds.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
@@ -16,7 +16,9 @@ pub trait UpdateEvent: Sized {
         UpdateEvent::from_update_args(&UpdateArgs { dt }, old_event)
     }
     /// Calls closure if this is an update event.
-    fn update<U, F>(&self, f: F) -> Option<U> where F: FnMut(&UpdateArgs) -> U;
+    fn update<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(&UpdateArgs) -> U;
     /// Returns update arguments.
     fn update_args(&self) -> Option<UpdateArgs> {
         self.update(|args| *args)
@@ -29,7 +31,8 @@ impl UpdateEvent for Event {
     }
 
     fn update<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&UpdateArgs) -> U
+    where
+        F: FnMut(&UpdateArgs) -> U,
     {
         match *self {
             Event::Loop(Loop::Update(ref args)) => Some(f(args)),
@@ -49,7 +52,8 @@ mod tests {
 
         let e: Event = UpdateArgs { dt: 0.0 }.into();
         let x: Option<Event> = UpdateEvent::from_update_args(&UpdateArgs { dt: 1.0 }, &e);
-        let y: Option<Event> = x.clone()
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .update(|args| UpdateEvent::from_update_args(args, x.as_ref().unwrap()))
             .unwrap();

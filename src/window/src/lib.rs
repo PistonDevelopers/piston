@@ -1,4 +1,15 @@
-#![deny(missing_docs, missing_copy_implementations, missing_debug_implementations)]
+#![deny(
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    future_incompatible,
+    nonstandard_style,
+    unused,
+    clippy::all,
+    clippy::doc_markdown,
+    missing_docs,
+    missing_copy_implementations,
+    missing_debug_implementations
+)]
 
 //! Window storage and interfacing traits.
 //!
@@ -21,16 +32,10 @@
 //! The [`Size`](./struct.Size.html) structure is used throughout Piston to store window sizes.
 //! It implements some conversion traits for convenience.
 
-extern crate graphics_api_version;
-extern crate input;
+use std::{convert::From, error::Error, time::Duration};
 
-use std::convert::From;
-use std::time::Duration;
-use std::error::Error;
+pub use graphics_api_version::{UnsupportedGraphicsApiError, Version as Api};
 use input::Event;
-
-pub use graphics_api_version::Version as Api;
-pub use graphics_api_version::UnsupportedGraphicsApiError;
 pub use no_window::NoWindow;
 
 mod no_window;
@@ -346,7 +351,6 @@ pub trait AdvancedWindow: Window + Sized {
     fn hide(&mut self);
 
     /// Gets the position of window.
-    ///
     // Returns `None` if the window no longer has a position.
     fn get_position(&self) -> Option<Position>;
 
@@ -385,7 +389,7 @@ pub trait AdvancedWindow: Window + Sized {
 /// using the `WindowSettings` structure.
 ///
 /// For more information about function pointer loading, see
-/// https://www.opengl.org/wiki/Load_OpenGL_Functions
+/// <https://www.opengl.org/wiki/Load_OpenGL_Functions>
 pub trait OpenGLWindow: Window {
     /// Returns the address of the specified OpenGL function if it exists.
     ///
@@ -427,7 +431,7 @@ impl WindowSettings {
     ///
     /// - samples: 0
     /// - fullscreen: false
-    /// - exit_on_esc: false
+    /// - `exit_on_esc`: false
     /// - vsync: false
     /// - srgb: true
     /// - resizable: true
@@ -577,7 +581,7 @@ impl WindowSettings {
 
     /// Gets the number of samples to use for anti-aliasing.
     ///
-    /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// See <https://en.wikipedia.org/wiki/Multisample_anti-aliasing>
     /// for more information.
     pub fn get_samples(&self) -> u8 {
         self.samples
@@ -585,7 +589,7 @@ impl WindowSettings {
 
     /// Sets the number of samples to use for anti-aliasing.
     ///
-    /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// See <https://en.wikipedia.org/wiki/Multisample_anti-aliasing>
     /// for more information.
     pub fn set_samples(&mut self, value: u8) {
         self.samples = value;
@@ -593,7 +597,7 @@ impl WindowSettings {
 
     /// Sets the number of samples to use for anti-aliasing.
     ///
-    /// See https://en.wikipedia.org/wiki/Multisample_anti-aliasing
+    /// See <https://en.wikipedia.org/wiki/Multisample_anti-aliasing>
     /// for more information.
     ///
     /// This method moves the current window data,
@@ -606,7 +610,7 @@ impl WindowSettings {
 
     /// Gets whether built windows should use vsync.
     ///
-    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
+    /// See <https://en.wikipedia.org/wiki/Screen_tearing> for more information>
     /// about vsync.
     pub fn get_vsync(&self) -> bool {
         self.vsync
@@ -614,7 +618,7 @@ impl WindowSettings {
 
     /// Sets whether built windows should use vsync.
     ///
-    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
+    /// See <https://en.wikipedia.org/wiki/Screen_tearing> for more information>
     /// about vsync.
     pub fn set_vsync(&mut self, value: bool) {
         self.vsync = value;
@@ -622,7 +626,7 @@ impl WindowSettings {
 
     /// Sets whether built windows should use vsync.
     ///
-    /// See https://en.wikipedia.org/wiki/Screen_tearing for more information
+    /// See <https://en.wikipedia.org/wiki/Screen_tearing> for more information>
     /// about vsync.
     ///
     /// This method moves the current window data,
@@ -689,13 +693,13 @@ impl WindowSettings {
     /// Gets whether built windows should use hardware accelerated color conversion.
     ///
     /// If true, the graphics hardware uses customized circuitry
-    /// to convert colors from sRGB to linear color space in graphics
-    /// shaders, and then converts pixel fragments back to sRGB
+    /// to convert colors from `sRGB` to linear color space in graphics
+    /// shaders, and then converts pixel fragments back to `sRGB`
     /// depending on the color format of the frame buffer. This feature
     /// is supported by most graphics hardware and set to true by
     /// default.
     ///
-    /// See https://en.wikipedia.org/wiki/SRGB for more information.
+    /// See <https://en.wikipedia.org/wiki/SRGB> for more information.
     pub fn get_srgb(&self) -> bool {
         self.srgb
     }
@@ -747,7 +751,7 @@ impl WindowSettings {
     /// header above the window, and the window border.
     ///
     /// For more information, see
-    /// https://en.wikipedia.org/wiki/Window_decoration
+    /// <https://en.wikipedia.org/wiki/Window_decoration>
     pub fn get_decorated(&self) -> bool {
         self.decorated
     }
@@ -758,7 +762,7 @@ impl WindowSettings {
     /// header above the window, and the window border.
     ///
     /// For more information, see
-    /// https://en.wikipedia.org/wiki/Window_decoration
+    /// <https://en.wikipedia.org/wiki/Window_decoration>
     pub fn set_decorated(&mut self, value: bool) {
         self.decorated = value;
     }
@@ -769,7 +773,7 @@ impl WindowSettings {
     /// header above the window, and the window border.
     ///
     /// For more information, see
-    /// https://en.wikipedia.org/wiki/Window_decoration
+    /// <https://en.wikipedia.org/wiki/Window_decoration>
     ///
     /// This method moves the current window data,
     /// unlike [`set_decorated()`](#method.set_decorated),

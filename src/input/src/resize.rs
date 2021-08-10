@@ -1,6 +1,6 @@
 use viewport::Viewport;
 
-use {Event, Input};
+use crate::{Event, Input};
 
 /// Resize arguments.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
@@ -29,7 +29,9 @@ pub trait ResizeEvent: Sized {
     /// Preserves time stamp from original input event, if any.
     fn from_resize_args(args: &ResizeArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a resize event.
-    fn resize<U, F>(&self, f: F) -> Option<U> where F: FnMut(&ResizeArgs) -> U;
+    fn resize<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(&ResizeArgs) -> U;
     /// Returns resize arguments.
     fn resize_args(&self) -> Option<ResizeArgs> {
         self.resize(|args| *args)
@@ -38,12 +40,17 @@ pub trait ResizeEvent: Sized {
 
 impl ResizeEvent for Event {
     fn from_resize_args(args: &ResizeArgs, old_event: &Self) -> Option<Self> {
-        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        let timestamp = if let Event::Input(_, x) = old_event {
+            *x
+        } else {
+            None
+        };
         Some(Event::Input(Input::Resize(*args), timestamp))
     }
 
     fn resize<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&ResizeArgs) -> U
+    where
+        F: FnMut(&ResizeArgs) -> U,
     {
         match *self {
             Event::Input(Input::Resize(ref args), _) => Some(f(args)),
@@ -61,11 +68,13 @@ mod tests {
         use super::super::Input;
 
         let args = ResizeArgs {
-            window_size: [100.0, 100.0], draw_size: [100, 100],
+            window_size: [100.0, 100.0],
+            draw_size: [100, 100],
         };
         let e: Event = Input::Resize(args).into();
         let x: Option<Event> = ResizeEvent::from_resize_args(&args, &e);
-        let y: Option<Event> = x.clone()
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .resize(|args| ResizeEvent::from_resize_args(args, x.as_ref().unwrap()))
             .unwrap();

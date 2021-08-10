@@ -1,0 +1,9 @@
+edition = "2018"
+use_try_shorthand = true
+use_field_init_shorthand = true
+hard_tabs = false
+
+unstable_features = true
+format_code_in_doc_comments = true
+imports_granularity = "crate"
+group_imports = "StdExternalCrate"

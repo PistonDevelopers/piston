@@ -1,6 +1,16 @@
 #![crate_name = "piston"]
-#![deny(clippy::doc_markdown, missing_docs)]
-#![warn(dead_code)]
+#![deny(
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    future_incompatible,
+    nonstandard_style,
+    unused,
+    clippy::all,
+    clippy::doc_markdown,
+    missing_docs,
+    missing_copy_implementations,
+    missing_debug_implementations
+)]
 
 //! A modular game engine written in Rust.
 //!
@@ -131,10 +141,6 @@
 //! For more information and an overview, see [Piston's README in the core repository](https://github.com/pistondevelopers/piston).
 
 // Reexported crates.
-pub extern crate input;
-pub extern crate event_loop;
-pub extern crate window;
-
-pub use input::*;
-pub use event_loop::*;
-pub use window::*;
+pub use event_loop::{self, *};
+pub use input::{self, *};
+pub use window::{self, *};
