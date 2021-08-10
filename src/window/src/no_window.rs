@@ -18,6 +18,7 @@ use std::error::Error;
 /// The size can be changed because the event loop does not emit
 /// [`Render`](../event_loop/trait.RenderEvent.html)
 /// events when the width or height is zero.
+#[derive(Debug)]
 pub struct NoWindow {
     should_close: bool,
     automatic_close: bool,

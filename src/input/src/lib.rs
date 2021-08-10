@@ -1,6 +1,5 @@
 #![crate_name = "input"]
-#![deny(missing_docs)]
-#![deny(missing_copy_implementations)]
+#![deny(missing_docs, missing_copy_implementations, missing_debug_implementations)]
 
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
