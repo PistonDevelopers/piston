@@ -1,13 +1,15 @@
 #![feature(test)]
 
-extern crate test;
 extern crate input;
+extern crate test;
 
-use test::Bencher;
 use input::{CursorEvent, Input};
+use test::Bencher;
 
 #[bench]
 fn bench_input_cursor(bencher: &mut Bencher) {
     let e = Input::Cursor(false);
-    bencher.iter(|| { let _: Option<Input> = CursorEvent::from_cursor(true, &e); });
+    bencher.iter(|| {
+        let _: Option<Input> = CursorEvent::from_cursor(true, &e);
+    });
 }

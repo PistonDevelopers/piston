@@ -1,11 +1,10 @@
-
 #![feature(test)]
 
-extern crate test;
 extern crate input;
+extern crate test;
 
+use input::{AfterRenderArgs, AfterRenderEvent, Input};
 use test::Bencher;
-use input::{Input, AfterRenderArgs, AfterRenderEvent};
 
 #[bench]
 fn bench_input_after_render(bencher: &mut Bencher) {

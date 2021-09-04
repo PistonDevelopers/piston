@@ -1,4 +1,3 @@
-
 //! An implementation of Window that runs without a window at all.
 //!
 //! It saves just enough information to implement the window interface,
@@ -6,11 +5,11 @@
 //!
 //! Often used in servers as an event loop.
 
-use {Window, WindowSettings, BuildFromWindowSettings, AdvancedWindow, Position, Size};
+use std::{error::Error, time::Duration};
 
 use input::Event;
-use std::time::Duration;
-use std::error::Error;
+
+use crate::{AdvancedWindow, BuildFromWindowSettings, Position, Size, Window, WindowSettings};
 
 /// A window without user interface, often used in server event loops.
 ///

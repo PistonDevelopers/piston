@@ -1,5 +1,16 @@
 #![crate_name = "input"]
-#![deny(missing_docs, missing_copy_implementations, missing_debug_implementations)]
+#![deny(
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    future_incompatible,
+    nonstandard_style,
+    unused,
+    clippy::all,
+    clippy::doc_markdown,
+    missing_docs,
+    missing_copy_implementations,
+    missing_debug_implementations
+)]
 
 //! A flexible structure for user interactions
 //! to be used in window frameworks and widgets libraries.
@@ -8,39 +19,32 @@
 extern crate bitflags;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
-extern crate viewport;
 
-use std::fmt;
-use std::any::Any;
-use std::sync::Arc;
-use std::path::PathBuf;
-use std::cmp::Ordering;
+use std::{any::Any, cmp::Ordering, fmt, path::PathBuf, sync::Arc};
 
-pub use mouse::MouseButton;
-pub use keyboard::Key;
 pub use controller::{ControllerAxisArgs, ControllerButton, ControllerHat};
+pub use keyboard::Key;
+pub use mouse::MouseButton;
 
 pub mod controller;
 pub mod keyboard;
 pub mod mouse;
 
 pub use after_render::{AfterRenderArgs, AfterRenderEvent};
+pub use button::{ButtonArgs, ButtonEvent, ButtonState, PressEvent, ReleaseEvent};
 pub use close::{CloseArgs, CloseEvent};
 pub use controller::ControllerAxisEvent;
 pub use cursor::CursorEvent;
+use event_id::EventId;
 pub use focus::FocusEvent;
 pub use generic_event::GenericEvent;
 pub use idle::{IdleArgs, IdleEvent};
 pub use mouse::{MouseCursorEvent, MouseRelativeEvent, MouseScrollEvent};
-pub use button::{ButtonState, ButtonArgs, ButtonEvent, PressEvent, ReleaseEvent};
-pub use resize::{ResizeArgs, ResizeEvent};
 pub use render::{RenderArgs, RenderEvent};
+pub use resize::{ResizeArgs, ResizeEvent};
 pub use text::TextEvent;
 pub use touch::{Touch, TouchArgs, TouchEvent};
 pub use update::{UpdateArgs, UpdateEvent};
-
-use event_id::EventId;
 
 pub mod event_id;
 pub mod generic_event;
@@ -180,7 +184,7 @@ pub enum Event {
 }
 
 impl fmt::Debug for Event {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Event::Input(ref input, _) => write!(f, "{:?}", input),
             Event::Loop(ref l) => write!(f, "{:?}", l),
@@ -210,8 +214,11 @@ impl PartialOrd for Event {
             (&Loop(ref a), &Loop(ref b)) => a.partial_cmp(b),
             (&Custom(ref a_id, _, _), &Custom(ref b_id, _, _)) => {
                 let res = a_id.partial_cmp(b_id);
-                if res == Some(Ordering::Equal) {None}
-                else {res}
+                if res == Some(Ordering::Equal) {
+                    None
+                } else {
+                    res
+                }
             }
             (&Input(_, _), _) => Some(Ordering::Less),
             (_, &Input(_, _)) => Some(Ordering::Greater),
@@ -330,7 +337,8 @@ impl From<CloseArgs> for Input {
 }
 
 impl<T> From<T> for Event
-    where Input: From<T>
+where
+    Input: From<T>,
 {
     fn from(args: T) -> Self {
         Event::Input(args.into(), None)
@@ -338,7 +346,8 @@ impl<T> From<T> for Event
 }
 
 impl<T> From<(T, Option<TimeStamp>)> for Event
-    where Input: From<T>
+where
+    Input: From<T>,
 {
     fn from(args: (T, Option<TimeStamp>)) -> Self {
         Event::Input(args.0.into(), args.1)

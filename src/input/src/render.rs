@@ -1,6 +1,6 @@
 use viewport::Viewport;
 
-use {Event, Loop};
+use crate::{Event, Loop};
 
 /// Render arguments.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
@@ -29,7 +29,9 @@ pub trait RenderEvent: Sized {
     /// Creates a render event.
     fn from_render_args(args: &RenderArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a render event.
-    fn render<U, F>(&self, f: F) -> Option<U> where F: FnMut(&RenderArgs) -> U;
+    fn render<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(&RenderArgs) -> U;
     /// Returns render arguments.
     fn render_args(&self) -> Option<RenderArgs> {
         self.render(|args| *args)
@@ -42,7 +44,8 @@ impl RenderEvent for Event {
     }
 
     fn render<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&RenderArgs) -> U
+    where
+        F: FnMut(&RenderArgs) -> U,
     {
         match *self {
             Event::Loop(Loop::Render(ref args)) => Some(f(args)),
@@ -63,14 +66,18 @@ mod tests {
             ext_dt: 0.0,
             window_size: [0.0, 0.0],
             draw_size: [0, 0],
-        }.into();
-        let x: Option<Event> = RenderEvent::from_render_args(&RenderArgs {
-                                                                 ext_dt: 1.0,
-                                                                 window_size: [10.0, 10.0],
-                                                                 draw_size: [10, 10],
-                                                             },
-                                                             &e);
-        let y: Option<Event> = x.clone()
+        }
+        .into();
+        let x: Option<Event> = RenderEvent::from_render_args(
+            &RenderArgs {
+                ext_dt: 1.0,
+                window_size: [10.0, 10.0],
+                draw_size: [10, 10],
+            },
+            &e,
+        );
+        let y: Option<Event> = x
+            .clone()
             .unwrap()
             .render(|args| RenderEvent::from_render_args(args, x.as_ref().unwrap()))
             .unwrap();

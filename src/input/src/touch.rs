@@ -1,4 +1,4 @@
-use {Event, Input, Motion};
+use crate::{Event, Input, Motion};
 
 /// Stores the touch state.
 #[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
@@ -59,12 +59,13 @@ impl TouchArgs {
     /// Creates arguments for 3D touch.
     ///
     /// The pressure direction vector should have maximum length 1.
-    pub fn new_3d(device: i64,
-                  id: i64,
-                  position_3d: [f64; 3],
-                  pressure_3d: [f64; 3],
-                  touch: Touch)
-                  -> TouchArgs {
+    pub fn new_3d(
+        device: i64,
+        id: i64,
+        position_3d: [f64; 3],
+        pressure_3d: [f64; 3],
+        touch: Touch,
+    ) -> TouchArgs {
         TouchArgs {
             device,
             id,
@@ -81,7 +82,9 @@ impl TouchArgs {
     }
 
     /// The position of the touch in 3D.
-    pub fn position_3d(&self) -> [f64; 3] {self.position_3d}
+    pub fn position_3d(&self) -> [f64; 3] {
+        self.position_3d
+    }
 
     /// The pressure magnitude, normalized 0..1.
     pub fn pressure(&self) -> f64 {
@@ -92,7 +95,9 @@ impl TouchArgs {
     }
 
     /// The pressure vector in 3D.
-    pub fn pressure_3d(&self) -> [f64; 3] {self.pressure_3d}
+    pub fn pressure_3d(&self) -> [f64; 3] {
+        self.pressure_3d
+    }
 }
 
 /// When a touch is started, moved, ended or cancelled.
@@ -102,7 +107,9 @@ pub trait TouchEvent: Sized {
     /// Preserves time stamp from original input event, if any.
     fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self>;
     /// Calls closure if this is a touch event.
-    fn touch<U, F>(&self, f: F) -> Option<U> where F: FnMut(&TouchArgs) -> U;
+    fn touch<U, F>(&self, f: F) -> Option<U>
+    where
+        F: FnMut(&TouchArgs) -> U;
     /// Returns touch arguments.
     fn touch_args(&self) -> Option<TouchArgs> {
         self.touch(|args| *args)
@@ -111,12 +118,17 @@ pub trait TouchEvent: Sized {
 
 impl TouchEvent for Event {
     fn from_touch_args(args: &TouchArgs, old_event: &Self) -> Option<Self> {
-        let timestamp = if let Event::Input(_, x) = old_event {*x} else {None};
+        let timestamp = if let Event::Input(_, x) = old_event {
+            *x
+        } else {
+            None
+        };
         Some(Event::Input(Input::Move(Motion::Touch(*args)), timestamp))
     }
 
     fn touch<U, F>(&self, mut f: F) -> Option<U>
-        where F: FnMut(&TouchArgs) -> U
+    where
+        F: FnMut(&TouchArgs) -> U,
     {
         match *self {
             Event::Input(Input::Move(Motion::Touch(ref args)), _) => Some(f(args)),
@@ -135,15 +147,14 @@ mod tests {
         let e: Event = TouchArgs::new(0, 0, pos, 1.0, Touch::Start).into();
         let a: Option<Event> =
             TouchEvent::from_touch_args(&TouchArgs::new(0, 0, pos, 1.0, Touch::Start), &e);
-        let b: Option<Event> = a.clone()
+        let b: Option<Event> = a
+            .clone()
             .unwrap()
             .touch(|t| {
-                TouchEvent::from_touch_args(&TouchArgs::new(t.device,
-                                                            t.id,
-                                                            t.position(),
-                                                            t.pressure(),
-                                                            Touch::Start),
-                                            a.as_ref().unwrap())
+                TouchEvent::from_touch_args(
+                    &TouchArgs::new(t.device, t.id, t.position(), t.pressure(), Touch::Start),
+                    a.as_ref().unwrap(),
+                )
             })
             .unwrap();
         assert_eq!(a, b);
@@ -158,15 +169,20 @@ mod tests {
         let e: Event = TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start).into();
         let a: Option<Event> =
             TouchEvent::from_touch_args(&TouchArgs::new_3d(0, 0, pos, pressure, Touch::Start), &e);
-        let b: Option<Event> = a.clone()
+        let b: Option<Event> = a
+            .clone()
             .unwrap()
             .touch(|t| {
-                TouchEvent::from_touch_args(&TouchArgs::new_3d(t.device,
-                                                               t.id,
-                                                               t.position_3d(),
-                                                               t.pressure_3d(),
-                                                               Touch::Start),
-                                            a.as_ref().unwrap())
+                TouchEvent::from_touch_args(
+                    &TouchArgs::new_3d(
+                        t.device,
+                        t.id,
+                        t.position_3d(),
+                        t.pressure_3d(),
+                        Touch::Start,
+                    ),
+                    a.as_ref().unwrap(),
+                )
             })
             .unwrap();
         assert_eq!(a, b);
