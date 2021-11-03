@@ -1,6 +1,6 @@
 [package]
 name = "pistoncore-window"
-version = "0.47.0"
+version = "0.47.1"
 edition = "2018"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
@@ -21,7 +21,7 @@ path = "src/lib.rs"
 
 [dependencies.pistoncore-input]
 path = "../input"
-version = "1.0.0"
+version = "1.0.1"
 
 [dependencies]
 piston-graphics_api_version = "1.0.0"

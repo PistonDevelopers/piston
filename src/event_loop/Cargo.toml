@@ -1,6 +1,6 @@
 [package]
 name = "pistoncore-event_loop"
-version = "0.53.0"
+version = "0.53.1"
 edition = "2018"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
@@ -25,8 +25,8 @@ spin_sleep = "1.0.0"
 
 [dependencies.pistoncore-window]
 path = "../window"
-version = "0.47.0"
+version = "0.47.1"
 
 [dependencies.pistoncore-input]
 path = "../input"
-version = "1.0.0"
+version = "1.0.1"
