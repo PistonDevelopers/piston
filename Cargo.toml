@@ -1,6 +1,6 @@
 [package]
 name = "piston"
-version = "0.53.1"
+version = "0.53.2"
 edition = "2018"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
