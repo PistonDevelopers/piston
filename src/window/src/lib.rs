@@ -431,12 +431,15 @@ impl WindowSettings {
     ///
     /// - samples: 0
     /// - fullscreen: false
-    /// - `exit_on_esc`: false
+    /// - exit_on_esc: false
+    /// - automatic_close: true
     /// - vsync: false
+    /// - graphics_api: None
     /// - srgb: true
     /// - resizable: true
     /// - decorated: true
     /// - controllers: true
+    /// - transparent: false
     pub fn new<T: Into<String>, S: Into<Size>>(title: T, size: S) -> WindowSettings {
         WindowSettings {
             title: title.into(),
