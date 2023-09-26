@@ -1,6 +1,6 @@
 [package]
 name = "pistoncore-window"
-version = "0.47.1"
+version = "1.0.0"
 edition = "2018"
 authors = [
     "bvssvni <bvssvni@gmail.com>",
