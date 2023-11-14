@@ -29,6 +29,9 @@ exclude = ["images/*", "Cargo.png"]
 name = "piston"
 path = "./src/lib.rs"
 
+[features]
+async = ["pistoncore-event_loop/async"]
+
 [dependencies.pistoncore-input]
 path = "src/input"
 version = "1.0.1"
