@@ -108,6 +108,7 @@
 //! - [pistoncore-glutin_window](https://github.com/pistondevelopers/glutin_window)
 //! - [pistoncore-sdl2_window](https://github.com/pistondevelopers/sdl2_window)
 //! - [pistoncore-glfw_window](https://github.com/pistondevelopers/glfw_window)
+//! - [pistoncore-winit_window](https://github.com/PistonDevelopers/winit_window)
 //!
 //! There are a [few other window backends as well](https://crates.io/search?q=piston%20window).
 //!
@@ -116,6 +117,7 @@
 //! - [piston2d-opengl_graphics](https://github.com/pistondevelopers/opengl_graphics)
 //! - [piston2d-gfx_graphics](https://github.com/pistondevelopers/gfx_graphics)
 //! - [piston2d-glium_graphics](https://github.com/pistondevelopers/glium_graphics)
+//! - [piston2d-wgpu_graphics](https://github.com/PistonDevelopers/wgpu_graphics)
 //!
 //! There are a [few other graphics backends as well](https://crates.io/search?q=piston%20graphics).
 //!
