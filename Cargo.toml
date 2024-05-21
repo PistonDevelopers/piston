@@ -23,7 +23,7 @@ repository = "https://github.com/PistonDevelopers/piston.git"
 homepage = "https://github.com/PistonDevelopers/piston"
 documentation = "https://docs.rs/piston"
 readme = "README.md"
-exclude = ["images/*", "Cargo.png"]
+exclude = ["images/*"]
 
 [lib]
 name = "piston"
