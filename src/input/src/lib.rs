@@ -17,6 +17,7 @@
 
 #[macro_use]
 extern crate bitflags;
+#[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde_derive;
 
@@ -67,7 +68,8 @@ mod update;
 pub type TimeStamp = u32;
 
 /// Models different kinds of buttons.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Ord, Eq, Hash, Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash, Debug)]
 pub enum Button {
     /// A keyboard button.
     Keyboard(Key),
@@ -80,7 +82,8 @@ pub enum Button {
 }
 
 /// Models different kinds of motion.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub enum Motion {
     /// Position in window coordinates.
     MouseCursor([f64; 2]),
@@ -95,7 +98,8 @@ pub enum Motion {
 }
 
 /// Stores controller hat state.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub enum HatState {
     /// Centered (no direction).
     Centered,
@@ -118,7 +122,8 @@ pub enum HatState {
 }
 
 /// Models dragging and dropping files.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum FileDrag {
     /// A file is being hovered over the window.
     Hover(PathBuf),
@@ -129,7 +134,8 @@ pub enum FileDrag {
 }
 
 /// Models input events.
-#[derive(Clone, Debug, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum Input {
     /// Changed button state.
     Button(ButtonArgs),
@@ -150,7 +156,8 @@ pub enum Input {
 }
 
 /// Models loop events.
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub enum Loop {
     /// Render graphics.
     Render(RenderArgs),

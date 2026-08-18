@@ -1,7 +1,8 @@
 use crate::{Event, Input, Motion};
 
 /// Stores the touch state.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub enum Touch {
     /// The start of touch, for example
     /// a finger pressed down on a touch screen.
@@ -27,7 +28,8 @@ pub enum Touch {
 ///
 /// For 2D touch the pressure is pointed in the z direction.
 /// Use `.pressure()` to get the pressure magnitude.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, PartialOrd, Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct TouchArgs {
     /// A unique identifier for touch device.
     pub device: i64,

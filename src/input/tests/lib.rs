@@ -1,8 +1,11 @@
 extern crate input;
+#[cfg(feature = "test")]
 extern crate serde_json;
 
+#[cfg(feature = "test")]
 use input::*;
 
+#[cfg(feature = "test")]
 #[test]
 fn test_encode_decode() {
     let test = |input| {

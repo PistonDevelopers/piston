@@ -3,7 +3,8 @@ use viewport::Viewport;
 use crate::{Event, Loop};
 
 /// Render arguments.
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct RenderArgs {
     /// Extrapolated time in seconds, used to do smooth animation.
     pub ext_dt: f64,

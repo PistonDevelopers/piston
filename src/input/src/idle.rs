@@ -1,7 +1,8 @@
 use crate::{Event, Loop};
 
 /// Idle arguments, such as expected idle time in seconds.
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct IdleArgs {
     /// Expected idle time in seconds.
     pub dt: f64,
