@@ -388,7 +388,12 @@ impl Events {
     where
         W: Window,
     {
+        #[cfg(feature = "spin_sleep")]
         let sleep = spin_sleep::sleep;
+
+        #[cfg(not(feature = "spin_sleep"))]
+        let sleep = std::thread::sleep;
+
         next_with_sleep!(self, window, sleep)
     }
 
