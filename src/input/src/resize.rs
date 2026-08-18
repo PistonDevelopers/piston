@@ -3,7 +3,8 @@ use viewport::Viewport;
 use crate::{Event, Input};
 
 /// Resize arguments.
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct ResizeArgs {
     /// The width and height of rendered area in points.
     pub window_size: [f64; 2],

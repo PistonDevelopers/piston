@@ -7,7 +7,7 @@ use crate::{Button, GenericEvent};
 // Defining every combination to allow assignment in static expressions.
 bitflags!(
     #[allow(missing_docs)]
-    #[derive(Deserialize, Serialize)]
+    #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
     pub struct ModifierKey: u8 {
         /// No modifier.
         const NO_MODIFIER           = 0b0000_0000;
@@ -95,7 +95,8 @@ impl Default for ModifierKey {
 /// Represent a keyboard key.
 /// Keycodes follows SDL <http://wiki.libsdl.org/SDLKeycodeLookup>
 #[allow(missing_docs)]
-#[derive(Copy, Clone, Deserialize, Serialize, Debug, PartialOrd, PartialEq, Ord, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Ord, Eq, Hash)]
 pub enum Key {
     Unknown = 0x00,
     Backspace = 0x08,

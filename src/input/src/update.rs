@@ -1,7 +1,8 @@
 use crate::{Event, Loop};
 
 /// Update arguments, such as delta time in seconds.
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct UpdateArgs {
     /// Delta time in seconds.
     pub dt: f64,

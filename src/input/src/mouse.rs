@@ -3,7 +3,8 @@
 use crate::{Event, Input, Motion};
 
 /// Represent a mouse button.
-#[derive(Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Ord, PartialOrd, Hash, Debug)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, Eq, Ord, PartialOrd, Hash, Debug)]
 pub enum MouseButton {
     /// Unknown mouse button.
     Unknown,

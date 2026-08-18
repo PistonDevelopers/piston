@@ -1,7 +1,8 @@
 use crate::{Event, Loop};
 
 /// After render arguments.
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Deserialize, Serialize, Hash)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct AfterRenderArgs;
 
 /// After rendering and buffers are swapped.

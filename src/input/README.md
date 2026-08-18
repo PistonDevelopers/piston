@@ -12,4 +12,14 @@ This library contains:
 * Window focus
 * Modifier keys
 
+### Serialization
+
+Serde is enabled behind the feature flag "serde".
+
+When you run tests on this library, use the following:
+
+```text
+cargo test --features test
+```
+
 [How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
