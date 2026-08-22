@@ -97,6 +97,7 @@ impl Default for ModifierKey {
 #[allow(missing_docs)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Ord, Eq, Hash)]
+#[repr(u32)]
 pub enum Key {
     Unknown = 0x00,
     Backspace = 0x08,

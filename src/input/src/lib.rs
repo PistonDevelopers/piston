@@ -67,6 +67,18 @@ mod update;
 /// Measured in milliseconds since initialization of window.
 pub type TimeStamp = u32;
 
+/// The type of scancode for physical buttons.
+///
+/// This is i32 to reflect the library bindings for SDL.
+pub type Scancode = i32;
+
+/// The type of actioncode for button actions.
+///
+/// These codes are determined by the application.
+///
+/// See [Button::Action] for more information.
+pub type Actioncode = u32;
+
 /// Models different kinds of buttons.
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[derive(Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash, Debug)]
@@ -79,6 +91,18 @@ pub enum Button {
     Controller(ControllerButton),
     /// A controller hat (d-Pad)
     Hat(ControllerHat),
+    /// A custom action.
+    ///
+    /// These codes are decided by the application.
+    /// Instead of passing around button settings
+    /// to every controller and widget
+    /// when the user changes input configurations,
+    /// it is simpler to set up actions and map button events
+    /// at application level, before passing the event to
+    /// controllers and widgets.
+    ///
+    /// You can use [ButtonEvent::map_to_action] to map to an action.
+    Action(Actioncode),
 }
 
 /// Models different kinds of motion.
@@ -398,5 +422,19 @@ mod tests {
         chk::<Input>();
         chk::<Loop>();
         chk::<Event>();
+    }
+
+    #[test]
+    fn test_map_to_action() {
+        fn foo<E: GenericEvent + Clone>(e: &E) -> E {
+            e.clone().map_to_action(|_, _| 42)
+        }
+
+        let e = foo(&Event::Input(Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Keyboard(Key::A),
+            scancode: None,
+        }), None));
+        assert_eq!(e.press_args(), Some(Button::Action(42)));
     }
 }
