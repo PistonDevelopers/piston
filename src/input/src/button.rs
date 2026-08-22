@@ -21,12 +21,12 @@ pub struct ButtonArgs {
     /// An optional scancode that tells the physical layout of a keyboard key.
     /// For other devices than keyboard, this is set to `None`.
     ///
-    /// Scancode follows SDL (https://wiki.libsdl.org/SDL_Scancode).
+    /// Scancode follows SDL (<https://wiki.libsdl.org/SDL3/CategoryScancode>).
     ///
     /// This is stored here to make `Button` equality check work with keyboard layouts.
     ///
     /// Some window backends might not support scancodes.
-    /// To test a window backend, use https://github.com/PistonDevelopers/piston-examples/tree/master/user_input
+    /// To test a window backend, see <https://github.com/PistonDevelopers/piston/issues/1417>.
     pub scancode: Option<Scancode>,
 }
 
