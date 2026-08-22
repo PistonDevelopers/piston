@@ -1,4 +1,4 @@
-use crate::{Button, Event, Input};
+use crate::{Actioncode, Button, Event, Input, Scancode};
 
 /// Stores button state.
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
@@ -27,7 +27,7 @@ pub struct ButtonArgs {
     ///
     /// Some window backends might not support scancodes.
     /// To test a window backend, use https://github.com/PistonDevelopers/piston-examples/tree/master/user_input
-    pub scancode: Option<i32>,
+    pub scancode: Option<Scancode>,
 }
 
 /// Changed button state.
@@ -43,6 +43,27 @@ pub trait ButtonEvent: Sized {
     /// Returns button arguments.
     fn button_args(&self) -> Option<ButtonArgs> {
         self.button(|args| args)
+    }
+
+    /// Maps button to some action.
+    ///
+    /// Other events than button events are preserved.
+    ///
+    /// This transformation preserves the scancode,
+    /// in case you need to know which physical button caused the action.
+    ///
+    /// If creating the event was unsuccessful, then the event remains unchanged.
+    fn map_to_action<F>(self, f: F) -> Self
+    where
+        F: FnOnce(Button, Option<Scancode>) -> Actioncode
+    {
+        if let Some(args) = self.button_args() {
+            Self::from_button_args(ButtonArgs {
+                state: args.state,
+                button: Button::Action(f(args.button, args.scancode)),
+                scancode: args.scancode,                
+            }, &self).unwrap_or(self)
+        } else {self}
     }
 }
 
