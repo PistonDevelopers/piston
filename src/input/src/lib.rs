@@ -12,8 +12,7 @@
     missing_debug_implementations
 )]
 
-//! A flexible structure for user interactions
-//! to be used in window frameworks and widgets libraries.
+#![doc = include_str!("../README.md")]
 
 #[macro_use]
 extern crate bitflags;
