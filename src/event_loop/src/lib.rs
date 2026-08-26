@@ -1,4 +1,3 @@
-//! A Piston event loop for games and interactive applications
 
 #![deny(
     rust_2018_compatibility,
@@ -12,6 +11,8 @@
     missing_copy_implementations,
     missing_debug_implementations
 )]
+
+#![doc = include_str!("../README.md")]
 
 use std::{
     cmp,

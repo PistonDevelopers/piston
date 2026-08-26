@@ -11,26 +11,7 @@
     missing_debug_implementations
 )]
 
-//! Window storage and interfacing traits.
-//!
-//! The [`Window`](./trait.Window.html) trait is the minimum interface required for event loop.
-//! All backends usually support this trait.
-//!
-//! The [`AdvancedWindow`](./trait.AdvancedWindow.html) trait
-//! is the maximum interface that can be provided,
-//! while still staying consistent between backends. Not all backends implement
-//! `AdvancedWindow`; check your backend's documentation to see whether it implements
-//! this trait.
-//!
-//! The [`WindowSettings`](./struct.WindowSettings.html) structure is the preferred way of building
-//! new windows in Piston. It uses the `BuildFromWindowSettings` trait,
-//! which backends implement to handle window creation and setup.
-//!
-//! The [`OpenGLWindow`](./trait.OpenGLWindow.html) trait is used to provide low-level
-//! access to OpenGL through the abstract Piston API.
-//!
-//! The [`Size`](./struct.Size.html) structure is used throughout Piston to store window sizes.
-//! It implements some conversion traits for convenience.
+#![doc = include_str!("../README.md")]
 
 use std::{convert::From, error::Error, time::Duration};
 
